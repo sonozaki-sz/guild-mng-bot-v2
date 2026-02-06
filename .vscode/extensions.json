@@ -1,0 +1,51 @@
+{
+  "recommendations": [
+    // === 必須 ===
+    // TypeScript/JavaScript
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "yoavbls.pretty-ts-errors",
+
+    // エラー表示
+    "usernamehw.errorlens",
+
+    // === 開発効率化 ===
+    // Git管理
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // パス補完
+    "christian-kohler.path-intellisense",
+    "christian-kohler.npm-intellisense",
+
+    // TODO管理
+    "gruntfuggly.todo-tree",
+
+    // スペルチェック
+    "streetsidesoftware.code-spell-checker",
+
+    // === プロジェクト固有 ===
+    // テスト
+    "orta.vscode-jest",
+    "firsttris.vscode-jest-runner",
+
+    // データベース
+    "prisma.prisma",
+
+    // REST Client (API開発・テスト用)
+    "humao.rest-client",
+
+    // Docker
+    "ms-azuretools.vscode-docker",
+
+    // === オプション ===
+    // コラボレーション
+    "ms-vsliveshare.vsliveshare",
+
+    // GitHub Copilot
+    "github.copilot",
+    "github.copilot-chat"
+  ],
+  "unwantedRecommendations": []
+}

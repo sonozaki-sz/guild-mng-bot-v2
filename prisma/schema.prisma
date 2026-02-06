@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Guild Configuration
+model GuildConfig {
+  id        String   @id @default(cuid())
+  guildId   String   @unique
+  locale    String   @default("ja")
+  timezone  String   @default("Asia/Tokyo")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("guild_configs")
+}
+
+// 将来的に追加予定のモデル
+// - VacConfig (VC自動作成設定)
+// - BumpReminderConfig (Bump通知設定)
+// - StickyMessageConfig (固定メッセージ設定)
+// - LeaveMemberLogConfig (退出ログ設定)
