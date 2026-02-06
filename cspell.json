@@ -1,0 +1,68 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaries": ["typescript", "node", "npm"],
+  "ignoreRegExpList": [],
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    ".build/**",
+    "coverage/**",
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "*.log"
+  ],
+  "words": [
+    // Discord.js関連
+    "discordjs",
+    "Repliable",
+    "Interactionable",
+    "Snowflake",
+    "Webhooks",
+    "Embeds",
+    "Partials",
+    "Intents",
+    "Opcodes",
+    // Prisma関連
+    "prisma",
+    "datasource",
+    "datetime",
+    "createdAt",
+    "updatedAt",
+    // プロジェクト固有
+    "keyvs",
+    "cnfAfk",
+    "cnfBumpReminder",
+    "cnfProfChannel",
+    "cnfVac",
+    "cnfVc",
+    "afk",
+    "vac",
+    "vc",
+    "mng",
+    "bot",
+    "guild",
+    // TypeScript/ツール関連
+    "tsconfig",
+    "tsbuildinfo",
+    "pnpm",
+    "esbenp",
+    "vscode",
+    "jsonc",
+    "typeof",
+    // 一般的な技術用語
+    "readonly",
+    "async",
+    "await",
+    "enum",
+    "args",
+    "env",
+    "config",
+    "utils",
+    "middleware",
+    "healthcheck",
+    "repo",
+    "repos",
+    "deferred"
+  ]
+}

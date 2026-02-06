@@ -3,231 +3,305 @@ import catalogJa from "./ja";
 // import catalogEn from "./en";
 
 export type Vocabulary = {
-    // 凡例: "翻訳ID": Message<{ 引数 }>; (引数がないときは単に Message でOK)
-    // 共通
-    "success": Message,
-    "info": Message,
-    "warn": Message,
-    "error": Message,
-    "enabled": Message,
-    "disabled": Message,
-    "peaple": Message,
-    "unlimited": Message,
-    "executing": Message,
-    "stopping": Message,
-    "userId": Message,
-    "displayName": Message,
-    "nickname": Message,
-    "unset": Message,
-    "role": Message,
-    "profile": Message,
-    "blank": Message,
-    "accountCreationDateTime": Message,
-    "serverJoinDateTime": Message,
-    "authority": Message,
-    "grouwing": Message,
-    "toFirst": Message,
-    "toPrevious": Message,
-    "delete": Message,
-    "toNext": Message,
-    "toLast": Message,
-    "selectPage": Message,
-    "footer/page": Message<{ page: string }>,
-    "rps/selectMenu/selectHand": Message,
-    "rps/rock": Message,
-    "rps/paper": Message,
-    "rps/scissors": Message,
-    "notting": Message,
-    "status": Message,
-    "destChannel": Message,
-    "triggerVc": Message,
-    "createdVc": Message,
-    "mentionRole": Message,
-    "mentionUsers": Message,
-    "notFoundUser": Message,
-    "doDelete": Message,
-    "cancel": Message,
-    "operationTimedOut": Message,
-    "stickMessageChannel": Message,
-    "leaveMemberLogSendChannel": Message,
+  // 凡例: "翻訳ID": Message<{ 引数 }>; (引数がないときは単に Message でOK)
+  // 共通
+  success: Message;
+  info: Message;
+  warn: Message;
+  error: Message;
+  enabled: Message;
+  disabled: Message;
+  peaple: Message;
+  unlimited: Message;
+  executing: Message;
+  stopping: Message;
+  userId: Message;
+  displayName: Message;
+  nickname: Message;
+  unset: Message;
+  role: Message;
+  profile: Message;
+  blank: Message;
+  accountCreationDateTime: Message;
+  serverJoinDateTime: Message;
+  authority: Message;
+  grouwing: Message;
+  toFirst: Message;
+  toPrevious: Message;
+  delete: Message;
+  toNext: Message;
+  toLast: Message;
+  selectPage: Message;
+  "footer/page": Message<{ page: string }>;
+  "rps/selectMenu/selectHand": Message;
+  "rps/rock": Message;
+  "rps/paper": Message;
+  "rps/scissors": Message;
+  notting: Message;
+  status: Message;
+  destChannel: Message;
+  triggerVc: Message;
+  createdVc: Message;
+  mentionRole: Message;
+  mentionUsers: Message;
+  notFoundUser: Message;
+  doDelete: Message;
+  cancel: Message;
+  operationTimedOut: Message;
+  stickMessageChannel: Message;
+  leaveMemberLogSendChannel: Message;
 
-    // log
-    "log/keyvs/set": Message<{ namespace: string }>,
-    "log/keyvs/reset": Message<{ namespace: string }>,
-    "log/keyvs/delete": Message<{ namespace: string }>,
-    "log/bot/login": Message<{ name: string }>,
-    "log/bot/login/faild": Message<{ error: string }>,
-    "log/bot/keyvs/delete/faild": Message<{ guild: string, error: string }>,
-    "log/bot/vcAutoCreation/createTriggerChannel": Message<{ guild: string, channel: string }>,
-    "log/bot/vcAutoCreation/deleteTriggerChannel": Message<{ guild: string, channel: string }>,
-    "log/bot/vcAutoCreation/deleteAutoCreatedChannel": Message<{ guild: string, channel: string }>,
-    "log/bot/vcAutoCreation/error": Message<{ guild: string, error: string }>,
-    "log/bot/vcAutoCreation/createChannel": Message<{ guild: string, channel: string }>,
-    "log/bot/vcAutoCreation/deleteChannel": Message<{ guild: string, channel: string }>,
-    "log/bot/vcAutoCreation/channelAlreadyDeleted": Message<{ guild: string, channel: string }>,
-    "log/bot/vcAutoCreation/deleteChannelFailed": Message<{ guild: string, channel: string, error: string }>,
-    "log/bot/bumpReminder/start": Message<{ guild: string }>,
-    "log/bot/bumpReminder/stop": Message<{ guild: string }>,
-    "log/bot/bumpReminder/setRemind": Message<{ guild: string, user: string }>,
-    "log/bot/bumpReminder/cancelRemind": Message<{ guild: string, user: string }>,
-    "log/bot/bumpReminder/remind": Message<{ guild: string }>,
-    "log/bot/bumpReminder/detectBump": Message<{ guild: string }>,
-    "log/bot/bumpReminder/error": Message<{ guild: string, channel: string, error: string }>,
-    "log/bot/stickMessage/execute": Message<{ guild: string, channel: string }>,
-    "log/bot/stickMessage/error": Message<{ guild: string, channel: string, error: string }>,
-    "log/bot/event/set": Message<{ name: string }>,
-    "log/bot/command/register/pre": Message<{ commandNames: string }>,
-    "log/bot/command/register/complated": Message,
-    "log/bot/command/register/faild": Message<{ error: string }>,
-    "log/bot/command/notFound": Message<{ command: string }>,
-    "log/bot/command/execute/success": Message<{ command: string, guild: string }>,
-    "log/bot/command/execute/faild": Message<{ command: string, guild: string, error: string }>,
-    "log/bot/command/autocomplete/undefined": Message<{ command: string }>,
-    "log/bot/command/autocomplete/success": Message<{ command: string, guild: string }>,
-    "log/bot/command/autocomplete/faild": Message<{ command: string, guild: string, error: string }>,
-    "log/bot/command/modal/notFound": Message<{ modal: string }>,
-    "log/bot/command/modal/success": Message<{ modal: string, guild: string }>,
-    "log/bot/command/modal/faild": Message<{ modal: string, guild: string, error: string }>,
-    "log/bot/guildEntry": Message<{ guild: string }>,
-    "log/bot/guildLeaving": Message<{ guild: string }>,
-    "log/bot/sendMemberLeaveLog": Message<{ guild: string, channel: string, user: string }>,
+  // log
+  "log/keyvs/set": Message<{ namespace: string }>;
+  "log/keyvs/reset": Message<{ namespace: string }>;
+  "log/keyvs/delete": Message<{ namespace: string }>;
+  "log/bot/login": Message<{ name: string }>;
+  "log/bot/login/faild": Message<{ error: string }>;
+  "log/bot/keyvs/delete/faild": Message<{ guild: string; error: string }>;
+  "log/bot/vcAutoCreation/createTriggerChannel": Message<{
+    guild: string;
+    channel: string;
+  }>;
+  "log/bot/vcAutoCreation/deleteTriggerChannel": Message<{
+    guild: string;
+    channel: string;
+  }>;
+  "log/bot/vcAutoCreation/deleteAutoCreatedChannel": Message<{
+    guild: string;
+    channel: string;
+  }>;
+  "log/bot/vcAutoCreation/error": Message<{ guild: string; error: string }>;
+  "log/bot/vcAutoCreation/createChannel": Message<{
+    guild: string;
+    channel: string;
+  }>;
+  "log/bot/vcAutoCreation/deleteChannel": Message<{
+    guild: string;
+    channel: string;
+  }>;
+  "log/bot/vcAutoCreation/channelAlreadyDeleted": Message<{
+    guild: string;
+    channel: string;
+  }>;
+  "log/bot/vcAutoCreation/deleteChannelFailed": Message<{
+    guild: string;
+    channel: string;
+    error: string;
+  }>;
+  "log/bot/bumpReminder/start": Message<{ guild: string }>;
+  "log/bot/bumpReminder/stop": Message<{ guild: string }>;
+  "log/bot/bumpReminder/setRemind": Message<{ guild: string; user: string }>;
+  "log/bot/bumpReminder/cancelRemind": Message<{ guild: string; user: string }>;
+  "log/bot/bumpReminder/remind": Message<{ guild: string }>;
+  "log/bot/bumpReminder/detectBump": Message<{ guild: string }>;
+  "log/bot/bumpReminder/error": Message<{
+    guild: string;
+    channel: string;
+    error: string;
+  }>;
+  "log/bot/stickMessage/execute": Message<{ guild: string; channel: string }>;
+  "log/bot/stickMessage/error": Message<{
+    guild: string;
+    channel: string;
+    error: string;
+  }>;
+  "log/bot/event/set": Message<{ name: string }>;
+  "log/bot/command/register/pre": Message<{ commandNames: string }>;
+  "log/bot/command/register/complated": Message;
+  "log/bot/command/register/faild": Message<{ error: string }>;
+  "log/bot/command/notFound": Message<{ command: string }>;
+  "log/bot/command/execute/success": Message<{
+    command: string;
+    guild: string;
+  }>;
+  "log/bot/command/execute/faild": Message<{
+    command: string;
+    guild: string;
+    error: string;
+  }>;
+  "log/bot/command/autocomplete/undefined": Message<{ command: string }>;
+  "log/bot/command/autocomplete/success": Message<{
+    command: string;
+    guild: string;
+  }>;
+  "log/bot/command/autocomplete/faild": Message<{
+    command: string;
+    guild: string;
+    error: string;
+  }>;
+  "log/bot/command/modal/notFound": Message<{ modal: string }>;
+  "log/bot/command/modal/success": Message<{ modal: string; guild: string }>;
+  "log/bot/command/modal/faild": Message<{
+    modal: string;
+    guild: string;
+    error: string;
+  }>;
+  "log/bot/guildEntry": Message<{ guild: string }>;
+  "log/bot/guildLeaving": Message<{ guild: string }>;
+  "log/bot/sendMemberLeaveLog": Message<{
+    guild: string;
+    channel: string;
+    user: string;
+  }>;
 
-    // Bot
-    "bot/config/reset": Message,
-    "bot/vcAutoCreation/error": Message<{ error: string }>,
-    "bot/bumpReminder/bumpMessage": Message<{ time: string, diffCurTime: string }>,
-    "bot/bumpReminder/button/doRemind": Message,
-    "bot/bumpReminder/button/doNotRemind": Message,
-    "bot/bumpReminder/setRemind": Message,
-    "bot/bumpReminder/cancelRemind": Message,
-    "bot/bumpReminder/remindMessage": Message<{ mentionRole: string, mentionUsers: string }>,
-    "bot/bumpReminder/alreadySetRemind": Message,
-    "bot/afk": Message,
-    "bot/vcAutoCreation": Message,
-    "bot/bumpReminder": Message,
-    "bot/stickMessage": Message,
-    "bot/leaveMemberLog": Message,
-    "bot/memberLeaveLog/message": Message<{ user: string }>,
+  // Bot
+  "bot/config/reset": Message;
+  "bot/vcAutoCreation/error": Message<{ error: string }>;
+  "bot/bumpReminder/bumpMessage": Message<{
+    time: string;
+    diffCurTime: string;
+  }>;
+  "bot/bumpReminder/button/doRemind": Message;
+  "bot/bumpReminder/button/doNotRemind": Message;
+  "bot/bumpReminder/setRemind": Message;
+  "bot/bumpReminder/cancelRemind": Message;
+  "bot/bumpReminder/remindMessage": Message<{
+    mentionRole: string;
+    mentionUsers: string;
+  }>;
+  "bot/bumpReminder/alreadySetRemind": Message;
+  "bot/afk": Message;
+  "bot/vcAutoCreation": Message;
+  "bot/bumpReminder": Message;
+  "bot/stickMessage": Message;
+  "bot/leaveMemberLog": Message;
+  "bot/memberLeaveLog/message": Message<{ user: string }>;
 
-    // コマンド共通
-    "bot/command/cooldown": Message<{ cooldown: string }>,
-    "bot/command/unsetDestAfk": Message,
-    "bot/command/notFoundDestAfk": Message,
-    "bot/command/notFoundUser": Message<{ user: string }>,
-    "bot/command/unsetProfChannel": Message,
-    "bot/command/notFoundChannel": Message<{ channelId: string }>,
-    "bot/command/getStatus/success": Message,
-    "bot/command/getStatusList/success": Message,
+  // コマンド共通
+  "bot/command/cooldown": Message<{ cooldown: string }>;
+  "bot/command/unsetDestAfk": Message;
+  "bot/command/notFoundDestAfk": Message;
+  "bot/command/notFoundUser": Message<{ user: string }>;
+  "bot/command/unsetProfChannel": Message;
+  "bot/command/notFoundChannel": Message<{ channelId: string }>;
+  "bot/command/getStatus/success": Message;
+  "bot/command/getStatusList/success": Message;
 
-    // コマンド固有
-    "bot/command/echo/description": Message,
-    "bot/command/echo/textOption/description": Message,
-    "bot/command/afk/description": Message,
-    "bot/command/afk/userOption/description": Message,
-    "bot/command/afk/success": Message<{ user: string, channel: string }>,
-    "bot/command/afk/success/followup": Message,
-    "bot/command/afk/alreadyAfk": Message<{ user: string, channel: string }>,
-    "bot/command/afk/faild": Message<{ user: string, error: string }>,
-    "bot/command/cnf-afk/description": Message,
-    "bot/command/cnf-afk/set-dest/description": Message,
-    "bot/command/cnf-afk/set-dest/channelOption/description": Message,
-    "bot/command/cnf-afk/set-dest/success": Message<{ channel: string }>,
-    "bot/command/cnf-afk/set-dest/faild": Message<{ error: string }>,
-    "bot/command/cnf-afk/get-dest/description": Message,
-    "bot/command/cnf-afk/get-dest/success": Message<{ channel: string }>,
-    "bot/command/cnf-afk/get-dest/faild": Message<{ error: string }>,
-    "bot/command/cnf-afk/status/description": Message,
-    "bot/command/cnf-vac/description": Message,
-    "bot/command/cnf-vac/start/description": Message,
-    "bot/command/cnf-vac/start/success": Message,
-    "bot/command/cnf-vac/start/faild": Message<{ error: string }>,
-    "bot/command/cnf-vac/start/createTriggerVcFaild": Message,
-    "bot/command/cnf-vac/start/setTriggerVcFaild": Message<{ error: string }>,
-    "bot/command/cnf-vac/start/alreadyStarting": Message,
-    "bot/command/cnf-vac/stop/description": Message,
-    "bot/command/cnf-vac/stop/success": Message,
-    "bot/command/cnf-vac/stop/faild": Message<{ error: string }>,
-    "bot/command/cnf-vac/stop/getTriggerVcFaild": Message<{ error: string }>,
-    "bot/command/cnf-vac/stop/triggerVcNotFound": Message,
-    "bot/command/cnf-vac/stop/notStarted": Message,
-    "bot/command/cnf-vac/status/description": Message,
-    "bot/command/cnf-vc/description": Message,
-    "bot/command/cnf-vc/notInVc": Message,
-    "bot/command/cnf-vc/notVacChannel": Message,
-    "bot/command/cnf-vc/rename/description": Message,
-    "bot/command/cnf-vc/rename/nameOption/description": Message,
-    "bot/command/cnf-vc/rename/success": Message<{ channel: string, name: string }>,
-    "bot/command/cnf-vc/rename/faild": Message<{ error: string }>,
-    "bot/command/cnf-vc/lock/description": Message,
-    "bot/command/cnf-vc/lock/channelOption/description": Message,
-    "bot/command/cnf-vc/user-limit/description": Message,
-    "bot/command/cnf-vc/user-limit/userLimitOption/description": Message,
-    "bot/command/cnf-vc/user-limit/success": Message<{ channel: string, userLimit: string }>,
-    "bot/command/cnf-vc/user-limit/faild": Message<{ channel: string, error: string }>,
-    "bot/command/cnf-prof-ch/description": Message,
-    "bot/command/cnf-prof-ch/set-ch/description": Message,
-    "bot/command/cnf-prof-ch/set-ch/channelOption/description": Message,
-    "bot/command/cnf-prof-ch/set-ch/success": Message<{ channel: string }>,
-    "bot/command/cnf-prof-ch/get-ch/description": Message,
-    "bot/command/cnf-prof-ch/get-ch/success": Message<{ channel: string }>,
-    "bot/command/notFoundProfChannel": Message,
-    "bot/command/user-info/description": Message,
-    "bot/command/user-info/normal/description": Message,
-    "bot/command/user-info/normal/userOption/description": Message,
-    "bot/command/user-info/success": Message,
-    "bot/command/user-info/vc-members/description": Message,
-    "bot/command/user-info/vc-members/notInVc": Message,
-    "bot/command/cnf-bump-reminder/description": Message,
-    "bot/command/cnf-bump-reminder/start/description": Message,
-    "bot/command/cnf-bump-reminder/start/success": Message,
-    "bot/command/cnf-bump-reminder/stop/description": Message,
-    "bot/command/cnf-bump-reminder/stop/success": Message,
-    "bot/command/cnf-bump-reminder/set-mention/description": Message,
-    "bot/command/cnf-bump-reminder/set-mention/roleOption/description": Message,
-    "bot/command/cnf-bump-reminder/set-mention/success": Message<{ role: string }>
-    "bot/command/cnf-bump-reminder/set-mention/notMentionable": Message<{ role: string }>,
-    "bot/command/cnf-bump-reminder/status/description": Message,
-    "bot/command/cnf-bump-reminder/status/success": Message<{ status: string, mentionRole: string }>,
-    "bot/command/send-text/description": Message,
-    "bot/command/send-text/channelOption/Description": Message,
-    "bot/command/send-text/notFoundChannel": Message,
-    "bot/command/send-text/success": Message<{ channel: string }>,
-    "bot/command/send-text/modal/title": Message,
-    "bot/command/send-text/modal/inputSendText/label": Message,
-    "bot/command/play/description": Message,
-    "bot/command/play/rps/description": Message,
-    "bot/command/play/rps/ready": Message,
-    "bot/command/play/rps/result": Message<{ botHand: string, userHand: string }>,
-    "bot/command/play/rps/botWin": Message,
-    "bot/command/play/rps/botDraw": Message,
-    "bot/command/play/rps/botLose": Message,
-    "bot/command/play/rps/timeout": Message,
-    "bot/command/status-list/description": Message,
-    "bot/command/stick-msg/description": Message,
-    "bot/command/stick-msg/start/description": Message,
-    "bot/command/stick-msg/start/channelOption/description": Message,
-    "bot/command/stick-msg/start/notFoundChannel": Message,
-    "bot/command/stick-msg/start/alreadySticked": Message,
-    "bot/command/stick-msg/start/cancel": Message,
-    "bot/command/stick-msg/start/success": Message<{ channel: string }>,
-    "bot/command/stick-msg/start/success/restick": Message<{ channel: string }>,
-    "bot/command/stick-msg/delete/description": Message,
-    "bot/command/stick-msg/delete/channelOption/description": Message,
-    "bot/command/stick-msg/delete/success": Message<{ channel: string }>,
-    "bot/command/stick-msg/delete/notSticked": Message,
-    "bot/command/stick-msg/status/description": Message,
-    "bot/command/stick-msg/modal/title": Message,
-    "bot/command/stick-msg/modal/inputStickText/label": Message,
-    "bot/command/leaveMemberLog/description": Message,
-    "bot/command/leaveMemberLog/start/description": Message,
-    "bot/command/leaveMemberLog/start/success": Message,
-    "bot/command/leaveMemberLog/stop/description": Message,
-    "bot/command/leaveMemberLog/stop/success": Message,
-    "bot/command/leaveMemberLog/status/description": Message,
+  // コマンド固有
+  "bot/command/echo/description": Message;
+  "bot/command/echo/textOption/description": Message;
+  "bot/command/afk/description": Message;
+  "bot/command/afk/userOption/description": Message;
+  "bot/command/afk/success": Message<{ user: string; channel: string }>;
+  "bot/command/afk/success/followup": Message;
+  "bot/command/afk/alreadyAfk": Message<{ user: string; channel: string }>;
+  "bot/command/afk/faild": Message<{ user: string; error: string }>;
+  "bot/command/cnf-afk/description": Message;
+  "bot/command/cnf-afk/set-dest/description": Message;
+  "bot/command/cnf-afk/set-dest/channelOption/description": Message;
+  "bot/command/cnf-afk/set-dest/success": Message<{ channel: string }>;
+  "bot/command/cnf-afk/set-dest/faild": Message<{ error: string }>;
+  "bot/command/cnf-afk/get-dest/description": Message;
+  "bot/command/cnf-afk/get-dest/success": Message<{ channel: string }>;
+  "bot/command/cnf-afk/get-dest/faild": Message<{ error: string }>;
+  "bot/command/cnf-afk/status/description": Message;
+  "bot/command/cnf-vac/description": Message;
+  "bot/command/cnf-vac/start/description": Message;
+  "bot/command/cnf-vac/start/success": Message;
+  "bot/command/cnf-vac/start/faild": Message<{ error: string }>;
+  "bot/command/cnf-vac/start/createTriggerVcFaild": Message;
+  "bot/command/cnf-vac/start/setTriggerVcFaild": Message<{ error: string }>;
+  "bot/command/cnf-vac/start/alreadyStarting": Message;
+  "bot/command/cnf-vac/stop/description": Message;
+  "bot/command/cnf-vac/stop/success": Message;
+  "bot/command/cnf-vac/stop/faild": Message<{ error: string }>;
+  "bot/command/cnf-vac/stop/getTriggerVcFaild": Message<{ error: string }>;
+  "bot/command/cnf-vac/stop/triggerVcNotFound": Message;
+  "bot/command/cnf-vac/stop/notStarted": Message;
+  "bot/command/cnf-vac/status/description": Message;
+  "bot/command/cnf-vc/description": Message;
+  "bot/command/cnf-vc/notInVc": Message;
+  "bot/command/cnf-vc/notVacChannel": Message;
+  "bot/command/cnf-vc/rename/description": Message;
+  "bot/command/cnf-vc/rename/nameOption/description": Message;
+  "bot/command/cnf-vc/rename/success": Message<{
+    channel: string;
+    name: string;
+  }>;
+  "bot/command/cnf-vc/rename/faild": Message<{ error: string }>;
+  "bot/command/cnf-vc/lock/description": Message;
+  "bot/command/cnf-vc/lock/channelOption/description": Message;
+  "bot/command/cnf-vc/user-limit/description": Message;
+  "bot/command/cnf-vc/user-limit/userLimitOption/description": Message;
+  "bot/command/cnf-vc/user-limit/success": Message<{
+    channel: string;
+    userLimit: string;
+  }>;
+  "bot/command/cnf-vc/user-limit/faild": Message<{
+    channel: string;
+    error: string;
+  }>;
+  "bot/command/cnf-prof-ch/description": Message;
+  "bot/command/cnf-prof-ch/set-ch/description": Message;
+  "bot/command/cnf-prof-ch/set-ch/channelOption/description": Message;
+  "bot/command/cnf-prof-ch/set-ch/success": Message<{ channel: string }>;
+  "bot/command/cnf-prof-ch/get-ch/description": Message;
+  "bot/command/cnf-prof-ch/get-ch/success": Message<{ channel: string }>;
+  "bot/command/notFoundProfChannel": Message;
+  "bot/command/user-info/description": Message;
+  "bot/command/user-info/normal/description": Message;
+  "bot/command/user-info/normal/userOption/description": Message;
+  "bot/command/user-info/success": Message;
+  "bot/command/user-info/vc-members/description": Message;
+  "bot/command/user-info/vc-members/notInVc": Message;
+  "bot/command/cnf-bump-reminder/description": Message;
+  "bot/command/cnf-bump-reminder/start/description": Message;
+  "bot/command/cnf-bump-reminder/start/success": Message;
+  "bot/command/cnf-bump-reminder/stop/description": Message;
+  "bot/command/cnf-bump-reminder/stop/success": Message;
+  "bot/command/cnf-bump-reminder/set-mention/description": Message;
+  "bot/command/cnf-bump-reminder/set-mention/roleOption/description": Message;
+  "bot/command/cnf-bump-reminder/set-mention/success": Message<{
+    role: string;
+  }>;
+  "bot/command/cnf-bump-reminder/set-mention/notMentionable": Message<{
+    role: string;
+  }>;
+  "bot/command/cnf-bump-reminder/status/description": Message;
+  "bot/command/cnf-bump-reminder/status/success": Message<{
+    status: string;
+    mentionRole: string;
+  }>;
+  "bot/command/send-text/description": Message;
+  "bot/command/send-text/channelOption/Description": Message;
+  "bot/command/send-text/notFoundChannel": Message;
+  "bot/command/send-text/success": Message<{ channel: string }>;
+  "bot/command/send-text/modal/title": Message;
+  "bot/command/send-text/modal/inputSendText/label": Message;
+  "bot/command/play/description": Message;
+  "bot/command/play/rps/description": Message;
+  "bot/command/play/rps/ready": Message;
+  "bot/command/play/rps/result": Message<{ botHand: string; userHand: string }>;
+  "bot/command/play/rps/botWin": Message;
+  "bot/command/play/rps/botDraw": Message;
+  "bot/command/play/rps/botLose": Message;
+  "bot/command/play/rps/timeout": Message;
+  "bot/command/status-list/description": Message;
+  "bot/command/stick-msg/description": Message;
+  "bot/command/stick-msg/start/description": Message;
+  "bot/command/stick-msg/start/channelOption/description": Message;
+  "bot/command/stick-msg/start/notFoundChannel": Message;
+  "bot/command/stick-msg/start/alreadySticked": Message;
+  "bot/command/stick-msg/start/cancel": Message;
+  "bot/command/stick-msg/start/success": Message<{ channel: string }>;
+  "bot/command/stick-msg/start/success/restick": Message<{ channel: string }>;
+  "bot/command/stick-msg/delete/description": Message;
+  "bot/command/stick-msg/delete/channelOption/description": Message;
+  "bot/command/stick-msg/delete/success": Message<{ channel: string }>;
+  "bot/command/stick-msg/delete/notSticked": Message;
+  "bot/command/stick-msg/status/description": Message;
+  "bot/command/stick-msg/modal/title": Message;
+  "bot/command/stick-msg/modal/inputStickText/label": Message;
+  "bot/command/leaveMemberLog/description": Message;
+  "bot/command/leaveMemberLog/start/description": Message;
+  "bot/command/leaveMemberLog/start/success": Message;
+  "bot/command/leaveMemberLog/stop/description": Message;
+  "bot/command/leaveMemberLog/stop/success": Message;
+  "bot/command/leaveMemberLog/status/description": Message;
 };
 
 // 各言語の翻訳データをまとめたオブジェクト
 export const book = new Book<Vocabulary>({
-    ja: catalogJa,
-    //   en: catalogEn,
+  ja: catalogJa,
+  //   en: catalogEn,
 });

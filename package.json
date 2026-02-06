@@ -2,16 +2,16 @@
   "name": "guild-mng-bot-v2",
   "version": "2.0.0",
   "description": "Discord Guild Management Bot with Web UI",
-  "main": "dist/bot-main.js",
+  "main": "dist/bot/main.js",
   "type": "module",
   "scripts": {
-    "dev:bot": "tsx watch src/bot-main.ts",
-    "dev:web": "tsx watch src/web-server.ts",
+    "dev:bot": "tsx watch src/bot/main.ts",
+    "dev:web": "tsx watch src/web/server.ts",
     "dev": "concurrently \"pnpm dev:bot\" \"pnpm dev:web\"",
     "build": "tsc --build",
     "tsc-watch": "tsc --build --watch",
-    "start:bot": "node dist/bot-main.js",
-    "start:web": "node dist/web-server.js",
+    "start:bot": "node dist/bot/main.js",
+    "start:web": "node dist/web/server.js",
     "start": "concurrently \"pnpm start:bot\" \"pnpm start:web\"",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -35,7 +35,7 @@
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.28.2",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",

@@ -2,6 +2,7 @@
   // パッケージマネージャー
   "npm.packageManager": "pnpm",
   // TypeScript設定
+  "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.tsserver.log": "off",
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.updateImportsOnFileMove.enabled": "always",
