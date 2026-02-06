@@ -1,0 +1,63 @@
+### Guild Management Bot v2 - API Test Collection
+### REST Client Extension用テストファイル
+
+@baseUrl = http://localhost:3000
+@guildId = YOUR_GUILD_ID_HERE
+
+###############################################################################
+# ヘルスチェック
+###############################################################################
+
+### Health Check - アプリケーション稼働確認
+GET {{baseUrl}}/health HTTP/1.1
+
+###############################################################################
+# Guild Configuration API (例)
+###############################################################################
+
+### Get Guild Config - ギルド設定取得
+GET {{baseUrl}}/api/guilds/{{guildId}}/config HTTP/1.1
+Content-Type: application/json
+
+### Update Guild Config - ギルド設定更新
+PUT {{baseUrl}}/api/guilds/{{guildId}}/config HTTP/1.1
+Content-Type: application/json
+
+{
+  "locale": "ja",
+  "timezone": "Asia/Tokyo"
+}
+
+###############################################################################
+# Feature Configuration (将来実装予定)
+###############################################################################
+
+### Get VAC Settings - VC自動作成設定取得
+GET {{baseUrl}}/api/guilds/{{guildId}}/features/vac HTTP/1.1
+
+### Enable VAC - VC自動作成有効化
+POST {{baseUrl}}/api/guilds/{{guildId}}/features/vac/enable HTTP/1.1
+Content-Type: application/json
+
+{
+  "triggerChannelId": "CHANNEL_ID_HERE"
+}
+
+### Get Bump Reminder Settings - Bump通知設定取得
+GET {{baseUrl}}/api/guilds/{{guildId}}/features/bump-reminder HTTP/1.1
+
+###############################################################################
+# データベース/キャッシュ操作 (開発用)
+###############################################################################
+
+### Clear Guild Cache - ギルドキャッシュクリア (開発用)
+# DELETE {{baseUrl}}/api/dev/cache/{{guildId}} HTTP/1.1
+
+###############################################################################
+# 環境変数設定例
+###############################################################################
+# .env ファイルに以下を設定:
+# TOKEN=your_discord_bot_token
+# APP_ID=your_application_id
+# LOCALE=ja
+# PORT=3000
