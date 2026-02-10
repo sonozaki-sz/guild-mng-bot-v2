@@ -50,6 +50,10 @@
     "vscode",
     "jsonc",
     "typeof",
+    // i18next関連
+    "i18next",
+    "i18n",
+    "TFunction",
     // 一般的な技術用語
     "readonly",
     "async",
@@ -63,6 +67,8 @@
     "healthcheck",
     "repo",
     "repos",
-    "deferred"
+    "deferred",
+    "cooldown",
+    "cooldowns"
   ]
 }

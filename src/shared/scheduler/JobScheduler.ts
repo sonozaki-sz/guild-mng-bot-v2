@@ -3,6 +3,7 @@
 // REFACTORING_PLAN.md Phase 2 準拠
 
 import cron, { ScheduledTask } from "node-cron";
+import { tDefault } from "../locale";
 import { logger } from "../utils/logger";
 
 interface ScheduledJob {
@@ -68,7 +69,7 @@ export class JobScheduler {
    * すべてのジョブを停止
    */
   public stopAll(): void {
-    logger.info("Stopping all scheduled jobs...");
+    logger.info(tDefault("system:scheduler.stopping"));
     for (const [id, job] of this.jobs.entries()) {
       job.stop();
       logger.debug(`Stopped job: ${id}`);
