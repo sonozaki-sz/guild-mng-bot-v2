@@ -5,6 +5,7 @@ import {
   handleCommandError,
   handleInteractionError,
 } from "../../shared/errors/ErrorHandler";
+import { tDefault } from "../../shared/locale";
 import type { BotEvent } from "../../shared/types/discord";
 import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
@@ -21,7 +22,11 @@ export const interactionCreateEvent: BotEvent<"interactionCreate"> = {
       const command = client.commands.get(interaction.commandName);
 
       if (!command) {
-        logger.warn(`Unknown command: ${interaction.commandName}`);
+        logger.warn(
+          tDefault("events:interaction.unknown_command", {
+            commandName: interaction.commandName,
+          }),
+        );
         return;
       }
 
@@ -35,7 +40,7 @@ export const interactionCreateEvent: BotEvent<"interactionCreate"> = {
 
       if (remaining > 0) {
         await interaction.reply({
-          content: `⏱️ このコマンドは **${remaining}秒後** に使用できます`,
+          content: tDefault("commands:cooldown.wait", { seconds: remaining }),
           ephemeral: true,
         });
         return;
@@ -44,10 +49,18 @@ export const interactionCreateEvent: BotEvent<"interactionCreate"> = {
       try {
         await command.execute(interaction);
         logger.debug(
-          `Command executed: ${command.data.name} by ${interaction.user.tag}`,
+          tDefault("events:interaction.command_executed", {
+            commandName: command.data.name,
+            userTag: interaction.user.tag,
+          }),
         );
       } catch (error) {
-        logger.error(`Error executing command ${command.data.name}:`, error);
+        logger.error(
+          tDefault("events:interaction.command_error", {
+            commandName: command.data.name,
+          }),
+          error,
+        );
         await handleCommandError(interaction, error as Error);
       }
     }
@@ -64,7 +77,9 @@ export const interactionCreateEvent: BotEvent<"interactionCreate"> = {
         await command.autocomplete(interaction);
       } catch (error) {
         logger.error(
-          `Error in autocomplete for ${interaction.commandName}:`,
+          tDefault("events:interaction.autocomplete_error", {
+            commandName: interaction.commandName,
+          }),
           error,
         );
       }
@@ -75,17 +90,29 @@ export const interactionCreateEvent: BotEvent<"interactionCreate"> = {
       const modal = client.modals.get(interaction.customId);
 
       if (!modal) {
-        logger.warn(`Unknown modal: ${interaction.customId}`);
+        logger.warn(
+          tDefault("events:interaction.unknown_modal", {
+            customId: interaction.customId,
+          }),
+        );
         return;
       }
 
       try {
         await modal.execute(interaction);
         logger.debug(
-          `Modal submitted: ${interaction.customId} by ${interaction.user.tag}`,
+          tDefault("events:interaction.modal_submitted", {
+            customId: interaction.customId,
+            userTag: interaction.user.tag,
+          }),
         );
       } catch (error) {
-        logger.error(`Error executing modal ${interaction.customId}:`, error);
+        logger.error(
+          tDefault("events:interaction.modal_error", {
+            customId: interaction.customId,
+          }),
+          error,
+        );
         await handleInteractionError(interaction, error as Error);
       }
     }

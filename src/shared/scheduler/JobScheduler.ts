@@ -24,18 +24,25 @@ export class JobScheduler {
    */
   public addJob(job: ScheduledJob): void {
     if (this.jobs.has(job.id)) {
-      logger.warn(`Job ${job.id} already exists. Removing old job.`);
+      logger.warn(tDefault("system:scheduler.job_exists", { jobId: job.id }));
       this.removeJob(job.id);
     }
 
     try {
       const scheduledTask = cron.schedule(job.schedule, async () => {
         try {
-          logger.debug(`Executing job: ${job.id}`);
+          logger.debug(
+            tDefault("system:scheduler.executing_job", { jobId: job.id }),
+          );
           await job.task();
-          logger.debug(`Job completed: ${job.id}`);
+          logger.debug(
+            tDefault("system:scheduler.job_completed", { jobId: job.id }),
+          );
         } catch (error) {
-          logger.error(`Error in job ${job.id}:`, error);
+          logger.error(
+            tDefault("system:scheduler.job_error", { jobId: job.id }),
+            error,
+          );
         }
       });
 
@@ -46,7 +53,10 @@ export class JobScheduler {
         `Job scheduled: ${job.id}${job.description ? ` - ${job.description}` : ""}`,
       );
     } catch (error) {
-      logger.error(`Failed to schedule job ${job.id}:`, error);
+      logger.error(
+        tDefault("system:scheduler.schedule_failed", { jobId: job.id }),
+        error,
+      );
       throw error;
     }
   }
@@ -59,7 +69,7 @@ export class JobScheduler {
     if (job) {
       job.stop();
       this.jobs.delete(id);
-      logger.info(`Job removed: ${id}`);
+      logger.info(tDefault("system:scheduler.job_removed", { jobId: id }));
       return true;
     }
     return false;
@@ -72,7 +82,7 @@ export class JobScheduler {
     logger.info(tDefault("system:scheduler.stopping"));
     for (const [id, job] of this.jobs.entries()) {
       job.stop();
-      logger.debug(`Stopped job: ${id}`);
+      logger.debug(tDefault("system:scheduler.job_stopped", { jobId: id }));
     }
     this.jobs.clear();
   }
@@ -122,7 +132,9 @@ export class BumpReminderManager {
 
     // 既存のリマインダーをキャンセル
     if (this.reminders.has(guildId)) {
-      logger.info(`Cancelling existing bump reminder for guild ${guildId}`);
+      logger.info(
+        tDefault("system:scheduler.cancel_bump_reminder", { guildId }),
+      );
       jobScheduler.removeJob(this.reminders.get(guildId)!.jobId);
     }
 
@@ -168,7 +180,9 @@ export class BumpReminderManager {
     if (reminder) {
       jobScheduler.removeJob(reminder.jobId);
       this.reminders.delete(guildId);
-      logger.info(`Bump reminder cancelled for guild ${guildId}`);
+      logger.info(
+        tDefault("system:scheduler.bump_reminder_cancelled", { guildId }),
+      );
       return true;
     }
     return false;

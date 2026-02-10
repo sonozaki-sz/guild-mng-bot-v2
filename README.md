@@ -109,8 +109,17 @@ guild-mng-bot-v2/
 
 ## 📖 ドキュメント
 
+- [TODO](TODO.md) - 残タスク一覧
 - [開発ロードマップ](docs/DEVELOPMENT_ROADMAP.md) - 開発方針と作業計画
-- [移行ガイド](MIGRATION_GUIDE.md) - 旧プロジェクトからの参考情報
+- [テストガイド](docs/TESTING.md) - テスト方針とガイドライン
+- [国際化ガイド](docs/I18N_GUIDE.md) - 多言語対応ガイド
+
+### 機能仕様書
+
+- [Bump通知機能](docs/BUMP_REMINDER_SPEC.md) - Disboard/ディス速のBump通知
+- [VAC機能](docs/VAC_SPEC.md) - ボイスチャンネル自動作成と操作パネル
+- [メンバー通知](docs/JOIN_LEAVE_LOG_SPEC.md) - メンバー加入・脱退通知
+- [メッセージ削除](docs/MSG_DEL_COMMAND_SPEC.md) - モデレーション機能
 
 ## 🔧 開発環境
 
@@ -186,9 +195,13 @@ REST Client拡張機能で「Send Request」をクリックするだけでテス
 
 ## 📊 プロジェクト状況
 
-**現在のフェーズ**: Phase 1 - 基盤実装 🚧
+**現在のフェーズ**: Phase 2 - コマンド実装（MVP） 🚧
 
-詳細は [開発ロードマップ](docs/DEVELOPMENT_ROADMAP.md) を参照してください。
+- ✅ Phase 0: 環境構築完了
+- ✅ Phase 1: 基盤実装完了（ロガー、Bot基盤、データベース、i18n、テスト）
+- 🚧 Phase 2: 基本コマンド実装中
+
+詳細は [開発ロードマップ](docs/DEVELOPMENT_ROADMAP.md) および [TODO](TODO.md) を参照してください。
 
 ## 📝 コミット規約
 
@@ -215,4 +228,4 @@ Apache License 2.0 - 詳細は [LICENSE](LICENSE) を参照
 ---
 
 **開発開始**: 2026年2月
-**最終更新**: 2026年2月7日
+**最終更新**: 2026年2月11日

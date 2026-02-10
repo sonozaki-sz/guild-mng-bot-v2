@@ -3,16 +3,23 @@
 
 export const events = {
   // Bot起動
-  "ready.logged_in": "{{username}} としてログインしました",
-  "ready.commands_registered": "{{count}} 個のコマンドを登録しました",
+  "ready.bot_ready": "✅ Botの準備が完了しました！ {{tag}} としてログイン",
+  "ready.servers": "📊 サーバー数: {{count}}",
+  "ready.users": "👥 ユーザー数: {{count}}",
+  "ready.commands": "💬 コマンド数: {{count}}",
+  "ready.status": "{{count}}個のサーバーで稼働中 | by sonozaki",
+  "ready.event_registered": "イベント登録: {{name}}",
 
-  // サーバー関連
-  "guild.joined": "新しいサーバーに参加しました: {{guildName}}",
-  "guild.left": "サーバーから退出しました: {{guildName}}",
-
-  // メンバー関連
-  "member.joined": "{{username}} がサーバーに参加しました",
-  "member.left": "{{username}} がサーバーから退出しました",
+  // インタラクション
+  "interaction.unknown_command": "不明なコマンド: {{commandName}}",
+  "interaction.command_executed":
+    "コマンド実行: {{commandName}} (実行者: {{userTag}})",
+  "interaction.command_error": "コマンド {{commandName}} の実行エラー:",
+  "interaction.autocomplete_error": "{{commandName}} の自動補完エラー:",
+  "interaction.unknown_modal": "不明なモーダル: {{customId}}",
+  "interaction.modal_submitted":
+    "モーダル送信: {{customId}} (送信者: {{userTag}})",
+  "interaction.modal_error": "モーダル {{customId}} の実行エラー:",
 } as const;
 
 export type EventsTranslations = typeof events;

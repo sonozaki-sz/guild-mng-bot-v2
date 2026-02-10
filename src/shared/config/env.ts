@@ -12,6 +12,7 @@ const envSchema = z.object({
   // Discord
   DISCORD_TOKEN: z.string().min(50, "DISCORD_TOKENが設定されていません"),
   DISCORD_APP_ID: z.string().min(10, "DISCORD_APP_IDが設定されていません"),
+  DISCORD_GUILD_ID: z.string().optional(), // 開発用：設定するとギルドコマンドとして即座に登録
 
   // ロケール
   LOCALE: z.string().default("ja"),

@@ -62,6 +62,9 @@
   // ESLint設定
   "eslint.validate": ["javascript", "typescript"],
   "eslint.format.enable": true,
+  // cSpell設定（問題タブに表示しない）
+  "cSpell.diagnosticLevel": "Hint",
+  "cSpell.showStatus": false,
   // 言語別設定
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

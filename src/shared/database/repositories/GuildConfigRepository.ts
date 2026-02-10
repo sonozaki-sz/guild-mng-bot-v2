@@ -4,6 +4,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { DatabaseError } from "../../errors/CustomErrors";
+import { tDefault } from "../../locale";
 import { logger } from "../../utils/logger";
 
 /**
@@ -108,9 +109,12 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
 
       return this.recordToConfig(record);
     } catch (error) {
-      logger.error(`Failed to get config for guild ${guildId}:`, error);
+      logger.error(
+        tDefault("system:database.get_config_log", { guildId }),
+        error,
+      );
       throw new DatabaseError(
-        `Failed to get guild config: ${error instanceof Error ? error.message : "unknown error"}`,
+        `${tDefault("errors:database.get_config_failed")}: ${error instanceof Error ? error.message : tDefault("errors:database.unknown_error")}`,
       );
     }
   }
@@ -141,11 +145,18 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
         },
       });
 
-      logger.info(`Saved config for guild ${config.guildId}`);
+      logger.info(
+        tDefault("system:database.saved_config", { guildId: config.guildId }),
+      );
     } catch (error) {
-      logger.error(`Failed to save config for guild ${config.guildId}:`, error);
+      logger.error(
+        tDefault("system:database.save_config_log", {
+          guildId: config.guildId,
+        }),
+        error,
+      );
       throw new DatabaseError(
-        `Failed to save guild config: ${error instanceof Error ? error.message : "unknown error"}`,
+        `${tDefault("errors:database.save_config_failed")}: ${error instanceof Error ? error.message : tDefault("errors:database.unknown_error")}`,
       );
     }
   }
@@ -194,11 +205,14 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
         data,
       });
 
-      logger.info(`Updated config for guild ${guildId}`);
+      logger.info(tDefault("system:database.updated_config", { guildId }));
     } catch (error) {
-      logger.error(`Failed to update config for guild ${guildId}:`, error);
+      logger.error(
+        tDefault("system:database.update_config_log", { guildId }),
+        error,
+      );
       throw new DatabaseError(
-        `Failed to update guild config: ${error instanceof Error ? error.message : "unknown error"}`,
+        `${tDefault("errors:database.update_config_failed")}: ${error instanceof Error ? error.message : tDefault("errors:database.unknown_error")}`,
       );
     }
   }
@@ -212,11 +226,14 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
         where: { guildId },
       });
 
-      logger.info(`Deleted config for guild ${guildId}`);
+      logger.info(tDefault("system:database.deleted_config", { guildId }));
     } catch (error) {
-      logger.error(`Failed to delete config for guild ${guildId}:`, error);
+      logger.error(
+        tDefault("system:database.delete_config_log", { guildId }),
+        error,
+      );
       throw new DatabaseError(
-        `Failed to delete guild config: ${error instanceof Error ? error.message : "unknown error"}`,
+        `${tDefault("errors:database.delete_config_failed")}: ${error instanceof Error ? error.message : tDefault("errors:database.unknown_error")}`,
       );
     }
   }
@@ -231,7 +248,10 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
       });
       return count > 0;
     } catch (error) {
-      logger.error(`Failed to check existence for guild ${guildId}:`, error);
+      logger.error(
+        tDefault("system:database.check_existence_log", { guildId }),
+        error,
+      );
       return false;
     }
   }
