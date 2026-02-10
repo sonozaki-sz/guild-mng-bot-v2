@@ -1,14 +1,15 @@
 // src/shared/locale/index.ts
 // ロケール関連のエクスポート
 
+export { getCommandLocalizations } from "./commandLocalizations";
 export {
+  DEFAULT_LOCALE,
+  SUPPORTED_LOCALES,
   addResources,
   changeLanguage,
-  DEFAULT_LOCALE,
   t as i18nT,
   initI18n,
-  SUPPORTED_LOCALES,
   type SupportedLocale,
 } from "./i18n";
-export { localeManager, LocaleManager, t, tDefault } from "./LocaleManager";
+export { LocaleManager, localeManager, t, tDefault } from "./LocaleManager";
 export { resources } from "./locales";

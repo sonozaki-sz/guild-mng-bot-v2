@@ -6,6 +6,7 @@ import fastifyStatic from "@fastify/static";
 import Fastify from "fastify";
 import { join } from "path";
 import { env } from "../shared/config/env";
+import { tDefault } from "../shared/locale";
 import { logger } from "../shared/utils/logger";
 import { apiRoutes } from "./routes/api";
 import { healthRoute } from "./routes/health";
@@ -38,7 +39,7 @@ async function startWebServer() {
     // エラーハンドラー
     fastify.setErrorHandler((error, request, reply) => {
       const err = error as Error & { statusCode?: number };
-      logger.error("API Error:", {
+      logger.error(tDefault("system:web.api_error"), {
         error: err.message,
         stack: err.stack,
         url: request.url,
@@ -46,7 +47,7 @@ async function startWebServer() {
       });
 
       reply.status(err.statusCode || 500).send({
-        error: "Internal Server Error",
+        error: tDefault("system:web.internal_server_error"),
         message: env.NODE_ENV === "development" ? err.message : undefined,
       });
     });
@@ -58,26 +59,28 @@ async function startWebServer() {
     });
 
     logger.info(
-      `Web サーバーが起動しました: http://${env.WEB_HOST}:${env.WEB_PORT}`,
+      tDefault("system:web.server_started", {
+        url: `http://${env.WEB_HOST}:${env.WEB_PORT}`,
+      }),
     );
   } catch (error) {
-    logger.error("Webサーバー起動エラー:", error);
+    logger.error(tDefault("system:web.startup_error"), error);
     process.exit(1);
   }
 }
 
 // エラーハンドリング
 process.on("unhandledRejection", (error) => {
-  logger.error("未処理のPromise拒否:", error);
+  logger.error(tDefault("system:web.unhandled_rejection"), error);
 });
 
 process.on("uncaughtException", (error) => {
-  logger.error("未処理の例外:", error);
+  logger.error(tDefault("system:web.uncaught_exception"), error);
   process.exit(1);
 });
 
 // 起動
 startWebServer().catch((error) => {
-  logger.error("Webサーバー起動失敗:", error);
+  logger.error(tDefault("system:web.startup_failed"), error);
   process.exit(1);
 });

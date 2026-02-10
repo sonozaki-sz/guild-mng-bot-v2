@@ -2,10 +2,8 @@
 // コマンド一覧をエクスポート
 
 import type { Command } from "../../shared/types/discord";
+import { afkCommand } from "./afk";
+import { afkConfigCommand } from "./afk-config";
+import { pingCommand } from "./ping";
 
-// TODO: コマンドをここに追加
-// import { exampleCommand } from './example.js';
-
-export const commands: Command[] = [
-  // exampleCommand,
-];
+export const commands: Command[] = [afkCommand, afkConfigCommand, pingCommand];

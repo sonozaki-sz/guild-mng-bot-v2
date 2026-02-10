@@ -40,10 +40,12 @@ export const getUserFriendlyMessage = (error: Error | BaseError): string => {
 
   // 本番環境では詳細を隠す
   if (process.env.NODE_ENV === "production") {
-    return "予期しないエラーが発生しました。後ほど再度お試しください。";
+    return tDefault("errors:general.unexpected_production");
   }
 
-  return `エラー: ${error.message}`;
+  return tDefault("errors:general.unexpected_with_message", {
+    message: error.message,
+  });
 };
 
 /**

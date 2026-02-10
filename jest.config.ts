@@ -3,14 +3,25 @@ export default {
   testEnvironment: "node",
   roots: ["<rootDir>/src", "<rootDir>/tests"],
   testMatch: ["**/__tests__/**/*.ts", "**/*.test.ts", "**/*.spec.ts"],
+  setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   collectCoverageFrom: [
     "src/**/*.ts",
     "!src/**/*.d.ts",
     "!src/**/*.test.ts",
     "!src/**/*.spec.ts",
+    "!src/**/main.ts",
+    "!src/**/server.ts",
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
+    },
+  },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
@@ -24,9 +35,7 @@ export default {
   },
   extensionsToTreatAsEsm: [".ts"],
   moduleFileExtensions: ["ts", "js", "json"],
-  globals: {
-    "ts-jest": {
-      useESM: true,
-    },
-  },
+  testTimeout: 10000,
+  clearMocks: true,
+  restoreMocks: true,
 };

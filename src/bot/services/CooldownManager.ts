@@ -62,7 +62,7 @@ export class CooldownManager {
    */
   reset(commandName: string, userId: string): void {
     this.cooldowns.get(commandName)?.delete(userId);
-    logger.debug(`Cooldown reset: ${commandName} for user ${userId}`);
+    logger.debug(tDefault("system:cooldown.reset", { commandName, userId }));
   }
 
   /**
@@ -70,7 +70,9 @@ export class CooldownManager {
    */
   clearCommand(commandName: string): void {
     this.cooldowns.delete(commandName);
-    logger.debug(`All cooldowns cleared for command: ${commandName}`);
+    logger.debug(
+      tDefault("system:cooldown.cleared_for_command", { commandName }),
+    );
   }
 
   /**
@@ -101,7 +103,9 @@ export class CooldownManager {
     }
 
     if (removedCount > 0) {
-      logger.debug(`Cleanup: removed ${removedCount} expired cooldowns`);
+      logger.debug(
+        tDefault("system:cooldown.cleanup", { count: removedCount }),
+      );
     }
   }
 

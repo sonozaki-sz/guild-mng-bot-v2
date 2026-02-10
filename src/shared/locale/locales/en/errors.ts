@@ -2,24 +2,34 @@
 // Error message translations (English)
 
 export const errors = {
-  // General errors
-  unexpected: "An unexpected error occurred.",
-  not_found: "Not found.",
-  invalid_input: "Invalid input.",
-  permission_denied: "Permission denied.",
-
   // Database errors
-  "database.connection_failed": "Failed to connect to the database.",
-  "database.query_failed": "Database query failed.",
-
-  // Discord API errors
-  "discord.api_error": "An error occurred with the Discord API.",
-  "discord.rate_limit": "API rate limit reached. Please try again later.",
+  "database.get_config_failed": "Failed to get config",
+  "database.save_config_failed": "Failed to save config",
+  "database.update_config_failed": "Failed to update config",
+  "database.delete_config_failed": "Failed to delete config",
+  "database.unknown_error": "unknown error",
 
   // Validation errors
-  "validation.required": "This field is required.",
-  "validation.invalid_format": "Invalid format.",
-  "validation.out_of_range": "Value out of range.",
+  "validation.guild_only": "This command can only be used within a server",
+  "validation.invalid_subcommand": "Invalid subcommand",
+
+  // Permission errors
+  "permission.administrator_required":
+    "Administrator permission is required to execute this command.",
+
+  // AFK errors
+  "afk.not_configured":
+    "AFK channel is not configured.\nPlease configure a channel with `/afk-config set-ch` (administrator only).",
+  "afk.member_not_found": "User not found.",
+  "afk.user_not_in_voice": "The specified user is not in a voice channel.",
+  "afk.channel_not_found":
+    "AFK channel not found.\nThe channel may have been deleted.",
+  "afk.invalid_channel_type": "Please specify a voice channel.",
+
+  // General errors
+  "general.unexpected_production":
+    "An unexpected error occurred. Please try again later.",
+  "general.unexpected_with_message": "Error: {{message}}",
 } as const;
 
 export type ErrorsTranslations = typeof errors;
