@@ -1,6 +1,7 @@
 // src/bot/services/CooldownManager.ts
 // コマンドクールダウン管理
 
+import { tDefault } from "../../shared/locale";
 import { logger } from "../../shared/utils/logger";
 
 /**
@@ -77,7 +78,7 @@ export class CooldownManager {
    */
   clearAll(): void {
     this.cooldowns.clear();
-    logger.debug("All cooldowns cleared");
+    logger.debug(tDefault("system:cooldown.cleared_all"));
   }
 
   /**
@@ -124,6 +125,6 @@ export class CooldownManager {
   destroy(): void {
     clearInterval(this.cleanupInterval);
     this.cooldowns.clear();
-    logger.info("CooldownManager destroyed");
+    logger.info(tDefault("system:cooldown.destroyed"));
   }
 }

@@ -3,6 +3,7 @@
 // REFACTORING_PLAN.md Phase 2 準拠
 
 import { ChatInputCommandInteraction, RepliableInteraction } from "discord.js";
+import { tDefault } from "../locale";
 import { logger } from "../utils/logger";
 import { BaseError } from "./CustomErrors";
 
@@ -68,7 +69,7 @@ export const handleCommandError = async (
       });
     }
   } catch (replyError) {
-    logger.error("エラーメッセージの送信に失敗しました", replyError);
+    logger.error(tDefault("system:error.reply_failed"), replyError);
   }
 };
 
@@ -96,7 +97,7 @@ export const handleInteractionError = async (
       });
     }
   } catch (replyError) {
-    logger.error("エラーメッセージの送信に失敗しました", replyError);
+    logger.error(tDefault("system:error.reply_failed"), replyError);
   }
 };
 
@@ -108,7 +109,7 @@ export const setupGlobalErrorHandlers = (): void => {
   process.on(
     "unhandledRejection",
     (reason: unknown, promise: Promise<unknown>) => {
-      logger.error("Unhandled Promise Rejection:", {
+      logger.error(tDefault("system:error.unhandled_rejection_log"), {
         reason,
         promise,
       });
@@ -121,7 +122,7 @@ export const setupGlobalErrorHandlers = (): void => {
 
   // Uncaught Exception
   process.on("uncaughtException", (error: Error) => {
-    logger.error("Uncaught Exception:", error);
+    logger.error(tDefault("system:error.uncaught_exception_log"), error);
     logError(error);
 
     // 非運用エラーの場合はプロセスを終了
@@ -132,7 +133,7 @@ export const setupGlobalErrorHandlers = (): void => {
 
   // ワーニング
   process.on("warning", (warning: Error) => {
-    logger.warn("Node Warning:", {
+    logger.warn(tDefault("system:error.node_warning"), {
       name: warning.name,
       message: warning.message,
       stack: warning.stack,
@@ -145,16 +146,16 @@ export const setupGlobalErrorHandlers = (): void => {
  */
 export const setupGracefulShutdown = (cleanup?: () => Promise<void>): void => {
   const shutdown = async (signal: string) => {
-    logger.info(`${signal} received, shutting down gracefully...`);
+    logger.info(tDefault("system:shutdown.signal_received", { signal }));
 
     try {
       if (cleanup) {
         await cleanup();
       }
-      logger.info("Cleanup completed");
+      logger.info(tDefault("system:error.cleanup_complete"));
       process.exit(0);
     } catch (error) {
-      logger.error("Error during cleanup:", error);
+      logger.error(tDefault("system:error.cleanup_failed"), error);
       process.exit(1);
     }
   };

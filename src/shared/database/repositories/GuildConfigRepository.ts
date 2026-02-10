@@ -1,9 +1,8 @@
 // src/shared/database/repositories/GuildConfigRepository.ts
-// Repositoryパターン実装
+// Repositoryパターン実装（Prisma版）
 // REFACTORING_PLAN.md Phase 3 準拠
 
-import KeyvSqlite from "@keyv/sqlite";
-import Keyv from "keyv";
+import { PrismaClient } from "@prisma/client";
 import { DatabaseError } from "../../errors/CustomErrors";
 import { logger } from "../../utils/logger";
 
@@ -18,7 +17,7 @@ export interface GuildConfig {
   vacConfig?: VacConfig;
   bumpReminderConfig?: BumpReminderConfig;
   stickMessages?: StickMessage[];
-  leaveMemberLogConfig?: LeaveMemberLogConfig;
+  joinLeaveLogConfig?: JoinLeaveLogConfig;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,7 +51,7 @@ export interface StickMessage {
   messageId: string;
 }
 
-export interface LeaveMemberLogConfig {
+export interface JoinLeaveLogConfig {
   channelId?: string;
 }
 
@@ -84,20 +83,14 @@ export interface IGuildConfigRepository {
 }
 
 /**
- * Keyv実装のRepository
+ * Prisma実装のRepository
  */
-export class KeyvGuildConfigRepository implements IGuildConfigRepository {
-  private keyv: Keyv;
+export class PrismaGuildConfigRepository implements IGuildConfigRepository {
+  private prisma: PrismaClient;
   private readonly DEFAULT_LOCALE = "ja";
 
-  constructor(connectionString: string) {
-    const store = new KeyvSqlite(connectionString);
-    this.keyv = new Keyv({ store });
-
-    this.keyv.on("error", (err) => {
-      logger.error("Keyv connection error:", err);
-      throw new DatabaseError("Database connection failed");
-    });
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
   }
 
   /**
@@ -105,18 +98,15 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
    */
   async getConfig(guildId: string): Promise<GuildConfig | null> {
     try {
-      const config = await this.keyv.get(`guild:${guildId}`);
+      const record = await this.prisma.guildConfig.findUnique({
+        where: { guildId },
+      });
 
-      if (!config) {
+      if (!record) {
         return null;
       }
 
-      // Date型への変換
-      return {
-        ...config,
-        createdAt: new Date(config.createdAt),
-        updatedAt: new Date(config.updatedAt),
-      };
+      return this.recordToConfig(record);
     } catch (error) {
       logger.error(`Failed to get config for guild ${guildId}:`, error);
       throw new DatabaseError(
@@ -130,15 +120,27 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
    */
   async saveConfig(config: GuildConfig): Promise<void> {
     try {
-      const now = new Date();
-      const configData = {
-        ...config,
-        locale: config.locale || this.DEFAULT_LOCALE,
-        createdAt: config.createdAt || now,
-        updatedAt: now,
-      };
+      await this.prisma.guildConfig.create({
+        data: {
+          guildId: config.guildId,
+          locale: config.locale || this.DEFAULT_LOCALE,
+          afkConfig: config.afkConfig ? JSON.stringify(config.afkConfig) : null,
+          profChannelConfig: config.profChannelConfig
+            ? JSON.stringify(config.profChannelConfig)
+            : null,
+          vacConfig: config.vacConfig ? JSON.stringify(config.vacConfig) : null,
+          bumpReminderConfig: config.bumpReminderConfig
+            ? JSON.stringify(config.bumpReminderConfig)
+            : null,
+          stickMessages: config.stickMessages
+            ? JSON.stringify(config.stickMessages)
+            : null,
+          joinLeaveLogConfig: config.joinLeaveLogConfig
+            ? JSON.stringify(config.joinLeaveLogConfig)
+            : null,
+        },
+      });
 
-      await this.keyv.set(`guild:${config.guildId}`, configData);
       logger.info(`Saved config for guild ${config.guildId}`);
     } catch (error) {
       logger.error(`Failed to save config for guild ${config.guildId}:`, error);
@@ -156,7 +158,7 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
     updates: Partial<GuildConfig>,
   ): Promise<void> {
     try {
-      const existing = await this.getConfig(guildId);
+      const existing = await this.exists(guildId);
 
       if (!existing) {
         // 存在しない場合は新規作成
@@ -170,14 +172,28 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
         return;
       }
 
-      const updated = {
-        ...existing,
-        ...updates,
-        guildId, // guildIdは変更不可
-        updatedAt: new Date(),
-      };
+      // 更新データの準備
+      const data: Record<string, unknown> = {};
 
-      await this.keyv.set(`guild:${guildId}`, updated);
+      if (updates.locale !== undefined) data.locale = updates.locale;
+      if (updates.afkConfig !== undefined)
+        data.afkConfig = JSON.stringify(updates.afkConfig);
+      if (updates.profChannelConfig !== undefined)
+        data.profChannelConfig = JSON.stringify(updates.profChannelConfig);
+      if (updates.vacConfig !== undefined)
+        data.vacConfig = JSON.stringify(updates.vacConfig);
+      if (updates.bumpReminderConfig !== undefined)
+        data.bumpReminderConfig = JSON.stringify(updates.bumpReminderConfig);
+      if (updates.stickMessages !== undefined)
+        data.stickMessages = JSON.stringify(updates.stickMessages);
+      if (updates.joinLeaveLogConfig !== undefined)
+        data.joinLeaveLogConfig = JSON.stringify(updates.joinLeaveLogConfig);
+
+      await this.prisma.guildConfig.update({
+        where: { guildId },
+        data,
+      });
+
       logger.info(`Updated config for guild ${guildId}`);
     } catch (error) {
       logger.error(`Failed to update config for guild ${guildId}:`, error);
@@ -192,7 +208,10 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
    */
   async deleteConfig(guildId: string): Promise<void> {
     try {
-      await this.keyv.delete(`guild:${guildId}`);
+      await this.prisma.guildConfig.delete({
+        where: { guildId },
+      });
+
       logger.info(`Deleted config for guild ${guildId}`);
     } catch (error) {
       logger.error(`Failed to delete config for guild ${guildId}:`, error);
@@ -207,8 +226,10 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
    */
   async exists(guildId: string): Promise<boolean> {
     try {
-      const config = await this.keyv.get(`guild:${guildId}`);
-      return config !== undefined && config !== null;
+      const count = await this.prisma.guildConfig.count({
+        where: { guildId },
+      });
+      return count > 0;
     } catch (error) {
       logger.error(`Failed to check existence for guild ${guildId}:`, error);
       return false;
@@ -216,9 +237,23 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
   }
 
   /**
+   * Guild別言語取得
+   */
+  async getLocale(guildId: string): Promise<string> {
+    const config = await this.getConfig(guildId);
+    return config?.locale || this.DEFAULT_LOCALE;
+  }
+
+  /**
+   * Guild別言語更新
+   */
+  async updateLocale(guildId: string, locale: string): Promise<void> {
+    await this.updateConfig(guildId, { locale });
+  }
+
+  /**
    * 機能別の便利メソッド
    */
-
   async getAfkConfig(guildId: string): Promise<AfkConfig | null> {
     const config = await this.getConfig(guildId);
     return config?.afkConfig || null;
@@ -264,15 +299,45 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
   }
 
   /**
-   * Guild別言語取得（Phase 3.3）
+   * PrismaレコードをGuildConfigに変換
    */
-  async getLocale(guildId: string): Promise<string> {
-    const config = await this.getConfig(guildId);
-    return config?.locale || this.DEFAULT_LOCALE;
-  }
-
-  async updateLocale(guildId: string, locale: string): Promise<void> {
-    await this.updateConfig(guildId, { locale });
+  private recordToConfig(record: {
+    id: string;
+    guildId: string;
+    locale: string;
+    afkConfig: string | null;
+    profChannelConfig: string | null;
+    vacConfig: string | null;
+    bumpReminderConfig: string | null;
+    stickMessages: string | null;
+    joinLeaveLogConfig: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }): GuildConfig {
+    return {
+      guildId: record.guildId,
+      locale: record.locale,
+      afkConfig: record.afkConfig
+        ? (JSON.parse(record.afkConfig) as AfkConfig)
+        : undefined,
+      profChannelConfig: record.profChannelConfig
+        ? (JSON.parse(record.profChannelConfig) as ProfChannelConfig)
+        : undefined,
+      vacConfig: record.vacConfig
+        ? (JSON.parse(record.vacConfig) as VacConfig)
+        : undefined,
+      bumpReminderConfig: record.bumpReminderConfig
+        ? (JSON.parse(record.bumpReminderConfig) as BumpReminderConfig)
+        : undefined,
+      stickMessages: record.stickMessages
+        ? (JSON.parse(record.stickMessages) as StickMessage[])
+        : undefined,
+      joinLeaveLogConfig: record.joinLeaveLogConfig
+        ? (JSON.parse(record.joinLeaveLogConfig) as JoinLeaveLogConfig)
+        : undefined,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    };
   }
 }
 
@@ -280,7 +345,7 @@ export class KeyvGuildConfigRepository implements IGuildConfigRepository {
  * Repositoryインスタンス作成
  */
 export const createGuildConfigRepository = (
-  databaseUrl: string,
+  prisma: PrismaClient,
 ): IGuildConfigRepository => {
-  return new KeyvGuildConfigRepository(databaseUrl);
+  return new PrismaGuildConfigRepository(prisma);
 };

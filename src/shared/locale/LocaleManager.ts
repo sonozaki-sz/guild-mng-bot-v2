@@ -1,22 +1,57 @@
 // src/shared/locale/LocaleManager.ts
-// Guild別言語対応
-// REFACTORING_PLAN.md Phase 3.3 準拠
+// Guild別言語対応（i18next版）
 
-import { Catalog } from "@hi18n/core";
-import { IGuildConfigRepository } from "../database/repositories/GuildConfigRepository";
+import i18next, { TFunction } from "i18next";
+import type { IGuildConfigRepository } from "../database/repositories/GuildConfigRepository";
 import { logger } from "../utils/logger";
+import {
+  DEFAULT_LOCALE,
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+} from "./i18n";
+import { resources } from "./locales";
 
 /**
  * ロケールマネージャー
  * Guild別に動的に言語を切り替える
  */
 export class LocaleManager {
-  private catalogs: Map<string, Catalog<any>> = new Map();
-  private defaultLocale: string;
+  private defaultLocale: SupportedLocale;
   private repository?: IGuildConfigRepository;
+  private initialized = false;
 
-  constructor(defaultLocale: string = "ja") {
+  constructor(defaultLocale: SupportedLocale = DEFAULT_LOCALE) {
     this.defaultLocale = defaultLocale;
+  }
+
+  /**
+   * i18nextを初期化
+   */
+  async initialize(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    await i18next.init({
+      lng: this.defaultLocale,
+      fallbackLng: this.defaultLocale,
+      debug: process.env.NODE_ENV === "development",
+
+      resources: {
+        ja: resources.ja,
+        en: resources.en,
+      },
+
+      interpolation: {
+        escapeValue: false,
+      },
+
+      ns: ["common", "commands", "errors", "events", "system"],
+      defaultNS: "common",
+    });
+
+    this.initialized = true;
+    logger.info("LocaleManager initialized with i18next");
   }
 
   /**
@@ -24,14 +59,6 @@ export class LocaleManager {
    */
   setRepository(repository: IGuildConfigRepository): void {
     this.repository = repository;
-  }
-
-  /**
-   * カタログを登録
-   */
-  registerCatalog(locale: string, catalog: Catalog<any>): void {
-    this.catalogs.set(locale, catalog);
-    logger.info(`Registered locale catalog: ${locale}`);
   }
 
   /**
@@ -43,27 +70,23 @@ export class LocaleManager {
     params?: Record<string, any>,
   ): Promise<string> {
     try {
+      if (!this.initialized) {
+        await this.initialize();
+      }
+
       // Guild IDが指定されている場合、Guild設定から言語を取得
-      let locale = this.defaultLocale;
+      let locale: SupportedLocale = this.defaultLocale;
 
       if (guildId && this.repository) {
         const guildLocale = await this.repository.getLocale(guildId);
-        locale = guildLocale || this.defaultLocale;
+        if (guildLocale && this.isSupported(guildLocale)) {
+          locale = guildLocale as SupportedLocale;
+        }
       }
 
-      // カタログから翻訳を取得
-      const catalog =
-        this.catalogs.get(locale) || this.catalogs.get(this.defaultLocale);
-
-      if (!catalog) {
-        logger.warn(`No catalog found for locale: ${locale}`);
-        return key;
-      }
-
-      // @hi18n/coreの翻訳メソッドを呼び出す
-      // @hi18n/coreのCatalogは getMessage や他のメソッドを使用する可能性があります
-      // 一時的に any として扱います
-      return (catalog as any).t?.(key, params) || (catalog as any)[key] || key;
+      // i18nextで翻訳
+      const options = params ? { lng: locale, ...params } : { lng: locale };
+      return i18next.t(key as any, options);
     } catch (error) {
       logger.error(`Translation failed for key: ${key}`, error);
       return key;
@@ -71,29 +94,52 @@ export class LocaleManager {
   }
 
   /**
+   * 翻訳関数を取得（特定の言語用）
+   */
+  getFixedT(locale: SupportedLocale): TFunction {
+    return i18next.getFixedT(locale);
+  }
+
+  /**
+   * Guild別の翻訳関数を取得
+   */
+  async getGuildT(guildId: string | undefined): Promise<TFunction> {
+    let locale: SupportedLocale = this.defaultLocale;
+
+    if (guildId && this.repository) {
+      const guildLocale = await this.repository.getLocale(guildId);
+      if (guildLocale && this.isSupported(guildLocale)) {
+        locale = guildLocale as SupportedLocale;
+      }
+    }
+
+    return this.getFixedT(locale);
+  }
+
+  /**
    * デフォルト言語を取得
    */
-  getDefaultLocale(): string {
+  getDefaultLocale(): SupportedLocale {
     return this.defaultLocale;
   }
 
   /**
    * 対応言語一覧を取得
    */
-  getSupportedLocales(): string[] {
-    return Array.from(this.catalogs.keys());
+  getSupportedLocales(): readonly SupportedLocale[] {
+    return SUPPORTED_LOCALES;
   }
 
   /**
    * 言語が対応しているか確認
    */
   isSupported(locale: string): boolean {
-    return this.catalogs.has(locale);
+    return SUPPORTED_LOCALES.includes(locale as SupportedLocale);
   }
 }
 
 // シングルトンインスタンス
-export const localeManager = new LocaleManager("ja");
+export const localeManager = new LocaleManager();
 
 /**
  * ヘルパー関数：Guild別翻訳
@@ -110,9 +156,8 @@ export const t = async (
  * ヘルパー関数：デフォルト言語で翻訳
  */
 export const tDefault = (key: string, params?: Record<string, any>): string => {
-  const catalog = localeManager["catalogs"].get(
-    localeManager.getDefaultLocale(),
-  );
-  if (!catalog) return key;
-  return (catalog as any).t?.(key, params) || (catalog as any)[key] || key;
+  const options = params
+    ? { lng: localeManager.getDefaultLocale(), ...params }
+    : { lng: localeManager.getDefaultLocale() };
+  return i18next.t(key as any, options);
 };

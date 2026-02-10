@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 // Guild Configuration
@@ -15,7 +14,15 @@ model GuildConfig {
   id        String   @id @default(cuid())
   guildId   String   @unique
   locale    String   @default("ja")
-  timezone  String   @default("Asia/Tokyo")
+
+  // 詳細設定（JSON形式で保存）
+  afkConfig              String? // JSON: AfkConfig
+  profChannelConfig      String? // JSON: ProfChannelConfig
+  vacConfig              String? // JSON: VacConfig
+  bumpReminderConfig     String? // JSON: BumpReminderConfig
+  stickMessages          String? // JSON: StickMessage[]
+  joinLeaveLogConfig     String? // JSON: JoinLeaveLogConfig
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -3,20 +3,23 @@
 
 import { Routes } from "discord.js";
 import { env } from "../shared/config/env";
+import { tDefault } from "../shared/locale";
 import { logger } from "../shared/utils/logger";
 import { createBotClient } from "./client";
 import { commands } from "./commands";
 import { events } from "./events";
 
 async function startBot() {
-  logger.info("Discord Botを起動しています...");
+  logger.info(tDefault("system:bot.starting"));
 
   // クライアント作成
   const client = createBotClient();
 
   try {
     // コマンド登録
-    logger.info(`${commands.length}個のコマンドを登録しています...`);
+    logger.info(
+      tDefault("system:bot.commands.registering", { count: commands.length }),
+    );
 
     for (const command of commands) {
       client.commands.set(command.data.name, command);
@@ -27,10 +30,12 @@ async function startBot() {
       body: commands.map((cmd) => cmd.data.toJSON()),
     });
 
-    logger.info("コマンド登録完了");
+    logger.info(tDefault("system:bot.commands.registered"));
 
     // イベント登録
-    logger.info(`${events.length}個のイベントを登録しています...`);
+    logger.info(
+      tDefault("system:bot.events.registering", { count: events.length }),
+    );
 
     for (const event of events) {
       if (event.once) {
@@ -43,28 +48,28 @@ async function startBot() {
       logger.debug(`イベント登録: ${event.name}`);
     }
 
-    logger.info("イベント登録完了");
+    logger.info(tDefault("system:bot.events.registered"));
 
     // Discordにログイン
     await client.login(env.DISCORD_TOKEN);
   } catch (error) {
-    logger.error("Bot起動中にエラーが発生しました:", error);
+    logger.error(tDefault("system:bot.startup.error"), error);
     process.exit(1);
   }
 }
 
 // エラーハンドリング
 process.on("unhandledRejection", (error) => {
-  logger.error("未処理のPromise拒否:", error);
+  logger.error(tDefault("system:error.unhandled_rejection"), error);
 });
 
 process.on("uncaughtException", (error) => {
-  logger.error("未処理の例外:", error);
+  logger.error(tDefault("system:error.uncaught_exception"), error);
   process.exit(1);
 });
 
 // 起動
 startBot().catch((error) => {
-  logger.error("Bot起動失敗:", error);
+  logger.error(tDefault("system:bot.startup.failed"), error);
   process.exit(1);
 });
