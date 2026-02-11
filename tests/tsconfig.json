@@ -1,40 +1,9 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    // === コンパイルターゲット ===
-    "target": "ES2024",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["ES2024"],
-
-    // === 出力設定 ===
-    "outDir": "../dist",
-    "declaration": false,
-    "sourceMap": true,
-    "noEmit": true,
-
-    // === 厳格性（テスト用に緩和） ===
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitReturns": false,
-    "noFallthroughCasesInSwitch": true,
-
-    // === モジュール互換性 ===
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-
-    // === パス・解決 ===
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": false,
-
-    // === テスト用型定義 ===
-    "types": ["node", "jest"]
+    "types": ["node", "jest"], // テスト環境用の型定義
+    "noEmit": true // テストコードはビルドしない
   },
-  "include": ["**/*.ts", "**/*.test.ts", "**/*.spec.ts"],
-  "exclude": ["node_modules", "../dist", "../node_modules"]
+  "include": ["./**/*"],
+  "exclude": ["node_modules"]
 }

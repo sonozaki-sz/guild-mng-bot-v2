@@ -34,9 +34,9 @@
     "allowImportingTsExtensions": false, // .ts拡張子インポート禁止
 
     // === その他 ===
-    "types": ["node", "jest"], // グローバル型定義
+    "types": ["node"], // グローバル型定義
     "noEmit": false // ビルド時に出力する
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests", "**/*.spec.ts", "**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "tests"]
 }

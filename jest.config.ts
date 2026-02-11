@@ -30,6 +30,7 @@ export default {
       "ts-jest",
       {
         useESM: true,
+        tsconfig: "tests/tsconfig.json",
       },
     ],
   },
