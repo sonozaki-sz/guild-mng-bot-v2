@@ -14,6 +14,7 @@ export const NODE_ENV = {
 
 export type NodeEnv = (typeof NODE_ENV_VALUES)[number];
 
+// 環境変数スキーマ定義（起動時バリデーション用）
 const envSchema = z.object({
   NODE_ENV: z.enum(NODE_ENV_VALUES).default(NODE_ENV.DEVELOPMENT),
 
@@ -50,10 +51,13 @@ const envSchema = z.object({
     .transform((val) => val === "true"),
 });
 
+// 実行環境変数を検証して利用可能な設定へ変換する
 const parseEnv = () => {
   try {
+    // 1) 依存関係を含む追加検証 2) 実環境変数をパース
     const result = envSchema
       .superRefine((data, ctx) => {
+        // 本番では JWT_SECRET を必須化（Web API認証の安全性確保）
         if (data.NODE_ENV === NODE_ENV.PRODUCTION && !data.JWT_SECRET) {
           ctx.addIssue({
             code: "custom",
@@ -72,6 +76,7 @@ const parseEnv = () => {
       );
     }
 
+    // 検証済み設定を呼び出し元へ返す
     return result;
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -82,6 +87,7 @@ const parseEnv = () => {
       });
       console.error("\nPlease check your .env file.");
     }
+    // 起動継続すると不正設定状態で動作するため即時終了
     process.exit(1);
   }
 };

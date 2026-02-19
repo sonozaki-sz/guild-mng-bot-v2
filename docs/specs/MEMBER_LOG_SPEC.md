@@ -343,6 +343,8 @@ function createLeaveEmbed(member: GuildMember): EmbedBuilder {
 
 ## 🧪 テストケース
 
+最新の件数とカバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照。
+
 ### ユニットテスト
 
 - [ ] Embed生成

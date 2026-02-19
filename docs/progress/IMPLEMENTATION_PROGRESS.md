@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年2月19日
+最終更新: 2026年2月20日
 
 ---
 
@@ -13,25 +13,25 @@
 | カテゴリ             | 実装済み | 未実装 | 進捗率 |
 | -------------------- | -------- | ------ | ------ |
 | コア機能             | 13       | 0      | 100%   |
-| コマンド             | 4        | 8      | 33%    |
-| イベント             | 3        | 4      | 43%    |
-| サービス             | 2        | 5      | 29%    |
-| 主要機能             | 2        | 5      | 29%    |
+| コマンド             | 6        | 6      | 50%    |
+| イベント             | 5        | 2      | 71%    |
+| サービス             | 4        | 3      | 57%    |
+| 主要機能             | 3        | 4      | 43%    |
 | データベーステーブル | 3        | 5      | 38%    |
 
 ### 機能別実装状況
 
-| 機能                 | 状態 | 実装率 | 備考                           |
-| -------------------- | ---- | ------ | ------------------------------ |
-| Bumpリマインダー     | ✅   | 100%   | 完全実装                       |
-| AFK                  | ✅   | 100%   | 完全実装                       |
-| 多言語対応           | ✅   | 100%   | i18next + コマンドローカライズ |
-| メッセージレスポンス | ✅   | 100%   | 完全実装                       |
-| VAC                  | 📋   | 0%     | 仕様書のみ                     |
-| メッセージ固定       | 📋   | 0%     | 仕様書のみ                     |
-| 参加・脱退ログ       | 📋   | 0%     | 仕様書のみ                     |
-| メッセージ削除       | 📋   | 0%     | 仕様書のみ                     |
-| Web UI               | 🚧   | 10%    | 基盤のみ                       |
+| 機能                 | 状態 | 実装率 | 備考                             |
+| -------------------- | ---- | ------ | -------------------------------- |
+| Bumpリマインダー     | ✅   | 100%   | 完全実装                         |
+| AFK                  | ✅   | 100%   | 完全実装                         |
+| 多言語対応           | ✅   | 100%   | i18next + コマンドローカライズ   |
+| メッセージレスポンス | ✅   | 100%   | 完全実装                         |
+| VAC                  | ✅   | 100%   | 自動作成・操作パネルまで実装完了 |
+| メッセージ固定       | 📋   | 0%     | 仕様書のみ                       |
+| 参加・脱退ログ       | 📋   | 0%     | 仕様書のみ                       |
+| メッセージ削除       | 📋   | 0%     | 仕様書のみ                       |
+| Web UI               | 🚧   | 10%    | 基盤のみ                         |
 
 **凡例**: ✅ 完了 | 🚧 実装中 | 📋 仕様書作成済み
 
@@ -116,7 +116,7 @@
   - findAllPending
   - create / findById / delete
   - cancelByGuild / cleanupOld
-- ✅ GuildBumpReminderConfigStore実装（`src/shared/database/repositories/GuildBumpReminderConfigStore.ts`）
+- ✅ GuildBumpReminderConfigStore実装（`src/shared/database/repositories/guildBumpReminderConfigStore.ts`）
   - getBumpReminderConfig / setBumpReminderConfig
   - mentionRoleの設定・解除
   - mentionUserの追加・削除・全削除
@@ -250,7 +250,7 @@
 
 - `src/bot/commands/afk.ts`
 - `src/bot/commands/afk-config.ts`
-- `src/shared/database/repositories/GuildConfigRepository.ts`
+- `src/shared/database/repositories/guildConfigRepository.ts`
 
 **テスト**:
 
@@ -289,7 +289,7 @@
 **関連ファイル**:
 
 - `src/shared/locale/i18n.ts`
-- `src/shared/locale/LocaleManager.ts`
+- `src/shared/locale/localeManager.ts`
 - `src/shared/locale/commandLocalizations.ts`
 - `src/shared/locale/locales/ja/translation.json`
 - `src/shared/locale/locales/en/translation.json`
@@ -391,12 +391,14 @@
 
 ### 🎮 実装済みコマンド
 
-| コマンド                | 説明                     | 状態 | 備考     |
-| ----------------------- | ------------------------ | ---- | -------- |
-| `/ping`                 | 疎通確認                 | ✅   | 完全実装 |
-| `/afk`                  | AFKチャンネルへ移動      | ✅   | 完全実装 |
-| `/afk-config`           | AFK機能設定              | ✅   | 完全実装 |
-| `/bump-reminder-config` | Bumpリマインダー機能設定 | ✅   | 完全実装 |
+| コマンド                | 説明                      | 状態 | 備考     |
+| ----------------------- | ------------------------- | ---- | -------- |
+| `/ping`                 | 疎通確認                  | ✅   | 完全実装 |
+| `/afk`                  | AFKチャンネルへ移動       | ✅   | 完全実装 |
+| `/afk-config`           | AFK機能設定               | ✅   | 完全実装 |
+| `/bump-reminder-config` | Bumpリマインダー機能設定  | ✅   | 完全実装 |
+| `/vac-config`           | VAC設定（作成/削除/表示） | ✅   | 完全実装 |
+| `/vac`                  | VAC VC操作（名前/人数）   | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -404,6 +406,8 @@
 - `src/bot/commands/afk.ts`
 - `src/bot/commands/afk-config.ts`
 - `src/bot/commands/bump-reminder-config.ts`
+- `src/bot/commands/vac-config.ts`
+- `src/bot/commands/vac.ts`
 - `src/bot/commands/index.ts`
 - `src/shared/utils/messageResponse.ts`
 
@@ -416,15 +420,20 @@
 | `clientReady`       | Bot起動処理                | ✅   | 完全実装 |
 | `interactionCreate` | インタラクション処理       | ✅   | 完全実装 |
 | `messageCreate`     | メッセージ作成（Bump検知） | ✅   | 完全実装 |
+| `voiceStateUpdate`  | VAC自動作成・自動削除      | ✅   | 完全実装 |
+| `channelDelete`     | VAC設定同期                | ✅   | 完全実装 |
 
 **関連ファイル**:
 
 - `src/bot/events/clientReady.ts`
 - `src/bot/events/interactionCreate.ts`
 - `src/bot/events/messageCreate.ts`
+- `src/bot/events/voiceStateUpdate.ts`
+- `src/bot/events/channelDelete.ts`
 - `src/bot/events/index.ts`
-- `src/bot/handlers/buttons/` (bumpPanel.ts ボタンハンドラー)
-- `src/bot/handlers/modals/` (モーダルハンドラー)
+- `src/bot/handlers/buttons/` (bumpPanel.ts, vacPanel.ts)
+- `src/bot/handlers/modals/` (vacPanel.ts)
+- `src/bot/handlers/selectMenus/` (vacPanel.ts)
 
 ---
 
@@ -435,11 +444,13 @@
 | CooldownManager     | コマンドクールダウン管理           | ✅   | 完全実装 |
 | BumpReminderManager | Bumpリマインダースケジューラー管理 | ✅   | 完全実装 |
 | messageResponse     | Embedメッセージユーティリティ      | ✅   | 完全実装 |
+| VacControlPanel     | VAC操作パネル送信ユーティリティ    | ✅   | 完全実装 |
 
 **関連ファイル**:
 
-- `src/bot/services/CooldownManager.ts`
+- `src/bot/services/cooldownManager.ts`
 - `src/bot/services/index.ts`
+- `src/bot/services/VacControlPanel.ts`
 - `src/shared/features/bump-reminder/manager.ts`
 - `src/shared/utils/messageResponse.ts`
 
@@ -499,20 +510,22 @@ model BumpReminder {
 
 以下は仕様書が作成済みで、実装待ちの機能です。
 
-### 🎤 VC自動作成機能（VAC）（仕様書のみ）
+### 🎤 VC自動作成機能（VAC）
 
-**状態**: 📋 仕様書作成済み、実装待ち
+**状態**: ✅ 実装完了
 
 **仕様書**: [docs/specs/VAC_SPEC.md](../specs/VAC_SPEC.md)
 
-**実装予定内容**:
+**実装内容**:
 
-- voiceStateUpdateイベントハンドラ
-- トリガーチャンネル監視と専用VC自動作成
-- 空チャンネル自動削除
-- 操作パネル（AFKチャンネル移動、VC設定変更）
-- `/vac-config` コマンド
-- データベーススキーマ追加
+- `voiceStateUpdate` でトリガー参加時に専用VCを自動作成
+- 作成済みVCの空室検知による自動削除
+- `channelDelete`/`clientReady` で設定と実体の同期クリーンアップ
+- `/vac-config`（`create-trigger-vc` / `remove-trigger-vc` / `show`）
+- `/vac`（`vc-rename` / `vc-limit`）
+- 操作パネル（button/modal/user select）
+- パネルUIを縦一列化し、全ボタン `ButtonStyle.Primary` に統一
+- 応答APIを `flags: MessageFlags.Ephemeral` へ統一
 
 ---
 
@@ -573,9 +586,9 @@ model BumpReminder {
 
 | コンポーネント | 実装済み | 未実装 | 合計 |
 | -------------- | -------- | ------ | ---- |
-| コマンド       | 4        | 8      | 12   |
-| イベント       | 3        | 4      | 7    |
-| サービス       | 3        | 4      | 7    |
+| コマンド       | 6        | 6      | 12   |
+| イベント       | 5        | 2      | 7    |
+| サービス       | 4        | 3      | 7    |
 | リポジトリ     | 2        | 5      | 7    |
 | ユーティリティ | 9        | 1      | 10   |
 
@@ -604,11 +617,27 @@ model BumpReminder {
 
 ---
 
-**最終更新**: 2026年2月19日
+**最終更新**: 2026年2月20日
 
 ---
 
 ## ✅ 最近の完了項目 (2026年2月19日 追記分)
+
+### Phase 2: VAC機能実装
+
+- ✅ `src/bot/events/voiceStateUpdate.ts` 実装（自動作成・自動削除）
+- ✅ `src/bot/events/channelDelete.ts` 実装（削除同期）
+- ✅ `src/bot/commands/vac-config.ts` 実装（create/remove/show）
+- ✅ `src/bot/commands/vac.ts` 実装（vc-rename/vc-limit）
+- ✅ `src/bot/services/VacControlPanel.ts` 実装（操作パネル生成）
+- ✅ `src/bot/handlers/selectMenus/vacPanel.ts` 追加（AFK移動）
+- ✅ `src/bot/events/clientReady.ts` 起動時VACクリーンアップを追加
+
+### deprecation対応（Interaction response）
+
+- ✅ `ephemeral` を `flags: MessageFlags.Ephemeral` へ置換
+- ✅ AFK/Bump/VAC/共通ErrorHandler/interactionCreate に横展開
+- ✅ docs/specs の表記も `MessageFlags.Ephemeral` に統一
 
 ### Phase 1: メッセージシステム統一
 

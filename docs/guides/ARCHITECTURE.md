@@ -66,34 +66,41 @@ src/
 ├── bot/                   # Bot プロセス専用
 │   ├── main.ts            # エントリーポイント
 │   ├── client.ts          # BotClient クラス（discord.js Client 拡張）
+│   ├── types/
+│   │   └── discord.ts     # Bot専用のdiscord.js型拡張
 │   ├── commands/          # スラッシュコマンド実装
 │   ├── events/            # Discord イベントハンドラ
-│   ├── handlers/
-│   │   ├── buttons/       # ボタンインタラクションハンドラ
-│   │   └── modals/        # モーダルインタラクションハンドラ
+│   ├── handlers/interactionCreate/
+│   │   ├── flow/          # command/components/modal のフロー制御
+│   │   └── ui/            # UIインタラクションハンドラレジストリ
+│   ├── errors/
+│   │   └── interactionErrorHandler.ts
+│   ├── utils/
+│   │   ├── interaction.ts
+│   │   └── messageResponse.ts
 │   └── services/
-│       └── CooldownManager.ts
+│       ├── cooldownManager.ts
+│       └── sharedAccess.ts
 │
 ├── shared/                # Bot・Web 両プロセスで使用する共有コード
 │   ├── config/
 │   │   └── env.ts         # 環境変数定義（Zod バリデーション）
 │   ├── database/
 │   │   ├── types.ts       # ドメイン型定義（GuildConfig, AfkConfig 等）
-│   │   └── repositories/  # DB アクセス層（Repository パターン）
+│   │   ├── repositories/  # DB アクセス層（Repository パターン）
+│   │   └── stores/        # 機能別の永続化ストア
 │   ├── errors/
-│   │   ├── CustomErrors.ts
-│   │   └── ErrorHandler.ts
+│   │   ├── customErrors.ts
+│   │   ├── errorUtils.ts
+│   │   └── processErrorHandler.ts
 │   ├── features/
-│   │   └── bump-reminder/ # 機能ごとのロジック集約
+│   │   ├── vac/           # 共有可能なVAC設定サービス（Repository依存）
+│   │   └── bump-reminder/ # 共有可能なBump設定サービス（Repository依存）
 │   ├── locale/            # i18n（i18next）
 │   ├── scheduler/
-│   │   └── JobScheduler.ts
-│   ├── types/
-│   │   └── discord.ts     # discord.js 型拡張
+│   │   └── jobScheduler.ts
 │   └── utils/
-│       ├── interaction.ts
 │       ├── logger.ts
-│       ├── messageResponse.ts
 │       └── prisma.ts
 │
 └── web/                   # Web プロセス専用
@@ -109,12 +116,21 @@ src/
 
 ### 設計原則
 
-| ルール                                                | 理由                                              |
-| ----------------------------------------------------- | ------------------------------------------------- |
-| `src/bot/` → `src/shared/` への依存のみ許可           | Bot と Web の疎結合を維持                         |
-| `src/web/` → `src/shared/` への依存のみ許可           | 同上                                              |
-| `src/shared/` は Bot・Web どちらにも依存しない        | 共有コードの独立性を保証                          |
-| 機能ロジックは `src/shared/features/<機能名>/` に集約 | コマンド・イベント・Webが同じロジックを参照できる |
+| ルール                                                          | 理由                                 |
+| --------------------------------------------------------------- | ------------------------------------ |
+| `src/bot/` → `src/shared/` への依存のみ許可                     | Bot と Web の疎結合を維持            |
+| `src/web/` → `src/shared/` への依存のみ許可                     | 同上                                 |
+| `src/shared/` は Bot・Web どちらにも依存しない                  | 共有コードの独立性を保証             |
+| 共有可能な機能ロジックは `src/shared/features/<機能名>/` に配置 | Bot/Web での再利用性を維持           |
+| Bot専用機能は `src/bot/features/<機能名>/` に配置               | Discord依存・Bot専用責務の混在を防止 |
+
+### 機能モジュールの命名規約
+
+- エントリーポイントは `index.ts` に統一する
+- 機能サービスは `*Service.ts`（例: `VacConfigService.ts`, `BumpReminderService.ts`）
+- 機能定数は `*Constants.ts`（例: `BumpReminderConstants.ts`）
+- 機能Repositoryは `*Repository.ts`（例: `BumpReminderRepository.ts`）
+- 互換ファイルは残さず廃止し、参照先は単一エントリーポイントへ統一する
 
 ---
 
@@ -190,7 +206,7 @@ const prisma = getPrismaClient(); // null の場合あり
 テスト時は Repository をモック注入することで DB 依存を排除できます。
 
 ```
-GuildConfigRepository   ← ギルド全般設定（locale, afkConfig, bumpReminderConfig 等）
+GuildConfigRepository   ← ギルド全般設定（locale, afkConfig, bumpReminderConfig, vacConfig 等）
 GuildBumpReminderConfigStore ← BumpReminderConfig の詳細な read/write 操作
 BumpReminderRepository  ← BumpReminder テーブルの CRUD（features/bump-reminder/）
 ```

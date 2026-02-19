@@ -107,7 +107,7 @@ AFKチャンネルを設定します。
 **動作:**
 
 1. 現在のAFK設定を取得
-2. 設定内容を表示（ephemeral）
+2. 設定内容を表示（MessageFlags.Ephemeral）
 
 **実行例:**
 
@@ -233,7 +233,7 @@ interface AfkConfig {
    - enabled: true
    - channelId: channel.id
    ↓
-5. 成功メッセージを送信（ephemeral）
+5. 成功メッセージを送信（MessageFlags.Ephemeral）
    ↓
 6. ログ記録
 ```
@@ -248,7 +248,7 @@ interface AfkConfig {
 3. 設定が存在すればチャンネル情報を表示
    設定がなければ未設定メッセージを表示
    ↓
-4. ephemeralで応答
+4. MessageFlags.Ephemeralで応答
 ```
 
 ---
@@ -365,6 +365,8 @@ throw new ValidationError(
 
 ## ✅ テストケース
 
+最新の件数とカバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照。
+
 ### `/afk` コマンド
 
 #### 正常系
@@ -387,7 +389,7 @@ throw new ValidationError(
 
 - [ ] **チャンネル設定**: ボイスチャンネルを指定し、AFK設定が保存される
 - [ ] **既存設定上書き**: 既にAFK設定がある場合、新しいチャンネルで上書きされる
-- [ ] **成功メッセージ**: 設定成功時にephemeralで通知される
+- [ ] **成功メッセージ**: 設定成功時にMessageFlags.Ephemeralで通知される
 
 #### 異常系
 

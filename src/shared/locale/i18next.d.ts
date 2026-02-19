@@ -10,6 +10,7 @@ declare module "i18next" {
     defaultNS: "common";
 
     // リソースの型定義
+    // ja を基準型にすることで全言語のキー整合を担保する
     resources: TranslationResources["ja"];
 
     // 翻訳キーの型安全性を有効化

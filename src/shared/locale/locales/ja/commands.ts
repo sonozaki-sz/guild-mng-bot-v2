@@ -28,6 +28,7 @@ export const commands = {
   "afk-config.embed.field.channel": "AFKチャンネル",
 
   // Bumpリマインダー設定コマンド（Discord UIラベル）
+  // スラッシュコマンド本体とサブコマンド説明
   "bump-reminder-config.description": "Bumpリマインダーの設定（管理者専用）",
   "bump-reminder-config.enable.description": "Bumpリマインダー機能を有効化",
   "bump-reminder-config.disable.description": "Bumpリマインダー機能を無効化",
@@ -46,6 +47,8 @@ export const commands = {
   "bump-reminder-config.show.description": "現在の設定を表示",
 
   // Bumpリマインダー設定コマンド レスポンス
+  // 共通状態メッセージ
+  // embed.* はコマンド側の成功/失敗ハンドリング順に並べる
   "bump-reminder-config.embed.success_title": "設定完了",
   "bump-reminder-config.embed.not_configured":
     "Bumpリマインダーが設定されていません。",
@@ -55,6 +58,7 @@ export const commands = {
     "Bumpリマインダー機能を有効化しました",
   "bump-reminder-config.embed.disable_success":
     "Bumpリマインダー機能を無効化しました",
+  // メンション設定（追加/削除/入力不備）
   "bump-reminder-config.embed.set_mention_role_success":
     "メンションロールを {{role}} に設定しました",
   "bump-reminder-config.embed.set_mention_user_added":
@@ -75,11 +79,63 @@ export const commands = {
   "bump-reminder-config.embed.remove_mention_error_title": "削除エラー",
   "bump-reminder-config.embed.remove_mention_error_no_users":
     "削除するユーザーが登録されていません",
+  // show サブコマンド表示用
   "bump-reminder-config.embed.title": "Bumpリマインダー機能",
   "bump-reminder-config.embed.status": "現在の設定状態",
   "bump-reminder-config.embed.field.status": "状態",
   "bump-reminder-config.embed.field.mention_role": "メンションロール",
   "bump-reminder-config.embed.field.mention_users": "メンションユーザー",
+
+  // VAC設定コマンド
+  // トリガーVC管理（作成/削除）
+  "vac-config.description": "VC自動作成機能の設定（サーバー管理者向け）",
+  "vac-config.create-trigger-vc.description": "トリガーチャンネルを作成",
+  "vac-config.create-trigger-vc.category.description":
+    "作成先カテゴリ（TOP またはカテゴリ。未指定時は実行カテゴリ）",
+  "vac-config.remove-trigger-vc.description": "トリガーチャンネルを削除",
+  "vac-config.remove-trigger-vc.category.description":
+    "削除対象（TOP またはカテゴリ。未指定時は実行カテゴリ）",
+  "vac-config.remove-trigger-vc.category.top": "TOP（カテゴリなし）",
+  "vac-config.show.description": "現在の設定を表示",
+  // show サブコマンド表示用
+  "vac-config.embed.title": "VC自動作成機能",
+  "vac-config.embed.not_configured": "未設定",
+  "vac-config.embed.no_created_vcs": "なし",
+  "vac-config.embed.top": "TOP",
+  "vac-config.embed.field.trigger_channels": "トリガーチャンネル",
+  "vac-config.embed.field.created_vcs": "作成されたVC数",
+  "vac-config.embed.field.created_vc_details": "作成されたVC",
+  "vac-config.embed.trigger_created":
+    "トリガーチャンネル {{channel}} を作成しました",
+  "vac-config.embed.trigger_removed":
+    "トリガーチャンネル {{channel}} を削除しました",
+  "vac-config.embed.remove_error_title": "削除エラー",
+
+  // VAC操作コマンド
+  // VC操作（リネーム/人数上限）
+  // `vac.panel.*` はボタン customId の表示順に合わせる
+  "vac.description": "自動作成VCの設定を変更",
+  "vac.vc-rename.description": "参加中のVC名を変更",
+  "vac.vc-rename.name.description": "新しいVC名",
+  "vac.vc-limit.description": "参加中VCの人数制限を変更",
+  "vac.vc-limit.limit.description": "人数制限（0=無制限、最大99）",
+  "vac.embed.renamed": "VC名を {{name}} に変更しました",
+  "vac.embed.limit_changed": "人数制限を {{limit}} に設定しました",
+  // パネル内の AFK 一括移動結果メッセージ
+  "vac.embed.members_moved": "{{count}}人を AFK に移動しました",
+  // パネル再送時（最下部移動）の成功メッセージ
+  "vac.embed.panel_refreshed": "パネルを最下部に移動しました",
+  // 0人制限を表示する際の共通ラベル
+  "vac.embed.unlimited": "無制限",
+  // 操作パネル UI 文言
+  "vac.panel.title": "ボイスチャンネル操作パネル",
+  // パネル導入説明（Embed本文）
+  "vac.panel.description": "このパネルからVCの設定を変更できます。",
+  // ボタンは command handler の customId と対応づく
+  "vac.panel.rename_button": "VC名を変更",
+  "vac.panel.limit_button": "人数制限を変更",
+  "vac.panel.afk_button": "メンバーをAFKに移動",
+  "vac.panel.refresh_button": "パネルを最下部に移動",
 } as const;
 
 export type CommandsTranslations = typeof commands;

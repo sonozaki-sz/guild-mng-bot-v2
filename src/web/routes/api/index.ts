@@ -5,10 +5,10 @@ import type { FastifyPluginAsync } from "fastify";
 import { apiAuthPlugin } from "../../middleware/auth";
 
 export const apiRoutes: FastifyPluginAsync = async (fastify) => {
-  // 全 APIルートに認証を適用
+  // この配下に登録される全APIへ認証フックを適用
   await fastify.register(apiAuthPlugin);
 
-  // TODO: APIルートをここに追加
+  // ルート生存確認用の最小エンドポイント
   fastify.get("/", async () => {
     return {
       message: "Guild Management Bot API",

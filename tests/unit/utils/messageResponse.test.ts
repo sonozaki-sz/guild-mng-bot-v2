@@ -12,11 +12,13 @@ import {
   createWarningEmbed,
 } from "../../../src/shared/utils/messageResponse";
 
+// i18n 依存のタイトル検証に備えてロケールを初期化
 beforeAll(async () => {
   await localeManager.initialize();
 });
 
 describe("messageResponse", () => {
+  // ステータス別Embed生成とオプション反映の挙動を検証
   describe("createStatusEmbed", () => {
     it.each<[MessageStatus, number, string]>([
       ["success", 0x57f287, "✅"],
@@ -39,6 +41,7 @@ describe("messageResponse", () => {
     );
 
     it("should add timestamp when timestamp option is true", () => {
+      // timestamp オプション有効時は埋め込みに時刻が付与される
       const embed = createStatusEmbed("info", "Title", "Description", {
         timestamp: true,
       });
@@ -47,6 +50,7 @@ describe("messageResponse", () => {
     });
 
     it("should not add timestamp when timestamp option is false or undefined", () => {
+      // false/未指定時は timestamp を付与しない
       const embed1 = createStatusEmbed("info", "Title", "Description", {
         timestamp: false,
       });
@@ -57,6 +61,7 @@ describe("messageResponse", () => {
     });
 
     it("should add fields when fields option is provided", () => {
+      // fields オプションで任意フィールドが反映されること
       const fields = [
         { name: "Field 1", value: "Value 1", inline: true },
         { name: "Field 2", value: "Value 2", inline: false },
@@ -123,6 +128,7 @@ describe("messageResponse", () => {
     });
 
     it("should support options with fields", () => {
+      // ラッパー関数経由でも fields 指定が維持されること
       const fields = [{ name: "Status", value: "Active", inline: true }];
       const embed = createInfoEmbed("Description", { fields });
 

@@ -56,11 +56,13 @@ jest.mock("../../../src/shared/locale", () => ({
 }));
 
 describe("Logger", () => {
+  // ロガーAPIの呼び出し委譲と入力ハンドリングを検証
   let logger: winston.Logger;
 
+  // 各テストの前にモック呼び出し履歴を初期化し、loggerモジュールを読み直す
   beforeEach(() => {
     jest.clearAllMocks();
-    // logger モジュールを再読み込み
+    // モジュールキャッシュの影響を避けるため isolateModules 内で再読み込み
     jest.isolateModules(() => {
       const loggerModule = require("../../../src/shared/utils/logger");
       logger = loggerModule.logger;
@@ -150,6 +152,7 @@ describe("Logger", () => {
 
   describe("Performance", () => {
     it("should handle rapid successive logs", () => {
+      // 連続ログ出力時に呼び出し漏れがないことを確認
       for (let i = 0; i < 100; i++) {
         logger.info(`Message ${i}`);
       }

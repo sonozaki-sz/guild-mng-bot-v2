@@ -1,0 +1,417 @@
+import {
+  BumpReminderManager,
+  getBumpReminderManager,
+} from "../../../../src/bot/features/bump-reminder";
+import { logger } from "../../../../src/shared/utils/logger";
+
+const addOneTimeJobMock = jest.fn();
+const removeJobMock = jest.fn();
+const repositoryMock = {
+  create: jest.fn(),
+  findAllPending: jest.fn(),
+  updateStatus: jest.fn(),
+};
+
+jest.mock("../../../../src/shared/locale", () => ({
+  tDefault: (key: string) => key,
+}));
+
+jest.mock("../../../../src/shared/utils/logger", () => ({
+  logger: {
+    info: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+jest.mock("../../../../src/shared/utils/prisma", () => ({
+  requirePrismaClient: jest.fn(() => ({})),
+}));
+
+jest.mock("../../../../src/shared/scheduler/jobScheduler", () => ({
+  jobScheduler: {
+    addOneTimeJob: (...args: unknown[]) => addOneTimeJobMock(...args),
+    removeJob: (...args: unknown[]) => removeJobMock(...args),
+  },
+}));
+
+jest.mock(
+  "../../../../src/bot/features/bump-reminder/bumpReminderRepository",
+  () => ({
+    getBumpReminderRepository: () => repositoryMock,
+  }),
+);
+
+describe("shared/features/bump-reminder/manager", () => {
+  // BumpReminderManager の分岐（重複処理・失敗時補償・復元）を重点検証
+  let manager: BumpReminderManager;
+
+  // 各ケースで時刻とモック状態を固定化
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-02-20T00:00:00.000Z"));
+    jest.clearAllMocks();
+    manager = new BumpReminderManager();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  // setReminder が one-time 登録し、実行後に sent 更新することを検証
+  it("schedules reminder and marks sent when task succeeds", async () => {
+    repositoryMock.create.mockResolvedValueOnce({
+      id: "rem-1",
+      guildId: "g-1",
+      channelId: "ch-1",
+      messageId: "m-1",
+      panelMessageId: "p-1",
+      scheduledAt: new Date("2026-02-20T02:00:00.000Z"),
+      status: "pending",
+    });
+
+    let capturedTask: (() => Promise<void>) | undefined;
+    addOneTimeJobMock.mockImplementationOnce(
+      (_jobId: string, _delayMs: number, task: () => Promise<void>) => {
+        capturedTask = task;
+      },
+    );
+
+    const task = jest.fn().mockResolvedValue(undefined);
+
+    await manager.setReminder("g-1", "ch-1", "m-1", "p-1", 120, task);
+
+    expect(addOneTimeJobMock).toHaveBeenCalledTimes(1);
+    expect(manager.hasReminder("g-1")).toBe(true);
+
+    await capturedTask?.();
+
+    expect(task).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.updateStatus).toHaveBeenCalledWith("rem-1", "sent");
+    expect(manager.hasReminder("g-1")).toBe(false);
+  });
+
+  // task 失敗時は cancelled 更新し、更新失敗時もログして握りつぶすことを検証
+  it("marks cancelled on task failure and logs secondary status update error", async () => {
+    repositoryMock.create.mockResolvedValueOnce({
+      id: "rem-2",
+      guildId: "g-2",
+      channelId: "ch-2",
+      messageId: null,
+      panelMessageId: null,
+      scheduledAt: new Date("2026-02-20T02:00:00.000Z"),
+      status: "pending",
+    });
+
+    let capturedTask: (() => Promise<void>) | undefined;
+    addOneTimeJobMock.mockImplementationOnce(
+      (_jobId: string, _delayMs: number, task: () => Promise<void>) => {
+        capturedTask = task;
+      },
+    );
+
+    const task = jest.fn().mockRejectedValue(new Error("task failed"));
+    repositoryMock.updateStatus.mockRejectedValueOnce(
+      new Error("status update failed"),
+    );
+
+    await manager.setReminder("g-2", "ch-2", undefined, undefined, 120, task);
+
+    await capturedTask?.();
+
+    expect(repositoryMock.updateStatus).toHaveBeenCalledWith(
+      "rem-2",
+      "cancelled",
+    );
+    expect(logger.error).toHaveBeenCalledWith(
+      "system:scheduler.bump_reminder_task_failed",
+      expect.any(Error),
+    );
+  });
+
+  // 既存リマインダーがある場合は先にキャンセルしてから再設定することを検証
+  it("cancels existing reminder before replacing with new one", async () => {
+    repositoryMock.create
+      .mockResolvedValueOnce({
+        id: "old-rem",
+        guildId: "g-3",
+        channelId: "ch-3",
+        messageId: null,
+        panelMessageId: null,
+        scheduledAt: new Date("2026-02-20T02:00:00.000Z"),
+        status: "pending",
+      })
+      .mockResolvedValueOnce({
+        id: "new-rem",
+        guildId: "g-3",
+        channelId: "ch-3",
+        messageId: null,
+        panelMessageId: null,
+        scheduledAt: new Date("2026-02-20T03:00:00.000Z"),
+        status: "pending",
+      });
+
+    addOneTimeJobMock.mockImplementation(
+      (_jobId, _delayMs, _task) => undefined,
+    );
+    removeJobMock.mockReturnValue(true);
+
+    await manager.setReminder(
+      "g-3",
+      "ch-3",
+      undefined,
+      undefined,
+      120,
+      jest.fn(),
+    );
+    await manager.setReminder(
+      "g-3",
+      "ch-3",
+      undefined,
+      undefined,
+      180,
+      jest.fn(),
+    );
+
+    expect(removeJobMock).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.updateStatus).toHaveBeenCalledWith(
+      "old-rem",
+      "cancelled",
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      "system:scheduler.cancel_bump_reminder",
+    );
+  });
+
+  // cancelReminder は DB更新失敗時でも true を返し、メモリ状態を解放することを検証
+  it("keeps cancellation successful even if status update fails", async () => {
+    repositoryMock.create.mockResolvedValueOnce({
+      id: "rem-4",
+      guildId: "g-4",
+      channelId: "ch-4",
+      messageId: null,
+      panelMessageId: null,
+      scheduledAt: new Date("2026-02-20T02:00:00.000Z"),
+      status: "pending",
+    });
+
+    addOneTimeJobMock.mockImplementation(
+      (_jobId, _delayMs, _task) => undefined,
+    );
+    repositoryMock.updateStatus.mockRejectedValueOnce(new Error("db failed"));
+
+    await manager.setReminder(
+      "g-4",
+      "ch-4",
+      undefined,
+      undefined,
+      120,
+      jest.fn(),
+    );
+
+    const result = await manager.cancelReminder("g-4");
+
+    expect(result).toBe(true);
+    expect(removeJobMock).toHaveBeenCalledTimes(1);
+    expect(manager.hasReminder("g-4")).toBe(false);
+  });
+
+  // 未登録ギルドの cancelReminder は false を返すことを検証
+  it("returns false when cancelling non-existent reminder", async () => {
+    await expect(manager.cancelReminder("missing-guild")).resolves.toBe(false);
+  });
+
+  // restorePendingReminders は重複pendingを古い順にキャンセルし、最新のみ復元することを検証
+  it("restores only latest pending per guild and cancels duplicates", async () => {
+    const now = new Date("2026-02-20T00:00:00.000Z");
+    repositoryMock.findAllPending.mockResolvedValueOnce([
+      {
+        id: "old-a",
+        guildId: "g-a",
+        channelId: "ch-a",
+        messageId: null,
+        panelMessageId: null,
+        serviceName: "UnknownService",
+        scheduledAt: new Date("2026-02-20T00:10:00.000Z"),
+      },
+      {
+        id: "new-a",
+        guildId: "g-a",
+        channelId: "ch-a",
+        messageId: "m-a",
+        panelMessageId: "p-a",
+        serviceName: "Disboard",
+        scheduledAt: new Date("2026-02-20T00:20:00.000Z"),
+      },
+      {
+        id: "past-b",
+        guildId: "g-b",
+        channelId: "ch-b",
+        messageId: null,
+        panelMessageId: null,
+        serviceName: "Dissoku",
+        scheduledAt: new Date(now.getTime() - 60_000),
+      },
+    ]);
+
+    addOneTimeJobMock.mockImplementation(
+      (_jobId, _delayMs, _task) => undefined,
+    );
+
+    const futureTask = jest.fn().mockResolvedValue(undefined);
+    const immediateTask = jest.fn().mockResolvedValue(undefined);
+
+    const taskFactory = jest
+      .fn()
+      .mockReturnValueOnce(futureTask)
+      .mockReturnValueOnce(immediateTask);
+
+    const restored = await manager.restorePendingReminders(taskFactory);
+
+    expect(restored).toBe(2);
+    expect(repositoryMock.updateStatus).toHaveBeenCalledWith(
+      "old-a",
+      "cancelled",
+    );
+    expect(taskFactory).toHaveBeenNthCalledWith(
+      1,
+      "g-a",
+      "ch-a",
+      "m-a",
+      "p-a",
+      "Disboard",
+    );
+    expect(taskFactory).toHaveBeenNthCalledWith(
+      2,
+      "g-b",
+      "ch-b",
+      undefined,
+      undefined,
+      "Dissoku",
+    );
+    expect(immediateTask).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.updateStatus).toHaveBeenCalledWith("past-b", "sent");
+  });
+
+  // 重複判定の else 分岐（既存より古いレコード）で toCancel へ積まれることを検証
+  it("cancels older duplicate via else branch when newer reminder appears first", async () => {
+    repositoryMock.findAllPending.mockResolvedValueOnce([
+      {
+        id: "new-first",
+        guildId: "g-dup",
+        channelId: "ch-dup",
+        messageId: null,
+        panelMessageId: null,
+        serviceName: "Disboard",
+        scheduledAt: new Date("2026-02-20T00:30:00.000Z"),
+      },
+      {
+        id: "old-second",
+        guildId: "g-dup",
+        channelId: "ch-dup",
+        messageId: null,
+        panelMessageId: null,
+        serviceName: "Disboard",
+        scheduledAt: new Date("2026-02-20T00:10:00.000Z"),
+      },
+    ]);
+
+    addOneTimeJobMock.mockImplementation(
+      (_jobId, _delayMs, _task) => undefined,
+    );
+    const taskFactory = jest.fn(() => jest.fn().mockResolvedValue(undefined));
+
+    await manager.restorePendingReminders(taskFactory);
+
+    expect(repositoryMock.updateStatus).toHaveBeenCalledWith(
+      "old-second",
+      "cancelled",
+    );
+  });
+
+  // clearAll の allSettled で reject が混ざる場合にエラーログすることを検証
+  it("logs rejection from clearAll cancellation batch", async () => {
+    (
+      manager as unknown as {
+        reminders: Map<string, { jobId: string; reminderId: string }>;
+      }
+    ).reminders.set("g-x", { jobId: "job-x", reminderId: "r-x" });
+
+    const cancelSpy = jest
+      .spyOn(manager, "cancelReminder")
+      .mockRejectedValueOnce(new Error("cancel failed"));
+
+    await manager.clearAll();
+
+    expect(cancelSpy).toHaveBeenCalledWith("g-x");
+    expect(logger.error).toHaveBeenCalledWith(
+      "system:scheduler.bump_reminder_task_failed",
+      expect.any(Error),
+    );
+  });
+
+  // 重複なし復元時は duplicate-cancel ログを出さず、serviceName 未指定で taskFactory を呼ぶことを検証
+  it("restores pending reminder without duplicate cancellation when list is unique", async () => {
+    repositoryMock.findAllPending.mockResolvedValueOnce([
+      {
+        id: "uniq-1",
+        guildId: "g-uniq",
+        channelId: "ch-uniq",
+        messageId: null,
+        panelMessageId: null,
+        serviceName: undefined,
+        scheduledAt: new Date("2026-02-20T01:00:00.000Z"),
+      },
+    ]);
+
+    addOneTimeJobMock.mockImplementation(
+      (_jobId, _delayMs, _task) => undefined,
+    );
+    const taskFactory = jest.fn(() => jest.fn().mockResolvedValue(undefined));
+
+    const restored = await manager.restorePendingReminders(taskFactory);
+
+    expect(restored).toBe(1);
+    expect(taskFactory).toHaveBeenCalledWith(
+      "g-uniq",
+      "ch-uniq",
+      undefined,
+      undefined,
+      undefined,
+    );
+    expect(logger.info).not.toHaveBeenCalledWith(
+      "system:scheduler.bump_reminder_duplicates_cancelled",
+    );
+  });
+
+  // clearAll ですべて成功した場合は reject ログを出さないことを検証
+  it("does not log error in clearAll when all cancellations succeed", async () => {
+    (
+      manager as unknown as {
+        reminders: Map<string, { jobId: string; reminderId: string }>;
+      }
+    ).reminders.set("g-ok", { jobId: "job-ok", reminderId: "r-ok" });
+
+    const cancelSpy = jest
+      .spyOn(manager, "cancelReminder")
+      .mockResolvedValueOnce(true);
+
+    await manager.clearAll();
+
+    expect(cancelSpy).toHaveBeenCalledWith("g-ok");
+    expect(logger.error).not.toHaveBeenCalledWith(
+      "system:scheduler.bump_reminder_task_failed",
+      expect.anything(),
+    );
+  });
+
+  // getBumpReminderManager は同一インスタンスを返すことを検証
+  it("returns singleton instance from getBumpReminderManager", () => {
+    const first = getBumpReminderManager();
+    const second = getBumpReminderManager();
+
+    expect(first).toBe(second);
+    expect(first).toBeInstanceOf(BumpReminderManager);
+  });
+});

@@ -250,8 +250,8 @@ export const msgDelCommand: Command = {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    // Deferレスポンス（ephemeral）
-    await interaction.deferReply({ ephemeral: true });
+    // Deferレスポンス（MessageFlags.Ephemeral）
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const countOption = interaction.options.getInteger("count");
     const targetUser = interaction.options.getUser("user", false);
@@ -507,6 +507,8 @@ Discordの`bulkDelete`メソッドは、**14日以上前のメッセージを削
 ---
 
 ## 🧪 テストケース
+
+最新の件数とカバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照。
 
 ### ユニットテスト
 

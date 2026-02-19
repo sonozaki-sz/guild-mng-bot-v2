@@ -245,7 +245,7 @@ guild-mng-bot-v2/
 - [テスト進捗](docs/progress/TEST_PROGRESS.md) - テスト実装の詳細進捗
 - [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
 - [開発環境セットアップ](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築とプロジェクト設定の詳細ガイド
-- [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針とガイドライン
+- [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
 - [国際化ガイド](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
 
 ### 機能仕様書

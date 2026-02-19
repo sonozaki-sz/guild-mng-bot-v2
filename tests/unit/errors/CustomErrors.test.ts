@@ -13,9 +13,10 @@ import {
   RateLimitError,
   TimeoutError,
   ValidationError,
-} from "../../../src/shared/errors/CustomErrors";
+} from "../../../src/shared/errors/customErrors";
 
 describe("CustomErrors", () => {
+  // 各エラークラスのプロパティ・継承・運用フラグの挙動を検証
   describe("BaseError", () => {
     it("should create error with correct properties", () => {
       const error = new BaseError("TestError", "Test message", true, 500);
@@ -39,12 +40,15 @@ describe("CustomErrors", () => {
     });
 
     it("should capture stack trace", () => {
+      // 生成時にスタック情報が保持されることを確認
       const error = new BaseError("TestError", "Test message");
-      expect(error.stack).toContain("BaseError");
+      expect(error.stack).toBeDefined();
+      expect(error.stack).toContain("TestError");
     });
   });
 
   describe("ValidationError", () => {
+    // 入力エラー用クラスの既定値と継承関係を検証
     it("should create validation error", () => {
       const error = new ValidationError("Invalid input");
 
@@ -66,6 +70,7 @@ describe("CustomErrors", () => {
   });
 
   describe("ConfigurationError", () => {
+    // 設定エラーの基本属性を検証
     it("should create configuration error", () => {
       const error = new ConfigurationError("Missing config");
 
@@ -77,6 +82,7 @@ describe("CustomErrors", () => {
   });
 
   describe("DatabaseError", () => {
+    // DBエラーの運用可否フラグ挙動を検証
     it("should create database error", () => {
       const error = new DatabaseError("Connection failed");
 
@@ -94,6 +100,7 @@ describe("CustomErrors", () => {
   });
 
   describe("DiscordApiError", () => {
+    // Discord APIエラーのステータスコード挙動を検証
     it("should create Discord API error with default status", () => {
       const error = new DiscordApiError("API rate limited");
 
@@ -110,6 +117,7 @@ describe("CustomErrors", () => {
   });
 
   describe("PermissionError", () => {
+    // 権限エラーのHTTPステータスを検証
     it("should create permission error", () => {
       const error = new PermissionError("Access denied");
 
@@ -121,6 +129,7 @@ describe("CustomErrors", () => {
   });
 
   describe("NotFoundError", () => {
+    // not found メッセージの組み立てを検証
     it("should create not found error with resource name", () => {
       const error = new NotFoundError("Guild");
 
@@ -140,6 +149,7 @@ describe("CustomErrors", () => {
   });
 
   describe("TimeoutError", () => {
+    // タイムアウトエラーの基本属性を検証
     it("should create timeout error", () => {
       const error = new TimeoutError("Request timed out");
 
@@ -151,6 +161,7 @@ describe("CustomErrors", () => {
   });
 
   describe("RateLimitError", () => {
+    // レート制限エラーの基本属性を検証
     it("should create rate limit error", () => {
       const error = new RateLimitError("Too many requests");
 
@@ -163,6 +174,7 @@ describe("CustomErrors", () => {
 
   describe("Error Handling Scenarios", () => {
     it("should preserve error information when rethrowing", () => {
+      // 再送出/再捕捉しても主要情報が失われないこと
       try {
         throw new ValidationError("Original error");
       } catch (error) {
@@ -175,6 +187,7 @@ describe("CustomErrors", () => {
     });
 
     it("should allow instanceof checks", () => {
+      // 継承関係が期待どおりに機能することを確認
       const validationErr = new ValidationError("test");
       const dbErr = new DatabaseError("test");
 
@@ -189,6 +202,7 @@ describe("CustomErrors", () => {
     });
 
     it("should differentiate operational from programming errors", () => {
+      // 運用エラーとプログラミングエラーをフラグで区別できること
       const operationalError = new DatabaseError("Connection lost", true);
       const programmingError = new DatabaseError("Invalid SQL", false);
 

@@ -6,15 +6,23 @@ import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,
 } from "discord.js";
-import { getGuildConfigRepository } from "../../shared/database";
-import { ValidationError } from "../../shared/errors/CustomErrors";
-import { handleCommandError } from "../../shared/errors/ErrorHandler";
-import { tDefault, tGuild } from "../../shared/locale";
-import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
-import type { Command } from "../../shared/types/discord";
+import type { Command } from "../../bot/types/discord";
 import { logger } from "../../shared/utils/logger";
-import { createSuccessEmbed } from "../../shared/utils/messageResponse";
+import { createSuccessEmbed } from "../../bot/utils/messageResponse";
+import {
+  getBotGuildConfigRepository
+} from "../services/shared-access";
+import {
+  getCommandLocalizations,
+  tDefault,
+  tGuild
+} from "../services/shared-access";
+import {
+  handleCommandError,
+  ValidationError
+} from "../services/shared-access";
 
+// AFK コマンド本体で利用するコマンド名・オプション名定数
 const AFK_COMMAND = {
   NAME: "afk",
   OPTION: {
@@ -22,6 +30,7 @@ const AFK_COMMAND = {
   },
 } as const;
 
+// AFK コマンド内で参照するローカライズキーを集約する定数
 const AFK_I18N_KEYS = {
   COMMAND_DESCRIPTION: "afk.description",
   USER_OPTION_DESCRIPTION: "afk.user.description",
@@ -39,6 +48,7 @@ const AFK_I18N_KEYS = {
  */
 export const afkCommand: Command = {
   data: (() => {
+    // 各ロケール文言を先に解決して SlashCommandBuilder へ流し込む
     const cmdDesc = getCommandLocalizations(AFK_I18N_KEYS.COMMAND_DESCRIPTION);
     const userDesc = getCommandLocalizations(
       AFK_I18N_KEYS.USER_OPTION_DESCRIPTION,
@@ -64,7 +74,7 @@ export const afkCommand: Command = {
       if (!guildId) {
         throw new ValidationError(tDefault(AFK_I18N_KEYS.ERROR_GUILD_ONLY));
       }
-
+      // 本体処理を関数分離し、execute は入力検証と委譲に専念
       await handleMoveUser(interaction, guildId);
     } catch (error) {
       // 統一エラーハンドリング
@@ -83,9 +93,10 @@ async function handleMoveUser(
   guildId: string,
 ): Promise<void> {
   // AFK設定を取得（優先して確認）
-  const config = await getGuildConfigRepository().getAfkConfig(guildId);
+  const config = await getBotGuildConfigRepository().getAfkConfig(guildId);
 
   if (!config || !config.enabled || !config.channelId) {
+    // 設定不足時は移動処理へ進まず、管理者向け設定導線へ戻す
     throw new ValidationError(
       await tGuild(guildId, AFK_I18N_KEYS.ERROR_NOT_CONFIGURED),
     );
@@ -99,6 +110,7 @@ async function handleMoveUser(
   const member = await interaction.guild?.members
     .fetch(targetUser.id)
     .catch(() => null);
+  // 実行時に都度 fetch して、キャッシュ古化による誤判定を避ける
 
   if (!member) {
     throw new ValidationError(
@@ -117,6 +129,7 @@ async function handleMoveUser(
   const afkChannel = await interaction.guild?.channels
     .fetch(config.channelId)
     .catch(() => null);
+  // 保存済み channelId が削除済みの場合を想定して実体を再検証する
 
   if (!afkChannel || afkChannel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
@@ -125,6 +138,7 @@ async function handleMoveUser(
   }
 
   // ユーザーを移動
+  // 実移動に成功した後のみ成功Embedを返す
   await member.voice.setChannel(afkChannel);
 
   const description = await tGuild(guildId, AFK_I18N_KEYS.EMBED_MOVED, {
@@ -132,11 +146,12 @@ async function handleMoveUser(
     channel: `<#${config.channelId}>`,
   });
 
+  // 返信は成功Embedのみ（AFK移動の結果を簡潔に通知）
   const embed = createSuccessEmbed(description);
 
+  // 実行結果をユーザーへ返却
   await interaction.reply({
     embeds: [embed],
-    ephemeral: false,
   });
 
   logger.info(

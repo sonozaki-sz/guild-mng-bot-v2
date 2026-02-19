@@ -2,7 +2,7 @@
 
 > トリガーチャンネル参加時に専用ボイスチャンネルを自動作成・管理する機能
 
-最終更新: 2026年2月19日
+最終更新: 2026年2月20日
 
 ---
 
@@ -85,6 +85,26 @@
 | 👥 人数制限を変更       | Modal表示        | VC参加中のユーザーのみ | 0-99の数値入力で人数制限を変更（0=無制限） |
 | 🔇 メンバーをAFKに移動  | User Select Menu | VC参加中のユーザーのみ | 複数メンバーを選択してAFKチャンネルに移動  |
 | 🔄 パネルを最下部に移動 | パネル再送信     | VC参加中のユーザーのみ | チャットが流れた際にパネルを最下部に移動   |
+
+**パネル操作時の応答例:**
+
+```
+✏️ VC名を変更
+✅ VC名を みんなのたまり場 に変更しました
+
+👥 人数制限を変更
+✅ 人数制限を 5 に設定しました
+✅ 人数制限を 無制限 に設定しました
+
+🔇 メンバーをAFKに移動
+✅ 2人を AFK に移動しました
+
+🔄 パネルを最下部に移動
+✅ パネルを最下部に移動しました
+
+エラー（VC未参加）
+❌ このVCに参加しているユーザーのみ操作できます
+```
 
 > **権限設計の方針**: パネルボタン経由の操作はBotが代理実行するため、ユーザー側に `ManageChannels` 権限は不要です。ボタンハンドラーでは**VC参加チェック**を行い、そのVCに現在参加しているユーザーのみ実行できます。
 
@@ -184,7 +204,7 @@ Discord標準UIからの操作権限は以下の通りです：
 **成功時の応答:**
 
 ```
-✅ 人数制限を 5人 に設定しました
+✅ 人数制限を 5 に設定しました
 ✅ 人数制限を 無制限 に設定しました
 ```
 
@@ -200,24 +220,38 @@ Discord標準UIからの操作権限は以下の通りです：
 
 **コマンド**: `/vac-config`
 
-**実行権限**: 管理者のみ
+**実行権限**: サーバー管理権限（`ManageGuild`）
 
-#### サブコマンド: `create-trigger`
+#### サブコマンド: `create-trigger-vc`
 
 トリガーチャンネルを自動作成します。
 
-**引数:** なし
+**引数:**
+
+| 引数名   | 型     | 必須 | 説明                                                                                              |
+| -------- | ------ | ---- | ------------------------------------------------------------------------------------------------- |
+| category | String | ❌   | 作成先カテゴリ（`TOP` またはカテゴリ）。未指定時はコマンド実行チャンネルのカテゴリ（なければTOP） |
 
 **動作:**
 
-1. コマンド実行チャンネルと同じカテゴリーに「CreateVC」を作成
-2. 作成したチャンネルを自動的にトリガーチャンネルとして登録
-3. データベースに保存
+1. `category` が指定されていれば、その対象（`TOP` またはカテゴリ）に「CreateVC」を作成
+2. `category` が未指定なら、コマンド実行チャンネルのカテゴリーを作成先にする（カテゴリなしならTOP）
+3. 同一カテゴリー内に既存トリガーチャンネルがある場合は作成しない
+4. 別カテゴリーなら複数トリガーチャンネルを作成可能
+5. 作成したチャンネルを自動的にトリガーチャンネルとして登録
+6. データベースに保存
+
+> **トリガー作成制約**: トリガーチャンネルは「カテゴリーごとに1個まで」。
+>
+> - カテゴリーAに1個、カテゴリーBに1個、トップレベル（カテゴリーなし）に1個、のように併存可能
+> - 同一カテゴリーに2個目は作成不可
 
 **実行例:**
 
 ```
-/vac-config create-trigger
+/vac-config create-trigger-vc category:TOP
+/vac-config create-trigger-vc category:カテゴリA
+/vac-config create-trigger-vc
 ```
 
 **成功時の応答:**
@@ -226,26 +260,30 @@ Discord標準UIからの操作権限は以下の通りです：
 ✅ トリガーチャンネル #CreateVC を作成しました
 ```
 
-#### サブコマンド: `remove-trigger`
+#### サブコマンド: `remove-trigger-vc`
 
 トリガーチャンネルを削除します。
 
 **引数:**
 
-| 引数名  | 型           | 必須 | 説明                       |
-| ------- | ------------ | ---- | -------------------------- |
-| channel | VoiceChannel | ✅   | 削除するトリガーチャンネル |
+| 引数名   | 型     | 必須 | 説明                                                     |
+| -------- | ------ | ---- | -------------------------------------------------------- |
+| category | String | ❌   | 削除対象（`TOP` またはカテゴリ）。未指定時は実行カテゴリ |
 
 **動作:**
 
-1. 指定されたチャンネルがトリガーチャンネルか確認
-2. チャンネルを削除
-3. データベースから登録解除
+1. `category` が指定されていれば、その対象を選択（`TOP`=カテゴリーなし、またはカテゴリ）
+2. `category` が未指定なら、コマンド実行チャンネルのカテゴリを対象にする（カテゴリなしならTOP）
+3. 指定カテゴリ（またはTOP）に紐づくトリガーチャンネルを特定
+4. チャンネルを削除
+5. データベースから登録解除
 
 **実行例:**
 
 ```
-/vac-config remove-trigger channel:#CreateVC
+/vac-config remove-trigger-vc category:TOP
+/vac-config remove-trigger-vc category:カテゴリA
+/vac-config remove-trigger-vc
 ```
 
 **成功時の応答:**
@@ -274,9 +312,23 @@ Discord標準UIからの操作権限は以下の通りです：
 **応答例:**
 
 ```
-【VC自動作成機能】
-トリガーチャンネル: #CreateVC
-作成されたVC: 3個
+【ℹ️ VC自動作成機能】
+トリガーチャンネル
+- #CreateVC (TOP)
+- #CreateVC (カテゴリA)
+作成されたVC
+- #しゅん's Room(@shun)
+- #作業VC(@alice)
+```
+
+未作成時:
+
+```
+【ℹ️ VC自動作成機能】
+トリガーチャンネル
+未設定
+作成されたVC
+なし
 ```
 
 ---
@@ -342,18 +394,48 @@ interface VacChannelPair {
 **VC作成処理フロー:**
 
 ```typescript
-async function handleVacCreate(member: GuildMember, newChannel: VoiceChannel) {
-  // 1. トリガーチャンネルか確認
-  const config = await repository.getVacConfig(member.guild.id);
+async function handleVacCreate(newState: VoiceState): Promise<void> {
+  const member = newState.member;
+  const newChannel = newState.channel;
+  if (!member || !newChannel || newChannel.type !== ChannelType.GuildVoice) {
+    return;
+  }
+
+  const config = await getVacConfigOrDefault(member.guild.id);
   if (!config.enabled || !config.triggerChannelIds.includes(newChannel.id)) {
     return;
   }
 
-  // 2. VCを作成
+  const existingOwnedChannel = config.createdChannels.find(
+    (channel) => channel.ownerId === member.id,
+  );
+  if (existingOwnedChannel) {
+    const ownedChannel = await member.guild.channels
+      .fetch(existingOwnedChannel.voiceChannelId)
+      .catch(() => null);
+    if (ownedChannel?.type === ChannelType.GuildVoice) {
+      await member.voice.setChannel(ownedChannel);
+      return;
+    }
+    await removeCreatedVacChannel(
+      member.guild.id,
+      existingOwnedChannel.voiceChannelId,
+    );
+  }
+
+  const parentCategory =
+    newChannel.parent?.type === ChannelType.GuildCategory
+      ? newChannel.parent
+      : null;
+
+  if (parentCategory && parentCategory.children.cache.size >= 50) {
+    return;
+  }
+
   const voiceChannel = await member.guild.channels.create({
-    name: `${member.displayName}'s Room`,
+    name: buildUniqueChannelName(member, member.guild.channels.cache),
     type: ChannelType.GuildVoice,
-    parent: newChannel.parent,
+    parent: parentCategory?.id ?? null,
     userLimit: 99,
     permissionOverwrites: [
       {
@@ -363,14 +445,14 @@ async function handleVacCreate(member: GuildMember, newChannel: VoiceChannel) {
     ],
   });
 
-  // 3. 操作パネルを設置
-  await sendControlPanel(voiceChannel);
+  if (voiceChannel.type !== ChannelType.GuildVoice) {
+    return;
+  }
 
-  // 4. ユーザーを移動
+  await sendVacControlPanel(voiceChannel);
   await member.voice.setChannel(voiceChannel);
 
-  // 5. データベースに保存
-  await repository.addCreatedChannel(member.guild.id, {
+  await addCreatedVacChannel(member.guild.id, {
     voiceChannelId: voiceChannel.id,
     ownerId: member.id,
     createdAt: Date.now(),
@@ -381,23 +463,23 @@ async function handleVacCreate(member: GuildMember, newChannel: VoiceChannel) {
 **VC削除処理フロー:**
 
 ```typescript
-async function handleVacDelete(oldChannel: VoiceChannel) {
-  // 1. 作成されたVCか確認
-  const config = await repository.getVacConfig(oldChannel.guild.id);
-  const channelInfo = config.createdChannels.find(
-    (ch) => ch.voiceChannelId === oldChannel.id,
+async function handleVacDelete(oldState: VoiceState): Promise<void> {
+  const oldChannel = oldState.channel;
+  if (!oldChannel || oldChannel.type !== ChannelType.GuildVoice) {
+    return;
+  }
+
+  const config = await getVacConfigOrDefault(oldChannel.guild.id);
+  const isManaged = config.createdChannels.some(
+    (channel) => channel.voiceChannelId === oldChannel.id,
   );
 
-  if (!channelInfo) return;
-
-  // 2. VCが空か確認
-  if (oldChannel.members.size === 0) {
-    // 3. VCを削除
-    await oldChannel.delete();
-
-    // 4. データベースから削除
-    await repository.removeCreatedChannel(oldChannel.guild.id, oldChannel.id);
+  if (!isManaged || oldChannel.members.size > 0) {
+    return;
   }
+
+  await oldChannel.delete().catch(() => null);
+  await removeCreatedVacChannel(oldChannel.guild.id, oldChannel.id);
 }
 ```
 
@@ -406,18 +488,21 @@ async function handleVacDelete(oldChannel: VoiceChannel) {
 **ファイル**: `src/bot/events/channelDelete.ts`
 
 ```typescript
-async function handleChannelDelete(channel: GuildChannel) {
+async function handleChannelDelete(channel: GuildChannel): Promise<void> {
+  if (channel.isDMBased()) return;
   if (channel.type !== ChannelType.GuildVoice) return;
 
-  const config = await repository.getVacConfig(channel.guildId);
+  const config = await getVacConfigOrDefault(channel.guildId);
 
-  // トリガーチャンネルが削除された場合
   if (config.triggerChannelIds.includes(channel.id)) {
-    config.triggerChannelIds = config.triggerChannelIds.filter(
-      (id) => id !== channel.id,
-    );
-    await repository.updateVacConfig(channel.guildId, config);
-    logger.info(`[VAC] Trigger channel deleted: ${channel.name}`);
+    await removeTriggerChannel(channel.guildId, channel.id);
+  }
+
+  const isManagedChannel = config.createdChannels.some(
+    (item) => item.voiceChannelId === channel.id,
+  );
+  if (isManagedChannel) {
+    await removeCreatedVacChannel(channel.guildId, channel.id);
   }
 }
 ```
@@ -430,11 +515,11 @@ async function handleChannelDelete(channel: GuildChannel) {
 
 **権限チェック:**
 
-- `PermissionFlagsBits.Administrator` を要求
+- `PermissionFlagsBits.ManageGuild` を要求
 
 **サブコマンド処理:**
 
-各サブコマンド（create-trigger, remove-trigger, show）の実装詳細は主要機能セクションを参照。
+各サブコマンド（create-trigger-vc, remove-trigger-vc, show）の実装詳細は主要機能セクションを参照。
 
 ### `/vac` コマンド
 
@@ -443,35 +528,27 @@ async function handleChannelDelete(channel: GuildChannel) {
 **権限チェック（共通）:**
 
 ```typescript
-async function checkVacMembership(
+async function getManagedVoiceChannel(
   interaction: ChatInputCommandInteraction,
-): Promise<VoiceChannel | null> {
-  const member = interaction.member as GuildMember;
+  guildId: string,
+): Promise<{ id: string }> {
+  const member = await interaction.guild?.members.fetch(interaction.user.id);
+  const voiceChannel = member?.voice.channel;
 
-  // 1. VCに参加しているか確認
-  const voiceChannel = member.voice.channel;
-  if (!voiceChannel) {
-    await interaction.reply({
-      content: await tGuild(guildId, "errors:vac.not_in_any_vc"),
-      ephemeral: true,
-    });
-    return null;
+  if (!voiceChannel || voiceChannel.type !== ChannelType.GuildVoice) {
+    throw new ValidationError(
+      await tGuild(guildId, "errors:vac.not_in_any_vc"),
+    );
   }
 
-  // 2. 自動作成VCか確認
-  const config = await repository.getVacConfig(interaction.guildId!);
-  const isVacChannel = config.createdChannels.some(
-    (ch) => ch.voiceChannelId === voiceChannel.id,
-  );
-  if (!isVacChannel) {
-    await interaction.reply({
-      content: await tGuild(guildId, "errors:vac.not_vac_channel"),
-      ephemeral: true,
-    });
-    return null;
+  const isManaged = await isManagedVacChannel(guildId, voiceChannel.id);
+  if (!isManaged) {
+    throw new ValidationError(
+      await tGuild(guildId, "errors:vac.not_vac_channel"),
+    );
   }
 
-  return voiceChannel as VoiceChannel;
+  return { id: voiceChannel.id };
 }
 ```
 
@@ -482,27 +559,59 @@ async function checkVacMembership(
 **パネル送信:**
 
 ```typescript
-async function sendControlPanel(voiceChannel: VoiceChannel) {
-  const embed = new EmbedBuilder()
-    .setTitle("🎤 ボイスチャンネル操作パネル")
-    .setDescription("このパネルからVCの設定を変更できます。")
-    .setColor(0x5865f2);
+async function sendVacControlPanel(voiceChannel: VoiceChannel) {
+  if (!voiceChannel.isTextBased() || !voiceChannel.isSendable()) return;
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("vac_rename")
-      .setLabel("VC名を変更")
-      .setEmoji("✏️")
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId("vac_limit")
-      .setLabel("人数制限を変更")
-      .setEmoji("👥")
-      .setStyle(ButtonStyle.Primary),
-    // ... 他のボタン
+  const guildId = voiceChannel.guild.id;
+  const title = await tGuild(guildId, "commands:vac.panel.title");
+  const description = await tGuild(guildId, "commands:vac.panel.description");
+
+  const renameLabel = await tGuild(guildId, "commands:vac.panel.rename_button");
+  const limitLabel = await tGuild(guildId, "commands:vac.panel.limit_button");
+  const afkLabel = await tGuild(guildId, "commands:vac.panel.afk_button");
+  const refreshLabel = await tGuild(
+    guildId,
+    "commands:vac.panel.refresh_button",
   );
 
-  await voiceChannel.send({ embeds: [embed], components: [row] });
+  const embed = createInfoEmbed(description, { title });
+
+  const renameRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`vac:rename:${voiceChannel.id}`)
+      .setLabel(renameLabel)
+      .setEmoji("✏️")
+      .setStyle(ButtonStyle.Primary),
+  );
+
+  const limitRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`vac:limit:${voiceChannel.id}`)
+      .setLabel(limitLabel)
+      .setEmoji("👥")
+      .setStyle(ButtonStyle.Primary),
+  );
+
+  const afkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`vac:afk:${voiceChannel.id}`)
+      .setLabel(afkLabel)
+      .setEmoji("🔇")
+      .setStyle(ButtonStyle.Primary),
+  );
+
+  const refreshRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`vac:refresh:${voiceChannel.id}`)
+      .setLabel(refreshLabel)
+      .setEmoji("🔄")
+      .setStyle(ButtonStyle.Primary),
+  );
+
+  await voiceChannel.send({
+    embeds: [embed],
+    components: [renameRow, limitRow, afkRow, refreshRow],
+  });
 }
 ```
 
@@ -517,20 +626,30 @@ async function sendControlPanel(voiceChannel: VoiceChannel) {
 ```typescript
 // VC名変更ボタンのハンドラー例（VC参加チェックあり）
 async function handleVacRename(interaction: ButtonInteraction) {
-  const voiceChannel = interaction.channel as VoiceBasedChannel;
+  const channelId = getVacPanelChannelId(interaction.customId, "vac:rename:");
+  const voiceChannel = await interaction.guild?.channels.fetch(channelId);
+  if (!voiceChannel || voiceChannel.type !== ChannelType.GuildVoice) {
+    await safeReply(interaction, {
+      embeds: [
+        createErrorEmbed(await tGuild(guildId, "errors:vac.not_vac_channel")),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
 
   // VC参加チェック: インタラクションを発行したユーザーがVCにいるか確認
   const member = interaction.member as GuildMember;
   if (member.voice.channelId !== voiceChannel.id) {
-    await interaction.reply({
-      content: await tGuild(guildId, "errors:vac.not_in_vc"),
-      ephemeral: true,
+    await safeReply(interaction, {
+      embeds: [createErrorEmbed(await tGuild(guildId, "errors:vac.not_in_vc"))],
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
 
   const modal = new ModalBuilder()
-    .setCustomId("vac_rename_modal")
+    .setCustomId(`vac:rename-modal:${voiceChannel.id}`)
     .setTitle("VC名を変更");
   // ...
   await interaction.showModal(modal);
@@ -549,13 +668,17 @@ async function handleVacRename(interaction: ButtonInteraction) {
 {
   "vac-config": {
     "description": "VC自動作成機能の設定",
-    "create-trigger": {
-      "description": "トリガーチャンネルを作成"
+    "create-trigger-vc": {
+      "description": "トリガーチャンネルを作成",
+      "category": {
+        "description": "作成先カテゴリ（TOP またはカテゴリ。未指定時は実行カテゴリ）"
+      }
     },
-    "remove-trigger": {
+    "remove-trigger-vc": {
       "description": "トリガーチャンネルを削除",
-      "channel": {
-        "description": "削除するトリガーチャンネル"
+      "category": {
+        "description": "削除対象（未指定時は実行カテゴリ）",
+        "top": "TOP（カテゴリなし）"
       }
     },
     "show": {
@@ -571,13 +694,13 @@ async function handleVacRename(interaction: ButtonInteraction) {
 {
   "vac": {
     "description": "自動作成VCの設定を変更",
-    "rename": {
+    "vc-rename": {
       "description": "参加中のVC名を変更",
       "name": {
         "description": "新しいVC名"
       }
     },
-    "limit": {
+    "vc-limit": {
       "description": "参加中のVCの人数制限を変更",
       "limit": {
         "description": "人数制限（0=無制限、最大99）"
@@ -592,17 +715,22 @@ async function handleVacRename(interaction: ButtonInteraction) {
 ```json
 {
   "commands": {
+    "vac-config": {
+      "embed": {
+        "title": "VC自動作成機能",
+        "field": {
+          "trigger_channels": "トリガーチャンネル",
+          "created_vc_details": "作成されたVC"
+        },
+        "not_configured": "未設定",
+        "no_created_vcs": "なし"
+      }
+    },
     "vac": {
-      "trigger_created": "トリガーチャンネル {{channel}} を作成しました",
-      "trigger_removed": "トリガーチャンネル {{channel}} を削除しました",
-      "vc_created": "{{user}} のVCを作成しました: {{channel}}",
-      "vc_deleted": "VCが削除されました",
       "renamed": "VC名を {{name}} に変更しました",
       "limit_changed": "人数制限を {{limit}} に設定しました",
       "members_moved": "{{count}}人を AFK に移動しました",
-      "settings_title": "【VC自動作成機能設定】",
-      "trigger_channels": "トリガーチャンネル",
-      "created_vcs": "作成されたVC"
+      "panel_refreshed": "パネルを最下部に移動しました"
     }
   }
 }
@@ -654,11 +782,13 @@ async function handleVacRename(interaction: ButtonInteraction) {
 **1. 権限不足**
 
 ```typescript
-// チャンネル作成権限がない
-catch (error) {
-  if (error.code === 50013) { // Missing Permissions
+function ensureManageGuildPermission(
+  interaction: ChatInputCommandInteraction,
+  guildId: string,
+): void {
+  if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.no_permission")
+      tDefault("errors:permission.manage_guild_required", { guildId }),
     );
   }
 }
@@ -667,8 +797,7 @@ catch (error) {
 **2. カテゴリが満杯**
 
 ```typescript
-// カテゴリ内のチャンネル数が上限（50）
-if (category.children.cache.size >= 50) {
+if (category && category.children.cache.size >= 50) {
   throw new ValidationError(await tGuild(guildId, "errors:vac.category_full"));
 }
 ```
@@ -676,32 +805,57 @@ if (category.children.cache.size >= 50) {
 **3. 名前の重複**
 
 ```typescript
-// 同じ名前のチャンネルが既に存在
-let channelName = `${member.displayName}'s Room`;
-let counter = 2;
-while (guild.channels.cache.find((ch) => ch.name === channelName)) {
-  channelName = `${member.displayName}'s Room (${counter})`;
-  counter++;
+function buildUniqueChannelName(
+  member: GuildMember,
+  channels: GuildChannelsCache,
+): string {
+  const baseName = `${member.displayName}'s Room`;
+  let channelName = baseName;
+  let counter = 2;
+
+  while (channels.find((channel) => channel.name === channelName)) {
+    channelName = `${baseName} (${counter})`;
+    counter += 1;
+  }
+
+  return channelName;
 }
 ```
 
 **4. Bot再起動時のクリーンアップ**
 
 ```typescript
-// Bot起動時に空のVCを削除
-async function cleanupEmptyVCs(guild: Guild) {
-  const config = await repository.getVacConfig(guild.id);
+for (const [, guild] of client.guilds.cache) {
+  const vacConfig = await getVacConfigOrDefault(guild.id);
 
-  for (const channelInfo of config.createdChannels) {
-    const channel = guild.channels.cache.get(channelInfo.voiceChannelId);
+  for (const triggerChannelId of vacConfig.triggerChannelIds) {
+    const triggerChannel = await guild.channels
+      .fetch(triggerChannelId)
+      .catch(() => null);
 
-    if (!channel || channel.members.size === 0) {
-      // 空のVC、または削除済みのVCをクリーンアップ
-      if (channel) await channel.delete();
-      await repository.removeCreatedChannel(
-        guild.id,
-        channelInfo.voiceChannelId,
-      );
+    if (!triggerChannel || triggerChannel.type !== ChannelType.GuildVoice) {
+      await removeTriggerChannel(guild.id, triggerChannelId);
+    }
+  }
+
+  for (const channelInfo of vacConfig.createdChannels) {
+    const channel = await guild.channels
+      .fetch(channelInfo.voiceChannelId)
+      .catch(() => null);
+
+    if (!channel) {
+      await removeCreatedVacChannel(guild.id, channelInfo.voiceChannelId);
+      continue;
+    }
+
+    if (channel.isDMBased() || channel.type !== ChannelType.GuildVoice) {
+      await removeCreatedVacChannel(guild.id, channelInfo.voiceChannelId);
+      continue;
+    }
+
+    if (channel.members.size === 0) {
+      await channel.delete().catch(() => null);
+      await removeCreatedVacChannel(guild.id, channelInfo.voiceChannelId);
     }
   }
 }
@@ -715,32 +869,41 @@ async function cleanupEmptyVCs(guild: Guild) {
 
 ## ✅ テストケース
 
-### `/vac-config create-trigger` コマンド
+最新の件数とカバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照。
+
+### `/vac-config create-trigger-vc` コマンド
 
 #### 正常系
 
 - [ ] **トリガーチャンネル作成**: コマンド実行チャンネルと同じカテゴリに「CreateVC」が作成される
+- [ ] **カテゴリ指定作成**: `category` 指定時に指定カテゴリへトリガーチャンネルが作成される
+- [ ] **TOP指定作成**: `category:TOP` 指定時にカテゴリなし（TOP）へトリガーチャンネルが作成される
+- [ ] **カテゴリ未指定作成**: `category` 未指定時にコマンド実行チャンネルのカテゴリ（なければTOP）へ作成される
+- [ ] **カテゴリ単位制約**: 同一カテゴリに2個目のトリガーチャンネルは作成できない
+- [ ] **複数カテゴリ許可**: 別カテゴリにはそれぞれトリガーチャンネルを作成できる
 - [ ] **自動登録**: 作成されたチャンネルが自動的にトリガーチャンネルとして登録される
 - [ ] **成功メッセージ**: 作成成功時に適切なメッセージが表示される
 
 #### 異常系
 
-- [ ] **管理者権限なし**: 管理者以外が実行した場合、エラーメッセージが表示される
-- [ ] **重複作成**: 既にトリガーチャンネルが存在する場合、エラーメッセージが表示される
+- [ ] **サーバー管理権限なし**: 権限不足で実行した場合、エラーメッセージが表示される
+- [ ] **同一カテゴリ重複作成**: 同一カテゴリに既存トリガーがある場合、エラーメッセージが表示される
 - [ ] **カテゴリ満杯**: カテゴリのチャンネル数が上限の場合、エラーメッセージが表示される
 
-### `/vac-config remove-trigger` コマンド
+### `/vac-config remove-trigger-vc` コマンド
 
 #### 正常系
 
-- [ ] **チャンネル削除**: 指定されたトリガーチャンネルが削除される
+- [ ] **カテゴリ指定削除**: 指定カテゴリのトリガーチャンネルが削除される
+- [ ] **TOP指定削除**: `TOP` 選択でカテゴリなしトリガーチャンネルが削除される
+- [ ] **カテゴリ未指定削除**: `category` 未指定時にコマンド実行チャンネルのカテゴリ（なければTOP）が対象になる
 - [ ] **登録解除**: データベースからトリガーチャンネル登録が解除される
 - [ ] **成功メッセージ**: 削除成功時に適切なメッセージが表示される
 
 #### 異常系
 
-- [ ] **管理者権限なし**: 管理者以外が実行した場合、エラーメッセージが表示される
-- [ ] **チャンネル不在**: 指定されたチャンネルが存在しない場合、適切に処理される
+- [ ] **サーバー管理権限なし**: 権限不足で実行した場合、エラーメッセージが表示される
+- [ ] **対象不在**: 指定カテゴリ（またはTOP）にトリガーチャンネルがない場合、適切に処理される
 
 ### `/vac-config show` コマンド
 
@@ -751,7 +914,7 @@ async function cleanupEmptyVCs(guild: Guild) {
 
 #### 異常系
 
-- [ ] **管理者権限なし**: 管理者以外が実行した場合、エラーメッセージが表示される
+- [ ] **サーバー管理権限なし**: 権限不足で実行した場合、エラーメッセージが表示される
 
 ### VC自動作成
 
@@ -782,31 +945,31 @@ async function cleanupEmptyVCs(guild: Guild) {
 
 - [ ] **削除失敗**: VCの削除に失敗した場合、適切にログ記録される
 
-### `/vac rename` コマンド
+### `/vac vc-rename` コマンド
 
 #### 正常系
 
 - [ ] **名前変更**: 参加中の自動作成VCの名前が変更される
-- [ ] **成功通知**: 変更成功時に確認メッセージが表示される（ephemeral）
+- [ ] **成功通知**: 変更成功時に確認メッセージが表示される（MessageFlags.Ephemeral）
 
 #### 異常系
 
-- [ ] **VC未参加**: VCに参加していない状態でコマンドを実行するとエラーメッセージが表示される（ephemeral）
-- [ ] **VAC管理外VC**: 自動作成VC以外のVCに参加中にコマンドを実行するとエラーメッセージが表示される（ephemeral）
+- [ ] **VC未参加**: VCに参加していない状態でコマンドを実行するとエラーメッセージが表示される（MessageFlags.Ephemeral）
+- [ ] **VAC管理外VC**: 自動作成VC以外のVCに参加中にコマンドを実行するとエラーメッセージが表示される（MessageFlags.Ephemeral）
 
-### `/vac limit` コマンド
+### `/vac vc-limit` コマンド
 
 #### 正常系
 
 - [ ] **制限変更**: 参加中の自動作成VCの人数制限が変更される
 - [ ] **無制限設定**: 0を指定すると無制限に設定される
-- [ ] **成功通知**: 変更成功時に確認メッセージが表示される（ephemeral）
+- [ ] **成功通知**: 変更成功時に確認メッセージが表示される（MessageFlags.Ephemeral）
 
 #### 異常系
 
-- [ ] **VC未参加**: VCに参加していない状態でコマンドを実行するとエラーメッセージが表示される（ephemeral）
-- [ ] **VAC管理外VC**: 自動作成VC以外のVCに参加中にコマンドを実行するとエラーメッセージが表示される（ephemeral）
-- [ ] **バリデーション**: 0-99の範囲外の値を指定するとエラーメッセージが表示される（ephemeral）
+- [ ] **VC未参加**: VCに参加していない状態でコマンドを実行するとエラーメッセージが表示される（MessageFlags.Ephemeral）
+- [ ] **VAC管理外VC**: 自動作成VC以外のVCに参加中にコマンドを実行するとエラーメッセージが表示される（MessageFlags.Ephemeral）
+- [ ] **バリデーション**: 0-99の範囲外の値を指定するとエラーメッセージが表示される（MessageFlags.Ephemeral）
 
 ### 操作パネル
 
@@ -816,7 +979,7 @@ async function cleanupEmptyVCs(guild: Guild) {
 - [ ] **名前変更**: 入力された名前でVCの名前が変更される
 - [ ] **成功通知**: 変更成功時に確認メッセージが表示される
 - [ ] **VC参加者のみ**: そのVCに参加中のユーザーのみボタンから名前変更できる
-- [ ] **非参加者拒否**: VCに参加していないユーザーが操作するとエラーメッセージが表示される（ephemeral）
+- [ ] **非参加者拒否**: VCに参加していないユーザーが操作するとエラーメッセージが表示される（MessageFlags.Ephemeral）
 - [ ] **既存チャンネル非対象**: VAC管理外の通常チャンネルでは動作しない
 
 #### 人数制限変更
@@ -826,7 +989,7 @@ async function cleanupEmptyVCs(guild: Guild) {
 - [ ] **制限変更**: 入力された数値でVCの人数制限が変更される
 - [ ] **無制限設定**: 0を入力すると無制限に設定される
 - [ ] **VC参加者のみ**: そのVCに参加中のユーザーのみボタンから人数制限を変更できる
-- [ ] **非参加者拒否**: VCに参加していないユーザーが操作するとエラーメッセージが表示される（ephemeral）
+- [ ] **非参加者拒否**: VCに参加していないユーザーが操作するとエラーメッセージが表示される（MessageFlags.Ephemeral）
 - [ ] **既存チャンネル非対象**: VAC管理外の通常チャンネルでは動作しない
 
 #### AFK移動
@@ -853,6 +1016,7 @@ async function cleanupEmptyVCs(guild: Guild) {
 - [ ] **空VC検知**: Bot再起動時に空のVCを検出
 - [ ] **クリーンアップ**: 空のVCが削除される
 - [ ] **DB同期**: データベースと実際のチャンネル状態が同期される
+- [ ] **トリガー同期**: Bot停止中に削除されたトリガーチャンネルIDが起動時に除去される
 
 ---
 

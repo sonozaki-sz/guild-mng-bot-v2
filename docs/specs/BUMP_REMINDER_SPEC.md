@@ -432,7 +432,9 @@ if (!config?.enabled) {
 
 ### ユニットテスト（実装済み）
 
-**BumpReminderRepository** (30 tests):
+最新の件数とカバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照。
+
+**BumpReminderRepository**:
 
 - [x] create(): リマインダー作成（serviceName含む）
 - [x] findById(): ID検索
@@ -442,7 +444,7 @@ if (!config?.enabled) {
 - [x] cancelByGuild(): ギルド単位キャンセル
 - [x] cleanupOldReminders(): 7日以上前のレコード削除
 
-**BumpReminderManager (JobScheduler)** (30 tests):
+**BumpReminderManager (JobScheduler)**:
 
 - [x] setReminder(): DB保存 + タイマー設定
 - [x] serviceName パラメータの保存
@@ -450,7 +452,7 @@ if (!config?.enabled) {
 - [x] 過去時刻の即時実行
 - [x] 未来時刻のタイマー再設定
 
-**既存機能への影響** (60 tests):
+**既存機能への影響** (実装済み):
 
 - [x] GuildConfigRepository
 - [x] LocaleManager
@@ -502,7 +504,7 @@ const DISSOKU_BOT_ID = "761562078095867916"; // 確認済み
 **実装の核心:**
 
 ```typescript
-// src/shared/scheduler/JobScheduler.ts
+// src/shared/scheduler/jobScheduler.ts
 export class BumpReminderManager {
   async setReminder(
     guildId: string,

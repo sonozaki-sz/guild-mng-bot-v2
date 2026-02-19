@@ -196,7 +196,7 @@ export function createErrorEmbed(title: string, description: string) {
 // Before (プレーンテキスト)
 await interaction.reply({
   content: "✅ Bumpリマインダー機能を有効化しました",
-  ephemeral: true,
+  flags: MessageFlags.Ephemeral,
 });
 
 // After (Embed)
@@ -206,7 +206,7 @@ const embed = createSuccessEmbed(
 );
 await interaction.reply({
   embeds: [embed],
-  ephemeral: true,
+  flags: MessageFlags.Ephemeral,
 });
 ```
 
@@ -225,7 +225,7 @@ const embed = createStatusEmbed(
     ],
   },
 );
-await interaction.reply({ embeds: [embed], ephemeral: true });
+await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 ```
 
 #### エラーメッセージ
@@ -235,7 +235,7 @@ const embed = createErrorEmbed(
   "権限不足",
   "このコマンドを実行するには管理者権限が必要です",
 );
-await interaction.reply({ embeds: [embed], ephemeral: true });
+await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 ```
 
 ---
@@ -394,6 +394,8 @@ export default {
 ---
 
 ## 🧪 テストケース
+
+最新の件数とカバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照。
 
 ### ユニットテスト
 

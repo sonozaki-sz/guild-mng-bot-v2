@@ -38,6 +38,7 @@ export type AllParseKeys = ParseKeys<AllNamespaces>;
  * i18nextインスタンスの初期化
  */
 export const initI18n = async (): Promise<I18nInstance> => {
+  // i18next を最小構成で初期化（リソースは後段で注入）
   await i18next.init({
     lng: DEFAULT_LOCALE,
     fallbackLng: DEFAULT_LOCALE,
@@ -69,6 +70,7 @@ export const addResources = (
   namespace: string,
   resources: Record<string, string>,
 ): void => {
+  // 既存バンドルへ追記/上書き可能な設定で登録
   i18next.addResourceBundle(locale, namespace, resources, true, true);
 };
 
@@ -78,6 +80,7 @@ export const addResources = (
 export const changeLanguage = async (
   locale: SupportedLocale,
 ): Promise<void> => {
+  // ランタイム言語を切り替え
   await i18next.changeLanguage(locale);
 };
 

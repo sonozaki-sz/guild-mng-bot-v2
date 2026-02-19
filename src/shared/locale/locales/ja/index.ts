@@ -8,6 +8,7 @@ import { events } from "./events";
 import { system } from "./system";
 
 export const ja = {
+  // i18next namespace 構成（common / commands / errors / events / system）
   common,
   commands,
   errors,

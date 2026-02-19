@@ -1,0 +1,119 @@
+import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
+import { safeReply } from "../../../src/shared/utils/interaction";
+
+type InteractionLike = {
+  replied: boolean;
+  deferred: boolean;
+  reply: jest.Mock<Promise<void>, [unknown]>;
+  followUp: jest.Mock<Promise<void>, [unknown]>;
+};
+
+// Interaction の最小モックを生成するヘルパー
+function createInteraction(
+  overrides?: Partial<InteractionLike>,
+): InteractionLike {
+  return {
+    replied: false,
+    deferred: false,
+    reply: jest.fn().mockResolvedValue(undefined),
+    followUp: jest.fn().mockResolvedValue(undefined),
+    ...overrides,
+  };
+}
+
+// DiscordAPIError として扱えるエラーインスタンスを組み立てるヘルパー
+function createDiscordApiError(code: number): DiscordAPIError {
+  const error = Object.assign(new Error("discord api error"), { code });
+  Object.setPrototypeOf(error, DiscordAPIError.prototype);
+  return error as DiscordAPIError;
+}
+
+describe("shared/utils/interaction safeReply", () => {
+  // 応答状態ごとの reply/followUp 分岐と例外ハンドリングを検証
+  it("uses reply when interaction has not been acknowledged", async () => {
+    const interaction = createInteraction();
+
+    await safeReply(interaction as never, { content: "hello" });
+
+    expect(interaction.reply).toHaveBeenCalledWith({ content: "hello" });
+    expect(interaction.followUp).not.toHaveBeenCalled();
+  });
+
+  it("uses followUp when interaction is already replied", async () => {
+    const interaction = createInteraction({ replied: true });
+
+    await safeReply(interaction as never, { content: "hello" });
+
+    expect(interaction.followUp).toHaveBeenCalledWith({ content: "hello" });
+    expect(interaction.reply).not.toHaveBeenCalled();
+  });
+
+  it("uses followUp when interaction is deferred", async () => {
+    const interaction = createInteraction({ deferred: true });
+
+    await safeReply(interaction as never, { content: "hello" });
+
+    expect(interaction.followUp).toHaveBeenCalledWith({ content: "hello" });
+    expect(interaction.reply).not.toHaveBeenCalled();
+  });
+
+  it("ignores UnknownInteraction Discord API error", async () => {
+    // 期限切れInteractionは安全に無視されること
+    const interaction = createInteraction({
+      reply: jest
+        .fn<Promise<void>, [unknown]>()
+        .mockRejectedValueOnce(
+          createDiscordApiError(RESTJSONErrorCodes.UnknownInteraction),
+        ),
+    });
+
+    await expect(
+      safeReply(interaction as never, { content: "ignored" }),
+    ).resolves.toBeUndefined();
+  });
+
+  it("ignores InteractionHasAlreadyBeenAcknowledged Discord API error", async () => {
+    // 応答済みエラーは再送処理で握りつぶすこと
+    const interaction = createInteraction({
+      reply: jest
+        .fn<Promise<void>, [unknown]>()
+        .mockRejectedValueOnce(
+          createDiscordApiError(
+            RESTJSONErrorCodes.InteractionHasAlreadyBeenAcknowledged,
+          ),
+        ),
+    });
+
+    await expect(
+      safeReply(interaction as never, { content: "ignored" }),
+    ).resolves.toBeUndefined();
+  });
+
+  it("rethrows non-ignored Discord API error", async () => {
+    // 無視対象以外の Discord API エラーは呼び出し元へ送出すること
+    const interaction = createInteraction({
+      reply: jest
+        .fn<Promise<void>, [unknown]>()
+        .mockRejectedValueOnce(
+          createDiscordApiError(RESTJSONErrorCodes.UnknownUser),
+        ),
+    });
+
+    await expect(
+      safeReply(interaction as never, { content: "boom" }),
+    ).rejects.toBeInstanceOf(DiscordAPIError);
+  });
+
+  it("rethrows non-Discord error", async () => {
+    // DiscordAPIError 以外の例外も握りつぶさず再送出すること
+    const interaction = createInteraction({
+      reply: jest
+        .fn<Promise<void>, [unknown]>()
+        .mockRejectedValueOnce(new Error("unexpected")),
+    });
+
+    await expect(
+      safeReply(interaction as never, { content: "boom" }),
+    ).rejects.toThrow("unexpected");
+  });
+});

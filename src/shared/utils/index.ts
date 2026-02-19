@@ -1,5 +1,8 @@
-// Utility exports
-export * from "./interaction";
-export * from "./logger";
-export * from "./messageResponse";
-export * from "./prisma";
+// src/shared/utils/index.ts
+// shared utility exports
+export { logger } from "./logger";
+export {
+  getPrismaClient,
+  requirePrismaClient,
+  setPrismaClient,
+} from "./prisma";

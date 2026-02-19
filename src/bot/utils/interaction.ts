@@ -1,0 +1,41 @@
+// src/bot/utils/interaction.ts
+// Discord Interaction関連のユーティリティ関数
+
+import type {
+  ButtonInteraction,
+  ChatInputCommandInteraction,
+  InteractionReplyOptions,
+  ModalSubmitInteraction,
+  UserSelectMenuInteraction,
+} from "discord.js";
+import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
+
+type AnyInteraction =
+  | ChatInputCommandInteraction
+  | ButtonInteraction
+  | ModalSubmitInteraction
+  | UserSelectMenuInteraction;
+
+export async function safeReply(
+  interaction: AnyInteraction,
+  options: InteractionReplyOptions,
+): Promise<void> {
+  try {
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp(options);
+    } else {
+      await interaction.reply(options);
+    }
+  } catch (error) {
+    if (error instanceof DiscordAPIError) {
+      const ignoredCodes: number[] = [
+        RESTJSONErrorCodes.UnknownInteraction,
+        RESTJSONErrorCodes.InteractionHasAlreadyBeenAcknowledged,
+      ];
+      if (ignoredCodes.includes(error.code as number)) {
+        return;
+      }
+    }
+    throw error;
+  }
+}
