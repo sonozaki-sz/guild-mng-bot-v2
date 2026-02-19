@@ -4,15 +4,31 @@
  */
 
 describe("Environment Configuration", () => {
-  const originalEnv = process.env;
+  // 必須/任意項目・型変換・列挙値の環境変数バリデーションを検証
+  const originalEnv = { ...process.env };
 
+  // process.env オブジェクトを差し替えず、キー単位で初期状態へ戻す
+  const restoreEnv = () => {
+    for (const key of Object.keys(process.env)) {
+      if (!(key in originalEnv)) {
+        delete process.env[key];
+      }
+    }
+
+    for (const [key, value] of Object.entries(originalEnv)) {
+      process.env[key] = value;
+    }
+  };
+
+  // 各テスト前にモジュールキャッシュを破棄し、環境変数を初期状態へ戻す
   beforeEach(() => {
     jest.resetModules();
-    process.env = { ...originalEnv };
+    restoreEnv();
   });
 
+  // テスト後に process.env を元に戻して副作用を防止
   afterEach(() => {
-    process.env = originalEnv;
+    restoreEnv();
   });
 
   describe("Required Fields", () => {
@@ -30,6 +46,7 @@ describe("Environment Configuration", () => {
     });
 
     it("should use default values for optional fields", () => {
+      // 任意項目を未設定にし、デフォルト値の適用を確認
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       // NODE_ENVはsetup.tsで"test"に設定されている
@@ -65,9 +82,10 @@ describe("Environment Configuration", () => {
     it("should accept valid NODE_ENV values", () => {
       const validEnvs = ["development", "production", "test"];
 
+      // 有効な NODE_ENV 値を順番に検証
       validEnvs.forEach((nodeEnv) => {
         jest.resetModules();
-        process.env = { ...originalEnv };
+        restoreEnv();
         process.env.DISCORD_TOKEN = "a".repeat(50);
         process.env.DISCORD_APP_ID = "1234567890";
         process.env.NODE_ENV = nodeEnv;
@@ -84,9 +102,10 @@ describe("Environment Configuration", () => {
     it("should accept valid LOG_LEVEL values", () => {
       const validLevels = ["trace", "debug", "info", "warn", "error"];
 
+      // 有効な LOG_LEVEL 値を順番に検証
       validLevels.forEach((level) => {
         jest.resetModules();
-        process.env = { ...originalEnv };
+        restoreEnv();
         process.env.DISCORD_TOKEN = "a".repeat(50);
         process.env.DISCORD_APP_ID = "1234567890";
         process.env.LOG_LEVEL = level;
@@ -121,6 +140,7 @@ describe("Environment Configuration", () => {
 
   describe("Database Configuration", () => {
     it("should use DATABASE_URL from setup", () => {
+      // setup.ts で注入されるテスト用 DATABASE_URL を利用すること
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       // DATABASE_URLはsetup.tsで設定済み

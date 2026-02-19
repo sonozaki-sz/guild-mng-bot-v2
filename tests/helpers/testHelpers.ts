@@ -11,6 +11,10 @@ import type {
   User,
 } from "discord.js";
 
+// ============================================================
+// Discord.js モック生成ヘルパー
+// ============================================================
+
 /**
  * モックユーザーの作成
  */
@@ -106,6 +110,10 @@ export const createMockInteraction = (
     ...overrides,
   }) as unknown as jest.Mocked<ChatInputCommandInteraction>;
 
+// ============================================================
+// 汎用ユーティリティ
+// ============================================================
+
 /**
  * 非同期処理の待機ヘルパー
  */
@@ -120,6 +128,10 @@ export const generateSnowflake = (): string => {
   const random = Math.floor(Math.random() * 4096);
   return ((BigInt(timestamp) << 22n) | BigInt(random)).toString();
 };
+
+// ============================================================
+// テストデータ生成ヘルパー
+// ============================================================
 
 /**
  * テストデータベース用のギルド設定を作成
@@ -144,8 +156,20 @@ export const expectError = async <T extends Error>(
   errorClass: new (...args: unknown[]) => T,
   message?: string,
 ): Promise<void> => {
-  await expect(fn()).rejects.toThrow(errorClass);
-  if (message) {
-    await expect(fn()).rejects.toThrow(message);
+  try {
+    await fn();
+    throw new Error(
+      `Expected ${errorClass.name} to be thrown, but function resolved successfully`,
+    );
+  } catch (error) {
+    // エラー型を検証
+    expect(error).toBeInstanceOf(errorClass);
+
+    // 必要に応じて同一エラーのメッセージも検証
+    if (message) {
+      const actualMessage =
+        error instanceof Error ? error.message : String(error);
+      expect(actualMessage).toContain(message);
+    }
   }
 };

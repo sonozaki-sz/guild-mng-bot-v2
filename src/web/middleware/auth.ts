@@ -18,6 +18,7 @@ import { logger } from "../../shared/utils/logger";
  * jsonwebtoken などに差し替えること。
  */
 export const apiAuthPlugin: FastifyPluginAsync = async (fastify) => {
+  // すべての受信リクエストで認証判定を行う
   fastify.addHook(
     "onRequest",
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -26,6 +27,7 @@ export const apiAuthPlugin: FastifyPluginAsync = async (fastify) => {
         return;
       }
 
+      // Authorization ヘッダーを取得してBearer形式を検証
       const authHeader = request.headers.authorization;
 
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -42,6 +44,7 @@ export const apiAuthPlugin: FastifyPluginAsync = async (fastify) => {
         return;
       }
 
+      // Bearer プレフィックスを除去した実トークン値
       const token = authHeader.slice(7).trim();
 
       // APIキーと一致するか確認（単純なAPIキー認証）
@@ -59,6 +62,8 @@ export const apiAuthPlugin: FastifyPluginAsync = async (fastify) => {
         });
         return;
       }
+
+      // ここに到達した場合のみ認証成功として後続ハンドラへ進む
     },
   );
 };

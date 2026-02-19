@@ -3,8 +3,8 @@
  * Bumpリマインダータイマー管理の統合テスト
  */
 
-import { BumpReminderManager } from "../../../src/shared/features/bump-reminder";
-import { jobScheduler } from "../../../src/shared/scheduler/JobScheduler";
+import { BumpReminderManager } from "../../../src/bot/features/bump-reminder";
+import { jobScheduler } from "../../../src/shared/scheduler/jobScheduler";
 
 // Logger のモック
 jest.mock("../../../src/shared/utils/logger", () => ({
@@ -38,14 +38,24 @@ const mockRepository = {
   cleanupOld: jest.fn(),
 };
 
-jest.mock("../../../src/shared/features/bump-reminder/repository", () => ({
-  getBumpReminderRepository: () => mockRepository,
-}));
+jest.mock(
+  "../../../src/bot/features/bump-reminder/bumpReminderRepository",
+  () => ({
+    getBumpReminderRepository: () => mockRepository,
+  }),
+);
 
 describe("BumpReminderManager Integration", () => {
+  // DB連携とJobScheduler連携を含むリマインダー運用フローを検証
   let manager: BumpReminderManager;
+  const fixedNow = new Date("2026-02-20T00:00:00.000Z");
 
+  // テストごとにManagerとScheduler状態を初期化
   beforeEach(() => {
+    // 時刻依存を固定してテストの再現性を担保
+    jest.useFakeTimers();
+    jest.setSystemTime(fixedNow);
+
     manager = new BumpReminderManager();
     jest.clearAllMocks();
 
@@ -54,12 +64,15 @@ describe("BumpReminderManager Integration", () => {
   });
 
   afterEach(() => {
-    // クリーンアップ
+    // 後片付けとしてスケジュール済みジョブを全停止
     jobScheduler.stopAll();
+    jest.clearAllTimers();
+    jest.useRealTimers();
   });
 
   describe("setReminder()", () => {
     it("should create a reminder in database and schedule job", async () => {
+      // DB保存とジョブ登録が1セットで行われること
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder = {
         id: "reminder-1",
@@ -100,6 +113,7 @@ describe("BumpReminderManager Integration", () => {
     });
 
     it("should create reminder without messageId", async () => {
+      // messageId 未指定（null相当）パターン
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder = {
         id: "reminder-1",
@@ -137,6 +151,7 @@ describe("BumpReminderManager Integration", () => {
 
   describe("cancelReminder()", () => {
     it("should cancel existing reminder", async () => {
+      // 先に登録してからキャンセル動作を確認
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder = {
         id: "reminder-1",
@@ -219,6 +234,7 @@ describe("BumpReminderManager Integration", () => {
 
   describe("restorePendingReminders()", () => {
     it("should restore future reminders from database", async () => {
+      // 未来時刻の pending はジョブとして再登録される
       const futureDate = new Date(Date.now() + 30 * 60 * 1000); // 30分後
       const mockReminders = [
         {
@@ -251,6 +267,7 @@ describe("BumpReminderManager Integration", () => {
     });
 
     it("should execute overdue reminders immediately", async () => {
+      // 期限超過分は復元時に即時実行される
       const pastDate = new Date(Date.now() - 10 * 60 * 1000); // 10分前
       const mockReminders = [
         {
@@ -294,6 +311,7 @@ describe("BumpReminderManager Integration", () => {
 
   describe("clearAll()", () => {
     it("should clear all reminders", async () => {
+      // 複数ギルド分のジョブが一括でクリアされること
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder1 = {
         id: "reminder-1",

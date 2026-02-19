@@ -5,29 +5,41 @@ import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import { Routes } from "discord.js";
 import { env } from "../shared/config/env";
-import { getGuildConfigRepository } from "../shared/database";
-import {
-  setupGlobalErrorHandlers,
-  setupGracefulShutdown,
-} from "../shared/errors/ErrorHandler";
-import { localeManager, tDefault } from "../shared/locale";
-import { registerBotEvent } from "../shared/types/discord";
 import { logger } from "../shared/utils/logger";
 import { setPrismaClient } from "../shared/utils/prisma";
 import { createBotClient } from "./client";
 import { commands } from "./commands";
 import { events } from "./events";
+import { registerBotEvents } from "./services/botEventRegistration";
+import {
+  getBotGuildConfigRepository
+} from "./services/shared-access";
+import {
+  localeManager,
+  tDefault
+} from "./services/shared-access";
+import {
+  setupGlobalErrorHandlers,
+  setupGracefulShutdown
+} from "./services/shared-access";
 
+// コマンド登録先（ギルド/グローバル）をログ表示で識別するための定数
 const COMMAND_REGISTRATION_SCOPE = {
   GUILD: "Guild",
   GLOBAL: "Global",
 } as const;
 
+// 起動失敗時に使用するプロセス終了コード定数
 const PROCESS_EXIT_CODE = {
   FAILURE: 1,
 } as const;
 
+/**
+ * Bot 起動シーケンスを実行するエントリー関数
+ * DB接続、コマンド登録、イベント登録、ログインまでを担当する
+ */
 async function startBot() {
+  // Prisma クライアントを adapter 経由で初期化して接続
   const adapter = new PrismaLibSql({
     url: env.DATABASE_URL,
   });
@@ -37,14 +49,15 @@ async function startBot() {
   // Prismaクライアントをモジュール内に登録（イベントハンドラーからアクセス可能にする）
   setPrismaClient(prisma);
 
-  localeManager.setRepository(getGuildConfigRepository());
+  // localeManager が guild 設定（言語）を参照できるよう repository を注入
+  localeManager.setRepository(getBotGuildConfigRepository());
 
   // LocaleManagerを初期化
   await localeManager.initialize();
 
   logger.info(tDefault("system:bot.starting"));
 
-  // クライアント作成
+  // Discord クライアント生成（command/cooldown など含む）
   const client = createBotClient();
 
   // グレースフルシャットダウンを設定
@@ -57,7 +70,7 @@ async function startBot() {
     // RESTクライアントにトークンを設定
     client.rest.setToken(env.DISCORD_TOKEN);
 
-    // コマンド登録
+    // ローカルレジストリへコマンド登録
     logger.info(
       tDefault("system:bot.commands.registering", { count: commands.length }),
     );
@@ -92,23 +105,13 @@ async function startBot() {
       );
     }
 
-    // イベント登録
-    logger.info(
-      tDefault("system:bot.events.registering", { count: events.length }),
-    );
+    // Discord イベントをクライアントへ登録
+    registerBotEvents(client, events);
 
-    for (const event of events) {
-      registerBotEvent(client, event);
-      logger.debug(
-        tDefault("system:ready.event_registered", { name: event.name }),
-      );
-    }
-
-    logger.info(tDefault("system:bot.events.registered"));
-
-    // Discordにログイン
+    // Discord Gateway へログイン
     await client.login(env.DISCORD_TOKEN);
   } catch (error) {
+    // 起動途中エラー時は DB 接続を閉じて非0終了
     logger.error(tDefault("system:bot.startup.error"), error);
     await prisma.$disconnect();
     process.exit(PROCESS_EXIT_CODE.FAILURE);
@@ -120,6 +123,7 @@ setupGlobalErrorHandlers();
 
 // 起動
 startBot().catch((error) => {
+  // 予期しない起動例外の最終防波堤
   logger.error(tDefault("system:bot.startup.failed"), error);
   process.exit(PROCESS_EXIT_CODE.FAILURE);
 });

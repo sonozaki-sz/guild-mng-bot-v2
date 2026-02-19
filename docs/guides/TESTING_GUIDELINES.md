@@ -2,7 +2,7 @@
 
 > Testing Guidelines - テスト設計とベストプラクティス
 
-最終更新: 2026年2月19日
+最終更新: 2026年2月20日
 
 ---
 
@@ -151,23 +151,40 @@ tests/
 ├── helpers/
 │   └── testHelpers.ts                  # テスト用ヘルパー関数
 ├── unit/                               # ユニットテスト
+│   ├── bot/
+│   │   ├── commands/
+│   │   │   ├── index.test.ts
+│   │   │   └── ping.test.ts
+│   │   ├── events/
+│   │   │   ├── index.test.ts
+│   │   │   └── interactionCreate.test.ts
+│   │   └── handlers/
+│   │       └── index.test.ts
 │   ├── config/
 │   │   └── env.test.ts
 │   ├── errors/
 │   │   ├── CustomErrors.test.ts
 │   │   └── ErrorHandler.test.ts
-│   ├── events/                         # イベントハンドラーのテスト
+│   ├── features/
+│   │   └── vac/
+│   │       └── config.test.ts
 │   ├── scheduler/                      # スケジューラーのテスト
 │   ├── services/
 │   │   └── CooldownManager.test.ts
 │   └── utils/
-│       └── logger.test.ts
+│       ├── interaction.test.ts
+│       ├── logger.test.ts
+│       └── messageResponse.test.ts
 ├── integration/                        # 統合テスト
+│   ├── bot/
+│   │   ├── command-event.integration.test.ts
+│   │   └── handler-routing.integration.test.ts
 │   ├── database/
 │   │   ├── GuildConfigRepository.test.ts
 │   │   └── BumpReminderRepository.test.ts
 │   └── scheduler/
 │       └── BumpReminderManager.test.ts
+├── logs/                               # テスト実行時のログ出力
 └── e2e/                                # E2Eテスト（今後実装予定）
 ```
 
@@ -239,12 +256,95 @@ tests/
 4. **可読性**
    - わかりやすいテストケース名
    - AAA パターンの遵守
-   - コメント少なめ、コード自体で意図を表現
+   - 関数単位・処理ブロック単位で「意図」を短い日本語コメントで明示
 
 5. **保守性**
    - ヘルパー関数の活用で重複を削減
    - テストの構造を統一
    - 変更に強い設計
+
+---
+
+## 📝 テストコメント規約（2026年2月20日 追加）
+
+テストの意図をレビュー時に即座に把握できるよう、以下を必須とします。
+
+1. **関数単位コメント**
+   - `describe` ごとに「何を検証するまとまりか」を1行で記述
+   - 例: `// 認証ヘッダー検証とトークン一致判定の分岐を検証`
+
+2. **処理ブロック単位コメント**
+   - `beforeEach`/`afterEach`/分岐の前に「なぜその準備・検証をするか」を記述
+   - 例: `// 期限超過分は復元時に即時実行される`
+
+3. **記述ルール**
+   - 日本語で簡潔に（1〜2行）
+   - 実装詳細の説明ではなく、テスト意図・前提・期待結果を書く
+   - 自明な1行処理の逐語説明は避ける
+
+---
+
+## 🔍 テスト設計レビュー（2026年2月20日）
+
+### 現状評価
+
+- ✅ テストは全件成功（13 suite / 178 tests）
+- ✅ ユニット・統合（モック中心）で主要ロジックの回帰検知は可能
+- ⚠️ グローバルカバレッジしきい値（70%）は未達（lines 39.03%, functions 36.66%）
+
+### 設計上の主な課題
+
+1. **実時間待ちによるフレーク/遅延リスク**
+   - 対象: `tests/unit/services/cooldownManager.test.ts`
+   - 状況: ✅ 対応済み（fake timers へ移行）
+   - 補足: 実時間待機を排除し、再現性と実行速度を改善
+
+2. **「統合テスト」のモック比率が高い**
+   - 対象: `tests/integration/database/*.test.ts`, `tests/integration/scheduler/*.test.ts`
+   - 外部依存を広くモックしており、実態はコンポーネントテスト寄り
+   - 対応: 実DB（SQLite in-memory）を使う狭い本統合テストを別レイヤーで追加
+
+3. **グローバル副作用の管理強化余地**
+   - 対象: `tests/setup.ts`, `tests/unit/config/env.test.ts`
+   - `global.console` や `process.env` の操作があり、拡張時に汚染リスクがある
+   - 状況: ✅ `env.test.ts` はキー単位復元へ移行済み
+   - 対応: 変更・復元ポリシーを明示し、必要箇所では `beforeEach/afterEach` で局所化
+
+4. **ヘルパー関数の安全性改善余地**
+   - 対象: `tests/helpers/testHelpers.ts` の `expectError`
+   - 状況: ✅ 対応済み（単一実行で型・メッセージを検証）
+   - 補足: 副作用を持つ関数でも検証結果が安定
+
+### 優先アクション（推奨）
+
+1. 本統合テスト（実DB使用）を最小ケースから追加
+2. 低カバレッジ領域（コマンド・イベント・Webルート）へ重点的にテスト追加
+3. `process.env` 変更テストの共通ヘルパー化（キー単位復元の横展開）
+
+### process.env の安全な取り扱い（必須）
+
+`process.env` をテスト内で扱う場合、**オブジェクト再代入を避けてキー単位で復元**する。
+
+```typescript
+const originalEnv = { ...process.env };
+
+const restoreEnv = () => {
+  for (const key of Object.keys(process.env)) {
+    if (!(key in originalEnv)) delete process.env[key];
+  }
+  for (const [key, value] of Object.entries(originalEnv)) {
+    process.env[key] = value;
+  }
+};
+
+beforeEach(() => restoreEnv());
+afterEach(() => restoreEnv());
+```
+
+理由:
+
+- `process.env = {...}` の再代入は参照共有中の副作用を招きやすい
+- キー単位復元は他テストへの汚染を最小化できる
 
 ---
 

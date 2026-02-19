@@ -12,6 +12,7 @@ let _prismaClient: PrismaClient | undefined;
  * アプリ起動時に一度だけ呼び出す
  */
 export function setPrismaClient(prisma: PrismaClient): void {
+  // 起動時に初期化済みクライアントを保存
   _prismaClient = prisma;
 }
 
@@ -19,6 +20,7 @@ export function setPrismaClient(prisma: PrismaClient): void {
  * Prismaクライアントを取得
  */
 export function getPrismaClient(): PrismaClient | null {
+  // 未初期化時は null を返し、利用可否を呼び出し側で判定可能にする
   return _prismaClient ?? null;
 }
 
@@ -27,11 +29,14 @@ export function getPrismaClient(): PrismaClient | null {
  * @throws {Error} Prismaクライアントが利用できない場合
  */
 export function requirePrismaClient(): PrismaClient {
+  // 任意取得APIを使って存在確認を一元化
   const prisma = getPrismaClient();
   if (!prisma) {
+    // 必須経路で未初期化は即時エラーとして扱う
     const error = new Error("Prisma client not available");
     logger.error(error.message);
     throw error;
   }
+  // 利用可能なクライアントを返す
   return prisma;
 }

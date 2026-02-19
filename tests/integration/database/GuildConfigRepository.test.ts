@@ -6,8 +6,8 @@
 import {
   PrismaGuildConfigRepository,
   type GuildConfig,
-} from "../../../src/shared/database/repositories/GuildConfigRepository";
-import { DatabaseError } from "../../../src/shared/errors/CustomErrors";
+} from "../../../src/shared/database/repositories/guildConfigRepository";
+import { DatabaseError } from "../../../src/shared/errors/customErrors";
 
 // Logger のモック
 jest.mock("../../../src/shared/utils/logger", () => ({
@@ -38,8 +38,15 @@ const mockPrismaClient = {
 };
 
 describe("PrismaGuildConfigRepository", () => {
+  // ギルド設定の取得・保存・CAS更新・機能別設定更新を統合検証
   let repository: PrismaGuildConfigRepository;
+  const baseTime = new Date("2026-02-20T00:00:00.000Z");
 
+  // 基準時刻からの差分で日時を作るヘルパー
+  const atOffsetMs = (offsetMs: number): Date =>
+    new Date(baseTime.getTime() + offsetMs);
+
+  // 各テストでリポジトリインスタンスとモック呼び出し履歴を初期化
   beforeEach(() => {
     // @ts-expect-error - モックのため型エラーは無視
     repository = new PrismaGuildConfigRepository(mockPrismaClient);
@@ -48,6 +55,7 @@ describe("PrismaGuildConfigRepository", () => {
 
   describe("getConfig()", () => {
     it("should return guild config when found", async () => {
+      // DBレコード(JSON文字列)がドメイン型へ復元されること
       const mockRecord = {
         guildId: "123456789",
         locale: "ja",
@@ -56,8 +64,8 @@ describe("PrismaGuildConfigRepository", () => {
         bumpReminderConfig: null,
         stickMessages: null,
         memberLogConfig: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       };
 
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue(mockRecord);
@@ -93,8 +101,8 @@ describe("PrismaGuildConfigRepository", () => {
       const newConfig: GuildConfig = {
         guildId: "123456789",
         locale: "ja",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       };
 
       mockPrismaClient.guildConfig.create.mockResolvedValue({
@@ -118,8 +126,8 @@ describe("PrismaGuildConfigRepository", () => {
       const newConfig: GuildConfig = {
         guildId: "123456789",
         locale: "ja",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       };
 
       mockPrismaClient.guildConfig.create.mockRejectedValue(
@@ -142,8 +150,8 @@ describe("PrismaGuildConfigRepository", () => {
         bumpReminderConfig: null,
         stickMessages: null,
         memberLogConfig: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       });
 
       await repository.updateConfig("123456789", { locale: "en" });
@@ -152,6 +160,7 @@ describe("PrismaGuildConfigRepository", () => {
     });
 
     it("should create config if not exists (upsert)", async () => {
+      // upsert により未作成ギルドでも更新APIで作成できること
       mockPrismaClient.guildConfig.upsert.mockResolvedValue({
         guildId: "123456789",
         locale: "ja",
@@ -160,8 +169,8 @@ describe("PrismaGuildConfigRepository", () => {
         bumpReminderConfig: null,
         stickMessages: null,
         memberLogConfig: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       });
 
       await repository.updateConfig("123456789", { locale: "en" });
@@ -180,8 +189,8 @@ describe("PrismaGuildConfigRepository", () => {
         bumpReminderConfig: null,
         stickMessages: null,
         memberLogConfig: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       });
 
       await repository.deleteConfig("123456789");
@@ -220,8 +229,8 @@ describe("PrismaGuildConfigRepository", () => {
         bumpReminderConfig: null,
         stickMessages: null,
         memberLogConfig: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       });
 
       const locale = await repository.getLocale("123456789");
@@ -230,6 +239,7 @@ describe("PrismaGuildConfigRepository", () => {
     });
 
     it("should return default locale when config not found", async () => {
+      // 未設定ギルドは既定ロケールを返す
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue(null);
 
       const locale = await repository.getLocale("nonexistent");
@@ -240,6 +250,7 @@ describe("PrismaGuildConfigRepository", () => {
 
   describe("setAfkChannel()", () => {
     it("should create AFK config when not configured", async () => {
+      // AFK設定未作成時は初期化してから保存
       mockPrismaClient.guildConfig.findUnique
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce({
@@ -256,6 +267,7 @@ describe("PrismaGuildConfigRepository", () => {
     });
 
     it("should update AFK config with CAS when configured", async () => {
+      // 既存値一致を条件に CAS で更新する
       const currentConfig = {
         enabled: false,
         channelId: "old-vc",
@@ -316,6 +328,7 @@ describe("PrismaGuildConfigRepository", () => {
 
   describe("getBumpReminderConfig()", () => {
     it("should return default enabled config when not configured", async () => {
+      // bump設定が無い場合は既定値（enabled: true）を返す
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue(null);
 
       const config = await repository.getBumpReminderConfig("123456789");
@@ -343,8 +356,8 @@ describe("PrismaGuildConfigRepository", () => {
         vacConfig: null,
         memberLogConfig: null,
         stickMessages: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       });
 
       const config = await repository.getBumpReminderConfig("123456789");
@@ -361,8 +374,8 @@ describe("PrismaGuildConfigRepository", () => {
         vacConfig: null,
         memberLogConfig: null,
         stickMessages: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       });
 
       const config = await repository.getBumpReminderConfig("123456789");
@@ -488,6 +501,7 @@ describe("PrismaGuildConfigRepository", () => {
 
   describe("addBumpReminderMentionUser()", () => {
     it("should initialize default config and add user when not configured", async () => {
+      // 未設定時は初期化後にユーザーIDを追加
       mockPrismaClient.guildConfig.findUnique
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce({
@@ -560,6 +574,7 @@ describe("PrismaGuildConfigRepository", () => {
     });
 
     it("should return already-exists when user is already in list", async () => {
+      // 既存ユーザーは重複追加せず結果コードを返す
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
         bumpReminderConfig: JSON.stringify({
           enabled: true,
@@ -700,6 +715,7 @@ describe("PrismaGuildConfigRepository", () => {
 
   describe("clearBumpReminderMentions()", () => {
     it("should clear role and users", async () => {
+      // ロールIDとユーザー一覧の両方を同時にクリア
       const currentConfig = {
         enabled: true,
         channelId: "111",

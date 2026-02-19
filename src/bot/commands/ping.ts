@@ -2,16 +2,22 @@
 // Pingコマンド - ボットの応答速度を確認
 
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { handleCommandError } from "../../shared/errors/ErrorHandler";
-import { tGuild } from "../../shared/locale";
-import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
-import type { Command } from "../../shared/types/discord";
-import { createSuccessEmbed } from "../../shared/utils/messageResponse";
+import type { Command } from "../../bot/types/discord";
+import { createSuccessEmbed } from "../../bot/utils/messageResponse";
+import {
+  getCommandLocalizations,
+  tGuild
+} from "../services/shared-access";
+import {
+  handleCommandError
+} from "../services/shared-access";
 
+// Ping コマンドで使用するコマンド名定数
 const PING_COMMAND = {
   NAME: "ping",
 } as const;
 
+// Ping コマンドの表示文言キーを管理する定数
 const PING_I18N_KEYS = {
   COMMAND_DESCRIPTION: "ping.description",
   EMBED_MEASURING: "commands:ping.embed.measuring",
@@ -33,6 +39,7 @@ export const pingCommand: Command = {
 
   async execute(interaction: ChatInputCommandInteraction) {
     try {
+      // DM実行でも共通翻訳APIを使えるよう guildId は optional 扱い
       const guildId = interaction.guildId ?? undefined;
 
       // 初回応答（タイムスタンプ計測用）
@@ -43,7 +50,9 @@ export const pingCommand: Command = {
       const sent = await interaction.fetchReply();
 
       // レイテンシー計算
+      // API遅延: コマンド受信〜返信メッセージ生成
       const apiLatency = sent.createdTimestamp - interaction.createdTimestamp;
+      // WebSocket遅延: Discord Gateway 往復
       const wsLatency = interaction.client.ws.ping;
 
       // 結果をEmbedで表示
@@ -55,6 +64,7 @@ export const pingCommand: Command = {
       const embed = createSuccessEmbed(description);
 
       await interaction.editReply({
+        // 計測中テキストを消して Embed のみ表示
         content: "",
         embeds: [embed],
       });

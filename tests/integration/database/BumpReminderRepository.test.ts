@@ -3,8 +3,11 @@
  * Bumpリマインダー永続化の統合テスト
  */
 
-import { DatabaseError } from "../../../src/shared/errors/CustomErrors";
-import { BumpReminderRepository } from "../../../src/shared/features/bump-reminder";
+import { DatabaseError } from "../../../src/shared/errors/customErrors";
+import {
+  BumpReminderRepository,
+  getBumpReminderRepository,
+} from "../../../src/bot/features/bump-reminder";
 
 // Logger のモック
 jest.mock("../../../src/shared/utils/logger", () => ({
@@ -37,8 +40,15 @@ const mockPrismaClient = {
 };
 
 describe("BumpReminderRepository", () => {
+  // 永続化CRUDとステータス遷移、例外ラップを統合的に検証
   let repository: BumpReminderRepository;
+  const baseTime = new Date("2026-02-20T00:00:00.000Z");
 
+  // 基準時刻からの差分で日時を作るヘルパー
+  const atOffsetMs = (offsetMs: number): Date =>
+    new Date(baseTime.getTime() + offsetMs);
+
+  // テストごとにリポジトリとモック状態を初期化
   beforeEach(() => {
     // @ts-expect-error - モックのため型エラーは無視
     repository = new BumpReminderRepository(mockPrismaClient);
@@ -52,7 +62,8 @@ describe("BumpReminderRepository", () => {
 
   describe("create()", () => {
     it("should create a new bump reminder", async () => {
-      const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      // 新規作成前に既存 pending を cancelled へ更新してから作成する
+      const scheduledAt = atOffsetMs(2 * 60 * 60 * 1000);
       const mockReminder = {
         id: "reminder-1",
         guildId: "guild-123",
@@ -60,8 +71,8 @@ describe("BumpReminderRepository", () => {
         messageId: "msg-789",
         scheduledAt,
         status: "pending",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       };
 
       mockPrismaClient.bumpReminder.updateMany.mockResolvedValue({
@@ -96,7 +107,8 @@ describe("BumpReminderRepository", () => {
     });
 
     it("should create reminder without messageId", async () => {
-      const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      // messageId が未指定でも作成できること
+      const scheduledAt = atOffsetMs(2 * 60 * 60 * 1000);
       const mockReminder = {
         id: "reminder-2",
         guildId: "guild-123",
@@ -104,8 +116,8 @@ describe("BumpReminderRepository", () => {
         messageId: null,
         scheduledAt,
         status: "pending",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       };
 
       mockPrismaClient.bumpReminder.updateMany.mockResolvedValue({
@@ -123,7 +135,7 @@ describe("BumpReminderRepository", () => {
     });
 
     it("should throw DatabaseError on failure", async () => {
-      const scheduledAt = new Date();
+      const scheduledAt = atOffsetMs(0);
       mockPrismaClient.bumpReminder.updateMany.mockResolvedValue({
         count: 0,
       });
@@ -144,10 +156,10 @@ describe("BumpReminderRepository", () => {
         guildId: "guild-123",
         channelId: "channel-456",
         messageId: "msg-789",
-        scheduledAt: new Date(),
+        scheduledAt: atOffsetMs(10 * 60 * 1000),
         status: "pending",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       };
 
       mockPrismaClient.bumpReminder.findUnique.mockResolvedValue(mockReminder);
@@ -161,6 +173,7 @@ describe("BumpReminderRepository", () => {
     });
 
     it("should return null when not found", async () => {
+      // 未存在IDの場合は null を返す
       mockPrismaClient.bumpReminder.findUnique.mockResolvedValue(null);
 
       const result = await repository.findById("nonexistent");
@@ -186,10 +199,10 @@ describe("BumpReminderRepository", () => {
         guildId: "guild-123",
         channelId: "channel-456",
         messageId: "msg-789",
-        scheduledAt: new Date(),
+        scheduledAt: atOffsetMs(10 * 60 * 1000),
         status: "pending",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: atOffsetMs(0),
+        updatedAt: atOffsetMs(0),
       };
 
       mockPrismaClient.bumpReminder.findFirst.mockResolvedValue(mockReminder);
@@ -210,6 +223,16 @@ describe("BumpReminderRepository", () => {
 
       expect(result).toBeNull();
     });
+
+    it("should throw DatabaseError on failure", async () => {
+      mockPrismaClient.bumpReminder.findFirst.mockRejectedValue(
+        new Error("DB error"),
+      );
+
+      await expect(repository.findPendingByGuild("guild-123")).rejects.toThrow(
+        DatabaseError,
+      );
+    });
   });
 
   describe("findAllPending()", () => {
@@ -220,20 +243,20 @@ describe("BumpReminderRepository", () => {
           guildId: "guild-123",
           channelId: "channel-456",
           messageId: "msg-789",
-          scheduledAt: new Date(),
+          scheduledAt: atOffsetMs(10 * 60 * 1000),
           status: "pending",
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: atOffsetMs(0),
+          updatedAt: atOffsetMs(0),
         },
         {
           id: "reminder-2",
           guildId: "guild-456",
           channelId: "channel-789",
           messageId: null,
-          scheduledAt: new Date(),
+          scheduledAt: atOffsetMs(20 * 60 * 1000),
           status: "pending",
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: atOffsetMs(0),
+          updatedAt: atOffsetMs(0),
         },
       ];
 
@@ -250,11 +273,20 @@ describe("BumpReminderRepository", () => {
     });
 
     it("should return empty array when no pending reminders", async () => {
+      // pending が0件なら空配列
       mockPrismaClient.bumpReminder.findMany.mockResolvedValue([]);
 
       const result = await repository.findAllPending();
 
       expect(result).toEqual([]);
+    });
+
+    it("should throw DatabaseError on failure", async () => {
+      mockPrismaClient.bumpReminder.findMany.mockRejectedValue(
+        new Error("DB error"),
+      );
+
+      await expect(repository.findAllPending()).rejects.toThrow(DatabaseError);
     });
   });
 
@@ -345,8 +377,36 @@ describe("BumpReminderRepository", () => {
     });
   });
 
+  describe("cancelByGuildAndChannel()", () => {
+    it("should cancel all pending reminders for guild and channel", async () => {
+      mockPrismaClient.bumpReminder.updateMany.mockResolvedValue({ count: 1 });
+
+      await repository.cancelByGuildAndChannel("guild-123", "channel-456");
+
+      expect(mockPrismaClient.bumpReminder.updateMany).toHaveBeenCalledWith({
+        where: {
+          guildId: "guild-123",
+          channelId: "channel-456",
+          status: "pending",
+        },
+        data: { status: "cancelled" },
+      });
+    });
+
+    it("should throw DatabaseError on failure", async () => {
+      mockPrismaClient.bumpReminder.updateMany.mockRejectedValue(
+        new Error("DB error"),
+      );
+
+      await expect(
+        repository.cancelByGuildAndChannel("guild-123", "channel-456"),
+      ).rejects.toThrow(DatabaseError);
+    });
+  });
+
   describe("cleanupOld()", () => {
     it("should delete old sent/cancelled reminders", async () => {
+      // 古い sent/cancelled レコードのみを削除対象にする
       mockPrismaClient.bumpReminder.deleteMany.mockResolvedValue({ count: 5 });
 
       const result = await repository.cleanupOld(7);
@@ -359,6 +419,7 @@ describe("BumpReminderRepository", () => {
     });
 
     it("should use default 7 days when no parameter provided", async () => {
+      // 引数未指定時は既定の保持日数を使用
       mockPrismaClient.bumpReminder.deleteMany.mockResolvedValue({ count: 3 });
 
       const result = await repository.cleanupOld();
@@ -372,6 +433,27 @@ describe("BumpReminderRepository", () => {
       );
 
       await expect(repository.cleanupOld()).rejects.toThrow(DatabaseError);
+    });
+  });
+
+  describe("getBumpReminderRepository()", () => {
+    it("should return same instance for same prisma client", () => {
+      const first = getBumpReminderRepository(mockPrismaClient as never);
+      const second = getBumpReminderRepository(mockPrismaClient as never);
+
+      expect(second).toBe(first);
+    });
+
+    it("should create new instance when prisma client changes", () => {
+      const first = getBumpReminderRepository(mockPrismaClient as never);
+      const anotherPrisma = {
+        ...mockPrismaClient,
+        bumpReminder: { ...mockPrismaClient.bumpReminder },
+      };
+
+      const second = getBumpReminderRepository(anotherPrisma as never);
+
+      expect(second).not.toBe(first);
     });
   });
 });

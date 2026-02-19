@@ -3,18 +3,18 @@
  * エラーハンドリング機能のテスト
  */
 
-import type { ChatInputCommandInteraction } from "discord.js";
+import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { NODE_ENV, env } from "../../../src/shared/config/env";
 import {
   BaseError,
   DatabaseError,
   ValidationError,
-} from "../../../src/shared/errors/CustomErrors";
+} from "../../../src/shared/errors/customErrors";
 import {
   getUserFriendlyMessage,
   handleCommandError,
   logError,
-} from "../../../src/shared/errors/ErrorHandler";
+} from "../../../src/shared/errors/errorHandler";
 import { logger } from "../../../src/shared/utils/logger";
 
 // Logger のモック
@@ -41,6 +41,8 @@ jest.mock("../../../src/shared/locale", () => ({
 }));
 
 describe("ErrorHandler", () => {
+  // ログ出力・ユーザー向けメッセージ変換・Interaction応答分岐を検証
+  // 各テスト実行前にモックの呼び出し履歴を初期化
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -102,6 +104,7 @@ describe("ErrorHandler", () => {
   describe("getUserFriendlyMessage()", () => {
     const originalEnv = env.NODE_ENV;
 
+    // NODE_ENV の上書きが他テストへ漏れないよう復元
     afterEach(() => {
       env.NODE_ENV = originalEnv;
     });
@@ -115,6 +118,7 @@ describe("ErrorHandler", () => {
     });
 
     it("should return generic message in production for non-operational errors", () => {
+      // 本番環境では内部詳細を出さず汎用メッセージにする
       env.NODE_ENV = NODE_ENV.PRODUCTION;
       const error = new Error("Internal server error");
 
@@ -124,6 +128,7 @@ describe("ErrorHandler", () => {
     });
 
     it("should return detailed message in development", () => {
+      // 開発環境ではデバッグ容易性のため詳細メッセージを返す
       env.NODE_ENV = NODE_ENV.DEVELOPMENT;
       const error = new Error("Detailed error message");
 
@@ -144,6 +149,7 @@ describe("ErrorHandler", () => {
   describe("handleCommandError()", () => {
     let mockInteraction: jest.Mocked<ChatInputCommandInteraction>;
 
+    // Interaction の最小モックを毎回組み立てる
     beforeEach(() => {
       mockInteraction = {
         replied: false,
@@ -168,12 +174,13 @@ describe("ErrorHandler", () => {
               }),
             }),
           ]),
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         }),
       );
     });
 
     it("should edit reply when already replied", async () => {
+      // 応答済みの場合は editReply へフォールバック
       mockInteraction.replied = true;
       const error = new ValidationError("Invalid command");
 
@@ -194,6 +201,7 @@ describe("ErrorHandler", () => {
     });
 
     it("should edit reply when deferred", async () => {
+      // defer 済みの場合も editReply で更新
       mockInteraction.deferred = true;
       const error = new DatabaseError("Connection failed");
 
@@ -222,6 +230,7 @@ describe("ErrorHandler", () => {
     });
 
     it("should handle reply failure gracefully", async () => {
+      // 返信処理自体が失敗しても例外で落とさずログへ記録
       mockInteraction.reply.mockRejectedValue(new Error("Reply failed"));
       const error = new ValidationError("Test error");
 
@@ -236,6 +245,7 @@ describe("ErrorHandler", () => {
 
   describe("Error Message Formatting", () => {
     it("should prefix error messages title with ❌", async () => {
+      // テストごとに独立した Interaction モックを用意
       const mockInteraction = {
         replied: false,
         deferred: false,

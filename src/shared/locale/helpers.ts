@@ -2,7 +2,6 @@
 // ローカライゼーション関連のヘルパー関数
 
 import { type ParseKeys } from "i18next";
-import type { IGuildConfigRepository } from "../database/repositories/GuildConfigRepository";
 import { type AllNamespaces, type SupportedLocale } from "./i18n";
 
 /** 全ネームスペースの翻訳キーを受け取るギルド用翻訳関数型 */
@@ -15,16 +14,16 @@ export type GuildTFunction = (
  * ギルド用の翻訳関数を取得
  * LocaleManager 経由でキャッシュを利用するため、直接 DB クエリを発行しない
  * @param guildId ギルドID
- * @param _guildConfigRepository 後方互換のため残存（現在は LocaleManager キャッシュを使用）
  * @returns 翻訳関数
  */
 export async function getGuildTranslator(
   guildId: string,
-  _guildConfigRepository?: IGuildConfigRepository,
 ): Promise<GuildTFunction> {
+  // 循環依存を避けるため遅延 import で localeManager を取得
   const { localeManager } = await import("./index");
+  // guildId に対応する固定 translator（ロケール解決済み）を取得
   const fixedT = await localeManager.getGuildT(guildId);
-  // i18nextのgetFixedTはデフォルトNSにバインドされるが実行時は全NSキーを受け入れるためキャスト
+  // i18next 側の型より実運用側（全NSキー許容）が広いため型を合わせる
   return fixedT as unknown as GuildTFunction;
 }
 
@@ -35,7 +34,9 @@ export async function getGuildTranslator(
 export async function invalidateGuildLocaleCache(
   guildId: string,
 ): Promise<void> {
+  // 循環依存を避けるため localeManager を遅延 import
   const { localeManager } = await import("./index");
+  // 対象 guild のロケールキャッシュだけを破棄（他ギルドへ影響させない）
   localeManager.invalidateLocaleCache(guildId);
 }
 

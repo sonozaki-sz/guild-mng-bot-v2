@@ -1,0 +1,54 @@
+import {
+  getGuildTranslator,
+  invalidateGuildLocaleCache,
+} from "../../../src/shared/locale/helpers";
+
+const getGuildTMock = jest.fn();
+const invalidateLocaleCacheMock = jest.fn();
+
+jest.mock("../../../src/shared/locale/index", () => ({
+  localeManager: {
+    getGuildT: (...args: unknown[]) => getGuildTMock(...args),
+    invalidateLocaleCache: (...args: unknown[]) =>
+      invalidateLocaleCacheMock(...args),
+  },
+}));
+
+// locale helper の dynamic import 経路とキャッシュ無効化呼び出しを検証
+describe("shared/locale/helpers", () => {
+  // 各ケースでモック呼び出し履歴を独立化する
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  // guild translator 取得時に localeManager.getGuildT を透過利用することを検証
+  it("returns guild translator from locale manager", async () => {
+    const fixedT = jest.fn((key: string) => `translated:${key}`);
+    getGuildTMock.mockResolvedValue(fixedT);
+
+    const translator = await getGuildTranslator("guild-1");
+
+    expect(getGuildTMock).toHaveBeenCalledWith("guild-1");
+    expect(translator("system:bot.starting" as never)).toBe(
+      "translated:system:bot.starting",
+    );
+  });
+
+  // 後方互換パラメータ（repository）を渡しても正常に解決されることを検証
+  it("accepts backward-compatible repository parameter", async () => {
+    const fixedT = jest.fn((key: string) => key);
+    getGuildTMock.mockResolvedValue(fixedT);
+
+    const repository = { getLocale: jest.fn() };
+    await getGuildTranslator("guild-2", repository as never);
+
+    expect(getGuildTMock).toHaveBeenCalledWith("guild-2");
+  });
+
+  // 明示的なキャッシュ無効化が対象 guildId に対して実行されることを検証
+  it("invalidates locale cache for target guild", async () => {
+    await invalidateGuildLocaleCache("guild-3");
+
+    expect(invalidateLocaleCacheMock).toHaveBeenCalledWith("guild-3");
+  });
+});
