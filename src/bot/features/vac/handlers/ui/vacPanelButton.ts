@@ -12,11 +12,9 @@ import {
   type ButtonInteraction,
   type GuildMember,
 } from "discord.js";
+import { isManagedVacChannel } from "../../../../../shared/features/vac";
+import { tGuild } from "../../../../../shared/locale";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
-import {
-  isManagedVacChannel,
-  tGuild,
-} from "../../../../services/shared-access";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,

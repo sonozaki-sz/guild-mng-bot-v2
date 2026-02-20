@@ -88,8 +88,7 @@ src/
 │   │   └── messageResponse.ts
 │   └── services/
 │       ├── cooldownManager.ts
-│       ├── botEventRegistration.ts
-│       └── shared-access/ # shared層アクセスの集約入口
+│       └── botEventRegistration.ts
 │
 ├── shared/                # Bot・Web 両プロセスで使用する共有コード
 │   ├── config/

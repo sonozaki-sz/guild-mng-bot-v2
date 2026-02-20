@@ -10,15 +10,14 @@ import {
   type Guild,
   type VoiceChannel,
 } from "discord.js";
+import { ValidationError } from "../../../../shared/errors";
 import {
   addTriggerChannel,
   getVacConfigOrDefault,
-  handleCommandError,
   removeTriggerChannel,
-  tDefault,
-  tGuild,
-  ValidationError,
-} from "../../../services/shared-access";
+} from "../../../../shared/features/vac";
+import { tDefault, tGuild } from "../../../../shared/locale";
+import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import {
   createInfoEmbed,
   createSuccessEmbed,

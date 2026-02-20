@@ -2,16 +2,15 @@
 // bump-reminder-config set-mention 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { logger } from "../../../../shared/utils";
+import { ValidationError } from "../../../../shared/errors";
 import {
   BUMP_REMINDER_MENTION_ROLE_RESULT,
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
   getBumpReminderConfigService,
-  tDefault,
-  tGuild,
-  ValidationError,
-} from "../../../services/shared-access";
+} from "../../../../shared/features/bump-reminder";
+import { tDefault, tGuild } from "../../../../shared/locale";
+import { logger } from "../../../../shared/utils";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "./bumpReminderConfigCommand.constants";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";

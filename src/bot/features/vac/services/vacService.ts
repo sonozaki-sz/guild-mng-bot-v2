@@ -8,9 +8,9 @@ import {
   type GuildMember,
   type VoiceState,
 } from "discord.js";
+import { tDefault } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import type { BotClient } from "../../../client";
-import { tDefault } from "../../../services/shared-access";
 import { sendVacControlPanel } from "../handlers/ui";
 import { getVacRepository, type IVacRepository } from "../repositories";
 

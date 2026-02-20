@@ -15,13 +15,13 @@ import {
   toScheduledAt,
   type BumpServiceName,
 } from "..";
-import { logger } from "../../../../shared/utils";
+import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
 import {
-  getBumpReminderConfigService,
   getGuildTranslator,
   tDefault,
   type GuildTFunction,
-} from "../../../services/shared-access";
+} from "../../../../shared/locale";
+import { logger } from "../../../../shared/utils";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 
 /**

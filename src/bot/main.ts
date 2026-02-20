@@ -5,18 +5,17 @@ import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import { Routes } from "discord.js";
 import { env } from "../shared/config";
+import { getGuildConfigRepository } from "../shared/database";
+import {
+  setupGlobalErrorHandlers,
+  setupGracefulShutdown,
+} from "../shared/errors";
+import { localeManager, tDefault } from "../shared/locale";
 import { logger, setPrismaClient } from "../shared/utils";
 import { createBotClient } from "./client";
 import { commands } from "./commands";
 import { events } from "./events";
 import { registerBotEvents } from "./services/botEventRegistration";
-import {
-  getBotGuildConfigRepository,
-  localeManager,
-  setupGlobalErrorHandlers,
-  setupGracefulShutdown,
-  tDefault,
-} from "./services/shared-access";
 
 // コマンド登録先（ギルド/グローバル）をログ表示で識別するための定数
 const COMMAND_REGISTRATION_SCOPE = {
@@ -45,7 +44,7 @@ async function startBot() {
   setPrismaClient(prisma);
 
   // localeManager が guild 設定（言語）を参照できるよう repository を注入
-  localeManager.setRepository(getBotGuildConfigRepository());
+  localeManager.setRepository(getGuildConfigRepository());
 
   // LocaleManagerを初期化
   await localeManager.initialize();

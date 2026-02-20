@@ -248,16 +248,20 @@
 - [x] **P1: `shared-access` 依存の段階削減（第一弾）**
   - [x] `VAC` repository の `shared-access` 依存を `shared/features/vac` 直接参照へ変更
   - [x] Bot 基盤（`clientReady` / `client` / `botEventRegistration`）の `tDefault` 参照を `shared/locale` 直参照へ変更
-- [ ] **P2: `shared-access` を機能別境界に分解（locale/errors/features）**
+- [x] **P2: `shared-access` を機能別境界に分解（locale/errors/features）**
   - [x] locale参照の直接import置換を開始（commands/VAC/Bump service）
   - [x] errors参照の直接import置換を開始（Bump repository）
-  - [ ] `shared-access` 利用箇所をカテゴリ単位で置換
-  - [ ] 最終的に `shared-access/index.ts` を縮退または廃止
-- [ ] **P3: `commands` 層の薄型化（入口責務へ限定）**
-  - [ ] `commands` から業務ロジックを `features/services` へ移送
-  - [ ] 権限・入力検証・応答のみ `commands` に残す
+  - [x] `shared-access` 利用箇所をカテゴリ単位で置換
+  - [x] `shared-access/index.ts` を廃止（wrapperディレクトリ削除）
+- [x] **P3: `commands` 層の薄型化（入口責務へ限定）**
+  - [x] `commands` から業務ロジックを `features/services` へ移送
+    - [x] `afk` / `afk-config` の実行ロジックを `features/afk/commands` へ移送
+    - [x] `vac` / `vac-config` / `bump-reminder-config` は `features` 委譲のみを維持
+    - [x] `ping` の実行ロジックを `features/ping/commands` へ移送
+  - [x] 権限・入力検証・応答のみ `commands` に残す
 - [ ] **P4: `shared/database` 巨大ファイル分割**
-  - [ ] CAS更新ロジックを共通ヘルパー化
+  - [x] CAS更新ロジックを共通ヘルパー化
+    - [x] `GuildBumpReminderConfigStore` のCAS処理を `stores/helpers/bumpReminderConfigCas.ts` へ抽出
   - [ ] `stores/repositories` の責務を serializer / persistence に再分離
 - [ ] **P5: singleton依存を明示DIへ段階移行**
   - [ ] `vac` / `bump-reminder` から factory + 注入経路を整備

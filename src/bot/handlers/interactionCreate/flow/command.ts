@@ -6,13 +6,10 @@ import {
   type AutocompleteInteraction,
   type ChatInputCommandInteraction,
 } from "discord.js";
+import { tDefault, tGuild } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import type { BotClient } from "../../../client";
-import {
-  handleCommandError,
-  tDefault,
-  tGuild,
-} from "../../../services/shared-access";
+import { handleCommandError } from "../../../errors/interactionErrorHandler";
 
 // interactionCreate のコマンド系処理で共通利用する既定値
 const INTERACTION_CONSTANTS = {

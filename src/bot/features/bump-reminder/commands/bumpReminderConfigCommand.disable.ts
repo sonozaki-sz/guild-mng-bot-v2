@@ -3,12 +3,9 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { getBumpReminderManager } from "..";
+import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
+import { tDefault, tGuild } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
-import {
-  getBumpReminderConfigService,
-  tDefault,
-  tGuild,
-} from "../../../services/shared-access";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 

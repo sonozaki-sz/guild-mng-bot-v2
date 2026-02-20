@@ -2,15 +2,14 @@
 // Bumpパネルのボタン処理
 
 import { MessageFlags, type ButtonInteraction } from "discord.js";
-import { logger } from "../../../../../shared/utils";
-import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
 import {
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
   getBumpReminderConfigService,
-  getGuildTranslator,
-  tDefault,
-} from "../../../../services/shared-access";
+} from "../../../../../shared/features/bump-reminder";
+import { getGuildTranslator, tDefault } from "../../../../../shared/locale";
+import { logger } from "../../../../../shared/utils";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,

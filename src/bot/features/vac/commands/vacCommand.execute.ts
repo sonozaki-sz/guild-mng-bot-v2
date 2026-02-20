@@ -6,13 +6,10 @@ import {
   ChatInputCommandInteraction,
   MessageFlags,
 } from "discord.js";
-import {
-  handleCommandError,
-  isManagedVacChannel,
-  tDefault,
-  tGuild,
-  ValidationError,
-} from "../../../services/shared-access";
+import { ValidationError } from "../../../../shared/errors";
+import { isManagedVacChannel } from "../../../../shared/features/vac";
+import { tDefault, tGuild } from "../../../../shared/locale";
+import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { VAC_COMMAND } from "./vacCommand.constants";
 

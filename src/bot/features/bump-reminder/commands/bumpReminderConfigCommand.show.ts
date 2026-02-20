@@ -2,10 +2,8 @@
 // bump-reminder-config show 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import {
-  getBumpReminderConfigService,
-  tGuild,
-} from "../../../services/shared-access";
+import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
+import { tGuild } from "../../../../shared/locale";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 

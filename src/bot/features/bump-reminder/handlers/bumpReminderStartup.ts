@@ -6,12 +6,10 @@ import {
   type BumpReminderTaskFactory,
   type BumpServiceName,
 } from "..";
+import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
+import { tDefault } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import type { BotClient } from "../../../client";
-import {
-  getBumpReminderConfigService,
-  tDefault,
-} from "../../../services/shared-access";
 import { sendBumpReminder } from "./bumpReminderHandler";
 
 /**

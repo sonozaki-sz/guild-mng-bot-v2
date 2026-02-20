@@ -9,18 +9,17 @@ import {
   MessageFlags,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { logger } from "../../../../shared/utils";
+import { ValidationError } from "../../../../shared/errors";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
   BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
   getBumpReminderConfigService,
-  tDefault,
-  tGuild,
-  ValidationError,
   type BumpReminderConfig,
-} from "../../../services/shared-access";
+} from "../../../../shared/features/bump-reminder";
+import { tDefault, tGuild } from "../../../../shared/locale";
+import { logger } from "../../../../shared/utils";
 import {
   createErrorEmbed,
   createSuccessEmbed,

@@ -7,11 +7,9 @@ import {
   type GuildMember,
   type ModalSubmitInteraction,
 } from "discord.js";
+import { isManagedVacChannel } from "../../../../../shared/features/vac";
+import { tGuild } from "../../../../../shared/locale";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui";
-import {
-  isManagedVacChannel,
-  tGuild,
-} from "../../../../services/shared-access";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,

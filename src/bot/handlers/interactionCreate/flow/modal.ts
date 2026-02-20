@@ -2,11 +2,9 @@
 // モーダル送信処理
 
 import type { ModalSubmitInteraction } from "discord.js";
+import { tDefault } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
-import {
-  handleInteractionError,
-  tDefault,
-} from "../../../services/shared-access";
+import { handleInteractionError } from "../../../errors/interactionErrorHandler";
 import { modalHandlers } from "../ui";
 
 /**
