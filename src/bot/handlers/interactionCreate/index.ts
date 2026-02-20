@@ -3,9 +3,13 @@
 
 import type { Interaction } from "discord.js";
 import type { BotClient } from "../../client";
-import { handleAutocomplete, handleChatInputCommand } from "./flow/command";
-import { handleButton, handleUserSelectMenu } from "./flow/components";
-import { handleModalSubmit } from "./flow/modal";
+import {
+  handleAutocomplete,
+  handleButton,
+  handleChatInputCommand,
+  handleModalSubmit,
+  handleUserSelectMenu,
+} from "./flow";
 
 /**
  * interactionCreate を種別ごとのフローへ振り分ける入口関数

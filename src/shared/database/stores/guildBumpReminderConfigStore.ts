@@ -2,7 +2,7 @@
 // Bumpリマインダー設定の永続化ストア
 
 import type { PrismaClient } from "@prisma/client";
-import { DatabaseError } from "../../errors/customErrors";
+import { DatabaseError } from "../../errors";
 import { tDefault } from "../../locale";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,

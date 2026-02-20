@@ -7,12 +7,12 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
+import { getCommandLocalizations } from "../../shared/locale";
 import {
   autocompleteVacConfigCommand,
   executeVacConfigCommand,
   VAC_CONFIG_COMMAND,
 } from "../features/vac/commands";
-import { getCommandLocalizations } from "../services/shared-access";
 import type { Command } from "../types/discord";
 
 export const vacConfigCommand: Command = {

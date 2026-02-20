@@ -2,12 +2,10 @@
 // Bumpリマインダー用リポジトリ
 
 import type { PrismaClient } from "@prisma/client";
+import { DatabaseError } from "../../../../shared/errors";
+import { tDefault } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
-import { DatabaseError, tDefault } from "../../../services/shared-access";
-import {
-  BUMP_REMINDER_STATUS,
-  type BumpReminderStatus,
-} from "../constants/bumpReminderConstants";
+import { BUMP_REMINDER_STATUS, type BumpReminderStatus } from "../constants";
 
 /**
  * Bump Reminder型定義

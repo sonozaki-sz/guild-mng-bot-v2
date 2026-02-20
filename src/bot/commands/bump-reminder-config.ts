@@ -2,11 +2,11 @@
 // Bumpリマインダー機能の設定コマンド定義
 
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { getCommandLocalizations } from "../../shared/locale";
 import {
   BUMP_REMINDER_CONFIG_COMMAND,
   executeBumpReminderConfigCommand,
 } from "../features/bump-reminder/commands";
-import { getCommandLocalizations } from "../services/shared-access";
 import type { Command } from "../types/discord";
 
 export const bumpReminderConfigCommand: Command = {

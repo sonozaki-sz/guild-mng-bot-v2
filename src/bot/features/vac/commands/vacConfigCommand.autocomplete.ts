@@ -2,7 +2,7 @@
 // VAC 設定コマンドの autocomplete 処理
 
 import { AutocompleteInteraction, ChannelType } from "discord.js";
-import { tGuild } from "../../../services/shared-access";
+import { tGuild } from "../../../../shared/locale";
 import { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
 
 /**

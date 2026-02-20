@@ -3,17 +3,17 @@
 // REFACTORING_PLAN.md Phase 2 - タイマー処理の重複リマインド対策
 // DB永続化対応：Bot再起動時もリマインダーを復元可能
 
+import { tDefault } from "../../../../shared/locale";
 import { jobScheduler } from "../../../../shared/scheduler";
 import { logger, requirePrismaClient } from "../../../../shared/utils";
-import { tDefault } from "../../../services/shared-access";
 import {
   BUMP_REMINDER_STATUS,
   isBumpServiceName,
   toBumpReminderJobId,
   toScheduledAt,
   type BumpServiceName,
-} from "../constants/bumpReminderConstants";
-import { getBumpReminderRepository } from "../repositories/bumpReminderRepository";
+} from "../constants";
+import { getBumpReminderRepository } from "../repositories";
 
 export type BumpReminderTaskFactory = (
   guildId: string,

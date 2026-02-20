@@ -5,8 +5,8 @@ import {
   type ChatInputCommandInteraction,
   SlashCommandBuilder,
 } from "discord.js";
+import { getCommandLocalizations } from "../../shared/locale";
 import { executeVacCommand, VAC_COMMAND } from "../features/vac/commands";
-import { getCommandLocalizations } from "../services/shared-access";
 import type { Command } from "../types/discord";
 
 export const vacCommand: Command = {

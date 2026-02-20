@@ -10,7 +10,7 @@ import {
   removeCreatedVacChannel,
   removeTriggerChannel,
   saveVacConfig,
-} from "../../../services/shared-access";
+} from "../../../../shared/features/vac";
 
 /**
  * VAC 機能が必要とする永続化アクセスの抽象
