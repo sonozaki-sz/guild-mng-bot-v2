@@ -29,7 +29,7 @@ export type {
 } from "./types";
 
 import type { PrismaClient } from "@prisma/client";
-import { requirePrismaClient } from "../utils/prisma";
+import { requirePrismaClient } from "../utils";
 import { createGuildConfigRepository } from "./repositories/guildConfigRepository";
 import type { IGuildConfigRepository } from "./types";
 

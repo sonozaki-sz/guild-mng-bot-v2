@@ -1,7 +1,7 @@
 // src/bot/services/cooldownManager.ts
 // コマンドクールダウン管理
 
-import { logger } from "../../shared/utils/logger";
+import { logger } from "../../shared/utils";
 import { tDefault } from "./shared-access";
 
 /**

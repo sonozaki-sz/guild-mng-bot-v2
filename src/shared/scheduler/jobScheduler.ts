@@ -4,7 +4,7 @@
 
 import cron, { ScheduledTask } from "node-cron";
 import { tDefault } from "../locale";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 
 interface ScheduledJob {
   id: string;

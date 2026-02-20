@@ -2,9 +2,9 @@
 // Web API ベアラートークン認証プラグイン
 
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
-import { env } from "../../shared/config/env";
+import { env } from "../../shared/config";
 import { tDefault } from "../../shared/locale";
-import { logger } from "../../shared/utils/logger";
+import { logger } from "../../shared/utils";
 
 /**
  * API 認証ミドルウェア（Fastify プラグイン）

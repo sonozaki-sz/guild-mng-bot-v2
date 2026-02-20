@@ -15,7 +15,7 @@ import {
   toScheduledAt,
   type BumpServiceName,
 } from "..";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import {
   getBumpReminderConfigService,
   getGuildTranslator,

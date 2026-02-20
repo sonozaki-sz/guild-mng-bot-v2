@@ -7,7 +7,7 @@ import {
   type GuildMember,
   type ModalSubmitInteraction,
 } from "discord.js";
-import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
+import type { ModalHandler } from "../../../../handlers/interactionCreate/ui";
 import {
   isManagedVacChannel,
   tGuild,

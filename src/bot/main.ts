@@ -4,23 +4,18 @@
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import { Routes } from "discord.js";
-import { env } from "../shared/config/env";
-import { logger } from "../shared/utils/logger";
-import { setPrismaClient } from "../shared/utils/prisma";
+import { env } from "../shared/config";
+import { logger, setPrismaClient } from "../shared/utils";
 import { createBotClient } from "./client";
 import { commands } from "./commands";
 import { events } from "./events";
 import { registerBotEvents } from "./services/botEventRegistration";
 import {
-  getBotGuildConfigRepository
-} from "./services/shared-access";
-import {
+  getBotGuildConfigRepository,
   localeManager,
-  tDefault
-} from "./services/shared-access";
-import {
   setupGlobalErrorHandlers,
-  setupGracefulShutdown
+  setupGracefulShutdown,
+  tDefault,
 } from "./services/shared-access";
 
 // コマンド登録先（ギルド/グローバル）をログ表示で識別するための定数

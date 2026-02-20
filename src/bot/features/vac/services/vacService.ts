@@ -8,7 +8,7 @@ import {
   type GuildMember,
   type VoiceState,
 } from "discord.js";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import type { BotClient } from "../../../client";
 import { tDefault } from "../../../services/shared-access";
 import { sendVacControlPanel } from "../handlers/ui";

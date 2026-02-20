@@ -9,7 +9,7 @@ import {
   MessageFlags,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,

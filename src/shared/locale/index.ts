@@ -16,5 +16,7 @@ export {
   tDefault,
   tGuild,
 } from "./localeManager";
+// ギルド翻訳ヘルパー
+export { getGuildTranslator, type GuildTFunction } from "./helpers";
 // 翻訳リソース定義
 export { resources } from "./locales";

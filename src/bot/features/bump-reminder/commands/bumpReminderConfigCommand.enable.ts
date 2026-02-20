@@ -2,7 +2,7 @@
 // bump-reminder-config enable 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import {
   getBumpReminderConfigService,
   tDefault,

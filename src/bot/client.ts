@@ -2,7 +2,7 @@
 // Discord Client初期化
 
 import { Client, Collection, GatewayIntentBits } from "discord.js";
-import { logger } from "../shared/utils/logger";
+import { logger } from "../shared/utils";
 import { CooldownManager } from "./services/cooldownManager";
 import { tDefault } from "./services/shared-access";
 import type { Command } from "./types/discord";

@@ -2,8 +2,8 @@
 // Bumpパネルのボタン処理
 
 import { MessageFlags, type ButtonInteraction } from "discord.js";
-import { logger } from "../../../../../shared/utils/logger";
-import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
+import { logger } from "../../../../../shared/utils";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
 import {
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,

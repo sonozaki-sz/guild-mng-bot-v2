@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { getBumpReminderManager } from "..";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import {
   getBumpReminderConfigService,
   tDefault,

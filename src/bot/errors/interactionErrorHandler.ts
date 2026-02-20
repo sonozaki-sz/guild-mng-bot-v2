@@ -6,14 +6,15 @@ import {
   MessageFlags,
   RepliableInteraction,
 } from "discord.js";
-import { BaseError, ValidationError } from "../../shared/errors/customErrors";
 import {
+  BaseError,
+  ValidationError,
   getUserFriendlyMessage,
   logError,
   toError,
-} from "../../shared/errors/errorUtils";
+} from "../../shared/errors";
 import { tDefault, tGuild } from "../../shared/locale";
-import { logger } from "../../shared/utils/logger";
+import { logger } from "../../shared/utils";
 import { createErrorEmbed } from "../utils/messageResponse";
 
 const getErrorTitle = async (

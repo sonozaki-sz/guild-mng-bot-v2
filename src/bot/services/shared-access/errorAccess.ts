@@ -1,10 +1,7 @@
 // src/bot/services/shared-access/errorAccess.ts
 // error handling API へのアクセス集約
 
-export {
-  DatabaseError,
-  ValidationError,
-} from "../../../shared/errors/customErrors";
+export { DatabaseError, ValidationError } from "../../../shared/errors";
 
 export {
   handleCommandError,
@@ -14,4 +11,4 @@ export {
 export {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,
-} from "../../../shared/errors/errorHandler";
+} from "../../../shared/errors";

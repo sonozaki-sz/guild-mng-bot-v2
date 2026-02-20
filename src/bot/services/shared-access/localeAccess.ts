@@ -3,12 +3,12 @@
 
 import {
   getCommandLocalizations,
+  getGuildTranslator,
+  type GuildTFunction,
   localeManager,
   tDefault,
   tGuild,
 } from "../../../shared/locale";
-import type { GuildTFunction } from "../../../shared/locale/helpers";
-import { getGuildTranslator } from "../../../shared/locale/helpers";
 
 export {
   getCommandLocalizations,

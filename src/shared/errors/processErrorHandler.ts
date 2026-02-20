@@ -2,7 +2,7 @@
 // プロセス全体の未処理例外とシャットダウン制御
 
 import { tDefault } from "../locale";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 import { BaseError } from "./customErrors";
 import { logError } from "./errorUtils";
 

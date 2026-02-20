@@ -3,7 +3,7 @@
 
 import type { Message } from "discord.js";
 import { BUMP_COMMANDS, BUMP_SERVICES, resolveBumpService } from "..";
-import { NODE_ENV, env } from "../../../../shared/config/env";
+import { NODE_ENV, env } from "../../../../shared/config";
 import type { BotClient } from "../../../client";
 import { handleBumpDetected } from "./bumpReminderHandler";
 

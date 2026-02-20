@@ -3,9 +3,8 @@
 // REFACTORING_PLAN.md Phase 2 - タイマー処理の重複リマインド対策
 // DB永続化対応：Bot再起動時もリマインダーを復元可能
 
-import { jobScheduler } from "../../../../shared/scheduler/jobScheduler";
-import { logger } from "../../../../shared/utils/logger";
-import { requirePrismaClient } from "../../../../shared/utils/prisma";
+import { jobScheduler } from "../../../../shared/scheduler";
+import { logger, requirePrismaClient } from "../../../../shared/utils";
 import { tDefault } from "../../../services/shared-access";
 import {
   BUMP_REMINDER_STATUS,

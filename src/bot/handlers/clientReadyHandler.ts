@@ -2,7 +2,7 @@
 // clientReady 時のBot共通ハンドラー
 
 import { ActivityType, PresenceUpdateStatus } from "discord.js";
-import { logger } from "../../shared/utils/logger";
+import { logger } from "../../shared/utils";
 import type { BotClient } from "../client";
 import { restoreBumpRemindersOnStartup } from "../features/bump-reminder/handlers";
 import { cleanupVacOnStartup } from "../features/vac/handlers";

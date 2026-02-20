@@ -2,7 +2,7 @@
 // Bumpリマインダー用リポジトリ
 
 import type { PrismaClient } from "@prisma/client";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import { DatabaseError, tDefault } from "../../../services/shared-access";
 import {
   BUMP_REMINDER_STATUS,

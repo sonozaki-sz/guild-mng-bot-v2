@@ -8,7 +8,7 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
-import { logger } from "../../shared/utils/logger";
+import { logger } from "../../shared/utils";
 import {
   getBotGuildConfigRepository,
   getCommandLocalizations,

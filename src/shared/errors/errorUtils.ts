@@ -1,9 +1,9 @@
 // src/shared/errors/errorUtils.ts
 // Discord非依存のエラー共通ユーティリティ
 
-import { NODE_ENV, env } from "../config/env";
+import { NODE_ENV, env } from "../config";
 import { tDefault } from "../locale";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 import { BaseError } from "./customErrors";
 
 export const toError = (error: unknown): Error | BaseError => {

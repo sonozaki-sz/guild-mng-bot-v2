@@ -7,7 +7,7 @@ import {
   type GuildMember,
   type UserSelectMenuInteraction,
 } from "discord.js";
-import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
+import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui";
 import {
   getBotGuildConfigRepository,
   isManagedVacChannel,

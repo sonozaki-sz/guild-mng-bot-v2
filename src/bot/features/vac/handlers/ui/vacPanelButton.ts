@@ -12,7 +12,7 @@ import {
   type ButtonInteraction,
   type GuildMember,
 } from "discord.js";
-import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
 import {
   isManagedVacChannel,
   tGuild,

@@ -2,6 +2,9 @@
 // Repositoryパターン実装（Prisma版）
 
 import type { PrismaClient } from "@prisma/client";
+import { DatabaseError } from "../../errors/customErrors";
+import { GuildBumpReminderConfigStore } from "../stores/guildBumpReminderConfigStore";
+import { GuildVacConfigStore } from "../stores/guildVacConfigStore";
 import type {
   AfkConfig,
   BumpReminderConfig,
@@ -15,10 +18,7 @@ import type {
   MemberLogConfig,
   StickMessage,
   VacConfig,
-} from "../../database/types";
-import { DatabaseError } from "../../errors/customErrors";
-import { GuildBumpReminderConfigStore } from "../stores/guildBumpReminderConfigStore";
-import { GuildVacConfigStore } from "../stores/guildVacConfigStore";
+} from "../types";
 
 const DB_ERROR = {
   UNKNOWN: "unknown error",

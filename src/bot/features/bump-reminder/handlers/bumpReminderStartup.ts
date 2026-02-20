@@ -6,7 +6,7 @@ import {
   type BumpReminderTaskFactory,
   type BumpServiceName,
 } from "..";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import type { BotClient } from "../../../client";
 import {
   getBumpReminderConfigService,

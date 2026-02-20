@@ -2,12 +2,12 @@
 // モーダル送信処理
 
 import type { ModalSubmitInteraction } from "discord.js";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../shared/utils";
 import {
   handleInteractionError,
   tDefault,
 } from "../../../services/shared-access";
-import { modalHandlers } from "../ui/modals";
+import { modalHandlers } from "../ui";
 
 /**
  * モーダル送信をレジストリで処理する関数

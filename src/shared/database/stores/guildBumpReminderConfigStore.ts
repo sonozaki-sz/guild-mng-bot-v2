@@ -2,6 +2,8 @@
 // Bumpリマインダー設定の永続化ストア
 
 import type { PrismaClient } from "@prisma/client";
+import { DatabaseError } from "../../errors/customErrors";
+import { tDefault } from "../../locale";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
@@ -16,9 +18,7 @@ import {
   type BumpReminderMentionUserMode,
   type BumpReminderMentionUserRemoveResult,
   type BumpReminderMentionUsersClearResult,
-} from "../../database/types";
-import { DatabaseError } from "../../errors/customErrors";
-import { tDefault } from "../../locale";
+} from "../types";
 
 /**
  * Guild単位のBumpリマインダー設定を永続化するストア
