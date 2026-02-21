@@ -1,3 +1,4 @@
+import type { MockedFunction } from "vitest";
 import {
   casUpdateBumpReminderConfig,
   createInitialBumpReminderConfig,
@@ -15,46 +16,46 @@ import {
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
 } from "@/shared/database/types";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn(() => "db-update-failed"),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn(() => "db-update-failed"),
 }));
 
-jest.mock("@/shared/database/stores/helpers/bumpReminderConfigCas", () => ({
+vi.mock("@/shared/database/stores/helpers/bumpReminderConfigCas", () => ({
   BUMP_REMINDER_CAS_MAX_RETRIES: 3,
-  fetchBumpReminderConfigSnapshot: jest.fn(),
-  initializeBumpReminderConfigIfMissing: jest.fn(),
-  createInitialBumpReminderConfig: jest.fn(() => ({
+  fetchBumpReminderConfigSnapshot: vi.fn(),
+  initializeBumpReminderConfigIfMissing: vi.fn(),
+  createInitialBumpReminderConfig: vi.fn(() => ({
     enabled: true,
     mentionUserIds: [],
   })),
-  casUpdateBumpReminderConfig: jest.fn(),
+  casUpdateBumpReminderConfig: vi.fn(),
 }));
 
 describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
   const fetchSnapshotMock =
-    fetchBumpReminderConfigSnapshot as jest.MockedFunction<
+    fetchBumpReminderConfigSnapshot as MockedFunction<
       typeof fetchBumpReminderConfigSnapshot
     >;
   const initializeIfMissingMock =
-    initializeBumpReminderConfigIfMissing as jest.MockedFunction<
+    initializeBumpReminderConfigIfMissing as MockedFunction<
       typeof initializeBumpReminderConfigIfMissing
     >;
   const createInitialMock =
-    createInitialBumpReminderConfig as jest.MockedFunction<
+    createInitialBumpReminderConfig as MockedFunction<
       typeof createInitialBumpReminderConfig
     >;
-  const casUpdateMock = casUpdateBumpReminderConfig as jest.MockedFunction<
+  const casUpdateMock = casUpdateBumpReminderConfig as MockedFunction<
     typeof casUpdateBumpReminderConfig
   >;
 
   const context = {
     prisma: { guildConfig: {} } as never,
     defaultLocale: "ja",
-    safeJsonParse: jest.fn(),
+    safeJsonParse: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("returns NOT_CONFIGURED when JSON exists but parse fails", async () => {

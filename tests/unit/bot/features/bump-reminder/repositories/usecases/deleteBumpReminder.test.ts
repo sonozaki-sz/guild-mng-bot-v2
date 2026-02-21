@@ -2,7 +2,7 @@ import { deleteBumpReminderUseCase } from "@/bot/features/bump-reminder/reposito
 
 describe("bot/features/bump-reminder/repositories/usecases/deleteBumpReminder", () => {
   it("deletes reminder by id", async () => {
-    const del = jest.fn().mockResolvedValue(undefined);
+    const del = vi.fn().mockResolvedValue(undefined);
     const prisma = { bumpReminder: { delete: del } };
 
     await deleteBumpReminderUseCase(prisma as never, "r1");

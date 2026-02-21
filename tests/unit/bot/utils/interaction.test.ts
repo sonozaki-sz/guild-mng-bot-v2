@@ -1,11 +1,12 @@
+import type { Mock } from "vitest";
 import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { safeReply } from "@/bot/utils/interaction";
 
 type InteractionLike = {
   replied: boolean;
   deferred: boolean;
-  reply: jest.Mock<Promise<void>, [unknown]>;
-  followUp: jest.Mock<Promise<void>, [unknown]>;
+  reply: Mock<Promise<void>, [unknown]>;
+  followUp: Mock<Promise<void>, [unknown]>;
 };
 
 // Interaction の最小モックを生成するヘルパー
@@ -15,8 +16,8 @@ function createInteraction(
   return {
     replied: false,
     deferred: false,
-    reply: jest.fn().mockResolvedValue(undefined),
-    followUp: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
+    followUp: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -60,7 +61,7 @@ describe("shared/utils/interaction safeReply", () => {
   it("ignores UnknownInteraction Discord API error", async () => {
     // 期限切れInteractionは安全に無視されること
     const interaction = createInteraction({
-      reply: jest
+      reply: vi
         .fn<Promise<void>, [unknown]>()
         .mockRejectedValueOnce(
           createDiscordApiError(RESTJSONErrorCodes.UnknownInteraction),
@@ -75,7 +76,7 @@ describe("shared/utils/interaction safeReply", () => {
   it("ignores InteractionHasAlreadyBeenAcknowledged Discord API error", async () => {
     // 応答済みエラーは再送処理で握りつぶすこと
     const interaction = createInteraction({
-      reply: jest
+      reply: vi
         .fn<Promise<void>, [unknown]>()
         .mockRejectedValueOnce(
           createDiscordApiError(
@@ -92,7 +93,7 @@ describe("shared/utils/interaction safeReply", () => {
   it("rethrows non-ignored Discord API error", async () => {
     // 無視対象以外の Discord API エラーは呼び出し元へ送出すること
     const interaction = createInteraction({
-      reply: jest
+      reply: vi
         .fn<Promise<void>, [unknown]>()
         .mockRejectedValueOnce(
           createDiscordApiError(RESTJSONErrorCodes.UnknownUser),
@@ -107,7 +108,7 @@ describe("shared/utils/interaction safeReply", () => {
   it("rethrows non-Discord error", async () => {
     // DiscordAPIError 以外の例外も握りつぶさず再送出すること
     const interaction = createInteraction({
-      reply: jest
+      reply: vi
         .fn<Promise<void>, [unknown]>()
         .mockRejectedValueOnce(new Error("unexpected")),
     });

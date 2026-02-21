@@ -1,20 +1,21 @@
+import type { Mock } from "vitest";
 import { getManagedVacVoiceChannel } from "@/bot/features/vac/commands/usecases/vacVoiceChannelGuard";
 import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async (_guildId: string, key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(),
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(),
 }));
 
 describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
   // 実行者VCの存在確認と管理対象判定の分岐を検証する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("throws ValidationError when member is not in a voice channel", async () => {
@@ -22,7 +23,7 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
       user: { id: "user-1" },
       guild: {
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channel: null },
           }),
         },
@@ -35,15 +36,15 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
   });
 
   it("throws ValidationError when current voice channel is not managed VAC", async () => {
-    (getBotVacRepository as jest.Mock).mockReturnValue({
-      isManagedVacChannel: jest.fn().mockResolvedValue(false),
+    (getBotVacRepository as Mock).mockReturnValue({
+      isManagedVacChannel: vi.fn().mockResolvedValue(false),
     });
 
     const interaction = {
       user: { id: "user-1" },
       guild: {
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: {
               channel: { id: "voice-1", type: ChannelType.GuildVoice },
             },
@@ -58,8 +59,8 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
   });
 
   it("returns voice channel id when user is in managed VAC channel", async () => {
-    const isManagedVacChannel = jest.fn().mockResolvedValue(true);
-    (getBotVacRepository as jest.Mock).mockReturnValue({
+    const isManagedVacChannel = vi.fn().mockResolvedValue(true);
+    (getBotVacRepository as Mock).mockReturnValue({
       isManagedVacChannel,
     });
 
@@ -67,7 +68,7 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
       user: { id: "user-1" },
       guild: {
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: {
               channel: { id: "voice-1", type: ChannelType.GuildVoice },
             },

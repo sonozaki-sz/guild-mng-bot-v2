@@ -1,10 +1,11 @@
+import type { Mock } from "vitest";
 import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
 import { executeVacRename } from "@/bot/features/vac/commands/usecases/vacRename";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(
     async (_guildId: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.renamed") {
         return `renamed:${String(params?.name)}`;
@@ -14,30 +15,30 @@ jest.mock("@/shared/locale/localeManager", () => ({
   ),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver",
   () => ({
-    resolveVacVoiceChannelForEdit: jest.fn(),
+    resolveVacVoiceChannelForEdit: vi.fn(),
   }),
 );
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: jest.fn((description: string) => ({ description })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
 describe("bot/features/vac/commands/usecases/vacRename", () => {
   // VC名変更の成功経路と依存エラー伝播を検証する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("renames channel and replies ephemeral success", async () => {
-    const edit = jest.fn().mockResolvedValue(undefined);
-    (resolveVacVoiceChannelForEdit as jest.Mock).mockResolvedValue({ edit });
+    const edit = vi.fn().mockResolvedValue(undefined);
+    (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
-    const reply = jest.fn().mockResolvedValue(undefined);
+    const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
-      options: { getString: jest.fn(() => "My VC") },
+      options: { getString: vi.fn(() => "My VC") },
       reply,
     };
 
@@ -52,13 +53,13 @@ describe("bot/features/vac/commands/usecases/vacRename", () => {
   });
 
   it("propagates resolver failure", async () => {
-    (resolveVacVoiceChannelForEdit as jest.Mock).mockRejectedValue(
+    (resolveVacVoiceChannelForEdit as Mock).mockRejectedValue(
       new Error("not vac channel"),
     );
 
     const interaction = {
-      options: { getString: jest.fn(() => "My VC") },
-      reply: jest.fn(),
+      options: { getString: vi.fn(() => "My VC") },
+      reply: vi.fn(),
     };
 
     await expect(

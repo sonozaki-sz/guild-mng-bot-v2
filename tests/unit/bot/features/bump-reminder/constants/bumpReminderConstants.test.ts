@@ -2,8 +2,8 @@
 describe("shared/features/bump-reminder/constants", () => {
   // TEST_MODE の切り替えを確実に反映させるため、モジュールを都度再読込する
   async function loadModule(testMode: boolean) {
-    jest.resetModules();
-    jest.doMock(
+    vi.resetModules();
+    vi.doMock(
       "@/shared/config/env",
       () => ({
         NODE_ENV: {
@@ -25,8 +25,8 @@ describe("shared/features/bump-reminder/constants", () => {
 
   // モジュールキャッシュとタイマー副作用を各ケースでリセットする
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.useRealTimers();
+    vi.clearAllMocks();
+    vi.useRealTimers();
   });
 
   // 定数値が仕様どおり固定されていることを検証
@@ -79,8 +79,8 @@ describe("shared/features/bump-reminder/constants", () => {
   // 現在時刻基準で分遅延を予定時刻へ変換できることを検証
   it("converts delay minutes to scheduled date from current time", async () => {
     const mod = await loadModule(false);
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2026-02-20T00:00:00.000Z"));
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-02-20T00:00:00.000Z"));
 
     const scheduledAt = mod.toScheduledAt(30);
 

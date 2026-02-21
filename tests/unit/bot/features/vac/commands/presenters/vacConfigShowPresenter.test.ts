@@ -2,8 +2,8 @@ import { presentVacConfigShow } from "@/bot/features/vac/commands/presenters/vac
 import type { VacConfig } from "@/shared/database/types";
 import { ChannelType } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async (_guildId: string, key: string) => {
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, key: string) => {
     const labels: Record<string, string> = {
       "commands:vac-config.embed.top": "TOP",
       "commands:vac-config.embed.not_configured": "未設定",
@@ -21,7 +21,7 @@ describe("bot/features/vac/commands/presenters/vacConfigShowPresenter", () => {
   it("formats trigger channels and created vc details", async () => {
     const guild = {
       channels: {
-        fetch: jest
+        fetch: vi
           .fn()
           .mockResolvedValueOnce({
             id: "trigger-1",
@@ -63,7 +63,7 @@ describe("bot/features/vac/commands/presenters/vacConfigShowPresenter", () => {
   it("uses fallback labels when config has no channels", async () => {
     const guild = {
       channels: {
-        fetch: jest.fn(),
+        fetch: vi.fn(),
       },
     };
 

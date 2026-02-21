@@ -1,20 +1,20 @@
 describe("shared/locale/i18n", () => {
   const loadModule = async (nodeEnv: "development" | "production" | "test") => {
-    jest.resetModules();
+    vi.resetModules();
 
     const i18nextMock = {
-      init: jest.fn().mockResolvedValue(undefined),
-      addResourceBundle: jest.fn(),
-      changeLanguage: jest.fn().mockResolvedValue(undefined),
-      t: jest.fn((key: string) => `translated:${key}`),
+      init: vi.fn().mockResolvedValue(undefined),
+      addResourceBundle: vi.fn(),
+      changeLanguage: vi.fn().mockResolvedValue(undefined),
+      t: vi.fn((key: string) => `translated:${key}`),
     };
 
-    jest.doMock("i18next", () => ({
+    vi.doMock("i18next", () => ({
       __esModule: true,
       default: i18nextMock,
     }));
 
-      jest.doMock("@/shared/config/env", () => ({
+      vi.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",

@@ -1,38 +1,38 @@
-const getVacConfigServiceMock = jest.fn();
+const getVacConfigServiceMock = vi.fn();
 
-jest.mock("@/shared/features/vac/vacConfigService", () => ({
+vi.mock("@/shared/features/vac/vacConfigService", () => ({
   getVacConfigService: (repository?: unknown) =>
     getVacConfigServiceMock(repository),
 }));
 
 function createVacConfigServicePortMock() {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
 function createRepositoryMock() {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
 describe("bot/features/vac/repositories/vacRepository", () => {
   beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
   });
 
   it("delegates all repository operations to injected vac config service", async () => {

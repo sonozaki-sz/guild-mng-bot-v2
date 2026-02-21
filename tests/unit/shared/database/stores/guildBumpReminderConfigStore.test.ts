@@ -1,3 +1,4 @@
+import type { MockedFunction } from "vitest";
 import { GuildBumpReminderConfigStore } from "@/shared/database/stores/guildBumpReminderConfigStore";
 import { getBumpReminderConfigUseCase } from "@/shared/database/stores/usecases/getBumpReminderConfig";
 import {
@@ -13,43 +14,43 @@ import {
   BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
 } from "@/shared/database/types";
 
-jest.mock("@/shared/database/stores/usecases/getBumpReminderConfig", () => ({
-  getBumpReminderConfigUseCase: jest.fn(),
+vi.mock("@/shared/database/stores/usecases/getBumpReminderConfig", () => ({
+  getBumpReminderConfigUseCase: vi.fn(),
 }));
-jest.mock("@/shared/database/stores/usecases/setBumpReminderEnabled", () => ({
-  setBumpReminderEnabledUseCase: jest.fn(),
+vi.mock("@/shared/database/stores/usecases/setBumpReminderEnabled", () => ({
+  setBumpReminderEnabledUseCase: vi.fn(),
 }));
-jest.mock("@/shared/database/stores/usecases/updateBumpReminderConfig", () => ({
-  updateBumpReminderConfigUseCase: jest.fn(),
+vi.mock("@/shared/database/stores/usecases/updateBumpReminderConfig", () => ({
+  updateBumpReminderConfigUseCase: vi.fn(),
 }));
-jest.mock("@/shared/database/stores/usecases/mutateBumpReminderConfig", () => ({
-  mutateBumpReminderConfigUseCase: jest.fn(),
-  mutateBumpReminderMentionUsersUseCase: jest.fn(),
+vi.mock("@/shared/database/stores/usecases/mutateBumpReminderConfig", () => ({
+  mutateBumpReminderConfigUseCase: vi.fn(),
+  mutateBumpReminderMentionUsersUseCase: vi.fn(),
 }));
 
 describe("shared/database/stores/guildBumpReminderConfigStore", () => {
-  const getConfigMock = getBumpReminderConfigUseCase as jest.MockedFunction<
+  const getConfigMock = getBumpReminderConfigUseCase as MockedFunction<
     typeof getBumpReminderConfigUseCase
   >;
-  const setEnabledMock = setBumpReminderEnabledUseCase as jest.MockedFunction<
+  const setEnabledMock = setBumpReminderEnabledUseCase as MockedFunction<
     typeof setBumpReminderEnabledUseCase
   >;
   const updateConfigMock =
-    updateBumpReminderConfigUseCase as jest.MockedFunction<
+    updateBumpReminderConfigUseCase as MockedFunction<
       typeof updateBumpReminderConfigUseCase
     >;
   const mutateConfigMock =
-    mutateBumpReminderConfigUseCase as jest.MockedFunction<
+    mutateBumpReminderConfigUseCase as MockedFunction<
       typeof mutateBumpReminderConfigUseCase
     >;
   const mutateUsersMock =
-    mutateBumpReminderMentionUsersUseCase as jest.MockedFunction<
+    mutateBumpReminderMentionUsersUseCase as MockedFunction<
       typeof mutateBumpReminderMentionUsersUseCase
     >;
 
   const createStore = () => {
     const prisma = { guildConfig: {} };
-    const safeJsonParse = jest.fn();
+    const safeJsonParse = vi.fn();
     const store = new GuildBumpReminderConfigStore(
       prisma as never,
       "ja",
@@ -59,7 +60,7 @@ describe("shared/database/stores/guildBumpReminderConfigStore", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("delegates basic read/write operations to usecases", async () => {

@@ -6,7 +6,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node", "jest"], // テスト環境用の型定義
+    "types": ["node", "vitest/globals"], // テスト環境用の型定義
     "noEmit": true // テストコードはビルドしない
   },
   "include": ["./**/*", "../src/**/*"],

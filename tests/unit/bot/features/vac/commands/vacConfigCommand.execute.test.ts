@@ -5,30 +5,30 @@ import { handleVacConfigShow } from "@/bot/features/vac/commands/usecases/vacCon
 import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand.constants";
 import { executeVacConfigCommand } from "@/bot/features/vac/commands/vacConfigCommand.execute";
 
-jest.mock(
+vi.mock(
   "@/bot/features/vac/commands/usecases/vacConfigCreateTrigger",
   () => ({
-    handleVacConfigCreateTrigger: jest.fn(),
+    handleVacConfigCreateTrigger: vi.fn(),
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/vac/commands/usecases/vacConfigRemoveTrigger",
   () => ({
-    handleVacConfigRemoveTrigger: jest.fn(),
+    handleVacConfigRemoveTrigger: vi.fn(),
   }),
 );
 
-jest.mock("@/bot/features/vac/commands/usecases/vacConfigShow", () => ({
-  handleVacConfigShow: jest.fn(),
+vi.mock("@/bot/features/vac/commands/usecases/vacConfigShow", () => ({
+  handleVacConfigShow: vi.fn(),
 }));
 
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
 function createInteraction(overrides?: {
@@ -40,14 +40,14 @@ function createInteraction(overrides?: {
     guildId:
       overrides && "guildId" in overrides ? overrides.guildId : "guild-1",
     memberPermissions: {
-      has: jest.fn(() =>
+      has: vi.fn(() =>
         overrides && "hasManageGuild" in overrides
           ? overrides.hasManageGuild
           : true,
       ),
     },
     options: {
-      getSubcommand: jest.fn(
+      getSubcommand: vi.fn(
         () => overrides?.subcommand ?? VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW,
       ),
     },
@@ -56,7 +56,7 @@ function createInteraction(overrides?: {
 
 describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("delegates guild-only validation error to handleCommandError", async () => {

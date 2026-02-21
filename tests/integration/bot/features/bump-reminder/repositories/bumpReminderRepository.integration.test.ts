@@ -10,32 +10,32 @@ import {
 import { DatabaseError } from "@/shared/errors/customErrors";
 
 // Logger のモック
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 
 // Prismaクライアントのモック
 const mockPrismaClient = {
-  $transaction: jest.fn(),
+  $transaction: vi.fn(),
   bumpReminder: {
-    findUnique: jest.fn(),
-    findFirst: jest.fn(),
-    findMany: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    updateMany: jest.fn(),
-    delete: jest.fn(),
-    deleteMany: jest.fn(),
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    updateMany: vi.fn(),
+    delete: vi.fn(),
+    deleteMany: vi.fn(),
   },
 };
 
@@ -52,7 +52,7 @@ describe("BumpReminderRepository", () => {
   beforeEach(() => {
     // @ts-expect-error - モックのため型エラーは無視
     repository = new BumpReminderRepository(mockPrismaClient);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // $transaction はコールバックを mockPrismaClient に委譲する
     mockPrismaClient.$transaction.mockImplementation(
       (callback: (tx: typeof mockPrismaClient) => Promise<unknown>) =>

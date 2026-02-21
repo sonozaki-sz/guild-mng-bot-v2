@@ -1,9 +1,9 @@
 import { handleVacChannelDelete } from "@/bot/features/vac/handlers/vacChannelDelete";
 
-const handleChannelDeleteMock = jest.fn();
+const handleChannelDeleteMock = vi.fn();
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacService: jest.fn(() => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacService: vi.fn(() => ({
     handleChannelDelete: (...args: unknown[]) =>
       handleChannelDeleteMock(...args),
   })),
@@ -11,7 +11,7 @@ jest.mock("@/bot/services/botVacDependencyResolver", () => ({
 
 describe("bot/features/vac/handlers/vacChannelDelete", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("delegates deleted channel to vac service", async () => {

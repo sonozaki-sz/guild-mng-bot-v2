@@ -7,38 +7,38 @@ import { BumpReminderManager } from "@/bot/features/bump-reminder/services/bumpR
 import { jobScheduler } from "@/shared/scheduler/jobScheduler";
 
 // Logger のモック
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 
 // Prismaユーティリティのモック
-jest.mock("@/shared/utils/prisma", () => ({
-  requirePrismaClient: jest.fn(() => ({})),
+vi.mock("@/shared/utils/prisma", () => ({
+  requirePrismaClient: vi.fn(() => ({})),
 }));
 
 // Repositoryのモック
 const mockRepository = {
-  create: jest.fn(),
-  findById: jest.fn(),
-  findPendingByGuild: jest.fn(),
-  findAllPending: jest.fn(),
-  updateStatus: jest.fn(),
-  delete: jest.fn(),
-  cancelByGuild: jest.fn(),
-  cleanupOld: jest.fn(),
+  create: vi.fn(),
+  findById: vi.fn(),
+  findPendingByGuild: vi.fn(),
+  findAllPending: vi.fn(),
+  updateStatus: vi.fn(),
+  delete: vi.fn(),
+  cancelByGuild: vi.fn(),
+  cleanupOld: vi.fn(),
 };
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/bumpReminderRepository",
   () => ({
     getBumpReminderRepository: () => mockRepository,
@@ -53,11 +53,11 @@ describe("BumpReminderManager Integration", () => {
   // テストごとにManagerとScheduler状態を初期化
   beforeEach(() => {
     // 時刻依存を固定してテストの再現性を担保
-    jest.useFakeTimers();
-    jest.setSystemTime(fixedNow);
+    vi.useFakeTimers();
+    vi.setSystemTime(fixedNow);
 
     manager = new BumpReminderManager(mockRepository as never);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // すべてのジョブをクリア
     jobScheduler.stopAll();
@@ -66,8 +66,8 @@ describe("BumpReminderManager Integration", () => {
   afterEach(() => {
     // 後片付けとしてスケジュール済みジョブを全停止
     jobScheduler.stopAll();
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   describe("setReminder()", () => {
@@ -87,7 +87,7 @@ describe("BumpReminderManager Integration", () => {
       };
 
       mockRepository.create.mockResolvedValue(mockReminder);
-      const mockTask = jest.fn();
+      const mockTask = vi.fn();
 
       await manager.setReminder(
         "guild-123",
@@ -135,7 +135,7 @@ describe("BumpReminderManager Integration", () => {
         undefined,
         undefined,
         120,
-        jest.fn(),
+        vi.fn(),
       );
 
       expect(mockRepository.create).toHaveBeenCalledWith(
@@ -174,7 +174,7 @@ describe("BumpReminderManager Integration", () => {
         undefined,
         undefined,
         120,
-        jest.fn(),
+        vi.fn(),
       );
 
       // ジョブが存在することを確認
@@ -221,7 +221,7 @@ describe("BumpReminderManager Integration", () => {
         undefined,
         undefined,
         120,
-        jest.fn(),
+        vi.fn(),
       );
 
       expect(manager.hasReminder("guild-123")).toBe(true);
@@ -253,7 +253,7 @@ describe("BumpReminderManager Integration", () => {
       mockRepository.findAllPending.mockResolvedValue(mockReminders);
       mockRepository.create.mockResolvedValue(mockReminders[0]);
 
-      const taskFactory = jest.fn(() => jest.fn());
+      const taskFactory = vi.fn(() => vi.fn());
       const result = await manager.restorePendingReminders(taskFactory);
 
       expect(result).toBe(1);
@@ -285,8 +285,8 @@ describe("BumpReminderManager Integration", () => {
 
       mockRepository.findAllPending.mockResolvedValue(mockReminders);
 
-      const mockTask = jest.fn().mockResolvedValue(undefined);
-      const taskFactory = jest.fn(() => mockTask);
+      const mockTask = vi.fn().mockResolvedValue(undefined);
+      const taskFactory = vi.fn(() => mockTask);
       const result = await manager.restorePendingReminders(taskFactory);
 
       // 即座に実行されたので復元数は1
@@ -301,7 +301,7 @@ describe("BumpReminderManager Integration", () => {
     it("should handle empty pending reminders", async () => {
       mockRepository.findAllPending.mockResolvedValue([]);
 
-      const taskFactory = jest.fn();
+      const taskFactory = vi.fn();
       const result = await manager.restorePendingReminders(taskFactory);
 
       expect(result).toBe(0);
@@ -346,7 +346,7 @@ describe("BumpReminderManager Integration", () => {
         undefined,
         undefined,
         120,
-        jest.fn(),
+        vi.fn(),
       );
       await manager.setReminder(
         "guild-456",
@@ -354,7 +354,7 @@ describe("BumpReminderManager Integration", () => {
         undefined,
         undefined,
         120,
-        jest.fn(),
+        vi.fn(),
       );
 
       // 両方存在することを確認

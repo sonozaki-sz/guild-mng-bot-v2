@@ -4,11 +4,11 @@ describe("shared/database/stores/usecases/getBumpReminderConfig", () => {
   const createContext = () => ({
     prisma: {
       guildConfig: {
-        findUnique: jest.fn(),
+        findUnique: vi.fn(),
       },
     },
     defaultLocale: "ja",
-    safeJsonParse: jest.fn(),
+    safeJsonParse: vi.fn(),
   });
 
   it("returns parsed config and normalizes mentionUserIds", async () => {

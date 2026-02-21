@@ -1,16 +1,16 @@
 describe("shared/errors/errorUtils", () => {
-  const warnMock = jest.fn();
-  const errorMock = jest.fn();
-  const tDefaultMock = jest.fn(
+  const warnMock = vi.fn();
+  const errorMock = vi.fn();
+  const tDefaultMock = vi.fn(
     (key: string, params?: { message?: string }) =>
       `${key}${params?.message ? `:${params.message}` : ""}`,
   );
 
   const loadModule = async (nodeEnv: "development" | "production" | "test") => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
 
-    jest.doMock("@/shared/config/env", () => ({
+    vi.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",
@@ -21,12 +21,12 @@ describe("shared/errors/errorUtils", () => {
       },
     }));
 
-    jest.doMock("@/shared/locale/localeManager", () => ({
+    vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: (key: string, params?: { message?: string }) =>
         tDefaultMock(key, params),
     }));
 
-    jest.doMock("@/shared/utils/logger", () => ({
+    vi.doMock("@/shared/utils/logger", () => ({
       logger: {
         warn: (...args: unknown[]) => warnMock(...args),
         error: (...args: unknown[]) => errorMock(...args),

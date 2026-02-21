@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import {
   findTriggerChannelByCategory,
   resolveTargetCategory,
@@ -8,40 +9,40 @@ import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => key),
-  tGuild: jest.fn(async (_guildId: string, key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(),
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: jest.fn((description: string) => ({ description })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/vac/commands/helpers/vacConfigTargetResolver",
   () => ({
-    resolveTargetCategory: jest.fn(),
-    findTriggerChannelByCategory: jest.fn(),
+    resolveTargetCategory: vi.fn(),
+    findTriggerChannelByCategory: vi.fn(),
   }),
 );
 
 describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
   // remove-trigger-vc のガード分岐と削除フローを検証する
   beforeEach(() => {
-    jest.clearAllMocks();
-    (resolveTargetCategory as jest.Mock).mockResolvedValue(null);
+    vi.clearAllMocks();
+    (resolveTargetCategory as Mock).mockResolvedValue(null);
   });
 
   it("throws ValidationError when guild context is missing", async () => {
     const interaction = {
       guild: null,
       channelId: "ch-1",
-      options: { getString: jest.fn() },
-      reply: jest.fn(),
+      options: { getString: vi.fn() },
+      reply: vi.fn(),
     };
 
     await expect(
@@ -50,19 +51,19 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
   });
 
   it("throws ValidationError when trigger channel is not found", async () => {
-    (getBotVacRepository as jest.Mock).mockReturnValue({
-      getVacConfigOrDefault: jest
+    (getBotVacRepository as Mock).mockReturnValue({
+      getVacConfigOrDefault: vi
         .fn()
         .mockResolvedValue({ triggerChannelIds: [] }),
-      removeTriggerChannel: jest.fn(),
+      removeTriggerChannel: vi.fn(),
     });
-    (findTriggerChannelByCategory as jest.Mock).mockResolvedValue(null);
+    (findTriggerChannelByCategory as Mock).mockResolvedValue(null);
 
     const interaction = {
-      guild: { channels: { fetch: jest.fn() } },
+      guild: { channels: { fetch: vi.fn() } },
       channelId: "ch-1",
-      options: { getString: jest.fn(() => "cat-1") },
-      reply: jest.fn(),
+      options: { getString: vi.fn(() => "cat-1") },
+      reply: vi.fn(),
     };
 
     await expect(
@@ -71,29 +72,29 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
   });
 
   it("removes trigger from config, deletes channel, and replies ephemeral", async () => {
-    const removeTriggerChannel = jest.fn().mockResolvedValue(undefined);
-    (getBotVacRepository as jest.Mock).mockReturnValue({
-      getVacConfigOrDefault: jest.fn().mockResolvedValue({
+    const removeTriggerChannel = vi.fn().mockResolvedValue(undefined);
+    (getBotVacRepository as Mock).mockReturnValue({
+      getVacConfigOrDefault: vi.fn().mockResolvedValue({
         triggerChannelIds: ["trigger-1"],
       }),
       removeTriggerChannel,
     });
-    (findTriggerChannelByCategory as jest.Mock).mockResolvedValue({
+    (findTriggerChannelByCategory as Mock).mockResolvedValue({
       id: "trigger-1",
       name: "CreateVC",
     });
 
-    const deleteMock = jest.fn().mockResolvedValue(undefined);
-    const fetch = jest.fn().mockResolvedValue({
+    const deleteMock = vi.fn().mockResolvedValue(undefined);
+    const fetch = vi.fn().mockResolvedValue({
       id: "trigger-1",
       type: ChannelType.GuildVoice,
       delete: deleteMock,
     });
-    const reply = jest.fn().mockResolvedValue(undefined);
+    const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guild: { channels: { fetch } },
       channelId: "ch-1",
-      options: { getString: jest.fn(() => "cat-1") },
+      options: { getString: vi.fn(() => "cat-1") },
       reply,
     };
 

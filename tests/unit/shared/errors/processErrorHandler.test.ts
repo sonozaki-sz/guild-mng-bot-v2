@@ -1,36 +1,36 @@
 describe("shared/errors/processErrorHandler", () => {
-  const tDefaultMock = jest.fn(
+  const tDefaultMock = vi.fn(
     (key: string, options?: { signal?: string }) =>
       `${key}${options?.signal ? `:${options.signal}` : ""}`,
   );
   const loggerMock = {
-    error: jest.fn(),
-    warn: jest.fn(),
-    info: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
   };
-  const logErrorMock = jest.fn();
+  const logErrorMock = vi.fn();
 
   beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
 
-    jest.doMock("@/shared/locale/localeManager", () => ({
+    vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
     }));
-    jest.doMock("@/shared/utils/logger", () => ({
+    vi.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
     }));
-    jest.doMock("@/shared/errors/errorUtils", () => ({
+    vi.doMock("@/shared/errors/errorUtils", () => ({
       logError: logErrorMock,
     }));
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("registers global handlers only once", async () => {
-    const onSpy = jest
+    const onSpy = vi
       .spyOn(process, "on")
       .mockImplementation((() => process) as typeof process.on);
     const { setupGlobalErrorHandlers } =
@@ -47,7 +47,7 @@ describe("shared/errors/processErrorHandler", () => {
 
   it("logs unhandled rejection and forwards Error reason", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
-    jest.spyOn(process, "on").mockImplementation(((
+    vi.spyOn(process, "on").mockImplementation(((
       event: string,
       listener: (...args: unknown[]) => void,
     ) => {
@@ -81,14 +81,14 @@ describe("shared/errors/processErrorHandler", () => {
 
   it("exits on non-operational BaseError from uncaughtException", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
-    jest.spyOn(process, "on").mockImplementation(((
+    vi.spyOn(process, "on").mockImplementation(((
       event: string,
       listener: (...args: unknown[]) => void,
     ) => {
       handlers.set(event, listener);
       return process;
     }) as typeof process.on);
-    const exitSpy = jest
+    const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
@@ -113,14 +113,14 @@ describe("shared/errors/processErrorHandler", () => {
 
   it("does not exit on operational BaseError from uncaughtException", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
-    jest.spyOn(process, "on").mockImplementation(((
+    vi.spyOn(process, "on").mockImplementation(((
       event: string,
       listener: (...args: unknown[]) => void,
     ) => {
       handlers.set(event, listener);
       return process;
     }) as typeof process.on);
-    const exitSpy = jest
+    const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
@@ -139,7 +139,7 @@ describe("shared/errors/processErrorHandler", () => {
 
   it("logs node warning details from warning event", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
-    jest.spyOn(process, "on").mockImplementation(((
+    vi.spyOn(process, "on").mockImplementation(((
       event: string,
       listener: (...args: unknown[]) => void,
     ) => {
@@ -170,21 +170,21 @@ describe("shared/errors/processErrorHandler", () => {
 
   it("registers graceful shutdown once and handles cleanup outcomes", async () => {
     const onceHandlers = new Map<string, () => void>();
-    jest.spyOn(process, "once").mockImplementation(((
+    vi.spyOn(process, "once").mockImplementation(((
       event: string,
       listener: () => void,
     ) => {
       onceHandlers.set(event, listener);
       return process;
     }) as typeof process.once);
-    const exitSpy = jest
+    const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
     const { setupGracefulShutdown } =
       await import("@/shared/errors/processErrorHandler");
 
-    const cleanup = jest.fn().mockResolvedValue(undefined);
+    const cleanup = vi.fn().mockResolvedValue(undefined);
     setupGracefulShutdown(cleanup);
     setupGracefulShutdown(cleanup);
 
@@ -205,30 +205,30 @@ describe("shared/errors/processErrorHandler", () => {
     );
     expect(exitSpy).toHaveBeenCalledWith(0);
 
-    const failingCleanup = jest
+    const failingCleanup = vi
       .fn()
       .mockRejectedValue(new Error("cleanup-failed"));
-    jest.resetModules();
-    jest.clearAllMocks();
-    jest.doMock("@/shared/locale/localeManager", () => ({
+    vi.resetModules();
+    vi.clearAllMocks();
+    vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
     }));
-    jest.doMock("@/shared/utils/logger", () => ({
+    vi.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
     }));
-    jest.doMock("@/shared/errors/errorUtils", () => ({
+    vi.doMock("@/shared/errors/errorUtils", () => ({
       logError: logErrorMock,
     }));
 
     const secondOnceHandlers = new Map<string, () => void>();
-    jest.spyOn(process, "once").mockImplementation(((
+    vi.spyOn(process, "once").mockImplementation(((
       event: string,
       listener: () => void,
     ) => {
       secondOnceHandlers.set(event, listener);
       return process;
     }) as typeof process.once);
-    const secondExitSpy = jest
+    const secondExitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
@@ -249,19 +249,19 @@ describe("shared/errors/processErrorHandler", () => {
 
   it("logs already-shutting-down warning when signal arrives again", async () => {
     const onceHandlers = new Map<string, () => void>();
-    jest.spyOn(process, "once").mockImplementation(((
+    vi.spyOn(process, "once").mockImplementation(((
       event: string,
       listener: () => void,
     ) => {
       onceHandlers.set(event, listener);
       return process;
     }) as typeof process.once);
-    jest
+    vi
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
     let resolveCleanup: (() => void) | undefined;
-    const cleanup = jest.fn(
+    const cleanup = vi.fn(
       () =>
         new Promise<void>((resolve) => {
           resolveCleanup = resolve;
@@ -289,14 +289,14 @@ describe("shared/errors/processErrorHandler", () => {
 
   it("exits successfully even when cleanup is not provided", async () => {
     const onceHandlers = new Map<string, () => void>();
-    jest.spyOn(process, "once").mockImplementation(((
+    vi.spyOn(process, "once").mockImplementation(((
       event: string,
       listener: () => void,
     ) => {
       onceHandlers.set(event, listener);
       return process;
     }) as typeof process.once);
-    const exitSpy = jest
+    const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 

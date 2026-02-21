@@ -1,9 +1,9 @@
 import { handleVacVoiceStateUpdate } from "@/bot/features/vac/handlers/vacVoiceStateUpdate";
 
-const handleVoiceStateUpdateMock = jest.fn();
+const handleVoiceStateUpdateMock = vi.fn();
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacService: jest.fn(() => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacService: vi.fn(() => ({
     handleVoiceStateUpdate: (...args: unknown[]) =>
       handleVoiceStateUpdateMock(...args),
   })),
@@ -11,7 +11,7 @@ jest.mock("@/bot/services/botVacDependencyResolver", () => ({
 
 describe("bot/features/vac/handlers/vacVoiceStateUpdate", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("delegates voice state pair to vac service", async () => {

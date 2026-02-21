@@ -1,13 +1,13 @@
 describe("shared/utils/prisma", () => {
   const loggerMock = {
-    error: jest.fn(),
+    error: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
 
-    jest.doMock("@/shared/utils/logger", () => ({
+    vi.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
     }));
   });
@@ -20,7 +20,7 @@ describe("shared/utils/prisma", () => {
   it("stores and returns initialized prisma client", async () => {
     const { getPrismaClient, setPrismaClient } =
       await import("@/shared/utils/prisma");
-    const client = { $disconnect: jest.fn() };
+    const client = { $disconnect: vi.fn() };
 
     setPrismaClient(client as never);
 
@@ -30,7 +30,7 @@ describe("shared/utils/prisma", () => {
   it("returns initialized client via requirePrismaClient", async () => {
     const { requirePrismaClient, setPrismaClient } =
       await import("@/shared/utils/prisma");
-    const client = { $connect: jest.fn() };
+    const client = { $connect: vi.fn() };
     setPrismaClient(client as never);
 
     expect(requirePrismaClient()).toBe(client);

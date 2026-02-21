@@ -1,10 +1,10 @@
 import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
 import { safeReply } from "@/bot/utils/interaction";
 
-const isManagedVacChannelMock = jest.fn();
+const isManagedVacChannelMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(
     async (_guildId: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.renamed") {
         return `renamed:${String(params?.name)}`;
@@ -20,29 +20,29 @@ jest.mock("@/shared/locale/localeManager", () => ({
   ),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(() => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(() => ({
     isManagedVacChannel: isManagedVacChannelMock,
   })),
 }));
 
-jest.mock("@/bot/utils/interaction", () => ({
-  safeReply: jest.fn(),
+vi.mock("@/bot/utils/interaction", () => ({
+  safeReply: vi.fn(),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: jest.fn((message: string) => ({ message })),
-  createSuccessEmbed: jest.fn((message: string) => ({ message })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: vi.fn((message: string) => ({ message })),
+  createSuccessEmbed: vi.fn((message: string) => ({ message })),
 }));
 
-jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
   VAC_PANEL_CUSTOM_ID: {
     RENAME_MODAL_PREFIX: "vac:rename-modal:",
     LIMIT_MODAL_PREFIX: "vac:limit-modal:",
     RENAME_INPUT: "rename-input",
     LIMIT_INPUT: "limit-input",
   },
-  getVacPanelChannelId: jest.fn((customId: string, prefix: string) =>
+  getVacPanelChannelId: vi.fn((customId: string, prefix: string) =>
     customId.startsWith(prefix) ? customId.slice(prefix.length) : "",
   ),
 }));
@@ -56,16 +56,16 @@ function createBaseInteraction(overrides?: {
 }) {
   const channel =
     overrides?.channel ??
-    ({ id: "voice-1", type: 2, edit: jest.fn() } as const);
+    ({ id: "voice-1", type: 2, edit: vi.fn() } as const);
 
   return {
     guild: {
       id: "guild-1",
       channels: {
-        fetch: jest.fn().mockResolvedValue(channel),
+        fetch: vi.fn().mockResolvedValue(channel),
       },
       members: {
-        fetch: jest.fn().mockResolvedValue({
+        fetch: vi.fn().mockResolvedValue({
           voice: { channelId: overrides?.memberChannelId ?? "voice-1" },
         }),
       },
@@ -73,7 +73,7 @@ function createBaseInteraction(overrides?: {
     customId: overrides?.customId ?? "vac:rename-modal:voice-1",
     user: { id: "user-1" },
     fields: {
-      getTextInputValue: jest.fn((inputId: string) => {
+      getTextInputValue: vi.fn((inputId: string) => {
         if (inputId === "rename-input") {
           return overrides?.renameInput ?? "Renamed VC";
         }
@@ -85,7 +85,7 @@ function createBaseInteraction(overrides?: {
 
 describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     isManagedVacChannelMock.mockResolvedValue(true);
   });
 
@@ -108,7 +108,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
   });
 
   it("renames voice channel and replies success", async () => {
-    const editMock = jest.fn().mockResolvedValue(undefined);
+    const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createBaseInteraction({
       customId: "vac:rename-modal:voice-1",
       channel: { id: "voice-1", type: 2, edit: editMock },
@@ -125,7 +125,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
   });
 
   it("replies range error when limit input is invalid", async () => {
-    const editMock = jest.fn().mockResolvedValue(undefined);
+    const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createBaseInteraction({
       customId: "vac:limit-modal:voice-1",
       channel: { id: "voice-1", type: 2, edit: editMock },

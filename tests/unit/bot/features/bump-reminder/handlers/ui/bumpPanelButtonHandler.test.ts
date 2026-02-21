@@ -10,12 +10,12 @@ import { tDefault } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
 import { MessageFlags } from "discord.js";
 
-const safeReplyMock = jest.fn();
-const addMentionUserMock = jest.fn();
-const removeMentionUserMock = jest.fn();
+const safeReplyMock = vi.fn();
+const addMentionUserMock = vi.fn();
+const removeMentionUserMock = vi.fn();
 
 // Bump設定サービス依存を切り離し、ハンドラ分岐に集中する
-jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
+vi.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   BUMP_REMINDER_MENTION_USER_ADD_RESULT: {
     ADDED: "added",
     ALREADY_EXISTS: "already_exists",
@@ -28,8 +28,8 @@ jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   },
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
-  getBotBumpReminderConfigService: jest.fn(() => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+  getBotBumpReminderConfigService: vi.fn(() => ({
     addBumpReminderMentionUser: (...args: unknown[]) =>
       addMentionUserMock(...args),
     removeBumpReminderMentionUser: (...args: unknown[]) =>
@@ -38,7 +38,7 @@ jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
 }));
 
 // 定数と翻訳を固定化してカスタムID判定と応答内容の検証を安定させる
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/constants/bumpReminderConstants",
   () => ({
     BUMP_CONSTANTS: {
@@ -49,26 +49,26 @@ jest.mock(
     },
   }),
 );
-jest.mock("@/shared/locale/helpers", () => ({
-  getGuildTranslator: jest.fn(async () => (key: string) => key),
+vi.mock("@/shared/locale/helpers", () => ({
+  getGuildTranslator: vi.fn(async () => (key: string) => key),
 }));
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
 }));
 
 // interaction 応答は safeReply 経由のみ検証する
-jest.mock("@/bot/utils/interaction", () => ({
+vi.mock("@/bot/utils/interaction", () => ({
   safeReply: (...args: unknown[]) => safeReplyMock(...args),
 }));
 
 // ログ・Embed 生成は副作用排除のためダミーにする
-jest.mock("@/shared/utils/logger", () => ({
-  logger: { debug: jest.fn(), error: jest.fn() },
+vi.mock("@/shared/utils/logger", () => ({
+  logger: { debug: vi.fn(), error: vi.fn() },
 }));
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: jest.fn((message: string) => ({ message })),
-  createSuccessEmbed: jest.fn((message: string) => ({ message })),
-  createWarningEmbed: jest.fn((message: string) => ({ message })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: vi.fn((message: string) => ({ message })),
+  createSuccessEmbed: vi.fn((message: string) => ({ message })),
+  createWarningEmbed: vi.fn((message: string) => ({ message })),
 }));
 
 type ButtonInteractionLike = {
@@ -92,7 +92,7 @@ function createInteraction(
 describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
   // モック履歴をケースごとに初期化
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     safeReplyMock.mockResolvedValue(undefined);
     addMentionUserMock.mockResolvedValue("added");
     removeMentionUserMock.mockResolvedValue("removed");

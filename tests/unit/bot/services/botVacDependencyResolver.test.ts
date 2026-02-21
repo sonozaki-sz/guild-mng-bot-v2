@@ -1,6 +1,6 @@
 describe("bot/services/botVacDependencyResolver", () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it("stores and returns vac repository and service", async () => {

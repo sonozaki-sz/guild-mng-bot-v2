@@ -1,7 +1,7 @@
-const createBumpReminderConfigServiceMock = jest.fn();
-const getBumpReminderConfigServiceMock = jest.fn();
+const createBumpReminderConfigServiceMock = vi.fn();
+const getBumpReminderConfigServiceMock = vi.fn();
 
-jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
+vi.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   createBumpReminderConfigService: (...args: unknown[]) =>
     createBumpReminderConfigServiceMock(...args),
   getBumpReminderConfigService: (...args: unknown[]) =>
@@ -10,18 +10,18 @@ jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
 
 describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver", () => {
   beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
   });
 
   it("creates feature config service from injected repository", async () => {
-    const service = { getBumpReminderConfig: jest.fn() };
+    const service = { getBumpReminderConfig: vi.fn() };
     createBumpReminderConfigServiceMock.mockReturnValue(service);
 
     const { createBumpReminderFeatureConfigService } =
       await import("@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver");
 
-    const repository = { getBumpReminderConfigByGuildId: jest.fn() };
+    const repository = { getBumpReminderConfigByGuildId: vi.fn() };
     const resolved = createBumpReminderFeatureConfigService(
       repository as never,
     );
@@ -33,7 +33,7 @@ describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
   });
 
   it("returns shared singleton when repository is omitted", async () => {
-    const shared = { getBumpReminderConfig: jest.fn() };
+    const shared = { getBumpReminderConfig: vi.fn() };
     getBumpReminderConfigServiceMock.mockReturnValue(shared);
 
     const { getBumpReminderFeatureConfigService } =

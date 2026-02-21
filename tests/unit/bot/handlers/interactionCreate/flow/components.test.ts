@@ -1,57 +1,58 @@
+import type { Mock } from "vitest";
 import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
 import {
   handleButton,
   handleUserSelectMenu,
 } from "@/bot/handlers/interactionCreate/flow/components";
 
-const loggerErrorMock = jest.fn();
+const loggerErrorMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },
 }));
 
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleInteractionError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleInteractionError: vi.fn(),
 }));
 
-jest.mock("@/bot/handlers/interactionCreate/ui/buttons", () => ({
+vi.mock("@/bot/handlers/interactionCreate/ui/buttons", () => ({
   buttonHandlers: [
     {
-      matches: jest.fn((id: string) => id === "target"),
-      execute: jest.fn().mockResolvedValue(undefined),
+      matches: vi.fn((id: string) => id === "target"),
+      execute: vi.fn().mockResolvedValue(undefined),
     },
     {
-      matches: jest.fn(() => true),
-      execute: jest.fn().mockResolvedValue(undefined),
+      matches: vi.fn(() => true),
+      execute: vi.fn().mockResolvedValue(undefined),
     },
   ],
 }));
 
-jest.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => ({
+vi.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => ({
   userSelectHandlers: [
     {
-      matches: jest.fn((id: string) => id === "target"),
-      execute: jest.fn().mockResolvedValue(undefined),
+      matches: vi.fn((id: string) => id === "target"),
+      execute: vi.fn().mockResolvedValue(undefined),
     },
   ],
 }));
 
 describe("bot/handlers/interactionCreate/flow/components", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("executes first matching button handler only", async () => {
     const interaction = { customId: "target" };
-    const uiModule = jest.requireMock(
+    const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
-    ) as { buttonHandlers: Array<{ execute: jest.Mock }> };
+    ) as { buttonHandlers: Array<{ execute: Mock }> };
 
     await handleButton(interaction as never);
 
@@ -63,9 +64,9 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
 
   it("delegates button handler error to interaction error handler", async () => {
     const error = new Error("button failed");
-    const uiModule = jest.requireMock(
+    const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
-    ) as { buttonHandlers: Array<{ execute: jest.Mock }> };
+    ) as { buttonHandlers: Array<{ execute: Mock }> };
     uiModule.buttonHandlers[0].execute.mockRejectedValueOnce(error);
     const interaction = { customId: "target" };
 
@@ -77,9 +78,9 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
 
   it("executes matching user-select handler", async () => {
     const interaction = { customId: "target" };
-    const uiModule = jest.requireMock(
+    const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
-    ) as { userSelectHandlers: Array<{ execute: jest.Mock }> };
+    ) as { userSelectHandlers: Array<{ execute: Mock }> };
 
     await handleUserSelectMenu(interaction as never);
 

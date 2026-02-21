@@ -7,22 +7,22 @@ import { vacCommand } from "@/bot/commands/vac";
 import { vacConfigCommand } from "@/bot/commands/vac-config";
 
 // 各コマンドモジュールを軽量スタブ化して index の配列構成のみを検証する
-jest.mock("@/bot/commands/afk", () => ({
+vi.mock("@/bot/commands/afk", () => ({
   afkCommand: { data: { name: "afk" } },
 }));
-jest.mock("@/bot/commands/afk-config", () => ({
+vi.mock("@/bot/commands/afk-config", () => ({
   afkConfigCommand: { data: { name: "afk-config" } },
 }));
-jest.mock("@/bot/commands/bump-reminder-config", () => ({
+vi.mock("@/bot/commands/bump-reminder-config", () => ({
   bumpReminderConfigCommand: { data: { name: "bump-reminder-config" } },
 }));
-jest.mock("@/bot/commands/vac", () => ({
+vi.mock("@/bot/commands/vac", () => ({
   vacCommand: { data: { name: "vac" } },
 }));
-jest.mock("@/bot/commands/vac-config", () => ({
+vi.mock("@/bot/commands/vac-config", () => ({
   vacConfigCommand: { data: { name: "vac-config" } },
 }));
-jest.mock("@/bot/commands/ping", () => ({
+vi.mock("@/bot/commands/ping", () => ({
   pingCommand: { data: { name: "ping" } },
 }));
 

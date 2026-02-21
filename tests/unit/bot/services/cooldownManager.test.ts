@@ -7,17 +7,17 @@ import { CooldownManager } from "@/bot/services/cooldownManager";
 import { logger } from "@/shared/utils/logger";
 
 // Logger のモック
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     `${key}:${JSON.stringify(params || {})}`,
 }));
@@ -29,9 +29,9 @@ describe("CooldownManager", () => {
   // 各テストで新しいインスタンスを作り、モック履歴を初期化
   beforeEach(() => {
     // 実時間待機を排除してテストを安定化
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     cooldownManager = new CooldownManager();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // テスト後にインスタンス破棄とタイマー掃除を実施
@@ -40,13 +40,13 @@ describe("CooldownManager", () => {
       cooldownManager.destroy();
     }
     // すべてのタイマーをクリア
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   afterAll(() => {
     // テストスイート終了時に残っているタイマーをクリア
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   describe("check()", () => {
@@ -60,7 +60,7 @@ describe("CooldownManager", () => {
       cooldownManager.check("testCommand", "user123", 5);
 
       // 1秒経過させて残り時間を確認
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       const remaining = cooldownManager.check("testCommand", "user123", 5);
       expect(remaining).toBeGreaterThan(0);
@@ -71,7 +71,7 @@ describe("CooldownManager", () => {
       cooldownManager.check("testCommand", "user123", 1);
 
       // クールダウン期間 + バッファ分を進める
-      jest.advanceTimersByTime(1100);
+      vi.advanceTimersByTime(1100);
 
       const remaining = cooldownManager.check("testCommand", "user123", 1);
       expect(remaining).toBe(0);
@@ -104,7 +104,7 @@ describe("CooldownManager", () => {
     it("should clear existing timer when resetting cooldown entry", () => {
       cooldownManager.check("testCommand", "user123", 0);
 
-      const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+      const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
       cooldownManager.check("testCommand", "user123", 0);
 
       expect(clearTimeoutSpy).toHaveBeenCalled();
@@ -120,7 +120,7 @@ describe("CooldownManager", () => {
         .get("testCommand")
         ?.set("user123", Date.now() + 60_000);
 
-      jest.advanceTimersByTime(1100);
+      vi.advanceTimersByTime(1100);
 
       const stats = cooldownManager.getStats();
       expect(stats.totalCommands).toBe(1);
@@ -208,7 +208,7 @@ describe("CooldownManager", () => {
       cooldownManager.check("testCommand", "user2", 10);
 
       // 短いクールダウンのみ期限切れにする
-      jest.advanceTimersByTime(1100);
+      vi.advanceTimersByTime(1100);
 
       cooldownManager.cleanup();
 
@@ -282,16 +282,16 @@ describe("CooldownManager", () => {
       expect(initialStats.totalUsers).toBe(1);
 
       // クールダウン期限 + バッファ分を進める
-      jest.advanceTimersByTime(1100);
+      vi.advanceTimersByTime(1100);
 
       const finalStats = cooldownManager.getStats();
       expect(finalStats.totalUsers).toBe(0);
     });
 
     it("should invoke cleanup via periodic interval callback", () => {
-      const cleanupSpy = jest.spyOn(cooldownManager, "cleanup");
+      const cleanupSpy = vi.spyOn(cooldownManager, "cleanup");
 
-      jest.advanceTimersByTime(5 * 60 * 1000);
+      vi.advanceTimersByTime(5 * 60 * 1000);
 
       expect(cleanupSpy).toHaveBeenCalled();
     });

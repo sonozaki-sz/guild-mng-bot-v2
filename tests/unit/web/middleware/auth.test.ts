@@ -1,7 +1,7 @@
 let jwtSecretValue: string | undefined;
 
 // auth ミドルウェア内で参照される env をテスト用に差し替える
-jest.mock("@/shared/config/env", () => ({
+vi.mock("@/shared/config/env", () => ({
   NODE_ENV: {
     DEVELOPMENT: "development",
     PRODUCTION: "production",
@@ -17,6 +17,7 @@ jest.mock("@/shared/config/env", () => ({
   },
 }));
 
+import type { Mock } from "vitest";
 import { apiAuthPlugin } from "@/web/middleware/auth";
 
 describe("web/middleware/auth apiAuthPlugin", () => {
@@ -28,7 +29,7 @@ describe("web/middleware/auth apiAuthPlugin", () => {
 
   // プラグイン登録時に設定される onRequest フックを取り出す
   async function setupHook() {
-    const addHook = jest.fn();
+    const addHook = vi.fn();
     const fastify = {
       addHook,
     };
@@ -44,15 +45,15 @@ describe("web/middleware/auth apiAuthPlugin", () => {
         method: string;
         url: string;
       },
-      reply: { status: jest.Mock; send: jest.Mock },
+      reply: { status: Mock; send: Mock },
     ) => Promise<void>;
   }
 
   // FastifyReply 互換の最小モックを生成
   function createReply() {
     return {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn().mockResolvedValue(undefined),
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn().mockResolvedValue(undefined),
     };
   }
 

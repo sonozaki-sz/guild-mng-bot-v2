@@ -1,16 +1,16 @@
 import { cleanupVacOnStartup } from "@/bot/features/vac/handlers/vacStartupCleanup";
 
-const cleanupOnStartupMock = jest.fn();
+const cleanupOnStartupMock = vi.fn();
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacService: jest.fn(() => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacService: vi.fn(() => ({
     cleanupOnStartup: (...args: unknown[]) => cleanupOnStartupMock(...args),
   })),
 }));
 
 describe("bot/features/vac/handlers/vacStartupCleanup", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("delegates startup client to vac service", async () => {

@@ -1,17 +1,18 @@
+import type { Mock, Mocked } from "vitest";
 import { sendVacControlPanel } from "@/bot/features/vac/handlers/ui/vacControlPanel";
 import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 
-const loggerInfoMock = jest.fn();
-const loggerWarnMock = jest.fn();
-const loggerErrorMock = jest.fn();
+const loggerInfoMock = vi.fn();
+const loggerWarnMock = vi.fn();
+const loggerErrorMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     warn: (...args: unknown[]) => loggerWarnMock(...args),
@@ -19,19 +20,19 @@ jest.mock("@/shared/utils/logger", () => ({
   },
 }));
 
-jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
-  sendVacControlPanel: jest.fn(),
+vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+  sendVacControlPanel: vi.fn(),
 }));
 
-function createRepositoryMock(): jest.Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<IVacRepository> {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
@@ -42,9 +43,9 @@ function createVoiceStateInput(options?: {
   channelNames?: string[];
   createdChannel?: { id: string; type: ChannelType };
 }) {
-  const setChannelMock = jest.fn().mockResolvedValue(undefined);
-  const fetchMock = jest.fn();
-  const createMock = jest.fn().mockResolvedValue(
+  const setChannelMock = vi.fn().mockResolvedValue(undefined);
+  const fetchMock = vi.fn();
+  const createMock = vi.fn().mockResolvedValue(
     options?.createdChannel ?? {
       id: "created-voice-1",
       type: ChannelType.GuildVoice,
@@ -108,13 +109,13 @@ function createVoiceStateInput(options?: {
 
 describe("bot/features/vac/services/usecases/handleVacCreate", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(Date, "now").mockReturnValue(1700000000000);
-    (sendVacControlPanel as jest.Mock).mockResolvedValue(undefined);
+    vi.clearAllMocks();
+    vi.spyOn(Date, "now").mockReturnValue(1700000000000);
+    (sendVacControlPanel as Mock).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("returns when member or channel is missing, or channel is not voice", async () => {
@@ -297,7 +298,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
       triggerChannelIds: ["trigger-1"],
       createdChannels: [],
     });
-    (sendVacControlPanel as jest.Mock).mockRejectedValueOnce(
+    (sendVacControlPanel as Mock).mockRejectedValueOnce(
       new Error("panel failed"),
     );
 

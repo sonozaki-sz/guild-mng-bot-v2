@@ -1,13 +1,13 @@
-const initMock = jest.fn();
-const translateMock = jest.fn();
-const getFixedTMock = jest.fn();
+const initMock = vi.fn();
+const translateMock = vi.fn();
+const getFixedTMock = vi.fn();
 
 const loggerMock = {
-  info: jest.fn(),
-  error: jest.fn(),
+  info: vi.fn(),
+  error: vi.fn(),
 };
 
-jest.mock("i18next", () => ({
+vi.mock("i18next", () => ({
   __esModule: true,
   default: {
     init: (...args: unknown[]) => initMock(...args),
@@ -16,13 +16,13 @@ jest.mock("i18next", () => ({
   },
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: loggerMock,
 }));
 
 describe("shared/locale/localeManager", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     initMock.mockResolvedValue(undefined);
     translateMock.mockImplementation(
       (key: string, options?: { lng?: string }) =>
@@ -71,7 +71,7 @@ describe("shared/locale/localeManager", () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
     const repository = {
-      getLocale: jest.fn().mockResolvedValue("en"),
+      getLocale: vi.fn().mockResolvedValue("en"),
     };
 
     manager.setRepository(repository as never);
@@ -94,7 +94,7 @@ describe("shared/locale/localeManager", () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
     const repository = {
-      getLocale: jest.fn().mockResolvedValue("fr"),
+      getLocale: vi.fn().mockResolvedValue("fr"),
     };
     manager.setRepository(repository as never);
 
@@ -142,7 +142,7 @@ describe("shared/locale/localeManager", () => {
     const { SUPPORTED_LOCALES } = await import("@/shared/locale/i18n");
     const manager = new LocaleManager("ja");
     const repository = {
-      getLocale: jest.fn().mockResolvedValue("en"),
+      getLocale: vi.fn().mockResolvedValue("en"),
     };
     manager.setRepository(repository as never);
 
@@ -166,7 +166,7 @@ describe("shared/locale/localeManager", () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
     const repository = {
-      getLocale: jest.fn().mockResolvedValue("en"),
+      getLocale: vi.fn().mockResolvedValue("en"),
     };
     manager.setRepository(repository as never);
 
@@ -180,7 +180,7 @@ describe("shared/locale/localeManager", () => {
   it("tGuild and tDefault delegate to singleton manager/i18next", async () => {
     const module = await import("@/shared/locale/localeManager");
 
-    const translateSpy = jest
+    const translateSpy = vi
       .spyOn(module.localeManager, "translate")
       .mockResolvedValue("guild-result");
 

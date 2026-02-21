@@ -1,16 +1,16 @@
 import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
 import { Events } from "discord.js";
 
-const handleVacVoiceStateUpdateMock = jest.fn();
+const handleVacVoiceStateUpdateMock = vi.fn();
 
-jest.mock("@/bot/features/vac/handlers/vacVoiceStateUpdate", () => ({
+vi.mock("@/bot/features/vac/handlers/vacVoiceStateUpdate", () => ({
   handleVacVoiceStateUpdate: (...args: unknown[]) =>
     handleVacVoiceStateUpdateMock(...args),
 }));
 
 describe("bot/events/voiceStateUpdate", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("has expected event metadata", () => {
