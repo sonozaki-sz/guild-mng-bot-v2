@@ -302,7 +302,7 @@
   - 対象: `vacConfigCommand.execute.ts` + `commands/presenters/*`
   - 目標: show用の整形/Embed生成前段を presenter 化
   - コミット例: `refactor: vac-config 表示整形を presenter に分離`
-- [ ] **C5: bump-reminder service の分割（ユースケース/スケジュール）**
+- [x] **C5: bump-reminder service の分割（ユースケース/スケジュール）**
   - 対象: `bumpReminderService.ts` + `services/*`
   - 目標: 復元/登録/取消ロジックの関心分離
   - コミット例: `refactor: bump-reminder service を用途別に分割`

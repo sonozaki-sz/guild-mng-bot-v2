@@ -4,7 +4,6 @@
 // DB永続化対応：Bot再起動時もリマインダーを復元可能
 
 import { tDefault } from "../../../../shared/locale";
-import { jobScheduler } from "../../../../shared/scheduler";
 import { logger, requirePrismaClient } from "../../../../shared/utils";
 import {
   BUMP_REMINDER_STATUS,
@@ -17,6 +16,12 @@ import {
   getBumpReminderRepository,
   type IBumpReminderRepository,
 } from "../repositories";
+import { createBumpReminderRestorePlan } from "./helpers/bumpReminderRestorePlanner";
+import {
+  cancelScheduledReminder,
+  scheduleReminderInMemory,
+  type ScheduledReminderRef,
+} from "./helpers/bumpReminderScheduleHelper";
 
 export type BumpReminderTaskFactory = (
   guildId: string,
@@ -34,8 +39,7 @@ export type BumpReminderTaskFactory = (
 export class BumpReminderManager {
   constructor(private readonly repository: IBumpReminderRepository) {}
 
-  private reminders: Map<string, { jobId: string; reminderId: string }> =
-    new Map();
+  private reminders: Map<string, ScheduledReminderRef> = new Map();
 
   /**
    * リマインダーを設定（DBに保存 + スケジュール登録）
@@ -81,7 +85,8 @@ export class BumpReminderManager {
 
     // メモリ上の one-time ジョブとして登録
     const delayMs = scheduledAt.getTime() - Date.now();
-    this.scheduleReminderInMemory(
+    scheduleReminderInMemory(
+      this.reminders,
       guildId,
       jobId,
       reminder.id,
@@ -147,49 +152,13 @@ export class BumpReminderManager {
   }
 
   /**
-   * DBレコードを作成せずにメモリ上だけでスケジュールを登録する（Bot再起動後の復元用）
-   * @param guildId ギルドID
-   * @param jobId ジョブID
-   * @param reminderId DB上のリマインダーID
-   * @param delayMs 実行までの遅延時間（ミリ秒）
-   * @param task 実行するタスク
-   * @returns なし
-   */
-  private scheduleReminderInMemory(
-    guildId: string,
-    jobId: string,
-    reminderId: string,
-    delayMs: number,
-    task: () => Promise<void>,
-  ): void {
-    // スケジューラー実行後は管理マップから除去してリークを防ぐ
-    jobScheduler.addOneTimeJob(jobId, delayMs, async () => {
-      try {
-        await task();
-      } finally {
-        // 1回限りなので削除
-        this.reminders.delete(guildId);
-      }
-    });
-
-    this.reminders.set(guildId, { jobId, reminderId });
-  }
-
-  /**
    * リマインダーをキャンセル
    * @param guildId キャンセル対象のギルドID
    * @returns キャンセルできた場合は true
    */
   public async cancelReminder(guildId: string): Promise<boolean> {
-    // 管理マップ上の予約情報を解決
-    const reminder = this.reminders.get(guildId);
+    const reminder = cancelScheduledReminder(this.reminders, guildId);
     if (reminder) {
-      // スケジューラーとメモリを先にクリア（DB更新の成否に関わらず一貫した状態を保つ）
-      // ※以前はDB更新後にメモリを削除していたが、DB更新失敗時にメモリが不整合になる
-      //   (スケジューラーには存在しないジョブをメモリが指し続ける) バグがあったため修正。
-      jobScheduler.removeJob(reminder.jobId);
-      this.reminders.delete(guildId);
-
       // DBをcancelled状態に更新（失敗してもスケジューラー・メモリは既にクリア済みのため続行）
       try {
         await this.repository.updateStatus(
@@ -234,39 +203,25 @@ export class BumpReminderManager {
     const pendingReminders = await this.repository.findAllPending();
     let restoredCount = 0;
 
-    // 同一ギルドの複数 pending レコードを最新のもの 1 件に絞り込む
-    // （Bot クラッシュ等で複数レコードが残った場合の安全対策）
-    // 同一 guild の重複 pending を「最新1件」に正規化
-    const latestByGuild = new Map<string, (typeof pendingReminders)[0]>();
-    const toCancel: (typeof pendingReminders)[0][] = [];
-
-    for (const reminder of pendingReminders) {
-      const existing = latestByGuild.get(reminder.guildId);
-      if (!existing || reminder.scheduledAt > existing.scheduledAt) {
-        if (existing) toCancel.push(existing);
-        latestByGuild.set(reminder.guildId, reminder);
-      } else {
-        toCancel.push(reminder);
-      }
-    }
+    const restorePlan = createBumpReminderRestorePlan(pendingReminders);
 
     // 古い重複 pending をキャンセル（失敗しても続行）
     await Promise.allSettled(
-      toCancel.map((r) =>
+      restorePlan.staleReminders.map((r) =>
         this.repository.updateStatus(r.id, BUMP_REMINDER_STATUS.CANCELLED),
       ),
     );
-    if (toCancel.length > 0) {
+    if (restorePlan.staleReminders.length > 0) {
       // 重複件数を明示して、データ不整合の兆候を追跡しやすくする
       logger.info(
         tDefault("system:scheduler.bump_reminder_duplicates_cancelled", {
-          count: toCancel.length,
+          count: restorePlan.staleReminders.length,
         }),
       );
     }
 
     // 正規化後のレコードを「即時実行」または「再スケジュール」
-    for (const reminder of latestByGuild.values()) {
+    for (const reminder of restorePlan.latestByGuild.values()) {
       const now = new Date();
       const serviceName =
         reminder.serviceName && isBumpServiceName(reminder.serviceName)
@@ -295,7 +250,8 @@ export class BumpReminderManager {
         const delayMs = reminder.scheduledAt.getTime() - now.getTime();
         const jobId = toBumpReminderJobId(reminder.guildId);
 
-        this.scheduleReminderInMemory(
+        scheduleReminderInMemory(
+          this.reminders,
           reminder.guildId,
           jobId,
           reminder.id,
