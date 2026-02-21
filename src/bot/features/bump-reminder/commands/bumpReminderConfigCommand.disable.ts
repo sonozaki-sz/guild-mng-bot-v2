@@ -2,11 +2,13 @@
 // bump-reminder-config disable 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { getBumpReminderManager } from "..";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
+import {
+  getBotBumpReminderConfigService,
+  getBotBumpReminderManager,
+} from "../../../services/botBumpReminderDependencyResolver";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
-import { getBumpReminderFeatureConfigService } from "../services";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
@@ -24,11 +26,11 @@ export async function handleBumpReminderConfigDisable(
   await ensureManageGuildPermission(interaction, guildId);
 
   // メモリ上の pending リマインダーをキャンセル
-  const bumpReminderManager = getBumpReminderManager();
+  const bumpReminderManager = getBotBumpReminderManager();
   await bumpReminderManager.cancelReminder(guildId);
 
   // 機能を無効化
-  await getBumpReminderFeatureConfigService().setBumpReminderEnabled(
+  await getBotBumpReminderConfigService().setBumpReminderEnabled(
     guildId,
     false,
   );

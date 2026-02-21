@@ -19,11 +19,11 @@ import {
 } from "../../../../shared/features/bump-reminder";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
+import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
 import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "../../../utils/messageResponse";
-import { getBumpReminderFeatureConfigService } from "../services";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "./bumpReminderConfigCommand.constants";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
@@ -45,7 +45,7 @@ export async function handleBumpReminderConfigRemoveMention(
     BUMP_REMINDER_CONFIG_COMMAND.OPTION.TARGET,
     true,
   );
-  const bumpReminderConfigService = getBumpReminderFeatureConfigService();
+  const bumpReminderConfigService = getBotBumpReminderConfigService();
   const currentConfig =
     await bumpReminderConfigService.getBumpReminderConfig(guildId);
   const successTitle = await tGuild(
@@ -252,7 +252,7 @@ async function handleUserSelectionUI(
     });
 
     const selectedUserIds = selectInteraction.values;
-    const bumpReminderConfigService = getBumpReminderFeatureConfigService();
+    const bumpReminderConfigService = getBotBumpReminderConfigService();
     let removedCount = 0;
 
     // 選択されたユーザーを順次削除

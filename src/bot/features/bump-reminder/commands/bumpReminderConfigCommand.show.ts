@@ -3,8 +3,8 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tGuild } from "../../../../shared/locale";
+import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
 import { createInfoEmbed } from "../../../utils/messageResponse";
-import { getBumpReminderFeatureConfigService } from "../services";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
@@ -22,7 +22,7 @@ export async function handleBumpReminderConfigShow(
 
   // 常に最新設定を取得して表示
   const config =
-    await getBumpReminderFeatureConfigService().getBumpReminderConfig(guildId);
+    await getBotBumpReminderConfigService().getBumpReminderConfig(guildId);
 
   // 未設定時は案内メッセージを返す
   if (!config) {

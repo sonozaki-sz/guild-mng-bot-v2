@@ -195,7 +195,7 @@
   - 完了条件: startup/detected/panel 系で direct `getBumpReminder*` 呼び出しを解消
   - コミット例: `refactor: bump-reminder handlers の依存取得を統一`
 
-- [ ] **SR-003** bump-reminder commands を resolver 経由へ移行
+- [x] **SR-003** bump-reminder commands を resolver 経由へ移行
   - 完了条件: config command 系の依存取得を bot service resolver へ統一
   - コミット例: `refactor: bump-reminder commands の依存境界を統一`
 
