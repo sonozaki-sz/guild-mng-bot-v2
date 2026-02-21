@@ -199,7 +199,7 @@
   - 完了条件: config command 系の依存取得を bot service resolver へ統一
   - コミット例: `refactor: bump-reminder commands の依存境界を統一`
 
-- [ ] **SR-004** bump-reminder service の fallback 経路を縮退
+- [x] **SR-004** bump-reminder service の fallback 経路を縮退
   - 完了条件: `requirePrismaClient` 依存の暗黙解決を段階的に排除（互換を維持しつつ縮小）
   - コミット例: `refactor: bump-reminder service の暗黙依存を縮退`
 

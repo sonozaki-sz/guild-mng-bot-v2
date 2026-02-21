@@ -3,7 +3,7 @@
 // DB永続化対応：Bot再起動時もリマインダーを復元可能
 
 import { tDefault } from "../../../../shared/locale";
-import { logger, requirePrismaClient } from "../../../../shared/utils";
+import { logger } from "../../../../shared/utils";
 import {
   BUMP_REMINDER_STATUS,
   isBumpServiceName,
@@ -11,10 +11,7 @@ import {
   toScheduledAt,
   type BumpServiceName,
 } from "../constants";
-import {
-  getBumpReminderRepository,
-  type IBumpReminderRepository,
-} from "../repositories";
+import { type IBumpReminderRepository } from "../repositories";
 import { createBumpReminderRestorePlan } from "./helpers/bumpReminderRestorePlanner";
 import {
   cancelScheduledReminder,
@@ -311,14 +308,19 @@ export function createBumpReminderManager(
 
 /**
  * BumpReminderManager を解決する
- * repository 未指定時は既存のシングルトン経路へフォールバックする
+ * repository 未指定時は初期化済みの repository を利用する
  * @returns 共有の BumpReminderManager インスタンス
  */
 export function getBumpReminderManager(
   repository?: IBumpReminderRepository,
 ): BumpReminderManager {
-  const resolvedRepository =
-    repository ?? getBumpReminderRepository(requirePrismaClient());
+  const resolvedRepository = repository ?? cachedRepository;
+
+  if (!resolvedRepository) {
+    throw new Error(
+      "BumpReminderManager is not initialized. Initialize in composition root first.",
+    );
+  }
 
   // 初回呼び出し時、または注入 repository の変更時のみ再生成
   if (!bumpReminderManager || cachedRepository !== resolvedRepository) {

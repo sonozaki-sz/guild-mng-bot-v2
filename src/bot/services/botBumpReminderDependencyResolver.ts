@@ -69,5 +69,17 @@ export function getBotBumpReminderRepository(
  * Bot層で利用するbump-reminderマネージャーを取得する
  */
 export function getBotBumpReminderManager(): BumpReminderManager {
-  return cachedManager ?? getBumpReminderManager();
+  if (cachedManager) {
+    return cachedManager;
+  }
+
+  if (cachedRepository) {
+    const manager = getBumpReminderManager(cachedRepository);
+    cachedManager = manager;
+    return manager;
+  }
+
+  throw new Error(
+    "BumpReminderManager is not initialized. Initialize in composition root first.",
+  );
 }
