@@ -2,7 +2,7 @@
 // Repositoryパターン実装（Prisma版）
 
 import type { PrismaClient } from "@prisma/client";
-import { DatabaseError } from "../../errors";
+import { DatabaseError } from "../../errors/customErrors";
 import { GuildAfkConfigStore } from "../stores/guildAfkConfigStore";
 import { GuildBumpReminderConfigStore } from "../stores/guildBumpReminderConfigStore";
 import { GuildMemberLogConfigStore } from "../stores/guildMemberLogConfigStore";
@@ -48,6 +48,13 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   private readonly vacConfigStore: GuildVacConfigStore;
   private readonly stickMessageStore: GuildStickMessageStore;
   private readonly memberLogConfigStore: GuildMemberLogConfigStore;
+  private readonly toDatabaseError = (
+    prefix: string,
+    error: unknown,
+  ): DatabaseError =>
+    new DatabaseError(
+      `${prefix}: ${error instanceof Error ? error.message : DB_ERROR.UNKNOWN}`,
+    );
 
   constructor(prisma: PrismaClient) {
     // Prisma 参照を保持し、機能別ストアへ safeJsonParse を注入
@@ -70,18 +77,12 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
     this.stickMessageStore = new GuildStickMessageStore(
       prisma,
       parseJsonSafe,
-      (guildId, updates) => this.updateConfig(guildId, updates),
+      this.updateConfig.bind(this),
     );
     this.memberLogConfigStore = new GuildMemberLogConfigStore(
       prisma,
       parseJsonSafe,
-      (guildId, updates) => this.updateConfig(guildId, updates),
-    );
-  }
-
-  private toDatabaseError(prefix: string, error: unknown): DatabaseError {
-    return new DatabaseError(
-      `${prefix}: ${error instanceof Error ? error.message : DB_ERROR.UNKNOWN}`,
+      this.updateConfig.bind(this),
     );
   }
 

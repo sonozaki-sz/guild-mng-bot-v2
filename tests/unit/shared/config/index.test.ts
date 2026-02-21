@@ -1,6 +1,6 @@
-describe("shared/config/index", () => {
-  it("loads module", async () => {
-    const module = await import("@/shared/config");
-    expect(module).toBeDefined();
+describe("shared/config/env", () => {
+  it("loads env module", async () => {
+    const module = await import("@/shared/config/env");
+    expect(module.env).toBeDefined();
   });
 });

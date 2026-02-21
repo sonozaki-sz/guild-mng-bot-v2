@@ -2,7 +2,7 @@
 // ヘルスチェックエンドポイント
 
 import { FastifyPluginAsync } from "fastify";
-import { getPrismaClient } from "../../shared/utils";
+import { getPrismaClient } from "../../shared/utils/prisma";
 
 export const healthRoute: FastifyPluginAsync = async (fastify) => {
   // プロセス生存確認用（依存先状態は問わない）

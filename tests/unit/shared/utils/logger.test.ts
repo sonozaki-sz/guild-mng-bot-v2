@@ -27,7 +27,7 @@ describe("Logger", () => {
       __esModule: true,
       default: dailyRotateMock,
     }));
-    jest.doMock("@/shared/config", () => ({
+    jest.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",
@@ -79,5 +79,79 @@ describe("Logger", () => {
     const createLoggerArgs = createLoggerMock.mock.calls[0][0];
     expect(createLoggerArgs.level).toBe("info");
     expect(createLoggerArgs.transports).toHaveLength(3);
+  });
+
+  it("formats console output with and without stack in development", async () => {
+    const { winstonMock } = await loadLoggerModule("development", "debug");
+
+    const printfCalls = winstonMock.format.printf.mock.calls;
+    const consolePrintf = printfCalls[1]?.[0] as
+      | ((entry: {
+          timestamp: string;
+          level: string;
+          message: string;
+          stack?: string;
+        }) => string)
+      | undefined;
+
+    expect(consolePrintf).toBeDefined();
+    expect(
+      consolePrintf?.({
+        timestamp: "2026-02-21 00:00:00",
+        level: "info",
+        message: "hello",
+      }),
+    ).toBe("2026-02-21 00:00:00 [info]: hello");
+    expect(
+      consolePrintf?.({
+        timestamp: "2026-02-21 00:00:00",
+        level: "error",
+        message: "boom",
+        stack: "STACK_TRACE",
+      }),
+    ).toBe("2026-02-21 00:00:00 [error]: boom\nSTACK_TRACE");
+  });
+
+  it("formats file output with meta and optional stack", async () => {
+    const { winstonMock } = await loadLoggerModule("development", "debug");
+
+    const printfCalls = winstonMock.format.printf.mock.calls;
+    const filePrintf = printfCalls[0]?.[0] as
+      | ((entry: {
+          timestamp: string;
+          level: string;
+          message: string;
+          stack?: string;
+          [key: string]: unknown;
+        }) => string)
+      | undefined;
+
+    expect(
+      filePrintf?.({
+        timestamp: "2026-02-21 00:00:00",
+        level: "info",
+        message: "hello",
+      }),
+    ).toBe("2026-02-21 00:00:00 [INFO]: hello");
+    expect(
+      filePrintf?.({
+        timestamp: "2026-02-21 00:00:00",
+        level: "error",
+        message: "boom",
+        stack: "STACK_TRACE",
+        guildId: "g1",
+      }),
+    ).toBe('2026-02-21 00:00:00 [ERROR]: boom{"guildId":"g1"}\nSTACK_TRACE');
+  });
+
+  it("uses debug default level when LOG_LEVEL is missing in development", async () => {
+    const { consoleTransportMock } = await loadLoggerModule(
+      "development",
+      undefined,
+    );
+
+    expect(consoleTransportMock).toHaveBeenCalledWith(
+      expect.objectContaining({ level: "debug" }),
+    );
   });
 });

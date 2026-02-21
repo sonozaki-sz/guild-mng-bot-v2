@@ -1,4 +1,4 @@
-import { BUMP_SERVICES } from "@/bot/features/bump-reminder";
+import { BUMP_SERVICES } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { sendBumpReminder } from "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder";
 
 const getGuildTranslatorMock = jest.fn();
@@ -10,13 +10,16 @@ const loggerInfoMock = jest.fn();
 const loggerDebugMock = jest.fn();
 const loggerWarnMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/helpers", () => ({
   getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
+}));
+
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, options?: Record<string, unknown>) =>
     tDefaultMock(key, options),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     debug: (...args: unknown[]) => loggerDebugMock(...args),

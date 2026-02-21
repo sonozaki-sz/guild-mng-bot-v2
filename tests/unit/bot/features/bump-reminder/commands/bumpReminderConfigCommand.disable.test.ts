@@ -7,12 +7,12 @@ const createSuccessEmbedMock = jest.fn((description: string) => ({
   description,
 }));
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
   tGuild: jest.fn(async () => "translated"),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: { info: jest.fn() },
 }));
 

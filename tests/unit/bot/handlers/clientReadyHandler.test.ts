@@ -13,23 +13,23 @@ const loggerInfoMock = jest.fn();
 const restoreBumpRemindersOnStartupMock = jest.fn();
 const cleanupVacOnStartupMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     tDefaultMock(key, params),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
-jest.mock("@/bot/features/bump-reminder/handlers", () => ({
+jest.mock("@/bot/features/bump-reminder/handlers/bumpReminderStartup", () => ({
   restoreBumpRemindersOnStartup: (...args: unknown[]) =>
     restoreBumpRemindersOnStartupMock(...args),
 }));
 
-jest.mock("@/bot/features/vac/handlers", () => ({
+jest.mock("@/bot/features/vac/handlers/vacStartupCleanup", () => ({
   cleanupVacOnStartup: (...args: unknown[]) => cleanupVacOnStartupMock(...args),
 }));
 

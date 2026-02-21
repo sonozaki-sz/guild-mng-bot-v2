@@ -17,7 +17,7 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/database", () => ({
+jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
   }),
@@ -29,11 +29,13 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
 }));
 
 // i18n を固定文字列化してアサーションを単純化する
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
+}));
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));

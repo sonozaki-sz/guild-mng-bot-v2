@@ -6,8 +6,8 @@ import {
   type ChatInputCommandInteraction,
   type VoiceChannel,
 } from "discord.js";
-import { ValidationError } from "../../../../../shared/errors";
-import { tGuild } from "../../../../../shared/locale";
+import { ValidationError } from "../../../../../shared/errors/customErrors";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 
 /**
  * 指定チャンネルIDから編集対象のVACボイスチャンネルを解決する

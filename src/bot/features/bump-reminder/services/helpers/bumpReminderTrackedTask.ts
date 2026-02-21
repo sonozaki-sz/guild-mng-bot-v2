@@ -1,10 +1,10 @@
 // src/bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask.ts
 // Bumpリマインダータスクの実行結果をDBステータスへ反映するヘルパー
 
-import { tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
-import { BUMP_REMINDER_STATUS } from "../../constants";
-import { type IBumpReminderRepository } from "../../repositories";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
+import { BUMP_REMINDER_STATUS } from "../../constants/bumpReminderConstants";
+import { type IBumpReminderRepository } from "../../repositories/types";
 
 /**
  * タスク実行後に DB ステータスを更新するラッパーを生成する

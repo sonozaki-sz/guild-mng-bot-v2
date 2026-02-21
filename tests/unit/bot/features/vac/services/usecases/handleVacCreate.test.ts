@@ -1,5 +1,5 @@
-import { sendVacControlPanel } from "@/bot/features/vac/handlers/ui";
-import type { IVacRepository } from "@/bot/features/vac/repositories";
+import { sendVacControlPanel } from "@/bot/features/vac/handlers/ui/vacControlPanel";
+import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 
@@ -7,11 +7,11 @@ const loggerInfoMock = jest.fn();
 const loggerWarnMock = jest.fn();
 const loggerErrorMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     warn: (...args: unknown[]) => loggerWarnMock(...args),
@@ -19,7 +19,7 @@ jest.mock("@/shared/utils", () => ({
   },
 }));
 
-jest.mock("@/bot/features/vac/handlers/ui", () => ({
+jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
   sendVacControlPanel: jest.fn(),
 }));
 
@@ -264,6 +264,29 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
       createdAt: 1700000000000,
     });
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns early when created channel is not a voice channel", async () => {
+    const repository = createRepositoryMock();
+    const { newState, createMock, setChannelMock } = createVoiceStateInput({
+      createdChannel: {
+        id: "created-text-1",
+        type: ChannelType.GuildText,
+      },
+    });
+
+    repository.getVacConfigOrDefault.mockResolvedValue({
+      enabled: true,
+      triggerChannelIds: ["trigger-1"],
+      createdChannels: [],
+    });
+
+    await handleVacCreateUseCase(repository, newState as never);
+
+    expect(createMock).toHaveBeenCalledTimes(1);
+    expect(sendVacControlPanel).not.toHaveBeenCalled();
+    expect(setChannelMock).not.toHaveBeenCalled();
+    expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
   });
 
   it("logs panel send failure and still continues move + save", async () => {

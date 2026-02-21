@@ -5,10 +5,11 @@ import { MessageFlags, type ButtonInteraction } from "discord.js";
 import {
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
-} from "../../../../../shared/features/bump-reminder";
-import { getGuildTranslator, tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
-import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
+} from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
+import { getGuildTranslator } from "../../../../../shared/locale/helpers";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotBumpReminderConfigService } from "../../../../services/botBumpReminderDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {
@@ -16,7 +17,7 @@ import {
   createSuccessEmbed,
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
-import { BUMP_CONSTANTS } from "../../index";
+import { BUMP_CONSTANTS } from "../../constants/bumpReminderConstants";
 
 // Bump パネル操作のログ文言を一貫化するための定数
 const BUMP_PANEL_LOG_CONSTANTS = {

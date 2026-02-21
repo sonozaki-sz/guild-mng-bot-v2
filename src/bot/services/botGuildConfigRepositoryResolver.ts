@@ -1,7 +1,7 @@
 // src/bot/services/botGuildConfigRepositoryResolver.ts
 // Bot層で利用する GuildConfigRepository の解決
 
-import { type IGuildConfigRepository } from "../../shared/database";
+import { type IGuildConfigRepository } from "../../shared/database/types";
 
 let cachedRepository: IGuildConfigRepository | undefined;
 

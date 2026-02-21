@@ -2,10 +2,13 @@
 // Bump検知ユースケースのオーケストレーション
 
 import type { Client } from "discord.js";
-import { getReminderDelayMinutes, type BumpServiceName } from "..";
-import { tDefault } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { tDefault } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
+import {
+  getReminderDelayMinutes,
+  type BumpServiceName,
+} from "../constants/bumpReminderConstants";
 import { scheduleBumpReminder } from "./usecases/scheduleBumpReminder";
 import { sendBumpPanel } from "./usecases/sendBumpPanel";
 

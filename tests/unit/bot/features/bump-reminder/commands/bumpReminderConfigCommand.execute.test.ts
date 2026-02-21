@@ -9,7 +9,7 @@ const setMentionMock = jest.fn();
 const removeMentionMock = jest.fn();
 const showMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
 }));
 

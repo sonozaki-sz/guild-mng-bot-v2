@@ -7,8 +7,8 @@ import {
   type GuildMember,
   type UserSelectMenuInteraction,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale";
-import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui";
+import { tGuild } from "../../../../../shared/locale/localeManager";
+import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotGuildConfigRepository } from "../../../../services/botGuildConfigRepositoryResolver";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";

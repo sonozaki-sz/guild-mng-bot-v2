@@ -16,7 +16,7 @@ jest.mock("i18next", () => ({
   },
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: loggerMock,
 }));
 
@@ -41,6 +41,16 @@ describe("shared/locale/localeManager", () => {
 
     expect(initMock).toHaveBeenCalledTimes(1);
     expect(loggerMock.info).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns immediately when initialize is called after already initialized", async () => {
+    const { LocaleManager } = await import("@/shared/locale/localeManager");
+    const manager = new LocaleManager("ja");
+
+    await manager.initialize();
+    await manager.initialize();
+
+    expect(initMock).toHaveBeenCalledTimes(1);
   });
 
   it("resets pending init promise after failure and allows retry", async () => {
@@ -101,6 +111,15 @@ describe("shared/locale/localeManager", () => {
     );
   });
 
+  it("uses default locale from cache path when repository is not set", async () => {
+    const { LocaleManager } = await import("@/shared/locale/localeManager");
+    const manager = new LocaleManager("ja");
+
+    await expect(
+      manager.translate("guild-no-repo", "ping.description" as never),
+    ).resolves.toBe("ja:ping.description");
+  });
+
   it("returns key and logs error when translation fails", async () => {
     translateMock.mockImplementation(() => {
       throw new Error("translation-failed");
@@ -141,6 +160,21 @@ describe("shared/locale/localeManager", () => {
     expect(manager.getSupportedLocales()).toBe(SUPPORTED_LOCALES);
     expect(manager.isSupported("ja")).toBe(true);
     expect(manager.isSupported("xx")).toBe(false);
+  });
+
+  it("getGuildT uses default locale when guildId is undefined", async () => {
+    const { LocaleManager } = await import("@/shared/locale/localeManager");
+    const manager = new LocaleManager("ja");
+    const repository = {
+      getLocale: jest.fn().mockResolvedValue("en"),
+    };
+    manager.setRepository(repository as never);
+
+    const translator = await manager.getGuildT(undefined);
+
+    expect(typeof translator).toBe("function");
+    expect(getFixedTMock).toHaveBeenCalledWith("ja");
+    expect(repository.getLocale).not.toHaveBeenCalled();
   });
 
   it("tGuild and tDefault delegate to singleton manager/i18next", async () => {

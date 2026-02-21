@@ -2,8 +2,8 @@
 // bump-reminder-config enable 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";

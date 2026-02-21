@@ -1,4 +1,4 @@
-import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder";
+import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import {
   cancelPendingByGuildAndChannelUseCase,
   cancelPendingByGuildUseCase,

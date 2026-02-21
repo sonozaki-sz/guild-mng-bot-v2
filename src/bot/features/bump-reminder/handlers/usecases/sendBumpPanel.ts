@@ -7,14 +7,17 @@ import {
   ButtonStyle,
   type Client,
 } from "discord.js";
-import { BUMP_CONSTANTS, toScheduledAt } from "../..";
 import {
   getGuildTranslator,
-  tDefault,
   type GuildTFunction,
-} from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
+} from "../../../../../shared/locale/helpers";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
+import {
+  BUMP_CONSTANTS,
+  toScheduledAt,
+} from "../../constants/bumpReminderConstants";
 
 /**
  * Bump 予約時刻を表示する操作パネルメッセージを送信する関数

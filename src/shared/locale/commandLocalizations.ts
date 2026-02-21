@@ -1,7 +1,7 @@
 // src/shared/locale/commandLocalizations.ts
 // コマンド定義用のローカライゼーションヘルパー
 
-import { resources } from "./locales";
+import { resources } from "./locales/resources";
 
 type CommandLocalizationMap = Record<string, string>;
 

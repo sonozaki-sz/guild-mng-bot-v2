@@ -2,16 +2,16 @@
 // Bot層の依存解決を集約する Composition Root
 
 import type { PrismaClient } from "@prisma/client";
-import { getGuildConfigRepository } from "../../shared/database";
-import { getVacConfigService } from "../../shared/features/vac";
-import { localeManager } from "../../shared/locale";
+import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
+import { localeManager } from "../../shared/locale/localeManager";
+import { getBumpReminderRepository } from "../features/bump-reminder/repositories/bumpReminderRepository";
 import {
   getBumpReminderFeatureConfigService,
-  getBumpReminderManager,
-  getBumpReminderRepository,
-} from "../features/bump-reminder";
-import { createVacRepository, getVacRepository } from "../features/vac";
-import { getVacService } from "../features/vac/services";
+} from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
+import { getBumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
+import { createVacRepository, getVacRepository } from "../features/vac/repositories/vacRepository";
+import { getVacService } from "../features/vac/services/vacService";
 import {
   setBotBumpReminderConfigService,
   setBotBumpReminderManager,

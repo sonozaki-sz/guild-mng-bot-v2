@@ -1,6 +1,5 @@
-describe("bot/handlers/interactionCreate/flow/index", () => {
-  it("re-exports interaction flow handlers", async () => {
-    const indexModule = await import("@/bot/handlers/interactionCreate/flow");
+describe("bot/handlers/interactionCreate/flow modules", () => {
+  it("exposes interaction flow handlers", async () => {
     const commandModule =
       await import("@/bot/handlers/interactionCreate/flow/command");
     const componentsModule =
@@ -8,16 +7,10 @@ describe("bot/handlers/interactionCreate/flow/index", () => {
     const modalModule =
       await import("@/bot/handlers/interactionCreate/flow/modal");
 
-    expect(indexModule.handleAutocomplete).toBe(
-      commandModule.handleAutocomplete,
-    );
-    expect(indexModule.handleChatInputCommand).toBe(
-      commandModule.handleChatInputCommand,
-    );
-    expect(indexModule.handleButton).toBe(componentsModule.handleButton);
-    expect(indexModule.handleUserSelectMenu).toBe(
-      componentsModule.handleUserSelectMenu,
-    );
-    expect(indexModule.handleModalSubmit).toBe(modalModule.handleModalSubmit);
+    expect(commandModule.handleAutocomplete).toBeDefined();
+    expect(commandModule.handleChatInputCommand).toBeDefined();
+    expect(componentsModule.handleButton).toBeDefined();
+    expect(componentsModule.handleUserSelectMenu).toBeDefined();
+    expect(modalModule.handleModalSubmit).toBeDefined();
   });
 });

@@ -1,12 +1,11 @@
 describe("bot/features/bump-reminder/constants/index", () => {
-  it("re-exports core constants and helpers", async () => {
-    const indexModule = await import("@/bot/features/bump-reminder/constants");
+  it("exposes core constants and helpers", async () => {
     const rawModule =
       await import("@/bot/features/bump-reminder/constants/bumpReminderConstants");
 
-    expect(indexModule.BUMP_CONSTANTS).toBe(rawModule.BUMP_CONSTANTS);
-    expect(indexModule.BUMP_SERVICES).toBe(rawModule.BUMP_SERVICES);
-    expect(indexModule.resolveBumpService).toBe(rawModule.resolveBumpService);
-    expect(indexModule.toBumpReminderJobId).toBe(rawModule.toBumpReminderJobId);
+    expect(rawModule.BUMP_CONSTANTS).toBeDefined();
+    expect(rawModule.BUMP_SERVICES).toBeDefined();
+    expect(rawModule.resolveBumpService).toBeDefined();
+    expect(rawModule.toBumpReminderJobId).toBeDefined();
   });
 });

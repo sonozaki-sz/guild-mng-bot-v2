@@ -2,8 +2,8 @@
 // bump-reminder-config コマンドのルーター
 
 import { type ChatInputCommandInteraction } from "discord.js";
-import { ValidationError } from "../../../../shared/errors";
-import { tDefault } from "../../../../shared/locale";
+import { ValidationError } from "../../../../shared/errors/customErrors";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "./bumpReminderConfigCommand.constants";
 import { handleBumpReminderConfigDisable } from "./bumpReminderConfigCommand.disable";

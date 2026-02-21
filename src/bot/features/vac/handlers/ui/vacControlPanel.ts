@@ -7,7 +7,7 @@ import {
   ButtonStyle,
   type VoiceChannel,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 
 // VAC パネルのボタン/モーダル/入力識別に使う customId 定数

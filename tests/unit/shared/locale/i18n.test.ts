@@ -14,7 +14,7 @@ describe("shared/locale/i18n", () => {
       default: i18nextMock,
     }));
 
-    jest.doMock("@/shared/config", () => ({
+      jest.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",

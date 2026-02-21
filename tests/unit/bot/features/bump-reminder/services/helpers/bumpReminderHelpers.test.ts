@@ -1,5 +1,5 @@
-import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants";
-import type { BumpReminder } from "@/bot/features/bump-reminder/repositories";
+import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
+import type { BumpReminder } from "@/bot/features/bump-reminder/repositories/types";
 import {
   createBumpReminderRestorePlan,
   type BumpReminderRestorePlan,
@@ -10,16 +10,16 @@ import {
   type ScheduledReminderRef,
 } from "@/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper";
 import { createTrackedReminderTask } from "@/bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask";
-import { logger } from "@/shared/utils";
+import { logger } from "@/shared/utils/logger";
 
 const addOneTimeJobMock = jest.fn();
 const removeJobMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => key),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: jest.fn(),
     debug: jest.fn(),
@@ -28,7 +28,7 @@ jest.mock("@/shared/utils", () => ({
   },
 }));
 
-jest.mock("@/shared/scheduler", () => ({
+jest.mock("@/shared/scheduler/jobScheduler", () => ({
   jobScheduler: {
     addOneTimeJob: (...args: unknown[]) => addOneTimeJobMock(...args),
     removeJob: (...args: unknown[]) => removeJobMock(...args),

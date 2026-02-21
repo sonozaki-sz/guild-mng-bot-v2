@@ -8,18 +8,24 @@ const tDefaultMock = jest.fn(
 const createInfoEmbedMock = jest.fn();
 const loggerErrorMock = jest.fn();
 
-jest.mock("@/bot/features/bump-reminder", () => ({
-  BUMP_CONSTANTS: {
-    CUSTOM_ID_PREFIX: {
-      MENTION_ON: "on:",
-      MENTION_OFF: "off:",
+jest.mock(
+  "@/bot/features/bump-reminder/constants/bumpReminderConstants",
+  () => ({
+    BUMP_CONSTANTS: {
+      CUSTOM_ID_PREFIX: {
+        MENTION_ON: "on:",
+        MENTION_OFF: "off:",
+      },
     },
-  },
-  toScheduledAt: (...args: unknown[]) => toScheduledAtMock(...args),
+    toScheduledAt: (...args: unknown[]) => toScheduledAtMock(...args),
+  }),
+);
+
+jest.mock("@/shared/locale/helpers", () => ({
+  getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
 }));
 
-jest.mock("@/shared/locale", () => ({
-  getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, options?: Record<string, unknown>) =>
     tDefaultMock(key, options),
 }));
@@ -28,7 +34,7 @@ jest.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: (...args: unknown[]) => createInfoEmbedMock(...args),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },

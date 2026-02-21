@@ -7,8 +7,8 @@ import {
   type GuildMember,
   type ModalSubmitInteraction,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale";
-import type { ModalHandler } from "../../../../handlers/interactionCreate/ui";
+import { tGuild } from "../../../../../shared/locale/localeManager";
+import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {

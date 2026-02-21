@@ -1,8 +1,8 @@
 // src/shared/errors/processErrorHandler.ts
 // プロセス全体の未処理例外とシャットダウン制御
 
-import { tDefault } from "../locale";
-import { logger } from "../utils";
+import { tDefault } from "../locale/localeManager";
+import { logger } from "../utils/logger";
 import { BaseError } from "./customErrors";
 import { logError } from "./errorUtils";
 

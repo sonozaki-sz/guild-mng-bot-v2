@@ -2,11 +2,14 @@
 // Bumpリマインダー予約登録ユースケース
 
 import type { Client } from "discord.js";
-import { getReminderDelayMinutes, type BumpServiceName } from "../..";
-import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder";
-import { tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
+import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
 import { getBotBumpReminderManager } from "../../../../services/botBumpReminderDependencyResolver";
+import {
+  getReminderDelayMinutes,
+  type BumpServiceName,
+} from "../../constants/bumpReminderConstants";
 import { sendBumpReminder } from "./sendBumpReminder";
 
 /**

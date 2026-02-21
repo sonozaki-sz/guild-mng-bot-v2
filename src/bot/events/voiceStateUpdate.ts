@@ -2,7 +2,7 @@
 // VAC用 voiceStateUpdate イベント
 
 import { Events, type VoiceState } from "discord.js";
-import { handleVacVoiceStateUpdate } from "../features/vac/handlers";
+import { handleVacVoiceStateUpdate } from "../features/vac/handlers/vacVoiceStateUpdate";
 import type { BotEvent } from "../types/discord";
 
 export const voiceStateUpdateEvent: BotEvent<typeof Events.VoiceStateUpdate> = {

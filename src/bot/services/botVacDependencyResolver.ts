@@ -1,8 +1,8 @@
 // src/bot/services/botVacDependencyResolver.ts
 // Bot層でVAC依存を解決するリゾルバ
 
-import type { IVacRepository } from "../features/vac";
-import type { VacService } from "../features/vac/services";
+import type { IVacRepository } from "../features/vac/repositories/vacRepository";
+import type { VacService } from "../features/vac/services/vacService";
 
 let cachedVacRepository: IVacRepository | undefined;
 let cachedVacService: VacService | undefined;

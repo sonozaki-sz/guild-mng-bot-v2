@@ -1,5 +1,5 @@
 import { executeAfkConfigCommand } from "@/bot/features/afk/commands/afkConfigCommand.execute";
-import { ValidationError } from "@/shared/errors";
+import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 
 const setAfkChannelMock = jest.fn();
@@ -22,13 +22,13 @@ jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
   }),
 }));
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: jest.fn(),
   },

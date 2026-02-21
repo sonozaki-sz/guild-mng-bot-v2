@@ -2,7 +2,7 @@
 // メッセージ作成イベント - Bump検知用
 
 import { Events } from "discord.js";
-import { handleBumpMessageCreate } from "../features/bump-reminder/handlers";
+import { handleBumpMessageCreate } from "../features/bump-reminder/handlers/bumpMessageCreateHandler";
 import type { BotEvent } from "../types/discord";
 
 export const messageCreateEvent: BotEvent<typeof Events.MessageCreate> = {

@@ -2,8 +2,8 @@
 // vac-config show 用の表示整形
 
 import { ChannelType, type Guild } from "discord.js";
-import type { VacConfig } from "../../../../../shared/database";
-import { tGuild } from "../../../../../shared/locale";
+import type { VacConfig } from "../../../../../shared/database/types";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 
 export interface VacConfigShowPresentation {
   title: string;

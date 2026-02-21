@@ -1,26 +1,25 @@
-import { Events } from "discord.js";
-import { events } from "@/bot/events";
 import { channelDeleteEvent } from "@/bot/events/channelDelete";
 import { clientReadyEvent } from "@/bot/events/clientReady";
+import { events } from "@/bot/events/events";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
 import { messageCreateEvent } from "@/bot/events/messageCreate";
 import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
 
 // 各イベントモジュールをスタブ化し、index の束ね方に焦点を当てる
 jest.mock("@/bot/events/channelDelete", () => ({
-  channelDeleteEvent: { name: Events.ChannelDelete },
+  channelDeleteEvent: { name: "channelDelete" },
 }));
 jest.mock("@/bot/events/clientReady", () => ({
-  clientReadyEvent: { name: Events.ClientReady },
+  clientReadyEvent: { name: "clientReady" },
 }));
 jest.mock("@/bot/events/interactionCreate", () => ({
-  interactionCreateEvent: { name: Events.InteractionCreate },
+  interactionCreateEvent: { name: "interactionCreate" },
 }));
 jest.mock("@/bot/events/messageCreate", () => ({
-  messageCreateEvent: { name: Events.MessageCreate },
+  messageCreateEvent: { name: "messageCreate" },
 }));
 jest.mock("@/bot/events/voiceStateUpdate", () => ({
-  voiceStateUpdateEvent: { name: Events.VoiceStateUpdate },
+  voiceStateUpdateEvent: { name: "voiceStateUpdate" },
 }));
 
 describe("bot/events index", () => {

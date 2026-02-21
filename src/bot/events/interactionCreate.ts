@@ -2,7 +2,7 @@
 // インタラクション処理イベント
 
 import { Events } from "discord.js";
-import { handleInteractionCreate } from "../handlers/interactionCreate";
+import { handleInteractionCreate } from "../handlers/interactionCreate/handleInteractionCreate";
 import type { BotEvent } from "../types/discord";
 
 export const interactionCreateEvent: BotEvent<typeof Events.InteractionCreate> =

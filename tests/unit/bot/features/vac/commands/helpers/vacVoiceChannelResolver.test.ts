@@ -1,9 +1,9 @@
 import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
-import { ValidationError } from "@/shared/errors";
-import { tGuild } from "@/shared/locale";
+import { ValidationError } from "@/shared/errors/customErrors";
+import { tGuild } from "@/shared/locale/localeManager";
 import { ChannelType } from "discord.js";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
 

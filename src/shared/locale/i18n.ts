@@ -3,7 +3,7 @@
 
 import type { i18n as I18nInstance, ParseKeys } from "i18next";
 import i18next from "i18next";
-import { NODE_ENV, env } from "../config";
+import { NODE_ENV, env } from "../config/env";
 
 /**
  * サポートする言語

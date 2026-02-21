@@ -1,4 +1,4 @@
-import type { IVacRepository } from "@/bot/features/vac/repositories";
+import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
 import { ChannelType } from "discord.js";
 
@@ -201,6 +201,46 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
     expect(repository.removeCreatedVacChannel).toHaveBeenCalledWith(
       "guild-1",
       "created-empty-delete-fail",
+    );
+  });
+
+  it("treats fetch errors as missing channels and removes stale records", async () => {
+    const repository = createRepositoryMock();
+    repository.getVacConfigOrDefault.mockResolvedValue({
+      enabled: true,
+      triggerChannelIds: ["trigger-fetch-error"],
+      createdChannels: [
+        {
+          voiceChannelId: "created-fetch-error",
+          ownerId: "user-1",
+          createdAt: 3,
+        },
+      ],
+    });
+
+    const guild = createGuild({
+      guildId: "guild-2",
+      fetchedChannels: {
+        "trigger-fetch-error": new Error("fetch failed"),
+        "created-fetch-error": new Error("fetch failed"),
+      },
+    });
+
+    const client = {
+      guilds: {
+        cache: new Map([[guild.id, guild]]),
+      },
+    };
+
+    await cleanupVacOnStartupUseCase(repository, client as never);
+
+    expect(repository.removeTriggerChannel).toHaveBeenCalledWith(
+      "guild-2",
+      "trigger-fetch-error",
+    );
+    expect(repository.removeCreatedVacChannel).toHaveBeenCalledWith(
+      "guild-2",
+      "created-fetch-error",
     );
   });
 });

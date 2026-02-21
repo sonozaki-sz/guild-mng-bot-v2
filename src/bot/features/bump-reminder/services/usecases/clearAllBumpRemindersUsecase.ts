@@ -1,8 +1,8 @@
 // src/bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsecase.ts
 // 全Bumpリマインダーのクリアユースケース
 
-import { tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
 import { type ScheduledReminderRef } from "../helpers/bumpReminderScheduleHelper";
 
 type ClearAllBumpRemindersUsecaseInput = {

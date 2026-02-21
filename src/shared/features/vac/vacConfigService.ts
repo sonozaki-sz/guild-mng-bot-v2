@@ -1,12 +1,12 @@
 // src/shared/features/vac/vacConfigService.ts
 // VAC設定のサービス実装（Repositoryパターン準拠）
 
+import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
 import {
-  getGuildConfigRepository,
   type IVacRepository,
   type VacChannelPair,
   type VacConfig,
-} from "../../database";
+} from "../../database/types";
 
 export const DEFAULT_VAC_CONFIG: VacConfig = {
   enabled: false,

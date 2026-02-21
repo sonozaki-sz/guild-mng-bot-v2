@@ -2,8 +2,8 @@
 // vac-config show のユースケース処理
 
 import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { ValidationError } from "../../../../../shared/errors";
-import { tDefault } from "../../../../../shared/locale";
+import { ValidationError } from "../../../../../shared/errors/customErrors";
+import { tDefault } from "../../../../../shared/locale/localeManager";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { presentVacConfigShow } from "../presenters/vacConfigShowPresenter";

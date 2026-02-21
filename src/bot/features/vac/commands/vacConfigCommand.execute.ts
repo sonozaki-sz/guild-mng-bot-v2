@@ -2,8 +2,8 @@
 // VAC 設定コマンド実行処理
 
 import { ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js";
-import { ValidationError } from "../../../../shared/errors";
-import { tDefault } from "../../../../shared/locale";
+import { ValidationError } from "../../../../shared/errors/customErrors";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { handleVacConfigCreateTrigger } from "./usecases/vacConfigCreateTrigger";
 import { handleVacConfigRemoveTrigger } from "./usecases/vacConfigRemoveTrigger";

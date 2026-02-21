@@ -1,4 +1,4 @@
-import type { IVacRepository } from "@/bot/features/vac/repositories";
+import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
@@ -17,19 +17,22 @@ const executeWithLoggedErrorMock = jest.fn(
 const loggerInfoMock = jest.fn();
 const getVacRepositoryMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/errorHandling", () => ({
   executeWithLoggedError: (operation: () => Promise<void>, message: string) =>
     executeWithLoggedErrorMock(operation, message),
+}));
+
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
-jest.mock("@/bot/features/vac/repositories", () => ({
+jest.mock("@/bot/features/vac/repositories/vacRepository", () => ({
   getVacRepository: (repository?: IVacRepository) =>
     getVacRepositoryMock(repository),
 }));
@@ -134,6 +137,34 @@ describe("bot/features/vac/services/vacService", () => {
       "voice-1",
     );
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not remove records when deleted voice channel is not tracked", async () => {
+    const repository = createRepositoryMock();
+    repository.getVacConfigOrDefault.mockResolvedValue({
+      enabled: true,
+      triggerChannelIds: ["trigger-1"],
+      createdChannels: [
+        {
+          voiceChannelId: "managed-1",
+          ownerId: "user-1",
+          createdAt: 1,
+        },
+      ],
+    });
+    const service = new VacService(repository);
+
+    const channel = {
+      id: "other-voice",
+      guildId: "guild-1",
+      type: ChannelType.GuildVoice,
+      isDMBased: jest.fn(() => false),
+    };
+
+    await service.handleChannelDelete(channel as never);
+
+    expect(repository.removeTriggerChannel).not.toHaveBeenCalled();
+    expect(repository.removeCreatedVacChannel).not.toHaveBeenCalled();
   });
 
   it("ignores channel delete for DM-based and non-voice channels", async () => {

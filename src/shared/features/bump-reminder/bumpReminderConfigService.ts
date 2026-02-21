@@ -1,13 +1,13 @@
 // src/shared/features/bump-reminder/bumpReminderConfigService.ts
 // Bumpリマインダー設定サービス実装（Repositoryパターン準拠）
 
+import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
   BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
-  getGuildConfigRepository,
   type BumpReminderConfig,
   type BumpReminderMentionClearResult,
   type BumpReminderMentionRoleResult,
@@ -15,7 +15,7 @@ import {
   type BumpReminderMentionUserRemoveResult,
   type BumpReminderMentionUsersClearResult,
   type IBumpReminderConfigRepository,
-} from "../../database";
+} from "../../database/types";
 
 export {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,

@@ -4,8 +4,6 @@ import {
   sendBumpReminder,
 } from "@/bot/features/bump-reminder/handlers/bumpReminderHandler";
 
-const getBumpReminderConfigServiceMock = jest.fn();
-const getBumpReminderManagerMock = jest.fn();
 const getBotBumpReminderConfigServiceMock = jest.fn();
 const scheduleBumpReminderMock = jest.fn();
 const getGuildTranslatorMock = jest.fn();
@@ -31,17 +29,9 @@ const toScheduledAtMock = jest.fn(
   (_delayMinutes: number) => new Date("2026-02-20T01:00:00.000Z"),
 );
 
-jest.mock("@/shared/features/bump-reminder", () => ({
-  getBumpReminderConfigService: () => getBumpReminderConfigServiceMock(),
+jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+  getBotBumpReminderConfigService: () => getBotBumpReminderConfigServiceMock(),
 }));
-
-jest.mock(
-  "@/bot/services/botBumpReminderDependencyResolver",
-  () => ({
-    getBotBumpReminderConfigService: () =>
-      getBotBumpReminderConfigServiceMock(),
-  }),
-);
 
 jest.mock(
   "@/bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder",
@@ -51,9 +41,12 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, options?: Record<string, unknown>) =>
     tDefaultMock(key, options),
+}));
+
+jest.mock("@/shared/locale/helpers", () => ({
   getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
 }));
 
@@ -71,17 +64,19 @@ jest.mock("@/bot/utils/messageResponse", () => ({
     createInfoEmbedMock(description, options),
 }));
 
-jest.mock("@/bot/features/bump-reminder", () => {
-  const actual = jest.requireActual(
-    "@/bot/features/bump-reminder",
-  );
-  return {
-    ...actual,
-    getBumpReminderManager: () => getBumpReminderManagerMock(),
-    getReminderDelayMinutes: () => getReminderDelayMinutesMock(),
-    toScheduledAt: (delayMinutes: number) => toScheduledAtMock(delayMinutes),
-  };
-});
+jest.mock(
+  "@/bot/features/bump-reminder/constants/bumpReminderConstants",
+  () => {
+    const actual = jest.requireActual(
+      "@/bot/features/bump-reminder/constants/bumpReminderConstants",
+    );
+    return {
+      ...actual,
+      getReminderDelayMinutes: () => getReminderDelayMinutesMock(),
+      toScheduledAt: (delayMinutes: number) => toScheduledAtMock(delayMinutes),
+    };
+  },
+);
 
 // bump-reminder handler の検知・パネル送信・通知送信の主要分岐を検証
 describe("bot/features/bump-reminder/bumpReminderHandler", () => {

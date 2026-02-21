@@ -4,7 +4,7 @@ import { safeReply } from "@/bot/utils/interaction";
 const isManagedVacChannelMock = jest.fn();
 const getAfkConfigMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(
     async (_guildId: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.members_moved") {

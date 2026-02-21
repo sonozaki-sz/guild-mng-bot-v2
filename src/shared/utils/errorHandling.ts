@@ -1,7 +1,7 @@
 // src/shared/utils/errorHandling.ts
 // 共通エラーハンドリングユーティリティ
 
-import { DatabaseError } from "../errors";
+import { DatabaseError } from "../errors/customErrors";
 import { logger } from "./logger";
 
 /**

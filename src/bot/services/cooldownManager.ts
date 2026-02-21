@@ -1,8 +1,8 @@
 // src/bot/services/cooldownManager.ts
 // コマンドクールダウン管理
 
-import { tDefault } from "../../shared/locale";
-import { logger } from "../../shared/utils";
+import { tDefault } from "../../shared/locale/localeManager";
+import { logger } from "../../shared/utils/logger";
 
 /**
  * コマンドのクールダウンを管理するクラス

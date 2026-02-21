@@ -2,7 +2,7 @@
 // Discord向けステータスEmbed生成ユーティリティ
 
 import { EmbedBuilder } from "discord.js";
-import { tDefault } from "../../shared/locale";
+import { tDefault } from "../../shared/locale/localeManager";
 
 export type MessageStatus = "success" | "info" | "warning" | "error";
 

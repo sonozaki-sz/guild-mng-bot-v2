@@ -2,7 +2,7 @@
 // Bumpリマインダー作成ユースケース
 
 import type { PrismaClient } from "@prisma/client";
-import { BUMP_REMINDER_STATUS } from "../../constants";
+import { BUMP_REMINDER_STATUS } from "../../constants/bumpReminderConstants";
 import type { BumpReminder } from "../types";
 
 /**

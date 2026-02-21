@@ -2,8 +2,8 @@
 // Bumpリマインダー用のジョブマネージャー
 // DB永続化対応：Bot再起動時もリマインダーを復元可能
 
-import { type BumpServiceName } from "../constants";
-import { type IBumpReminderRepository } from "../repositories";
+import { type BumpServiceName } from "../constants/bumpReminderConstants";
+import { type IBumpReminderRepository } from "../repositories/types";
 import { type ScheduledReminderRef } from "./helpers/bumpReminderScheduleHelper";
 import { cancelBumpReminderUsecase } from "./usecases/cancelBumpReminderUsecase";
 import { clearAllBumpRemindersUsecase } from "./usecases/clearAllBumpRemindersUsecase";

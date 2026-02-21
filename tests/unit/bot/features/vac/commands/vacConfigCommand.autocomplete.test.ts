@@ -2,7 +2,7 @@ import { autocompleteVacConfigCommand } from "@/bot/features/vac/commands/vacCon
 import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand.constants";
 import { ChannelType } from "discord.js";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(async (_guildId: string, _key: string) => "TOP"),
 }));
 

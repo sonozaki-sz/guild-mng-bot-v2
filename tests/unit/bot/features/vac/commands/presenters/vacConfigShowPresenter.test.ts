@@ -1,8 +1,8 @@
 import { presentVacConfigShow } from "@/bot/features/vac/commands/presenters/vacConfigShowPresenter";
-import type { VacConfig } from "@/shared/database";
+import type { VacConfig } from "@/shared/database/types";
 import { ChannelType } from "discord.js";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => {
     const labels: Record<string, string> = {
       "commands:vac-config.embed.top": "TOP",

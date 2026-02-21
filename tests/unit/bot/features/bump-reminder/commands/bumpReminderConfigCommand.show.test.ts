@@ -7,7 +7,7 @@ const createInfoEmbedMock = jest.fn((description: string) => ({
   kind: "info",
 }));
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(async () => "translated"),
 }));
 

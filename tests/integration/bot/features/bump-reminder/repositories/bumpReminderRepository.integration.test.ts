@@ -3,11 +3,11 @@
  * Bumpリマインダー永続化の統合テスト
  */
 
-import { DatabaseError } from "@/shared/errors/customErrors";
 import {
   BumpReminderRepository,
   getBumpReminderRepository,
-} from "@/bot/features/bump-reminder";
+} from "@/bot/features/bump-reminder/repositories/bumpReminderRepository";
+import { DatabaseError } from "@/shared/errors/customErrors";
 
 // Logger のモック
 jest.mock("@/shared/utils/logger", () => ({
@@ -20,7 +20,7 @@ jest.mock("@/shared/utils/logger", () => ({
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 

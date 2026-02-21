@@ -3,7 +3,7 @@ import { handleBumpMessageCreate } from "@/bot/features/bump-reminder/handlers/b
 const resolveBumpServiceMock = jest.fn();
 const handleBumpDetectedMock = jest.fn();
 
-jest.mock("@/shared/config", () => ({
+jest.mock("@/shared/config/env", () => ({
   NODE_ENV: { PRODUCTION: "production" },
   env: {
     NODE_ENV: "test",
@@ -11,7 +11,7 @@ jest.mock("@/shared/config", () => ({
   },
 }));
 
-jest.mock("@/bot/features/bump-reminder", () => ({
+jest.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
   BUMP_COMMANDS: {
     DISBOARD: "/bump",
     DISSOKU: "/dissoku up",

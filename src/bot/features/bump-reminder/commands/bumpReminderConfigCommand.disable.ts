@@ -2,8 +2,8 @@
 // bump-reminder-config disable 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import {
   getBotBumpReminderConfigService,
   getBotBumpReminderManager,

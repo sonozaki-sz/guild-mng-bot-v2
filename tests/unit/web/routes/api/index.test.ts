@@ -1,5 +1,5 @@
 import { apiAuthPlugin } from "@/web/middleware/auth";
-import { apiRoutes } from "@/web/routes/api";
+import { apiRoutes } from "@/web/routes/api/apiRoutes";
 
 jest.mock("@/web/middleware/auth", () => ({
   apiAuthPlugin: jest.fn(async () => undefined),

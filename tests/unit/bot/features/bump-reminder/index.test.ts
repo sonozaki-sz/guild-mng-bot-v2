@@ -1,19 +1,14 @@
 describe("bot/features/bump-reminder/index", () => {
-  it("re-exports constants/services/repositories", async () => {
-    const indexModule = await import("@/bot/features/bump-reminder");
+  it("exposes core symbols from concrete modules", async () => {
     const constantsModule =
-      await import("@/bot/features/bump-reminder/constants");
+      await import("@/bot/features/bump-reminder/constants/bumpReminderConstants");
     const servicesModule =
-      await import("@/bot/features/bump-reminder/services");
+      await import("@/bot/features/bump-reminder/services/bumpReminderService");
     const repositoriesModule =
-      await import("@/bot/features/bump-reminder/repositories");
+      await import("@/bot/features/bump-reminder/repositories/bumpReminderRepository");
 
-    expect(indexModule.BUMP_SERVICES).toBe(constantsModule.BUMP_SERVICES);
-    expect(indexModule.getBumpReminderManager).toBe(
-      servicesModule.getBumpReminderManager,
-    );
-    expect(indexModule.getBumpReminderRepository).toBe(
-      repositoriesModule.getBumpReminderRepository,
-    );
+    expect(constantsModule.BUMP_SERVICES).toBeDefined();
+    expect(servicesModule.getBumpReminderManager).toBeDefined();
+    expect(repositoriesModule.getBumpReminderRepository).toBeDefined();
   });
 });

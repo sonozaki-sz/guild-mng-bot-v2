@@ -5,7 +5,7 @@ import {
 } from "@/shared/database/stores/helpers/bumpReminderConfigCas";
 import { updateBumpReminderConfigUseCase } from "@/shared/database/stores/usecases/updateBumpReminderConfig";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn(() => "update-config-failed"),
 }));
 

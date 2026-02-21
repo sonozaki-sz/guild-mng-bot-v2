@@ -2,7 +2,7 @@
 // Bumpリマインダーの期限超過データ削除ユースケース
 
 import type { PrismaClient } from "@prisma/client";
-import { BUMP_REMINDER_STATUS } from "../../constants";
+import { BUMP_REMINDER_STATUS } from "../../constants/bumpReminderConstants";
 
 /**
  * 指定日数より古い送信済み/キャンセル済みリマインダーを削除する

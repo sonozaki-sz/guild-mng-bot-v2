@@ -1,4 +1,4 @@
-// src/bot/events/index.ts
+// src/bot/events/events.ts
 // イベント一覧をエクスポート
 
 import { channelDeleteEvent } from "./channelDelete";
@@ -8,7 +8,6 @@ import { messageCreateEvent } from "./messageCreate";
 import { voiceStateUpdateEvent } from "./voiceStateUpdate";
 
 export const events = [
-  // 登録順序を明示し、起動時に一括登録する
   channelDeleteEvent,
   interactionCreateEvent,
   clientReadyEvent,

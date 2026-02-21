@@ -2,7 +2,7 @@
 // VACのチャンネル削除同期イベント
 
 import { Events } from "discord.js";
-import { handleVacChannelDelete } from "../features/vac/handlers";
+import { handleVacChannelDelete } from "../features/vac/handlers/vacChannelDelete";
 import type { BotEvent } from "../types/discord";
 
 export const channelDeleteEvent: BotEvent<typeof Events.ChannelDelete> = {

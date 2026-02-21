@@ -1,5 +1,5 @@
-// src/shared/locale/locales/en/index.ts
-// English translation resources export
+// src/shared/locale/locales/ja/resources.ts
+// 日本語翻訳リソースのエクスポート
 
 import { commands } from "./commands";
 import { common } from "./common";
@@ -7,8 +7,7 @@ import { errors } from "./errors";
 import { events } from "./events";
 import { system } from "./system";
 
-export const en = {
-  // i18next namespace 構成（common / commands / errors / events / system）
+export const ja = {
   common,
   commands,
   errors,
@@ -16,4 +15,4 @@ export const en = {
   system,
 } as const;
 
-export type EnglishTranslations = typeof en;
+export type JapaneseTranslations = typeof ja;

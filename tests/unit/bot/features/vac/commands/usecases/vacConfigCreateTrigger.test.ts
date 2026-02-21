@@ -5,10 +5,10 @@ import {
 import { handleVacConfigCreateTrigger } from "@/bot/features/vac/commands/usecases/vacConfigCreateTrigger";
 import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
-import { ValidationError } from "@/shared/errors";
+import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => key),
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));

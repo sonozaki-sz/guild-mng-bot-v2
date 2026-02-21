@@ -1,12 +1,12 @@
 // src/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver.ts
 // bump-reminder 設定サービスの依存解決
 
-import { type IBumpReminderConfigRepository } from "../../../../shared/database";
+import { type IBumpReminderConfigRepository } from "../../../../shared/database/types";
 import {
   BumpReminderConfigService,
   createBumpReminderConfigService,
   getBumpReminderConfigService,
-} from "../../../../shared/features/bump-reminder";
+} from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
 
 let cachedService: BumpReminderConfigService | undefined;
 let cachedRepository: IBumpReminderConfigRepository | undefined;

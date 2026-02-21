@@ -1,33 +1,3 @@
-// src/shared/database/index.ts
-// Database module exports
-
-export {
-  createGuildConfigRepository,
-  PrismaGuildConfigRepository,
-} from "./repositories/guildConfigRepository";
-export {
-  BUMP_REMINDER_MENTION_CLEAR_RESULT,
-  BUMP_REMINDER_MENTION_ROLE_RESULT,
-  BUMP_REMINDER_MENTION_USER_ADD_RESULT,
-  BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
-  BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
-} from "./types";
-export type {
-  BumpReminderConfig,
-  BumpReminderMentionClearResult,
-  BumpReminderMentionRoleResult,
-  BumpReminderMentionUserAddResult,
-  BumpReminderMentionUserRemoveResult,
-  BumpReminderMentionUsersClearResult,
-  IAfkRepository,
-  IBaseGuildRepository,
-  IBumpReminderConfigRepository,
-  IGuildConfigRepository,
-  IVacRepository,
-  VacChannelPair,
-  VacConfig,
-} from "./types";
-
 import type { PrismaClient } from "@prisma/client";
 import { createGuildConfigRepository } from "./repositories/guildConfigRepository";
 import type { IGuildConfigRepository } from "./types";

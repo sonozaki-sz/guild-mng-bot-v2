@@ -6,8 +6,8 @@ import {
   type ChatInputCommandInteraction,
   MessageFlags,
 } from "discord.js";
-import { ValidationError } from "../../../../../shared/errors";
-import { tDefault, tGuild } from "../../../../../shared/locale";
+import { ValidationError } from "../../../../../shared/errors/customErrors";
+import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import {
