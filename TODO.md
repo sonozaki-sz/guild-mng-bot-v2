@@ -306,7 +306,7 @@
   - 対象: `bumpReminderService.ts` + `services/*`
   - 目標: 復元/登録/取消ロジックの関心分離
   - コミット例: `refactor: bump-reminder service を用途別に分割`
-- [ ] **C6: guildConfigRepository のファサード薄化（機能別集約）**
+- [x] **C6: guildConfigRepository のファサード薄化（機能別集約）**
   - 対象: `shared/database/repositories/*`
   - 目標: 機能別エントリへ分割し、集約層は委譲のみへ縮小
   - コミット例: `refactor: guildConfigRepository を機能別ファサードへ再編`

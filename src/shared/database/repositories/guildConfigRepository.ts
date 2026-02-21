@@ -5,6 +5,8 @@ import type { PrismaClient } from "@prisma/client";
 import { DatabaseError } from "../../errors";
 import { GuildAfkConfigStore } from "../stores/guildAfkConfigStore";
 import { GuildBumpReminderConfigStore } from "../stores/guildBumpReminderConfigStore";
+import { GuildMemberLogConfigStore } from "../stores/guildMemberLogConfigStore";
+import { GuildStickMessageStore } from "../stores/guildStickMessageStore";
 import { GuildVacConfigStore } from "../stores/guildVacConfigStore";
 import type {
   AfkConfig,
@@ -24,8 +26,6 @@ import {
   existsGuildConfigRecord,
   findGuildConfigRecord,
   findGuildLocale,
-  findMemberLogConfigJson,
-  findStickMessagesJson,
 } from "./persistence/guildConfigReadPersistence";
 import {
   createGuildConfigRecord,
@@ -57,6 +57,8 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   private readonly afkConfigStore: GuildAfkConfigStore;
   private readonly bumpReminderStore: GuildBumpReminderConfigStore;
   private readonly vacConfigStore: GuildVacConfigStore;
+  private readonly stickMessageStore: GuildStickMessageStore;
+  private readonly memberLogConfigStore: GuildMemberLogConfigStore;
 
   constructor(prisma: PrismaClient) {
     // Prisma 参照を保持し、機能別ストアへ safeJsonParse を注入
@@ -75,6 +77,16 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
       prisma,
       this.DEFAULT_LOCALE,
       parseJsonSafe,
+    );
+    this.stickMessageStore = new GuildStickMessageStore(
+      prisma,
+      parseJsonSafe,
+      (guildId, updates) => this.updateConfig(guildId, updates),
+    );
+    this.memberLogConfigStore = new GuildMemberLogConfigStore(
+      prisma,
+      parseJsonSafe,
+      (guildId, updates) => this.updateConfig(guildId, updates),
     );
   }
 
@@ -301,38 +313,35 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    * 固定メッセージ設定一覧を取得する
    */
   async getStickMessages(guildId: string): Promise<StickMessage[]> {
-    // stickMessages カラムのみ select
-    const stickMessagesJson = await findStickMessagesJson(this.prisma, guildId);
-    // 未設定/不正JSONは空配列へフォールバック
-    return parseJsonSafe<StickMessage[]>(stickMessagesJson) ?? [];
+    // 固定メッセージ設定取得は専用ストアへ委譲
+    return this.stickMessageStore.getStickMessages(guildId);
   }
 
   async updateStickMessages(
     guildId: string,
     stickMessages: StickMessage[],
   ): Promise<void> {
-    // 統一更新ルート（upsert含む）へ委譲
-    await this.updateConfig(guildId, { stickMessages });
+    // 固定メッセージ設定更新は専用ストアへ委譲
+    await this.stickMessageStore.updateStickMessages(guildId, stickMessages);
   }
 
   /**
    * メンバーログ設定を取得する
    */
   async getMemberLogConfig(guildId: string): Promise<MemberLogConfig | null> {
-    // memberLogConfig カラムのみ select
-    const memberLogConfigJson = await findMemberLogConfigJson(
-      this.prisma,
-      guildId,
-    );
-    return parseJsonSafe<MemberLogConfig>(memberLogConfigJson) ?? null;
+    // メンバーログ設定取得は専用ストアへ委譲
+    return this.memberLogConfigStore.getMemberLogConfig(guildId);
   }
 
   async updateMemberLogConfig(
     guildId: string,
     memberLogConfig: MemberLogConfig,
   ): Promise<void> {
-    // 統一更新ルート（upsert含む）へ委譲
-    await this.updateConfig(guildId, { memberLogConfig });
+    // メンバーログ設定更新は専用ストアへ委譲
+    await this.memberLogConfigStore.updateMemberLogConfig(
+      guildId,
+      memberLogConfig,
+    );
   }
 }
 
