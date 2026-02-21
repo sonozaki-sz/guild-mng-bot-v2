@@ -232,7 +232,7 @@
   - 完了条件: pending取得/状態更新/クリーンアップ/ログ整形を独立モジュール化
   - コミット例: `refactor: bump reminder repository を query 単位で分離`
 
-- [ ] **SRC-006** `shared/database/index.ts` の暗黙DIを縮退し明示注入へ寄せる
+- [x] **SRC-006** `shared/database/index.ts` の暗黙DIを縮退し明示注入へ寄せる
   - 完了条件: 新規呼び出しで `requirePrismaClient` 非依存、段階移行の互換経路を用意
   - コミット例: `refactor: shared database を明示DI優先へ移行`
 

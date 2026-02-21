@@ -29,7 +29,6 @@ export type {
 } from "./types";
 
 import type { PrismaClient } from "@prisma/client";
-import { requirePrismaClient } from "../utils";
 import { createGuildConfigRepository } from "./repositories/guildConfigRepository";
 import type { IGuildConfigRepository } from "./types";
 
@@ -37,25 +36,44 @@ import type { IGuildConfigRepository } from "./types";
 // Prismaクライアントが差し替えられた場合（テスト等）は自動的に再生成する
 let _cachedRepository: IGuildConfigRepository | undefined;
 let _cachedPrisma: PrismaClient | undefined;
+let _defaultRepository: IGuildConfigRepository | undefined;
+
+/**
+ * デフォルトの GuildConfigRepository を登録する（互換レイヤー）
+ * @param repository 登録する repository
+ */
+export function setDefaultGuildConfigRepository(
+  repository: IGuildConfigRepository,
+): void {
+  _defaultRepository = repository;
+}
 
 /**
  * GuildConfigRepositoryのシングルトンを返す
  * Prismaクライアントが変わった場合（テスト時のモック差し替えなど）は自動的に再生成する
- * @param prisma 明示的に利用する Prisma クライアント（未指定時は requirePrismaClient を使用）
+ * @param prisma 明示的に利用する Prisma クライアント（推奨）
  */
 export function getGuildConfigRepository(
   prisma?: PrismaClient,
 ): IGuildConfigRepository {
-  // 明示注入を優先し、未指定時のみ既存の global accessor を使う
-  const resolvedPrisma = prisma ?? requirePrismaClient();
-  // Prisma 差し替え時（主にテスト）や初回呼び出し時に repository を再生成
-  if (!_cachedRepository || _cachedPrisma !== resolvedPrisma) {
-    // 依存 Prisma に紐づく新しい repository を生成
-    _cachedRepository = createGuildConfigRepository(resolvedPrisma);
-    _cachedPrisma = resolvedPrisma;
+  if (prisma) {
+    // Prisma 差し替え時（主にテスト）や初回呼び出し時に repository を再生成
+    if (!_cachedRepository || _cachedPrisma !== prisma) {
+      // 依存 Prisma に紐づく新しい repository を生成
+      _cachedRepository = createGuildConfigRepository(prisma);
+      _cachedPrisma = prisma;
+    }
+    _defaultRepository = _cachedRepository;
+    return _cachedRepository;
   }
-  // 現在有効な repository シングルトンを返す
-  return _cachedRepository;
+
+  if (_defaultRepository) {
+    return _defaultRepository;
+  }
+
+  throw new Error(
+    "GuildConfigRepository is not initialized. Pass PrismaClient explicitly or register default repository first.",
+  );
 }
 
 /**
@@ -65,4 +83,5 @@ export function resetGuildConfigRepositoryCache(): void {
   // テストごとに repository / prisma の関連付けをクリア
   _cachedRepository = undefined;
   _cachedPrisma = undefined;
+  _defaultRepository = undefined;
 }
