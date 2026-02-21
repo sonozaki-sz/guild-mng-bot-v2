@@ -224,7 +224,7 @@
   - 完了条件: manager本体は schedule/cancel/restore の調停のみを担当
   - コミット例: `refactor: bump reminder manager を責務分離`
 
-- [ ] **SRC-004** `guildConfigRepository.ts` を facade 化し、機能別委譲を徹底
+- [x] **SRC-004** `guildConfigRepository.ts` を facade 化し、機能別委譲を徹底
   - 完了条件: repository本体からJSON変換・機能別更新責務を分離し、委譲中心へ
   - コミット例: `refactor: guild config repository を facade 化`
 
