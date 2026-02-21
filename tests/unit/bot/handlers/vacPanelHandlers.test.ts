@@ -1,7 +1,13 @@
 import { vacPanelButtonHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelButton";
 import { vacPanelModalHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelModal";
 import { vacPanelUserSelectHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelUserSelect";
-import { safeReply } from "../../../../src/shared/utils/interaction";
+import { safeReply } from "../../../../src/bot/utils/interaction";
+
+const isManagedVacChannelMock = jest.fn().mockResolvedValue(true);
+const getAfkConfigMock = jest.fn();
+const getGuildConfigRepositoryMock = jest.fn(() => ({
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
+}));
 
 // VAC パネル customId 定数を固定化して matches 判定を検証しやすくする
 jest.mock(
@@ -24,21 +30,30 @@ jest.mock(
 );
 
 // 外部依存の副作用を抑えるため、呼び出し不要なモジュールはダミー化
-jest.mock("../../../../src/shared/features/vac", () => ({
-  isManagedVacChannel: jest.fn(),
-}));
-jest.mock("../../../../src/shared/database", () => ({
-  getGuildConfigRepository: jest.fn(() => ({
-    getAfkConfig: jest.fn(),
+jest.mock("../../../../src/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: jest.fn(() => ({
+    isManagedVacChannel: isManagedVacChannelMock,
   })),
+}));
+jest.mock("../../../../src/shared/features/vac", () => ({
+  isManagedVacChannel: isManagedVacChannelMock,
+}));
+jest.mock(
+  "../../../../src/bot/services/botGuildConfigRepositoryResolver",
+  () => ({
+    getBotGuildConfigRepository: jest.fn(() => getGuildConfigRepositoryMock()),
+  }),
+);
+jest.mock("../../../../src/shared/database", () => ({
+  getGuildConfigRepository: getGuildConfigRepositoryMock,
 }));
 jest.mock("../../../../src/shared/locale", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
-jest.mock("../../../../src/shared/utils/interaction", () => ({
+jest.mock("../../../../src/bot/utils/interaction", () => ({
   safeReply: jest.fn(),
 }));
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createErrorEmbed: jest.fn((message: string) => ({ message })),
   createSuccessEmbed: jest.fn((message: string) => ({ message })),
 }));
@@ -47,6 +62,7 @@ describe("bot/features/vac/ui handlers", () => {
   // 各ケース前にモックを初期化する
   beforeEach(() => {
     jest.clearAllMocks();
+    getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: "afk-1" });
   });
 
   // `matches` が customId prefix ベースで判定できることを検証

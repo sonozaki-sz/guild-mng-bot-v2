@@ -3,13 +3,11 @@ import { pingCommand } from "../../../src/bot/commands/ping";
 import { interactionCreateEvent } from "../../../src/bot/events/interactionCreate";
 
 // コマンド・イベント結合検証のため、翻訳とEmbed生成のみ固定化する
-jest.mock("../../../src/shared/locale/commandLocalizations", () => ({
+jest.mock("../../../src/shared/locale", () => ({
   getCommandLocalizations: () => ({
     ja: "ping description",
     localizations: { "en-US": "ping description" },
   }),
-}));
-jest.mock("../../../src/shared/locale", () => ({
   tDefault: jest.fn((key: string) => key),
   tGuild: jest.fn(
     async (
@@ -27,11 +25,11 @@ jest.mock("../../../src/shared/locale", () => ({
     },
   ),
 }));
-jest.mock("../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
   handleInteractionError: jest.fn(),
 }));
-jest.mock("../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../src/bot/utils/messageResponse", () => ({
   createSuccessEmbed: jest.fn((description: string) => ({ description })),
 }));
 jest.mock("../../../src/shared/utils/logger", () => ({

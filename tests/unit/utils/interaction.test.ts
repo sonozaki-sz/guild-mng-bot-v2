@@ -1,5 +1,5 @@
 import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
-import { safeReply } from "../../../src/shared/utils/interaction";
+import { safeReply } from "../../../src/bot/utils/interaction";
 
 type InteractionLike = {
   replied: boolean;

@@ -3,10 +3,8 @@
  * Prisma Repositoryの統合テスト
  */
 
-import {
-  PrismaGuildConfigRepository,
-  type GuildConfig,
-} from "../../../src/shared/database/repositories/guildConfigRepository";
+import { PrismaGuildConfigRepository } from "../../../src/shared/database/repositories/guildConfigRepository";
+import type { GuildConfig } from "../../../src/shared/database/types";
 import { DatabaseError } from "../../../src/shared/errors/customErrors";
 
 // Logger のモック
@@ -269,8 +267,8 @@ describe("PrismaGuildConfigRepository", () => {
     it("should update AFK config with CAS when configured", async () => {
       // 既存値一致を条件に CAS で更新する
       const currentConfig = {
-        enabled: false,
-        channelId: "old-vc",
+        enabled: true,
+        channelId: "vc-1",
       };
 
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
@@ -410,9 +408,8 @@ describe("PrismaGuildConfigRepository", () => {
     it("should update existing bump config while preserving mentions", async () => {
       const currentConfig = {
         enabled: true,
-        channelId: "old-ch",
-        mentionRoleId: "role-a",
-        mentionUserIds: ["user-a"],
+        channelId: "ch-1",
+        mentionUserIds: [],
       };
 
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
@@ -431,8 +428,8 @@ describe("PrismaGuildConfigRepository", () => {
           bumpReminderConfig: JSON.stringify({
             ...currentConfig,
             enabled: false,
-            channelId: "old-ch",
-            mentionUserIds: ["user-a"],
+            channelId: "ch-1",
+            mentionUserIds: [],
           }),
         },
       });

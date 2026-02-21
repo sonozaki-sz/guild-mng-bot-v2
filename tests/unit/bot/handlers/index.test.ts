@@ -1,4 +1,4 @@
-import { bumpPanelButtonHandler } from "../../../../src/bot/features/bump-reminder/ui/bumpPanelButtonHandler";
+import { bumpPanelButtonHandler } from "../../../../src/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
 import { vacPanelButtonHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelButton";
 import { vacPanelModalHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelModal";
 import { vacPanelUserSelectHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelUserSelect";
@@ -8,7 +8,7 @@ import { userSelectHandlers } from "../../../../src/bot/handlers/interactionCrea
 
 // 重い依存を避けるため、各ハンドラ本体は最小スタブを注入する
 jest.mock(
-  "../../../../src/bot/features/bump-reminder/ui/bumpPanelButtonHandler",
+  "../../../../src/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler",
   () => ({
     bumpPanelButtonHandler: {
       matches: jest.fn(() => false),

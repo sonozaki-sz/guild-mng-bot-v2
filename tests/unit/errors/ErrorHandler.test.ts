@@ -4,6 +4,7 @@
  */
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import { handleCommandError } from "../../../src/bot/errors/interactionErrorHandler";
 import { NODE_ENV, env } from "../../../src/shared/config/env";
 import {
   BaseError,
@@ -12,13 +13,12 @@ import {
 } from "../../../src/shared/errors/customErrors";
 import {
   getUserFriendlyMessage,
-  handleCommandError,
   logError,
 } from "../../../src/shared/errors/errorHandler";
-import { logger } from "../../../src/shared/utils/logger";
+import { logger } from "../../../src/shared/utils";
 
 // Logger のモック
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("../../../src/shared/utils", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),

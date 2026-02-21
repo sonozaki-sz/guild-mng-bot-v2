@@ -1,8 +1,8 @@
+import { handleInteractionError } from "../../../src/bot/errors/interactionErrorHandler";
 import { interactionCreateEvent } from "../../../src/bot/events/interactionCreate";
-import { handleInteractionError } from "../../../src/shared/errors/errorHandler";
 
 // エラーハンドラは呼び出し確認だけ行う
-jest.mock("../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
   handleInteractionError: jest.fn(),
 }));

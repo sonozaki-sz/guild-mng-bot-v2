@@ -34,13 +34,12 @@ describe("shared/locale/helpers", () => {
     );
   });
 
-  // 後方互換パラメータ（repository）を渡しても正常に解決されることを検証
-  it("accepts backward-compatible repository parameter", async () => {
+  // 追加パラメータなしで guild translator を解決できることを検証
+  it("resolves translator without repository parameter", async () => {
     const fixedT = jest.fn((key: string) => key);
     getGuildTMock.mockResolvedValue(fixedT);
 
-    const repository = { getLocale: jest.fn() };
-    await getGuildTranslator("guild-2", repository as never);
+    await getGuildTranslator("guild-2");
 
     expect(getGuildTMock).toHaveBeenCalledWith("guild-2");
   });

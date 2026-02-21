@@ -6,10 +6,15 @@
 export {
   BUMP_COMMANDS,
   BUMP_CONSTANTS,
+  BUMP_DETECTION_RULES,
+  BUMP_REMINDER_STATUS,
   BUMP_SERVICES,
   getReminderDelayMinutes,
+  isBumpServiceName,
   resolveBumpService,
+  toBumpReminderJobId,
   toScheduledAt,
+  type BumpReminderStatus,
   type BumpServiceName,
 } from "./constants";
 

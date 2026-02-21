@@ -28,7 +28,7 @@ type BootResult = {
   };
   setupGlobalErrorHandlers: jest.Mock;
   setupGracefulShutdown: jest.Mock;
-  registerBotEvent: jest.Mock;
+  registerBotEvents: jest.Mock;
   routes: {
     applicationGuildCommands: jest.Mock;
     applicationCommands: jest.Mock;
@@ -69,7 +69,7 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
 
   const setupGlobalErrorHandlers = jest.fn();
   const setupGracefulShutdown = jest.fn();
-  const registerBotEvent = jest.fn();
+  const registerBotEvents = jest.fn();
 
   const logger = {
     info: jest.fn(),
@@ -124,7 +124,7 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     getGuildConfigRepository: jest.fn(() => ({ mocked: true })),
   }));
 
-  jest.doMock("../../../src/shared/errors/errorHandler", () => ({
+  jest.doMock("../../../src/shared/errors", () => ({
     setupGlobalErrorHandlers,
     setupGracefulShutdown,
   }));
@@ -137,14 +137,17 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     tDefault: jest.fn((key: string) => key),
   }));
 
-  jest.doMock("../../../src/shared/types/discord", () => ({
-    registerBotEvent,
+  jest.doMock("../../../src/shared/utils", () => ({
+    logger,
+    setPrismaClient: jest.fn(),
   }));
 
-  jest.doMock("../../../src/shared/utils/logger", () => ({ logger }));
+  jest.doMock("../../../src/bot/services/botEventRegistration", () => ({
+    registerBotEvents,
+  }));
 
-  jest.doMock("../../../src/shared/utils/prisma", () => ({
-    setPrismaClient: jest.fn(),
+  jest.doMock("../../../src/bot/services/botCompositionRoot", () => ({
+    initializeBotCompositionRoot: jest.fn(),
   }));
 
   jest.doMock("../../../src/bot/client", () => ({
@@ -168,7 +171,7 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     prisma,
     setupGlobalErrorHandlers,
     setupGracefulShutdown,
-    registerBotEvent,
+    registerBotEvents,
     routes,
     processExitSpy,
   };
@@ -197,7 +200,7 @@ describe("bot/main", () => {
       "ping",
       expect.any(Object),
     );
-    expect(boot.registerBotEvent).toHaveBeenCalledTimes(1);
+    expect(boot.registerBotEvents).toHaveBeenCalledTimes(1);
     expect(boot.client.login).toHaveBeenCalledWith("test-token");
 
     const shutdownHandler = boot.setupGracefulShutdown.mock

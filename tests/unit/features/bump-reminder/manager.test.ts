@@ -2,7 +2,7 @@ import {
   BumpReminderManager,
   getBumpReminderManager,
 } from "../../../../src/bot/features/bump-reminder";
-import { logger } from "../../../../src/shared/utils/logger";
+import { logger } from "../../../../src/shared/utils";
 
 const addOneTimeJobMock = jest.fn();
 const removeJobMock = jest.fn();
@@ -16,7 +16,7 @@ jest.mock("../../../../src/shared/locale", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("../../../../src/shared/utils/logger", () => ({
+jest.mock("../../../../src/shared/utils", () => ({
   logger: {
     info: jest.fn(),
     debug: jest.fn(),
@@ -37,7 +37,7 @@ jest.mock("../../../../src/shared/scheduler/jobScheduler", () => ({
 }));
 
 jest.mock(
-  "../../../../src/bot/features/bump-reminder/bumpReminderRepository",
+  "../../../../src/bot/features/bump-reminder/repositories/bumpReminderRepository",
   () => ({
     getBumpReminderRepository: () => repositoryMock,
   }),
@@ -52,7 +52,7 @@ describe("shared/features/bump-reminder/manager", () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date("2026-02-20T00:00:00.000Z"));
     jest.clearAllMocks();
-    manager = new BumpReminderManager();
+    manager = new BumpReminderManager(repositoryMock as never);
   });
 
   afterEach(() => {
@@ -408,7 +408,7 @@ describe("shared/features/bump-reminder/manager", () => {
 
   // getBumpReminderManager は同一インスタンスを返すことを検証
   it("returns singleton instance from getBumpReminderManager", () => {
-    const first = getBumpReminderManager();
+    const first = getBumpReminderManager(repositoryMock as never);
     const second = getBumpReminderManager();
 
     expect(first).toBe(second);

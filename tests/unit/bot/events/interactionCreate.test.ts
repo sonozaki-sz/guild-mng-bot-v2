@@ -1,14 +1,14 @@
 import { Events, MessageFlags } from "discord.js";
-import { interactionCreateEvent } from "../../../../src/bot/events/interactionCreate";
 import {
   handleCommandError,
   handleInteractionError,
-} from "../../../../src/shared/errors/errorHandler";
+} from "../../../../src/bot/errors/interactionErrorHandler";
+import { interactionCreateEvent } from "../../../../src/bot/events/interactionCreate";
 import { tGuild } from "../../../../src/shared/locale";
 import { logger } from "../../../../src/shared/utils/logger";
 
 // ErrorHandler は呼び出し有無の検証に限定する
-jest.mock("../../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
   handleInteractionError: jest.fn(),
 }));
@@ -50,16 +50,19 @@ jest.mock("../../../../src/bot/handlers/interactionCreate/ui/modals", () => {
     __mockModalHandler: mockModalHandler,
   };
 });
-jest.mock("../../../../src/bot/handlers/interactionCreate/ui/selectMenus", () => {
-  const mockUserSelectHandler = {
-    matches: jest.fn(() => false),
-    execute: jest.fn().mockResolvedValue(undefined),
-  };
-  return {
-    userSelectHandlers: [mockUserSelectHandler],
-    __mockUserSelectHandler: mockUserSelectHandler,
-  };
-});
+jest.mock(
+  "../../../../src/bot/handlers/interactionCreate/ui/selectMenus",
+  () => {
+    const mockUserSelectHandler = {
+      matches: jest.fn(() => false),
+      execute: jest.fn().mockResolvedValue(undefined),
+    };
+    return {
+      userSelectHandlers: [mockUserSelectHandler],
+      __mockUserSelectHandler: mockUserSelectHandler,
+    };
+  },
+);
 
 type BaseInteraction = {
   client: {
@@ -356,8 +359,8 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // modal registry 非一致時に client.modals へフォールバックすることを検証
-  it("falls back to client modal collection when registry has no match", async () => {
+  // modal registry 非一致時は client.modals を使わず警告して終了することを検証
+  it("does not use client modal collection when registry has no match", async () => {
     const mockedModalModule = jest.requireMock(
       "../../../../src/bot/handlers/interactionCreate/ui/modals",
     ) as {
@@ -376,9 +379,9 @@ describe("bot/events/interactionCreate", () => {
 
     await interactionCreateEvent.execute(interaction as never);
 
-    expect(modalExecute).toHaveBeenCalledWith(interaction);
-    expect(logger.debug).toHaveBeenCalledWith(
-      "default:system:interaction.modal_submitted",
+    expect(modalExecute).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      "default:system:interaction.unknown_modal",
     );
   });
 
@@ -405,8 +408,8 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // modal fallback 実行失敗時は interaction error ハンドラへ委譲することを検証
-  it("delegates modal fallback error to interaction error handler", async () => {
+  // registry 非一致時は fallback モーダルの失敗も発生せず interaction error へ委譲しない
+  it("does not delegate modal collection errors when registry has no match", async () => {
     const mockedModalModule = jest.requireMock(
       "../../../../src/bot/handlers/interactionCreate/ui/modals",
     ) as {
@@ -426,10 +429,8 @@ describe("bot/events/interactionCreate", () => {
 
     await interactionCreateEvent.execute(interaction as never);
 
-    expect(handleInteractionError).toHaveBeenCalledWith(
-      interaction,
-      modalError,
-    );
+    expect(modalExecute).not.toHaveBeenCalled();
+    expect(handleInteractionError).not.toHaveBeenCalled();
   });
 
   // user select ハンドラ成功時に execute が呼ばれることを検証

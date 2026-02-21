@@ -8,6 +8,15 @@ const createSuccessEmbedMock = jest.fn((description: string) => ({
 }));
 
 // DB依存は AFK 設定取得のみをモックし、コマンド本体ロジックを直接検証する
+jest.mock(
+  "../../../../src/bot/services/botGuildConfigRepositoryResolver",
+  () => ({
+    getBotGuildConfigRepository: () => ({
+      getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
+    }),
+  }),
+);
+
 jest.mock("../../../../src/shared/database", () => ({
   getGuildConfigRepository: () => ({
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
@@ -15,26 +24,22 @@ jest.mock("../../../../src/shared/database", () => ({
 }));
 
 // 共通エラーハンドラの委譲を検証する
-jest.mock("../../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
 
 // i18n を固定文字列化してアサーションを単純化する
 jest.mock("../../../../src/shared/locale", () => ({
-  tDefault: tDefaultMock,
-  tGuild: tGuildMock,
-}));
-
-// コマンド定義生成に必要な localizations を簡易モック
-jest.mock("../../../../src/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
+  tDefault: tDefaultMock,
+  tGuild: tGuildMock,
 }));
 
 // Embed 生成は引数検証に集中する
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
 }));
@@ -47,7 +52,7 @@ jest.mock("../../../../src/shared/utils/logger", () => ({
 }));
 
 import { afkCommand } from "../../../../src/bot/commands/afk";
-import { handleCommandError } from "../../../../src/shared/errors/errorHandler";
+import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
 
 type AfkInteraction = {
   guildId: string | null;

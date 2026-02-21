@@ -20,16 +20,18 @@ const createInfoEmbedMock = jest.fn(
 );
 
 // VAC設定関数の依存を置き換え、コマンド分岐を実コードで検証する
-jest.mock("../../../../src/shared/features/vac", () => ({
-  addTriggerChannel: (...args: unknown[]) => addTriggerChannelMock(...args),
-  getVacConfigOrDefault: (...args: unknown[]) =>
-    getVacConfigOrDefaultMock(...args),
-  removeTriggerChannel: (...args: unknown[]) =>
-    removeTriggerChannelMock(...args),
+jest.mock("../../../../src/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: () => ({
+    addTriggerChannel: (...args: unknown[]) => addTriggerChannelMock(...args),
+    getVacConfigOrDefault: (...args: unknown[]) =>
+      getVacConfigOrDefaultMock(...args),
+    removeTriggerChannel: (...args: unknown[]) =>
+      removeTriggerChannelMock(...args),
+  }),
 }));
 
 // 共通エラーハンドラ委譲のみ検証する
-jest.mock("../../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
 
@@ -44,7 +46,7 @@ jest.mock("../../../../src/shared/locale", () => ({
 }));
 
 // Embed 生成は簡易オブジェクトを返す
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
   createInfoEmbed: (description: string, options?: unknown) =>
@@ -52,7 +54,7 @@ jest.mock("../../../../src/shared/utils/messageResponse", () => ({
 }));
 
 import { vacConfigCommand } from "../../../../src/bot/commands/vac-config";
-import { handleCommandError } from "../../../../src/shared/errors/errorHandler";
+import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
 
 type CommandInteractionLike = {
   guildId: string | null;

@@ -2,10 +2,12 @@ import {
   handleBumpDetected,
   sendBumpPanel,
   sendBumpReminder,
-} from "../../../../src/bot/features/bump-reminder/bumpReminderHandler";
+} from "../../../../src/bot/features/bump-reminder/handlers/bumpReminderHandler";
 
 const getBumpReminderConfigServiceMock = jest.fn();
 const getBumpReminderManagerMock = jest.fn();
+const getBotBumpReminderConfigServiceMock = jest.fn();
+const scheduleBumpReminderMock = jest.fn();
 const getGuildTranslatorMock = jest.fn();
 const tDefaultMock = jest.fn(
   (key: string, _options?: Record<string, unknown>) => key,
@@ -33,12 +35,25 @@ jest.mock("../../../../src/shared/features/bump-reminder", () => ({
   getBumpReminderConfigService: () => getBumpReminderConfigServiceMock(),
 }));
 
+jest.mock(
+  "../../../../src/bot/services/botBumpReminderDependencyResolver",
+  () => ({
+    getBotBumpReminderConfigService: () =>
+      getBotBumpReminderConfigServiceMock(),
+  }),
+);
+
+jest.mock(
+  "../../../../src/bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder",
+  () => ({
+    scheduleBumpReminder: (...args: unknown[]) =>
+      scheduleBumpReminderMock(...args),
+  }),
+);
+
 jest.mock("../../../../src/shared/locale", () => ({
   tDefault: (key: string, options?: Record<string, unknown>) =>
     tDefaultMock(key, options),
-}));
-
-jest.mock("../../../../src/shared/locale/helpers", () => ({
   getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
 }));
 
@@ -51,7 +66,7 @@ jest.mock("../../../../src/shared/utils/logger", () => ({
   },
 }));
 
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createInfoEmbed: (description: string, options?: { title?: string }) =>
     createInfoEmbedMock(description, options),
 }));
@@ -503,7 +518,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
   // handleBumpDetected の検知有効性判定・リマインダー登録・失敗時補償を検証
   describe("handleBumpDetected", () => {
     it("returns early when bump reminder is disabled", async () => {
-      getBumpReminderConfigServiceMock.mockReturnValue({
+      getBotBumpReminderConfigServiceMock.mockReturnValue({
         getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: false }),
       });
 
@@ -518,10 +533,11 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       expect(loggerMock.debug).toHaveBeenCalledWith(
         "system:scheduler.bump_reminder_disabled",
       );
+      expect(scheduleBumpReminderMock).not.toHaveBeenCalled();
     });
 
     it("returns early when channel does not match configured channel", async () => {
-      getBumpReminderConfigServiceMock.mockReturnValue({
+      getBotBumpReminderConfigServiceMock.mockReturnValue({
         getBumpReminderConfig: jest.fn().mockResolvedValue({
           enabled: true,
           channelId: "expected-ch",
@@ -539,26 +555,21 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       expect(loggerMock.debug).toHaveBeenCalledWith(
         "system:scheduler.bump_reminder_unregistered_channel",
       );
+      expect(scheduleBumpReminderMock).not.toHaveBeenCalled();
     });
 
-    it("sets reminder and logs detected message on success", async () => {
-      const setReminder = jest.fn().mockResolvedValue(undefined);
-      getBumpReminderManagerMock.mockReturnValue({ setReminder });
-      getBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: jest
-          .fn()
-          .mockResolvedValueOnce({ enabled: true })
-          .mockResolvedValueOnce({ enabled: true, mentionUserIds: [] }),
-      });
+    it("schedules reminder and logs detected message on success", async () => {
+      const configService = {
+        getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: true }),
+      };
+      getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
+      scheduleBumpReminderMock.mockResolvedValue(undefined);
 
       const sendMock = jest.fn().mockResolvedValue({ id: "panel-1" });
       const channel = {
         isTextBased: () => true,
         isSendable: () => true,
         send: sendMock,
-        messages: {
-          fetch: jest.fn(),
-        },
       };
       const client = {
         channels: {
@@ -575,53 +586,68 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         "Disboard",
       );
 
-      expect(setReminder).toHaveBeenCalledWith(
+      expect(scheduleBumpReminderMock).toHaveBeenCalledWith(
+        client,
         "guild-1",
         "ch-1",
         "msg-1",
-        "panel-1",
-        120,
-        expect.any(Function),
         "Disboard",
+        configService,
+        "panel-1",
       );
       expect(loggerMock.info).toHaveBeenCalledWith(
         "system:bump-reminder.detected",
       );
     });
 
-    it("executes reminder task closure passed to manager", async () => {
-      let capturedTask: (() => Promise<void>) | undefined;
-      const setReminder = jest
-        .fn()
-        .mockImplementation(
-          async (
-            _guildId: string,
-            _channelId: string,
-            _messageId: string,
-            _panelMessageId: string | undefined,
-            _delayMinutes: number,
-            task: () => Promise<void>,
-          ) => {
-            capturedTask = task;
-          },
-        );
-      getBumpReminderManagerMock.mockReturnValue({ setReminder });
-      getBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: jest.fn().mockResolvedValue({
-          enabled: true,
-          mentionRoleId: null,
-          mentionUserIds: [],
-        }),
-      });
+    it("passes undefined panel message id when panel is not sendable", async () => {
+      const configService = {
+        getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: true }),
+      };
+      getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
+      scheduleBumpReminderMock.mockResolvedValue(undefined);
 
-      const sendMock = jest.fn().mockResolvedValue(undefined);
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => false,
+      };
+      const client = {
+        channels: {
+          fetch: jest.fn().mockResolvedValue(channel),
+        },
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await handleBumpDetected(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+      );
+
+      expect(scheduleBumpReminderMock).toHaveBeenCalledWith(
+        client,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+        configService,
+        undefined,
+      );
+    });
+
+    it("logs detection failure when scheduling throws", async () => {
+      getBotBumpReminderConfigServiceMock.mockReturnValue({
+        getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: true }),
+      });
+      scheduleBumpReminderMock.mockRejectedValue(new Error("set failed"));
+
+      const sendMock = jest.fn().mockResolvedValue({ id: "panel-1" });
       const channel = {
         isTextBased: () => true,
         isSendable: () => true,
         send: sendMock,
-        messages: {
-          fetch: jest.fn(),
-        },
       };
       const client = {
         channels: {
@@ -638,172 +664,6 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         "Disboard",
       );
 
-      expect(capturedTask).toBeDefined();
-      await capturedTask?.();
-
-      expect(sendMock).toHaveBeenCalledWith({
-        content: "events:bump-reminder.reminder_message.disboard",
-        reply: { messageReference: "msg-1" },
-      });
-    });
-
-    it("deletes orphaned panel when setReminder fails", async () => {
-      const setReminder = jest.fn().mockRejectedValue(new Error("set failed"));
-      getBumpReminderManagerMock.mockReturnValue({ setReminder });
-      getBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: true }),
-      });
-
-      const panelDelete = jest.fn().mockResolvedValue(undefined);
-      const channel = {
-        isTextBased: () => true,
-        isSendable: () => true,
-        send: jest.fn().mockResolvedValue({ id: "panel-1" }),
-        messages: {
-          fetch: jest.fn().mockResolvedValue({ delete: panelDelete }),
-        },
-      };
-      const client = {
-        channels: {
-          fetch: jest.fn().mockResolvedValue(channel),
-        },
-      };
-      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
-
-      await handleBumpDetected(
-        client as never,
-        "guild-1",
-        "ch-1",
-        "msg-1",
-        "Disboard",
-      );
-
-      expect(panelDelete).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error).toHaveBeenCalledWith(
-        "system:bump-reminder.detection_failed",
-        expect.any(Error),
-      );
-    });
-
-    it("logs orphaned panel deletion failure when cleanup throws", async () => {
-      const setReminder = jest.fn().mockRejectedValue(new Error("set failed"));
-      getBumpReminderManagerMock.mockReturnValue({ setReminder });
-      getBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: true }),
-      });
-
-      const channel = {
-        isTextBased: () => true,
-        isSendable: () => true,
-        send: jest.fn().mockResolvedValue({ id: "panel-1" }),
-        messages: {
-          fetch: jest.fn().mockRejectedValue(new Error("panel fetch failed")),
-        },
-      };
-      const client = {
-        channels: {
-          fetch: jest.fn().mockResolvedValue(channel),
-        },
-      };
-      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
-
-      await handleBumpDetected(
-        client as never,
-        "guild-1",
-        "ch-1",
-        "msg-1",
-        "Disboard",
-      );
-
-      expect(loggerMock.debug).toHaveBeenCalledWith(
-        "system:scheduler.bump_reminder_orphaned_panel_delete_failed",
-        expect.any(Error),
-      );
-      expect(loggerMock.error).toHaveBeenCalledWith(
-        "system:bump-reminder.detection_failed",
-        expect.any(Error),
-      );
-    });
-
-    it("skips orphan cleanup delete when fetched channel is not text-based", async () => {
-      const setReminder = jest.fn().mockRejectedValue(new Error("set failed"));
-      getBumpReminderManagerMock.mockReturnValue({ setReminder });
-      getBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: true }),
-      });
-
-      const panelChannel = {
-        isTextBased: () => true,
-        isSendable: () => true,
-        send: jest.fn().mockResolvedValue({ id: "panel-1" }),
-        messages: {
-          fetch: jest.fn(),
-        },
-      };
-      const nonTextChannel = {
-        isTextBased: () => false,
-      };
-      const fetchMock = jest
-        .fn()
-        .mockResolvedValueOnce(panelChannel)
-        .mockResolvedValueOnce(nonTextChannel);
-      const client = {
-        channels: {
-          fetch: fetchMock,
-        },
-      };
-      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
-
-      await handleBumpDetected(
-        client as never,
-        "guild-1",
-        "ch-1",
-        "msg-1",
-        "Disboard",
-      );
-
-      expect(fetchMock).toHaveBeenCalledTimes(2);
-      expect(loggerMock.error).toHaveBeenCalledWith(
-        "system:bump-reminder.detection_failed",
-        expect.any(Error),
-      );
-    });
-
-    it("skips orphan cleanup block when panel message id is undefined", async () => {
-      const setReminder = jest.fn().mockRejectedValue(new Error("set failed"));
-      getBumpReminderManagerMock.mockReturnValue({ setReminder });
-      getBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: true }),
-      });
-
-      const nonTextChannel = {
-        isTextBased: () => false,
-      };
-      const fetchMock = jest.fn().mockResolvedValue(nonTextChannel);
-      const client = {
-        channels: {
-          fetch: fetchMock,
-        },
-      };
-
-      await handleBumpDetected(
-        client as never,
-        "guild-1",
-        "ch-1",
-        "msg-1",
-        "Disboard",
-      );
-
-      expect(setReminder).toHaveBeenCalledWith(
-        "guild-1",
-        "ch-1",
-        "msg-1",
-        undefined,
-        120,
-        expect.any(Function),
-        "Disboard",
-      );
-      expect(fetchMock).toHaveBeenCalledTimes(1);
       expect(loggerMock.error).toHaveBeenCalledWith(
         "system:bump-reminder.detection_failed",
         expect.any(Error),

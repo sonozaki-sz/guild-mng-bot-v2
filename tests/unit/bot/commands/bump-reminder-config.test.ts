@@ -59,15 +59,36 @@ jest.mock("../../../../src/shared/features/bump-reminder", () => ({
   })),
 }));
 
+jest.mock(
+  "../../../../src/bot/services/botBumpReminderDependencyResolver",
+  () => ({
+    getBotBumpReminderConfigService: jest.fn(() => ({
+      setBumpReminderEnabled: (...args: unknown[]) =>
+        setBumpReminderEnabledMock(...args),
+      getBumpReminderConfig: (...args: unknown[]) =>
+        getBumpReminderConfigMock(...args),
+      setBumpReminderMentionRole: (...args: unknown[]) =>
+        setBumpReminderMentionRoleMock(...args),
+      addBumpReminderMentionUser: (...args: unknown[]) =>
+        addBumpReminderMentionUserMock(...args),
+      clearBumpReminderMentionUsers: (...args: unknown[]) =>
+        clearBumpReminderMentionUsersMock(...args),
+      clearBumpReminderMentions: (...args: unknown[]) =>
+        clearBumpReminderMentionsMock(...args),
+      removeBumpReminderMentionUser: (...args: unknown[]) =>
+        removeBumpReminderMentionUserMock(...args),
+    })),
+    getBotBumpReminderManager: jest.fn(() => ({
+      cancelReminder: (...args: unknown[]) => cancelReminderMock(...args),
+    })),
+  }),
+);
+
 // BumpReminderManager は cancel 呼び出しのみ検証
-jest.mock("../../../../src/bot/features/bump-reminder", () => ({
-  getBumpReminderManager: jest.fn(() => ({
-    cancelReminder: (...args: unknown[]) => cancelReminderMock(...args),
-  })),
-}));
+jest.mock("../../../../src/bot/features/bump-reminder", () => ({}));
 
 // 共通エラーハンドラの委譲を確認
-jest.mock("../../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
 
@@ -82,7 +103,7 @@ jest.mock("../../../../src/shared/locale", () => ({
 }));
 
 // メッセージ生成は簡易オブジェクト化
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createErrorEmbed: jest.fn((message: string) => ({ message })),
   createInfoEmbed: jest.fn((message: string) => ({ message })),
   createSuccessEmbed: (description: string) =>
@@ -90,7 +111,7 @@ jest.mock("../../../../src/shared/utils/messageResponse", () => ({
 }));
 
 // ログ出力の副作用を抑止
-jest.mock("../../../../src/shared/utils/logger", () => ({
+jest.mock("../../../../src/shared/utils", () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn(),
@@ -98,7 +119,7 @@ jest.mock("../../../../src/shared/utils/logger", () => ({
 }));
 
 import { bumpReminderConfigCommand } from "../../../../src/bot/commands/bump-reminder-config";
-import { handleCommandError } from "../../../../src/shared/errors/errorHandler";
+import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
 
 type InteractionLike = {
   guildId: string | null;
