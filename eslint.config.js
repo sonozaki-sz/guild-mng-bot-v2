@@ -40,4 +40,52 @@ export default [
       "@typescript-eslint/no-non-null-assertion": "warn",
     },
   },
+  {
+    files: ["src/shared/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/bot/**", "**/web/**"],
+              message: "shared から bot/web への依存は禁止です。",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/bot/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/web/**"],
+              message: "bot から web への依存は禁止です。",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/web/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/bot/**"],
+              message: "web から bot への依存は禁止です。",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
