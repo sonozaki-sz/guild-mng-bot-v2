@@ -19,6 +19,16 @@ const createInfoEmbedMock = jest.fn(
 );
 
 // AFK設定永続化の呼び出しだけをモックし、コマンド分岐を直接検証する
+jest.mock(
+  "../../../../src/bot/services/botGuildConfigRepositoryResolver",
+  () => ({
+    getBotGuildConfigRepository: () => ({
+      setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
+      getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
+    }),
+  }),
+);
+
 jest.mock("../../../../src/shared/database", () => ({
   getGuildConfigRepository: () => ({
     setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
@@ -27,7 +37,7 @@ jest.mock("../../../../src/shared/database", () => ({
 }));
 
 // 共通エラーハンドラへの委譲可否を確認する
-jest.mock("../../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
 
@@ -42,7 +52,7 @@ jest.mock("../../../../src/shared/locale", () => ({
 }));
 
 // メッセージ生成ユーティリティは生成結果を簡易オブジェクトに置換する
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string, options?: unknown) =>
     createSuccessEmbedMock(description, options),
   createInfoEmbed: (description: string, options?: unknown) =>
@@ -57,7 +67,7 @@ jest.mock("../../../../src/shared/utils/logger", () => ({
 }));
 
 import { afkConfigCommand } from "../../../../src/bot/commands/afk-config";
-import { handleCommandError } from "../../../../src/shared/errors/errorHandler";
+import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
 
 type AfkConfigInteraction = {
   guildId: string | null;

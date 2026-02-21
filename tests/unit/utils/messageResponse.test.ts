@@ -2,7 +2,6 @@
 // メッセージレスポンスユーティリティのテスト
 
 import { EmbedBuilder } from "discord.js";
-import { localeManager } from "../../../src/shared/locale";
 import {
   MessageStatus,
   createErrorEmbed,
@@ -10,7 +9,8 @@ import {
   createStatusEmbed,
   createSuccessEmbed,
   createWarningEmbed,
-} from "../../../src/shared/utils/messageResponse";
+} from "../../../src/bot/utils/messageResponse";
+import { localeManager } from "../../../src/shared/locale";
 
 // i18n 依存のタイトル検証に備えてロケールを初期化
 beforeAll(async () => {

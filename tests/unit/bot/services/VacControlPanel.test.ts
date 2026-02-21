@@ -3,14 +3,14 @@ import {
   getVacPanelChannelId,
   sendVacControlPanel,
 } from "../../../../src/bot/features/vac/handlers/ui/vacControlPanel";
+import { createInfoEmbed } from "../../../../src/bot/utils/messageResponse";
 import { tGuild } from "../../../../src/shared/locale";
-import { createInfoEmbed } from "../../../../src/shared/utils/messageResponse";
 
 jest.mock("../../../../src/shared/locale", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
 
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createInfoEmbed: jest.fn(
     (description: string, options?: { title?: string }) => ({
       description,

@@ -1,23 +1,21 @@
 import type { ChatInputCommandInteraction } from "discord.js";
 import { pingCommand } from "../../../../src/bot/commands/ping";
-import { handleCommandError } from "../../../../src/shared/errors/errorHandler";
+import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
+import { createSuccessEmbed } from "../../../../src/bot/utils/messageResponse";
 import { tGuild } from "../../../../src/shared/locale";
-import { createSuccessEmbed } from "../../../../src/shared/utils/messageResponse";
 
 // Ping コマンドが依存する外部モジュールをモック化して、処理分岐に集中する
-jest.mock("../../../../src/shared/errors/errorHandler", () => ({
+jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
-jest.mock("../../../../src/shared/locale/commandLocalizations", () => ({
+jest.mock("../../../../src/shared/locale", () => ({
   getCommandLocalizations: () => ({
     ja: "ping description",
     localizations: { "en-US": "ping description" },
   }),
-}));
-jest.mock("../../../../src/shared/locale", () => ({
   tGuild: jest.fn(),
 }));
-jest.mock("../../../../src/shared/utils/messageResponse", () => ({
+jest.mock("../../../../src/bot/utils/messageResponse", () => ({
   createSuccessEmbed: jest.fn((description: string) => ({ description })),
 }));
 

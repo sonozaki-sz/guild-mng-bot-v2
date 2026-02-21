@@ -7,7 +7,7 @@ import { BumpReminderManager } from "../../../src/bot/features/bump-reminder";
 import { jobScheduler } from "../../../src/shared/scheduler/jobScheduler";
 
 // Logger のモック
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("../../../src/shared/utils", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -39,7 +39,7 @@ const mockRepository = {
 };
 
 jest.mock(
-  "../../../src/bot/features/bump-reminder/bumpReminderRepository",
+  "../../../src/bot/features/bump-reminder/repositories/bumpReminderRepository",
   () => ({
     getBumpReminderRepository: () => mockRepository,
   }),
@@ -56,7 +56,7 @@ describe("BumpReminderManager Integration", () => {
     jest.useFakeTimers();
     jest.setSystemTime(fixedNow);
 
-    manager = new BumpReminderManager();
+    manager = new BumpReminderManager(mockRepository as never);
     jest.clearAllMocks();
 
     // すべてのジョブをクリア

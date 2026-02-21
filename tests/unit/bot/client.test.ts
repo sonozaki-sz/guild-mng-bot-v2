@@ -1,12 +1,12 @@
 import { Collection, GatewayIntentBits } from "discord.js";
 import { BotClient, createBotClient } from "../../../src/bot/client";
-import { logger } from "../../../src/shared/utils/logger";
+import { logger } from "../../../src/shared/utils";
 
 jest.mock("../../../src/shared/locale", () => ({
   tDefault: jest.fn((key: string) => key),
 }));
 
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("../../../src/shared/utils", () => ({
   logger: {
     info: jest.fn(),
   },
@@ -21,7 +21,6 @@ describe("bot/client", () => {
     const client = new BotClient();
 
     expect(client.commands).toBeInstanceOf(Collection);
-    expect(client.modals).toBeInstanceOf(Collection);
     expect(client.cooldownManager).toBeDefined();
     expect(client.options.intents.has(GatewayIntentBits.Guilds)).toBe(true);
     expect(client.options.intents.has(GatewayIntentBits.MessageContent)).toBe(
