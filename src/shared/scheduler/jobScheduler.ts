@@ -1,6 +1,5 @@
 // src/shared/scheduler/jobScheduler.ts
 // タイマー処理（node-cron + setTimeout）
-// REFACTORING_PLAN.md Phase 2 準拠
 
 import cron, { ScheduledTask } from "node-cron";
 import { tDefault } from "../locale";

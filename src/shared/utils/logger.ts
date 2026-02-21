@@ -1,6 +1,5 @@
 // src/shared/utils/logger.ts
 // ロガー設定（Winston）
-// REFACTORING_PLAN.md Phase 2 準拠
 
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";

@@ -1,6 +1,5 @@
 // src/shared/errors/customErrors.ts
 // カスタムエラークラス
-// REFACTORING_PLAN.md Phase 2 準拠
 
 /**
  * ベースエラークラス
