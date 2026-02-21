@@ -173,6 +173,46 @@
 
 ## 🔧 技術的改善タスク
 
+### src整備スプリント（最優先 / コミット単位）
+
+> 目的: 責務分離・依存境界・ディレクトリ構成を固定し、既存実装をテストしやすい構造へ収束させる。
+
+#### 実施ポリシー
+
+- [ ] **P-1: 1コミット1関心**（目安: 3〜8ファイル）
+- [ ] **P-2: 各コミットで `pnpm run typecheck` を通す**
+- [ ] **P-3: 互換レイヤー先行**（resolver追加 → 呼び出し側移行 → 旧fallback縮退）
+- [ ] **P-4: 挙動変更を避ける**（原則リファクタのみ。仕様変更は別コミット）
+- [ ] **P-5: テスト修正はsrc安定後に集中実施**
+
+#### コミット単位タスク
+
+- [ ] **SR-001** bump-reminder の bot層依存リゾルバ追加
+  - 完了条件: manager/config-service/repository 参照を bot service resolver で解決可能
+  - コミット例: `refactor: bump-reminder 依存解決を bot リゾルバ経由に追加`
+
+- [ ] **SR-002** bump-reminder handlers を resolver 経由へ移行
+  - 完了条件: startup/detected/panel 系で direct `getBumpReminder*` 呼び出しを解消
+  - コミット例: `refactor: bump-reminder handlers の依存取得を統一`
+
+- [ ] **SR-003** bump-reminder commands を resolver 経由へ移行
+  - 完了条件: config command 系の依存取得を bot service resolver へ統一
+  - コミット例: `refactor: bump-reminder commands の依存境界を統一`
+
+- [ ] **SR-004** bump-reminder service の fallback 経路を縮退
+  - 完了条件: `requirePrismaClient` 依存の暗黙解決を段階的に排除（互換を維持しつつ縮小）
+  - コミット例: `refactor: bump-reminder service の暗黙依存を縮退`
+
+- [ ] **SR-005** 大型ファイル分割（usecase単位）
+  - 対象: `bumpReminderHandler.ts`（detect / schedule / send / panel）
+  - 完了条件: 入口関数は薄いオーケストレーションのみ
+  - コミット例: `refactor: bump-reminder handler を用途別に分割`
+
+- [ ] **SR-006** エクスポート境界の整理（過剰 re-export 抑制）
+  - 対象: `bot/features/*/index.ts` の公開面
+  - 完了条件: 呼び出し側が必要最小の公開APIのみ参照
+  - コミット例: `refactor: feature index の公開境界を最小化`
+
 ### コード品質
 
 - [ ] ESLintルール厳格化
@@ -244,22 +284,20 @@
 
 ### 直近の推奨作業順序
 
-1. **メッセージ固定機能の実装**
-   - Prisma SchemaにStickyMessage追加
-   - `/sticky-message` コマンド実装
-   - messageCreateイベント再送信ロジック
-   - テスト作成
+1. **src整備スプリントの実施（SR-001〜SR-006）**
+   - 依存解決を bot層 resolver へ統一
+   - bump-reminder の暗黙依存を段階縮退
+   - 大型ファイル分割と公開境界の最小化
 
-2. **メンバー参加・脱退ログ機能の実装**
-   - `guildMemberAdd` / `guildMemberRemove` イベント実装
-   - `/member-log-config` コマンド実装
-   - MemberLogConfig の Schema更新
-   - テスト作成
+2. **既存実装のテスト修正（src安定後）**
+   - 既存ユニットテストの import/モックを新境界へ追随
+   - VAC/Bump の回帰テストを優先
+   - `typecheck` + `test` を通して基準化
 
-3. **VC自動作成機能のテスト拡充**
-   - `/vac-config` / `/vac` コマンドのユニットテスト作成
-   - `voiceStateUpdate` / `channelDelete` イベントテスト作成
-   - パネル（button/modal/select）ハンドラのテスト作成
+3. **主要機能実装へ復帰（1.2 / 1.3 / 1.4）**
+   - メッセージ固定
+   - メンバーログ
+   - メッセージ削除
 
 4. **デプロイ準備の着手条件確認（bot層完了後）**
    - 1〜3の未完了タスクを解消
@@ -270,4 +308,4 @@
 
 **最終更新**: 2026年2月21日
 **全体進捗**: 残54件（bot優先30件 / デプロイ12件 / Web凍結12件）
-**次のマイルストーン**: bot層完了（1〜3）後に4へ移行、5は凍結維持
+**次のマイルストーン**: src整備スプリント完了（SR-001〜SR-006）
