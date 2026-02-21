@@ -70,6 +70,54 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     );
   });
 
+  it("detects test dissoku command in test mode", async () => {
+    const message = createMessage({
+      author: { id: "user-1", bot: false },
+      content: "test /dissoku up",
+    });
+
+    await handleBumpMessageCreate(message as never);
+
+    expect(handleBumpDetectedMock).toHaveBeenCalledWith(
+      message.client,
+      "guild-1",
+      "channel-1",
+      "msg-1",
+      "dissoku",
+    );
+  });
+
+  it("ignores non-bot normal messages outside test command flow", async () => {
+    const message = createMessage({
+      author: { id: "user-1", bot: false },
+      content: "hello",
+    });
+
+    await handleBumpMessageCreate(message as never);
+
+    expect(handleBumpDetectedMock).not.toHaveBeenCalled();
+    expect(resolveBumpServiceMock).not.toHaveBeenCalled();
+  });
+
+  it("ignores bot message without interaction commandName", async () => {
+    const message = createMessage({ interaction: null });
+
+    await handleBumpMessageCreate(message as never);
+
+    expect(handleBumpDetectedMock).not.toHaveBeenCalled();
+    expect(resolveBumpServiceMock).not.toHaveBeenCalled();
+  });
+
+  it("ignores when resolver cannot map service", async () => {
+    resolveBumpServiceMock.mockReturnValueOnce(undefined);
+    const message = createMessage({ interaction: { commandName: "unknown" } });
+
+    await handleBumpMessageCreate(message as never);
+
+    expect(resolveBumpServiceMock).toHaveBeenCalledWith("bot-1", "unknown");
+    expect(handleBumpDetectedMock).not.toHaveBeenCalled();
+  });
+
   it("detects production bot interaction message via resolver", async () => {
     resolveBumpServiceMock.mockReturnValueOnce("dissoku");
     const message = createMessage({

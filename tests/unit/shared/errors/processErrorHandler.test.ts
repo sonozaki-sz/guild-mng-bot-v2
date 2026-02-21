@@ -1,6 +1,232 @@
 describe("shared/errors/processErrorHandler", () => {
-  it("loads module", async () => {
-    const module = await import("@/shared/errors/processErrorHandler");
-    expect(module).toBeDefined();
+  const tDefaultMock = jest.fn(
+    (key: string, options?: { signal?: string }) =>
+      `${key}${options?.signal ? `:${options.signal}` : ""}`,
+  );
+  const loggerMock = {
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn(),
+  };
+  const logErrorMock = jest.fn();
+
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+
+    jest.doMock("@/shared/locale", () => ({
+      tDefault: tDefaultMock,
+    }));
+    jest.doMock("@/shared/utils", () => ({
+      logger: loggerMock,
+    }));
+    jest.doMock("@/shared/errors/errorUtils", () => ({
+      logError: logErrorMock,
+    }));
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("registers global handlers only once", async () => {
+    const onSpy = jest
+      .spyOn(process, "on")
+      .mockImplementation((() => process) as typeof process.on);
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+
+    setupGlobalErrorHandlers();
+    setupGlobalErrorHandlers();
+
+    expect(onSpy).toHaveBeenCalledTimes(3);
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      "Global error handlers already registered, skipping.",
+    );
+  });
+
+  it("logs unhandled rejection and forwards Error reason", async () => {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    jest.spyOn(process, "on").mockImplementation(((
+      event: string,
+      listener: (...args: unknown[]) => void,
+    ) => {
+      handlers.set(event, listener);
+      return process;
+    }) as typeof process.on);
+
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGlobalErrorHandlers();
+
+    const unhandledRejection = handlers.get("unhandledRejection");
+    expect(unhandledRejection).toBeDefined();
+
+    const reason = new Error("boom");
+    const promise = Promise.resolve("ok");
+    unhandledRejection?.(reason, promise);
+
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      "system:error.unhandled_rejection_log",
+      {
+        reason,
+        promise,
+      },
+    );
+    expect(logErrorMock).toHaveBeenCalledWith(reason);
+
+    unhandledRejection?.("string-reason", promise);
+    expect(logErrorMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("exits on non-operational BaseError from uncaughtException", async () => {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    jest.spyOn(process, "on").mockImplementation(((
+      event: string,
+      listener: (...args: unknown[]) => void,
+    ) => {
+      handlers.set(event, listener);
+      return process;
+    }) as typeof process.on);
+    const exitSpy = jest
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined as never) as typeof process.exit);
+
+    const { BaseError } = await import("@/shared/errors/customErrors");
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGlobalErrorHandlers();
+
+    const uncaughtException = handlers.get("uncaughtException");
+    expect(uncaughtException).toBeDefined();
+
+    const fatal = new BaseError("FatalError", "fatal", false);
+    uncaughtException?.(fatal);
+
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      "system:error.uncaught_exception_log",
+      fatal,
+    );
+    expect(logErrorMock).toHaveBeenCalledWith(fatal);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it("registers graceful shutdown once and handles cleanup outcomes", async () => {
+    const onceHandlers = new Map<string, () => void>();
+    jest.spyOn(process, "once").mockImplementation(((
+      event: string,
+      listener: () => void,
+    ) => {
+      onceHandlers.set(event, listener);
+      return process;
+    }) as typeof process.once);
+    const exitSpy = jest
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined as never) as typeof process.exit);
+
+    const { setupGracefulShutdown } =
+      await import("@/shared/errors/processErrorHandler");
+
+    const cleanup = jest.fn().mockResolvedValue(undefined);
+    setupGracefulShutdown(cleanup);
+    setupGracefulShutdown(cleanup);
+
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      "Graceful shutdown handlers already registered, skipping.",
+    );
+
+    onceHandlers.get("SIGTERM")?.();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(loggerMock.info).toHaveBeenCalledWith(
+      "system:shutdown.signal_received:SIGTERM",
+    );
+    expect(loggerMock.info).toHaveBeenCalledWith(
+      "system:error.cleanup_complete",
+    );
+    expect(exitSpy).toHaveBeenCalledWith(0);
+
+    const failingCleanup = jest
+      .fn()
+      .mockRejectedValue(new Error("cleanup-failed"));
+    jest.resetModules();
+    jest.clearAllMocks();
+    jest.doMock("@/shared/locale", () => ({
+      tDefault: tDefaultMock,
+    }));
+    jest.doMock("@/shared/utils", () => ({
+      logger: loggerMock,
+    }));
+    jest.doMock("@/shared/errors/errorUtils", () => ({
+      logError: logErrorMock,
+    }));
+
+    const secondOnceHandlers = new Map<string, () => void>();
+    jest.spyOn(process, "once").mockImplementation(((
+      event: string,
+      listener: () => void,
+    ) => {
+      secondOnceHandlers.set(event, listener);
+      return process;
+    }) as typeof process.once);
+    const secondExitSpy = jest
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined as never) as typeof process.exit);
+
+    const { setupGracefulShutdown: setupGracefulShutdown2 } =
+      await import("@/shared/errors/processErrorHandler");
+
+    setupGracefulShutdown2(failingCleanup);
+    secondOnceHandlers.get("SIGINT")?.();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      "system:error.cleanup_failed",
+      expect.any(Error),
+    );
+    expect(secondExitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it("logs already-shutting-down warning when signal arrives again", async () => {
+    const onceHandlers = new Map<string, () => void>();
+    jest.spyOn(process, "once").mockImplementation(((
+      event: string,
+      listener: () => void,
+    ) => {
+      onceHandlers.set(event, listener);
+      return process;
+    }) as typeof process.once);
+    jest
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined as never) as typeof process.exit);
+
+    let resolveCleanup: (() => void) | undefined;
+    const cleanup = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveCleanup = resolve;
+        }),
+    );
+
+    const { setupGracefulShutdown } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGracefulShutdown(cleanup);
+
+    const sigterm = onceHandlers.get("SIGTERM");
+    expect(sigterm).toBeDefined();
+
+    sigterm?.();
+    sigterm?.();
+    await Promise.resolve();
+
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      expect.stringContaining("(already shutting down)"),
+    );
+
+    resolveCleanup?.();
+    await Promise.resolve();
   });
 });

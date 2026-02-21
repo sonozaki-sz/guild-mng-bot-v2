@@ -3,19 +3,19 @@
  * エラーハンドリング機能のテスト
  */
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
+import {
+  handleCommandError,
+  handleInteractionError,
+} from "@/bot/errors/interactionErrorHandler";
 import { NODE_ENV, env } from "@/shared/config/env";
 import {
   BaseError,
   DatabaseError,
   ValidationError,
 } from "@/shared/errors/customErrors";
-import {
-  getUserFriendlyMessage,
-  logError,
-} from "@/shared/errors/errorHandler";
+import { getUserFriendlyMessage, logError } from "@/shared/errors/errorHandler";
 import { logger } from "@/shared/utils";
+import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 
 // Logger のモック
 jest.mock("@/shared/utils", () => ({
@@ -37,6 +37,12 @@ jest.mock("@/shared/locale", () => ({
       "system:error.reply_failed": "返信に失敗しました",
     };
     return translations[key] || key;
+  },
+  tGuild: async (_guildId: string, key: string) => {
+    if (key === "errors:validation.error_title") {
+      return "サーバー検証エラー";
+    }
+    return key;
   },
 }));
 
@@ -240,6 +246,56 @@ describe("ErrorHandler", () => {
         "返信に失敗しました",
         expect.any(Error),
       );
+    });
+  });
+
+  describe("handleInteractionError()", () => {
+    it("should use guild validation title when guildId exists", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: "guild-1",
+        reply: jest.fn().mockResolvedValue(undefined),
+        editReply: jest.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(interaction, new ValidationError("invalid"));
+
+      expect(interaction.reply).toHaveBeenCalledTimes(1);
+      const payload = interaction.reply.mock.calls[0][0];
+      expect(payload.flags).toBe(MessageFlags.Ephemeral);
+      const embed = payload.embeds[0];
+      expect(embed.data?.description ?? embed.description).toBe("invalid");
+      expect(embed.data?.title ?? embed.title).toMatch(/^❌/);
+    });
+
+    it("should prioritize BaseError.embedTitle over default title", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        reply: jest.fn().mockResolvedValue(undefined),
+        editReply: jest.fn().mockResolvedValue(undefined),
+      };
+
+      const error = new BaseError(
+        "CustomError",
+        "custom message",
+        true,
+        400,
+        "カスタムタイトル",
+      );
+
+      await handleInteractionError(interaction, error);
+
+      expect(interaction.reply).toHaveBeenCalledTimes(1);
+      const payload = interaction.reply.mock.calls[0][0];
+      expect(payload.flags).toBe(MessageFlags.Ephemeral);
+      const embed = payload.embeds[0];
+      expect(embed.data?.description ?? embed.description).toBe(
+        "custom message",
+      );
+      expect(embed.data?.title ?? embed.title).toMatch(/^❌/);
     });
   });
 
