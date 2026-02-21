@@ -173,7 +173,7 @@
 
 ## 🔧 技術的改善タスク
 
-### src整備スプリント（最優先 / コミット単位）
+### src整備スプリント（第1フェーズ / 完了）
 
 > 目的: 責務分離・依存境界・ディレクトリ構成を固定し、既存実装をテストしやすい構造へ収束させる。
 
@@ -212,6 +212,45 @@
   - 対象: `bot/features/*/index.ts` の公開面
   - 完了条件: 呼び出し側が必要最小の公開APIのみ参照
   - コミット例: `refactor: feature index の公開境界を最小化`
+
+### src整備スプリント（第2フェーズ / コミット単位）
+
+> 目的: 大型ファイルの責務分離を進め、shared層の暗黙依存をさらに削減し、feature内部公開面も最小化する。
+
+#### 実施ポリシー（第2フェーズ）
+
+- [ ] **P2-1: 1コミット1関心**（目安: 3〜8ファイル）
+- [ ] **P2-2: 各コミットで `pnpm run typecheck` を通す**
+- [ ] **P2-3: 挙動変更を避ける**（原則リファクタのみ。仕様変更は別コミット）
+- [ ] **P2-4: 公開境界の縮小を優先**（不要な re-export を段階削除）
+- [ ] **P2-5: テスト修正はフェーズ完了後に集中実施**
+
+#### コミット単位タスク（第2フェーズ）
+
+- [x] **NS-001** `GuildBumpReminderConfigStore` をCAS更新ユースケースへ分割
+  - 完了条件: get/update/mutate系を用途別モジュールへ分離し、store本体は委譲中心にする
+  - コミット例: `refactor: bump reminder config store を用途別に分割`
+
+- [ ] **NS-002** `VacService` を create/delete/cleanup usecase へ分割
+  - 完了条件: `VacService` は薄いオーケストレーションのみを保持する
+  - コミット例: `refactor: vac service をユースケース単位に分割`
+
+- [ ] **NS-003** `BumpReminderRepository` のクエリ責務を分割
+  - 完了条件: pending取得/更新/クリーンアップを内部モジュール化し、重複ロギングを削減
+  - コミット例: `refactor: bump reminder repository の責務を整理`
+
+- [ ] **NS-004** shared DBアクセスの暗黙依存を縮退（`requirePrismaClient` 利用面の縮小）
+  - 完了条件: DB repository生成を明示注入経路に寄せ、global accessor依存を段階削減
+  - コミット例: `refactor: shared database 依存解決の明示化`
+
+- [ ] **NS-005** feature内部 `index.ts` の過剰 `export *` を抑制
+  - 対象: `bot/features/*/{handlers,services,repositories}/index.ts`
+  - 完了条件: 呼び出し側で使用するシンボルのみ明示export
+  - コミット例: `refactor: feature 内部公開面を最小化`
+
+- [ ] **NS-006** エラー/ログ共通処理の薄いユーティリティ化
+  - 完了条件: repository/service内の重複した try-catch + logger パターンを共通化
+  - コミット例: `refactor: error logging 共通処理を抽出`
 
 ### コード品質
 
@@ -284,10 +323,11 @@
 
 ### 直近の推奨作業順序
 
-1. **src整備スプリントの実施（SR-001〜SR-006）**
-   - 依存解決を bot層 resolver へ統一
-   - bump-reminder の暗黙依存を段階縮退
-   - 大型ファイル分割と公開境界の最小化
+1. **src整備スプリント第2フェーズの実施（NS-001〜NS-006）**
+
+- store/service/repository の大型ファイル分割
+- shared層の暗黙依存の段階縮退
+- feature内部公開境界の最小化
 
 2. **既存実装のテスト修正（src安定後）**
    - 既存ユニットテストの import/モックを新境界へ追随
@@ -308,4 +348,4 @@
 
 **最終更新**: 2026年2月21日
 **全体進捗**: 残54件（bot優先30件 / デプロイ12件 / Web凍結12件）
-**次のマイルストーン**: src整備スプリント完了（SR-001〜SR-006）
+**次のマイルストーン**: src整備スプリント第2フェーズ着手（NS-001〜NS-006）
