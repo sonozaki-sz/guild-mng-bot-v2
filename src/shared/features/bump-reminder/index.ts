@@ -13,6 +13,7 @@ export {
   addBumpReminderMentionUser,
   clearBumpReminderMentionUsers,
   clearBumpReminderMentions,
+  createBumpReminderConfigService,
   getBumpReminderConfig,
   getBumpReminderConfigOrDefault,
   getBumpReminderConfigService,

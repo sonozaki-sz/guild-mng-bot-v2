@@ -12,7 +12,6 @@ import {
   type ButtonInteraction,
   type GuildMember,
 } from "discord.js";
-import { isManagedVacChannel } from "../../../../../shared/features/vac";
 import { tGuild } from "../../../../../shared/locale";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
 import { safeReply } from "../../../../utils/interaction";
@@ -20,6 +19,7 @@ import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "../../../../utils/messageResponse";
+import { getVacRepository } from "../../repositories";
 import {
   getVacPanelChannelId,
   sendVacControlPanel,
@@ -77,7 +77,10 @@ export const vacPanelButtonHandler: ButtonHandler = {
     }
 
     // VAC 管理対象チャンネルかを検証
-    const isManaged = await isManagedVacChannel(guild.id, channel.id);
+    const isManaged = await getVacRepository().isManagedVacChannel(
+      guild.id,
+      channel.id,
+    );
     if (!isManaged) {
       // 操作対象が通常VCだった場合は VAC 専用エラーで統一
       await safeReply(interaction, {

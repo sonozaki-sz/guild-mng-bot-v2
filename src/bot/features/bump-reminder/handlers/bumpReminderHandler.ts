@@ -10,12 +10,13 @@ import {
 import {
   BUMP_CONSTANTS,
   BUMP_SERVICES,
+  getBumpReminderFeatureConfigService,
   getBumpReminderManager,
   getReminderDelayMinutes,
   toScheduledAt,
   type BumpServiceName,
 } from "..";
-import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
+import type { BumpReminderConfigService } from "../../../../shared/features/bump-reminder";
 import {
   getGuildTranslator,
   tDefault,
@@ -42,7 +43,7 @@ export async function handleBumpDetected(
 ): Promise<void> {
   try {
     // Bump 設定サービスを取得し、機能有効状態を確認
-    const bumpReminderConfigService = getBumpReminderConfigService();
+    const bumpReminderConfigService = getBumpReminderFeatureConfigService();
 
     const config =
       await bumpReminderConfigService.getBumpReminderConfig(guildId);
@@ -165,7 +166,7 @@ export async function sendBumpReminder(
   channelId: string,
   messageId: string | undefined,
   serviceName: BumpServiceName | undefined,
-  bumpReminderConfigService: ReturnType<typeof getBumpReminderConfigService>,
+  bumpReminderConfigService: BumpReminderConfigService,
   panelMessageId?: string,
 ): Promise<void> {
   let channel: Awaited<ReturnType<Client["channels"]["fetch"]>> | undefined;

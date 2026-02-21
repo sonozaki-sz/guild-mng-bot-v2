@@ -8,7 +8,6 @@ import {
   type UserSelectMenuInteraction,
 } from "discord.js";
 import { getGuildConfigRepository } from "../../../../../shared/database";
-import { isManagedVacChannel } from "../../../../../shared/features/vac";
 import { tGuild } from "../../../../../shared/locale";
 import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui";
 import { safeReply } from "../../../../utils/interaction";
@@ -16,6 +15,7 @@ import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "../../../../utils/messageResponse";
+import { getVacRepository } from "../../repositories";
 import { getVacPanelChannelId, VAC_PANEL_CUSTOM_ID } from "./vacControlPanel";
 
 export const vacPanelUserSelectHandler: UserSelectHandler = {
@@ -64,7 +64,10 @@ export const vacPanelUserSelectHandler: UserSelectHandler = {
     }
 
     // VAC 管理対象チャンネルかを検証
-    const isManaged = await isManagedVacChannel(guild.id, channel.id);
+    const isManaged = await getVacRepository().isManagedVacChannel(
+      guild.id,
+      channel.id,
+    );
     if (!isManaged) {
       // 通常VCを対象にした誤操作も同一エラーへ統一する
       await safeReply(interaction, {

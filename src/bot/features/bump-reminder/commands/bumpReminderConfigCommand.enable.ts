@@ -2,10 +2,10 @@
 // bump-reminder-config enable 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
+import { getBumpReminderFeatureConfigService } from "../services";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
@@ -26,7 +26,7 @@ export async function handleBumpReminderConfigEnable(
   const channelId = interaction.channelId;
 
   // 設定を有効化（channelId を同時保存）
-  await getBumpReminderConfigService().setBumpReminderEnabled(
+  await getBumpReminderFeatureConfigService().setBumpReminderEnabled(
     guildId,
     true,
     channelId,

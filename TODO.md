@@ -259,12 +259,17 @@
     - [x] `vac` / `vac-config` / `bump-reminder-config` は `features` 委譲のみを維持
     - [x] `ping` の実行ロジックを `features/ping/commands` へ移送
   - [x] 権限・入力検証・応答のみ `commands` に残す
-- [ ] **P4: `shared/database` 巨大ファイル分割**
+- [x] **P4: `shared/database` 巨大ファイル分割**
   - [x] CAS更新ロジックを共通ヘルパー化
     - [x] `GuildBumpReminderConfigStore` のCAS処理を `stores/helpers/bumpReminderConfigCas.ts` へ抽出
-  - [ ] `stores/repositories` の責務を serializer / persistence に再分離
-- [ ] **P5: singleton依存を明示DIへ段階移行**
-  - [ ] `vac` / `bump-reminder` から factory + 注入経路を整備
+    - [x] AFK CAS処理を `stores/helpers/afkConfigCas.ts` へ抽出
+  - [x] `stores/repositories` の責務を serializer / persistence に再分離
+    - [x] `PrismaGuildConfigRepository` の JSON serializer/deserializer を `repositories/serializers/guildConfigSerializer.ts` へ抽出
+    - [x] AFK処理（`getAfkConfig` / `setAfkChannel` / `updateAfkConfig`）を `stores/guildAfkConfigStore.ts` へ分離
+    - [x] read系クエリ（config/exists/locale/afk/stick/member-log）を `repositories/persistence/guildConfigReadPersistence.ts` へ抽出
+    - [x] write系クエリ（save/update/delete）を `repositories/persistence/guildConfigWritePersistence.ts` へ抽出
+- [x] **P5: singleton依存を明示DIへ段階移行**
+  - [x] `vac` / `bump-reminder` から factory + 注入経路を整備
 
 ### コード品質
 

@@ -2,11 +2,11 @@
 // Bump リマインダーの起動時復元処理
 
 import {
+  getBumpReminderFeatureConfigService,
   getBumpReminderManager,
   type BumpReminderTaskFactory,
   type BumpServiceName,
 } from "..";
-import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
 import { tDefault } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import type { BotClient } from "../../../client";
@@ -22,7 +22,7 @@ export async function restoreBumpRemindersOnStartup(
 ): Promise<void> {
   try {
     // 復元処理で使用する依存サービスを取得
-    const bumpReminderConfigService = getBumpReminderConfigService();
+    const bumpReminderConfigService = getBumpReminderFeatureConfigService();
     const bumpReminderManager = getBumpReminderManager();
 
     // 永続化されたジョブ情報を実行可能タスクへ変換するファクトリ

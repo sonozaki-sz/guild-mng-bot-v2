@@ -2,9 +2,9 @@
 // bump-reminder-config show 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
 import { tGuild } from "../../../../shared/locale";
 import { createInfoEmbed } from "../../../utils/messageResponse";
+import { getBumpReminderFeatureConfigService } from "../services";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
@@ -22,7 +22,7 @@ export async function handleBumpReminderConfigShow(
 
   // 常に最新設定を取得して表示
   const config =
-    await getBumpReminderConfigService().getBumpReminderConfig(guildId);
+    await getBumpReminderFeatureConfigService().getBumpReminderConfig(guildId);
 
   // 未設定時は案内メッセージを返す
   if (!config) {

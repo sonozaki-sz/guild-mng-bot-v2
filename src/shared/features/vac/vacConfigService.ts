@@ -191,6 +191,15 @@ export class VacConfigService {
 }
 
 /**
+ * VAC設定サービスを依存注入で生成する
+ */
+export function createVacConfigService(
+  repository: IVacRepository,
+): VacConfigService {
+  return new VacConfigService(repository);
+}
+
+/**
  * VAC設定サービスのシングルトンを取得する
  */
 export function getVacConfigService(
@@ -199,7 +208,7 @@ export function getVacConfigService(
   // 引数優先で repository を解決し、同一インスタンスなら既存 service を再利用
   const resolvedRepository = repository ?? getGuildConfigRepository();
   if (!vacConfigService || cachedRepository !== resolvedRepository) {
-    vacConfigService = new VacConfigService(resolvedRepository);
+    vacConfigService = createVacConfigService(resolvedRepository);
     cachedRepository = resolvedRepository;
   }
   return vacConfigService;

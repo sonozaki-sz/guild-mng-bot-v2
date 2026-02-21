@@ -3,10 +3,10 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { getBumpReminderManager } from "..";
-import { getBumpReminderConfigService } from "../../../../shared/features/bump-reminder";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
+import { getBumpReminderFeatureConfigService } from "../services";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
@@ -28,7 +28,10 @@ export async function handleBumpReminderConfigDisable(
   await bumpReminderManager.cancelReminder(guildId);
 
   // 機能を無効化
-  await getBumpReminderConfigService().setBumpReminderEnabled(guildId, false);
+  await getBumpReminderFeatureConfigService().setBumpReminderEnabled(
+    guildId,
+    false,
+  );
 
   const description = await tGuild(
     guildId,

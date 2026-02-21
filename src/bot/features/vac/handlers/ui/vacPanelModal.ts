@@ -7,7 +7,6 @@ import {
   type GuildMember,
   type ModalSubmitInteraction,
 } from "discord.js";
-import { isManagedVacChannel } from "../../../../../shared/features/vac";
 import { tGuild } from "../../../../../shared/locale";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui";
 import { safeReply } from "../../../../utils/interaction";
@@ -15,6 +14,7 @@ import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "../../../../utils/messageResponse";
+import { getVacRepository } from "../../repositories";
 import { getVacPanelChannelId, VAC_PANEL_CUSTOM_ID } from "./vacControlPanel";
 
 // Discord VC userLimit の許容範囲（0 は無制限）
@@ -79,7 +79,10 @@ export const vacPanelModalHandler: ModalHandler = {
     }
 
     // VAC 管理対象チャンネルかを検証
-    const isManaged = await isManagedVacChannel(guild.id, channel.id);
+    const isManaged = await getVacRepository().isManagedVacChannel(
+      guild.id,
+      channel.id,
+    );
     if (!isManaged) {
       await safeReply(interaction, {
         embeds: [

@@ -198,6 +198,15 @@ export class BumpReminderConfigService {
 }
 
 /**
+ * Bumpリマインダー設定サービスを依存注入で生成する
+ */
+export function createBumpReminderConfigService(
+  repository: IBumpReminderConfigRepository,
+): BumpReminderConfigService {
+  return new BumpReminderConfigService(repository);
+}
+
+/**
  * Bumpリマインダー設定サービスのシングルトンを取得する
  */
 export function getBumpReminderConfigService(
@@ -206,9 +215,8 @@ export function getBumpReminderConfigService(
   // 引数優先で repository を解決し、同一依存なら service を再利用
   const resolvedRepository = repository ?? getGuildConfigRepository();
   if (!bumpReminderConfigService || cachedRepository !== resolvedRepository) {
-    bumpReminderConfigService = new BumpReminderConfigService(
-      resolvedRepository,
-    );
+    bumpReminderConfigService =
+      createBumpReminderConfigService(resolvedRepository);
     cachedRepository = resolvedRepository;
   }
   return bumpReminderConfigService;

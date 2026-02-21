@@ -21,6 +21,8 @@ export {
 // スケジューリング/復元を担うマネージャー
 export {
   BumpReminderManager,
+  createBumpReminderFeatureConfigService,
+  getBumpReminderFeatureConfigService,
   getBumpReminderManager,
   type BumpReminderTaskFactory,
 } from "./services";

@@ -7,10 +7,10 @@ import {
   MessageFlags,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors";
-import { isManagedVacChannel } from "../../../../shared/features/vac";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
+import { getVacRepository } from "../repositories";
 import { VAC_COMMAND } from "./vacCommand.constants";
 
 /**
@@ -70,7 +70,10 @@ async function getManagedVoiceChannel(
     );
   }
 
-  const isManaged = await isManagedVacChannel(guildId, voiceChannel.id);
+  const isManaged = await getVacRepository().isManagedVacChannel(
+    guildId,
+    voiceChannel.id,
+  );
   if (!isManaged) {
     throw new ValidationError(
       await tGuild(guildId, "errors:vac.not_vac_channel"),

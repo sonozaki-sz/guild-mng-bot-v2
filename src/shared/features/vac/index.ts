@@ -7,6 +7,7 @@ export {
   VacConfigService,
   addCreatedVacChannel,
   addTriggerChannel,
+  createVacConfigService,
   getVacConfigOrDefault,
   getVacConfigService,
   isManagedVacChannel,

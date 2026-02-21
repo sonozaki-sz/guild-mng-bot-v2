@@ -7,11 +7,11 @@ import {
   BUMP_REMINDER_MENTION_ROLE_RESULT,
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
-  getBumpReminderConfigService,
 } from "../../../../shared/features/bump-reminder";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
+import { getBumpReminderFeatureConfigService } from "../services";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "./bumpReminderConfigCommand.constants";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
@@ -36,7 +36,7 @@ export async function handleBumpReminderConfigSetMention(
   const user = interaction.options.getUser(
     BUMP_REMINDER_CONFIG_COMMAND.OPTION.USER,
   );
-  const bumpReminderConfigService = getBumpReminderConfigService();
+  const bumpReminderConfigService = getBumpReminderFeatureConfigService();
   const currentConfig =
     await bumpReminderConfigService.getBumpReminderConfig(guildId);
 

@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { DatabaseError } from "../../errors";
+import { GuildAfkConfigStore } from "../stores/guildAfkConfigStore";
 import { GuildBumpReminderConfigStore } from "../stores/guildBumpReminderConfigStore";
 import { GuildVacConfigStore } from "../stores/guildVacConfigStore";
 import type {
@@ -19,6 +20,24 @@ import type {
   StickMessage,
   VacConfig,
 } from "../types";
+import {
+  existsGuildConfigRecord,
+  findGuildConfigRecord,
+  findGuildLocale,
+  findMemberLogConfigJson,
+  findStickMessagesJson,
+} from "./persistence/guildConfigReadPersistence";
+import {
+  createGuildConfigRecord,
+  deleteGuildConfigRecord,
+  upsertGuildConfigRecord,
+} from "./persistence/guildConfigWritePersistence";
+import {
+  parseJsonSafe,
+  toGuildConfig,
+  toGuildConfigCreateData,
+  toGuildConfigUpdateData,
+} from "./serializers/guildConfigSerializer";
 
 const DB_ERROR = {
   UNKNOWN: "unknown error",
@@ -35,21 +54,27 @@ const DB_ERROR = {
 export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   private prisma: PrismaClient;
   private readonly DEFAULT_LOCALE = "ja";
+  private readonly afkConfigStore: GuildAfkConfigStore;
   private readonly bumpReminderStore: GuildBumpReminderConfigStore;
   private readonly vacConfigStore: GuildVacConfigStore;
 
   constructor(prisma: PrismaClient) {
     // Prisma 参照を保持し、機能別ストアへ safeJsonParse を注入
     this.prisma = prisma;
+    this.afkConfigStore = new GuildAfkConfigStore(
+      prisma,
+      this.DEFAULT_LOCALE,
+      parseJsonSafe,
+    );
     this.bumpReminderStore = new GuildBumpReminderConfigStore(
       prisma,
       this.DEFAULT_LOCALE,
-      this.safeJsonParse.bind(this),
+      parseJsonSafe,
     );
     this.vacConfigStore = new GuildVacConfigStore(
       prisma,
       this.DEFAULT_LOCALE,
-      this.safeJsonParse.bind(this),
+      parseJsonSafe,
     );
   }
 
@@ -65,16 +90,14 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   async getConfig(guildId: string): Promise<GuildConfig | null> {
     try {
       // 設定レコード全体を取得
-      const record = await this.prisma.guildConfig.findUnique({
-        where: { guildId },
-      });
+      const record = await findGuildConfigRecord(this.prisma, guildId);
 
       if (!record) {
         return null;
       }
 
       // DB レコードをアプリ用 GuildConfig へ変換
-      return this.recordToConfig(record);
+      return toGuildConfig(record);
     } catch (error) {
       throw this.toDatabaseError(DB_ERROR.GET_CONFIG_FAILED, error);
     }
@@ -86,23 +109,10 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   async saveConfig(config: GuildConfig): Promise<void> {
     try {
       // 新規作成時は JSON カラムを文字列化して保存
-      await this.prisma.guildConfig.create({
-        data: {
-          guildId: config.guildId,
-          locale: config.locale || this.DEFAULT_LOCALE,
-          afkConfig: config.afkConfig ? JSON.stringify(config.afkConfig) : null,
-          vacConfig: config.vacConfig ? JSON.stringify(config.vacConfig) : null,
-          bumpReminderConfig: config.bumpReminderConfig
-            ? JSON.stringify(config.bumpReminderConfig)
-            : null,
-          stickMessages: config.stickMessages
-            ? JSON.stringify(config.stickMessages)
-            : null,
-          memberLogConfig: config.memberLogConfig
-            ? JSON.stringify(config.memberLogConfig)
-            : null,
-        },
-      });
+      await createGuildConfigRecord(
+        this.prisma,
+        toGuildConfigCreateData(config, this.DEFAULT_LOCALE),
+      );
     } catch (error) {
       throw this.toDatabaseError(DB_ERROR.SAVE_CONFIG_FAILED, error);
     }
@@ -116,31 +126,13 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
     updates: Partial<GuildConfig>,
   ): Promise<void> {
     try {
-      // 更新データの準備
-      const data: Record<string, unknown> = {};
-
-      // 更新対象のみを詰めた data を upsert に渡す
-      if (updates.locale !== undefined) data.locale = updates.locale;
-      if (updates.afkConfig !== undefined)
-        data.afkConfig = JSON.stringify(updates.afkConfig);
-      if (updates.vacConfig !== undefined)
-        data.vacConfig = JSON.stringify(updates.vacConfig);
-      if (updates.bumpReminderConfig !== undefined)
-        data.bumpReminderConfig = JSON.stringify(updates.bumpReminderConfig);
-      if (updates.stickMessages !== undefined)
-        data.stickMessages = JSON.stringify(updates.stickMessages);
-      if (updates.memberLogConfig !== undefined)
-        data.memberLogConfig = JSON.stringify(updates.memberLogConfig);
+      const data = toGuildConfigUpdateData(updates);
 
       // exists → update/insert の 2 クエリを回避、upsert 1 回に統一
-      await this.prisma.guildConfig.upsert({
-        where: { guildId },
-        update: data,
-        create: {
-          guildId,
-          locale: (updates.locale as string | undefined) ?? this.DEFAULT_LOCALE,
-          ...data,
-        },
+      await upsertGuildConfigRecord(this.prisma, guildId, data, {
+        guildId,
+        locale: (updates.locale as string | undefined) ?? this.DEFAULT_LOCALE,
+        ...data,
       });
     } catch (error) {
       throw this.toDatabaseError(DB_ERROR.UPDATE_CONFIG_FAILED, error);
@@ -152,9 +144,7 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    */
   async deleteConfig(guildId: string): Promise<void> {
     try {
-      await this.prisma.guildConfig.delete({
-        where: { guildId },
-      });
+      await deleteGuildConfigRecord(this.prisma, guildId);
     } catch (error) {
       throw this.toDatabaseError(DB_ERROR.DELETE_CONFIG_FAILED, error);
     }
@@ -165,11 +155,7 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    */
   async exists(guildId: string): Promise<boolean> {
     try {
-      const record = await this.prisma.guildConfig.findUnique({
-        where: { guildId },
-        select: { id: true },
-      });
-      return record !== null;
+      return await existsGuildConfigRecord(this.prisma, guildId);
     } catch (error) {
       throw this.toDatabaseError(DB_ERROR.CHECK_EXISTS_FAILED, error);
     }
@@ -181,13 +167,10 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    */
   async getLocale(guildId: string): Promise<string> {
     try {
-      const record = await this.prisma.guildConfig.findUnique({
-        where: { guildId },
-        select: { locale: true },
-      });
+      const locale = await findGuildLocale(this.prisma, guildId);
       // 未設定時は既定ロケールへフォールバック
-      return record?.locale || this.DEFAULT_LOCALE;
-    } catch (error) {
+      return locale || this.DEFAULT_LOCALE;
+    } catch (_error) {
       // 取得失敗時も呼び出し側を止めず既定ロケールを返す
       return this.DEFAULT_LOCALE;
     }
@@ -206,109 +189,24 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    * 各取得メソッドは必要なフィールドのみ select して全体取得を避ける
    */
   async getAfkConfig(guildId: string): Promise<AfkConfig | null> {
-    // AFK 設定カラムのみ select
-    const record = await this.prisma.guildConfig.findUnique({
-      where: { guildId },
-      select: { afkConfig: true },
-    });
-    return this.safeJsonParse<AfkConfig>(record?.afkConfig ?? null) ?? null;
+    // AFK 設定取得は専用ストアへ委譲
+    return this.afkConfigStore.getAfkConfig(guildId);
   }
 
   /**
    * AFKチャンネルを設定し、AFK機能を有効化する
    */
   async setAfkChannel(guildId: string, channelId: string): Promise<void> {
-    // チャンネル設定時は AFK を有効化して保存
-    await this.updateAfkConfig(guildId, {
-      enabled: true,
-      channelId,
-    });
+    // チャンネル設定は専用ストアへ委譲
+    await this.afkConfigStore.setAfkChannel(guildId, channelId);
   }
 
   /**
    * AFK設定を安全に更新する（競合時は再試行）
    */
   async updateAfkConfig(guildId: string, afkConfig: AfkConfig): Promise<void> {
-    // AFK 設定は競合を想定した CAS 更新
-    const maxRetries = 3;
-    const nextJson = JSON.stringify(afkConfig);
-
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      // CAS 比較用の最新値を取得
-      // 毎リトライで最新状態を読み直す
-      const record = await this.prisma.guildConfig.findUnique({
-        where: { guildId },
-        select: { afkConfig: true },
-      });
-
-      const rawConfig = record?.afkConfig ?? null;
-      const existingConfig = this.safeJsonParse<AfkConfig>(rawConfig);
-
-      // 未初期化なら null 条件付き更新 or upsert で初期化
-      if (!existingConfig) {
-        if (record) {
-          const initResult = await this.prisma.guildConfig.updateMany({
-            where: {
-              guildId,
-              afkConfig: null,
-            },
-            data: {
-              afkConfig: nextJson,
-            },
-          });
-          if (initResult.count > 0) {
-            // null 状態からの初期投入が成功
-            return;
-          }
-        } else {
-          // レコード自体が無い場合は guild 行ごと作成
-          await this.prisma.guildConfig.upsert({
-            where: { guildId },
-            update: {},
-            create: {
-              guildId,
-              locale: this.DEFAULT_LOCALE,
-              afkConfig: nextJson,
-            },
-          });
-        }
-        continue;
-      }
-
-      // 既存値に部分更新をマージ
-      const updatedConfig: AfkConfig = {
-        ...existingConfig,
-        ...afkConfig,
-      };
-
-      // 変更がない場合は更新不要
-      const updatedJson = JSON.stringify(updatedConfig);
-      if (updatedJson === rawConfig) {
-        return;
-      }
-
-      // 旧値一致条件で CAS 更新
-      const result = await this.prisma.guildConfig.updateMany({
-        where: {
-          guildId,
-          afkConfig: rawConfig,
-        },
-        data: {
-          afkConfig: updatedJson,
-        },
-      });
-
-      if (result.count > 0) {
-        return;
-      }
-
-      // CAS 不一致時は他更新先行とみなし再試行
-    }
-
-    // 最大リトライ超過時のみ競合エラーとして失敗
-    throw new DatabaseError(
-      `${DB_ERROR.UPDATE_CONFIG_FAILED}: afk config update conflict (${guildId})`,
-    );
+    // AFK 設定更新は専用ストアへ委譲
+    await this.afkConfigStore.updateAfkConfig(guildId, afkConfig);
   }
 
   async getBumpReminderConfig(
@@ -404,14 +302,9 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    */
   async getStickMessages(guildId: string): Promise<StickMessage[]> {
     // stickMessages カラムのみ select
-    const record = await this.prisma.guildConfig.findUnique({
-      where: { guildId },
-      select: { stickMessages: true },
-    });
+    const stickMessagesJson = await findStickMessagesJson(this.prisma, guildId);
     // 未設定/不正JSONは空配列へフォールバック
-    return (
-      this.safeJsonParse<StickMessage[]>(record?.stickMessages ?? null) ?? []
-    );
+    return parseJsonSafe<StickMessage[]>(stickMessagesJson) ?? [];
   }
 
   async updateStickMessages(
@@ -427,14 +320,11 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    */
   async getMemberLogConfig(guildId: string): Promise<MemberLogConfig | null> {
     // memberLogConfig カラムのみ select
-    const record = await this.prisma.guildConfig.findUnique({
-      where: { guildId },
-      select: { memberLogConfig: true },
-    });
-    return (
-      this.safeJsonParse<MemberLogConfig>(record?.memberLogConfig ?? null) ??
-      null
+    const memberLogConfigJson = await findMemberLogConfigJson(
+      this.prisma,
+      guildId,
     );
+    return parseJsonSafe<MemberLogConfig>(memberLogConfigJson) ?? null;
   }
 
   async updateMemberLogConfig(
@@ -443,53 +333,6 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   ): Promise<void> {
     // 統一更新ルート（upsert含む）へ委譲
     await this.updateConfig(guildId, { memberLogConfig });
-  }
-
-  /**
-   * PrismaレコードをGuildConfigに変換
-   */
-  private recordToConfig(record: {
-    id: string;
-    guildId: string;
-    locale: string;
-    afkConfig: string | null;
-    vacConfig: string | null;
-    bumpReminderConfig: string | null;
-    stickMessages: string | null;
-    memberLogConfig: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }): GuildConfig {
-    // JSON カラムは必要な型へ安全に逆変換して詰め直す
-    return {
-      guildId: record.guildId,
-      locale: record.locale,
-      afkConfig: this.safeJsonParse<AfkConfig>(record.afkConfig),
-      vacConfig: this.safeJsonParse<VacConfig>(record.vacConfig),
-      bumpReminderConfig: this.safeJsonParse<BumpReminderConfig>(
-        record.bumpReminderConfig,
-      ),
-      stickMessages: this.safeJsonParse<StickMessage[]>(record.stickMessages),
-      memberLogConfig: this.safeJsonParse<MemberLogConfig>(
-        record.memberLogConfig,
-      ),
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
-    };
-  }
-
-  /**
-   * 安全なJSON.parse（エラーハンドリング付き）
-   */
-  private safeJsonParse<T>(json: string | null): T | undefined {
-    // null/空は未設定として扱う
-    if (!json) return undefined;
-    try {
-      return JSON.parse(json) as T;
-    } catch (error) {
-      // 壊れた JSON はログ化して undefined を返す
-      return undefined;
-    }
   }
 }
 

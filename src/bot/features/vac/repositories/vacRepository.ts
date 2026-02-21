@@ -1,15 +1,14 @@
 // src/bot/features/vac/repositories/vacRepository.ts
 // VAC機能向けの永続化アクセスリポジトリ
 
-import type { VacChannelPair, VacConfig } from "../../../../shared/database";
 import {
-  addCreatedVacChannel,
-  addTriggerChannel,
-  getVacConfigOrDefault,
-  isManagedVacChannel,
-  removeCreatedVacChannel,
-  removeTriggerChannel,
-  saveVacConfig,
+  getGuildConfigRepository,
+  type VacChannelPair,
+  type VacConfig,
+} from "../../../../shared/database";
+import {
+  createVacConfigService,
+  type VacConfigService,
 } from "../../../../shared/features/vac";
 
 /**
@@ -34,16 +33,44 @@ export interface IVacRepository {
   ): Promise<boolean>;
 }
 
-function createVacRepository(): IVacRepository {
+type VacConfigServicePort = Pick<
+  VacConfigService,
+  | "getVacConfigOrDefault"
+  | "saveVacConfig"
+  | "addTriggerChannel"
+  | "removeTriggerChannel"
+  | "addCreatedVacChannel"
+  | "removeCreatedVacChannel"
+  | "isManagedVacChannel"
+>;
+
+/**
+ * VAC設定サービスを注入して VAC リポジトリを生成する
+ */
+export function createVacRepository(
+  vacConfigService: VacConfigServicePort,
+): IVacRepository {
   return {
-    getVacConfigOrDefault,
-    saveVacConfig,
-    addTriggerChannel,
-    removeTriggerChannel,
-    addCreatedVacChannel,
-    removeCreatedVacChannel,
-    isManagedVacChannel,
+    getVacConfigOrDefault: (guildId) =>
+      vacConfigService.getVacConfigOrDefault(guildId),
+    saveVacConfig: (guildId, config) =>
+      vacConfigService.saveVacConfig(guildId, config),
+    addTriggerChannel: (guildId, channelId) =>
+      vacConfigService.addTriggerChannel(guildId, channelId),
+    removeTriggerChannel: (guildId, channelId) =>
+      vacConfigService.removeTriggerChannel(guildId, channelId),
+    addCreatedVacChannel: (guildId, channel) =>
+      vacConfigService.addCreatedVacChannel(guildId, channel),
+    removeCreatedVacChannel: (guildId, voiceChannelId) =>
+      vacConfigService.removeCreatedVacChannel(guildId, voiceChannelId),
+    isManagedVacChannel: (guildId, voiceChannelId) =>
+      vacConfigService.isManagedVacChannel(guildId, voiceChannelId),
   };
+}
+
+function createDefaultVacRepository(): IVacRepository {
+  const vacConfigService = createVacConfigService(getGuildConfigRepository());
+  return createVacRepository(vacConfigService);
 }
 
 let vacRepository: IVacRepository | undefined;
@@ -59,7 +86,7 @@ export function getVacRepository(repository?: IVacRepository): IVacRepository {
 
   // 通常実行時は遅延初期化シングルトンを返す
   if (!vacRepository) {
-    vacRepository = createVacRepository();
+    vacRepository = createDefaultVacRepository();
   }
 
   return vacRepository;

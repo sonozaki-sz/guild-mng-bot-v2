@@ -11,17 +11,13 @@ import {
   type VoiceChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors";
-import {
-  addTriggerChannel,
-  getVacConfigOrDefault,
-  removeTriggerChannel,
-} from "../../../../shared/features/vac";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import {
   createInfoEmbed,
   createSuccessEmbed,
 } from "../../../utils/messageResponse";
+import { getVacRepository } from "../repositories";
 import { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
 
 /**
@@ -108,7 +104,7 @@ async function handleCreateTrigger(
   );
   const targetCategoryId = category?.id ?? null;
 
-  const config = await getVacConfigOrDefault(guildId);
+  const config = await getVacRepository().getVacConfigOrDefault(guildId);
   // 同一カテゴリへの重複トリガー作成を防止
   const existingTrigger = await findTriggerChannelByCategory(
     guild,
@@ -139,7 +135,7 @@ async function handleCreateTrigger(
   });
 
   // 作成したトリガーVCを設定へ反映して永続化する
-  await addTriggerChannel(guildId, triggerChannel.id);
+  await getVacRepository().addTriggerChannel(guildId, triggerChannel.id);
 
   const embed = createSuccessEmbed(
     await tGuild(guildId, "commands:vac-config.embed.trigger_created", {
@@ -180,7 +176,7 @@ async function handleRemoveTrigger(
   const targetCategoryId = category?.id ?? null;
 
   // 設定上の対象トリガーを特定
-  const config = await getVacConfigOrDefault(guildId);
+  const config = await getVacRepository().getVacConfigOrDefault(guildId);
   const triggerChannel = await findTriggerChannelByCategory(
     guild,
     config.triggerChannelIds,
@@ -195,7 +191,7 @@ async function handleRemoveTrigger(
   }
 
   // 設定を先に更新し、実体削除は後続で試行する
-  await removeTriggerChannel(guildId, triggerChannel.id);
+  await getVacRepository().removeTriggerChannel(guildId, triggerChannel.id);
 
   const guildChannel = await interaction.guild?.channels
     .fetch(triggerChannel.id)
@@ -309,7 +305,7 @@ async function handleShow(
     throw new ValidationError(tDefault("errors:validation.guild_only"));
   }
 
-  const config = await getVacConfigOrDefault(guildId);
+  const config = await getVacRepository().getVacConfigOrDefault(guildId);
   const topLabel = await tGuild(guildId, "commands:vac-config.embed.top");
 
   const triggerChannels =
