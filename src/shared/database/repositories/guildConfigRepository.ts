@@ -22,30 +22,19 @@ import type {
   StickMessage,
   VacConfig,
 } from "../types";
+import { parseJsonSafe } from "./serializers/guildConfigSerializer";
 import {
-  existsGuildConfigRecord,
-  findGuildConfigRecord,
-  findGuildLocale,
-} from "./persistence/guildConfigReadPersistence";
-import {
-  createGuildConfigRecord,
-  deleteGuildConfigRecord,
-  upsertGuildConfigRecord,
-} from "./persistence/guildConfigWritePersistence";
-import {
-  parseJsonSafe,
-  toGuildConfig,
-  toGuildConfigCreateData,
-  toGuildConfigUpdateData,
-} from "./serializers/guildConfigSerializer";
+  deleteGuildConfigUsecase,
+  existsGuildConfigUsecase,
+  getGuildConfigUsecase,
+  getGuildLocaleUsecase,
+  saveGuildConfigUsecase,
+  updateGuildConfigUsecase,
+  updateGuildLocaleUsecase,
+} from "./usecases/guildConfigCoreUsecases";
 
 const DB_ERROR = {
   UNKNOWN: "unknown error",
-  GET_CONFIG_FAILED: "Failed to get guild config",
-  SAVE_CONFIG_FAILED: "Failed to save guild config",
-  UPDATE_CONFIG_FAILED: "Failed to update guild config",
-  DELETE_CONFIG_FAILED: "Failed to delete guild config",
-  CHECK_EXISTS_FAILED: "Failed to check guild config existence",
 } as const;
 
 /**
@@ -100,34 +89,14 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    * Guild設定を取得
    */
   async getConfig(guildId: string): Promise<GuildConfig | null> {
-    try {
-      // 設定レコード全体を取得
-      const record = await findGuildConfigRecord(this.prisma, guildId);
-
-      if (!record) {
-        return null;
-      }
-
-      // DB レコードをアプリ用 GuildConfig へ変換
-      return toGuildConfig(record);
-    } catch (error) {
-      throw this.toDatabaseError(DB_ERROR.GET_CONFIG_FAILED, error);
-    }
+    return getGuildConfigUsecase(this.getCoreDeps(), guildId);
   }
 
   /**
    * Guild設定を保存（新規作成）
    */
   async saveConfig(config: GuildConfig): Promise<void> {
-    try {
-      // 新規作成時は JSON カラムを文字列化して保存
-      await createGuildConfigRecord(
-        this.prisma,
-        toGuildConfigCreateData(config, this.DEFAULT_LOCALE),
-      );
-    } catch (error) {
-      throw this.toDatabaseError(DB_ERROR.SAVE_CONFIG_FAILED, error);
-    }
+    await saveGuildConfigUsecase(this.getCoreDeps(), config);
   }
 
   /**
@@ -137,40 +106,21 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
     guildId: string,
     updates: Partial<GuildConfig>,
   ): Promise<void> {
-    try {
-      const data = toGuildConfigUpdateData(updates);
-
-      // exists → update/insert の 2 クエリを回避、upsert 1 回に統一
-      await upsertGuildConfigRecord(this.prisma, guildId, data, {
-        guildId,
-        locale: (updates.locale as string | undefined) ?? this.DEFAULT_LOCALE,
-        ...data,
-      });
-    } catch (error) {
-      throw this.toDatabaseError(DB_ERROR.UPDATE_CONFIG_FAILED, error);
-    }
+    await updateGuildConfigUsecase(this.getCoreDeps(), guildId, updates);
   }
 
   /**
    * Guild設定を削除
    */
   async deleteConfig(guildId: string): Promise<void> {
-    try {
-      await deleteGuildConfigRecord(this.prisma, guildId);
-    } catch (error) {
-      throw this.toDatabaseError(DB_ERROR.DELETE_CONFIG_FAILED, error);
-    }
+    await deleteGuildConfigUsecase(this.getCoreDeps(), guildId);
   }
 
   /**
    * Guild設定の存在確認
    */
   async exists(guildId: string): Promise<boolean> {
-    try {
-      return await existsGuildConfigRecord(this.prisma, guildId);
-    } catch (error) {
-      throw this.toDatabaseError(DB_ERROR.CHECK_EXISTS_FAILED, error);
-    }
+    return existsGuildConfigUsecase(this.getCoreDeps(), guildId);
   }
 
   /**
@@ -178,22 +128,23 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
    * localeフィールドのみを取得する専用クエリ（全体取得より効率的）
    */
   async getLocale(guildId: string): Promise<string> {
-    try {
-      const locale = await findGuildLocale(this.prisma, guildId);
-      // 未設定時は既定ロケールへフォールバック
-      return locale || this.DEFAULT_LOCALE;
-    } catch (_error) {
-      // 取得失敗時も呼び出し側を止めず既定ロケールを返す
-      return this.DEFAULT_LOCALE;
-    }
+    return getGuildLocaleUsecase(this.getCoreDeps(), guildId);
   }
 
   /**
    * Guild別言語更新
    */
   async updateLocale(guildId: string, locale: string): Promise<void> {
-    // locale 更新は共通更新ルート（upsert含む）へ委譲
-    await this.updateConfig(guildId, { locale });
+    await updateGuildLocaleUsecase(this.getCoreDeps(), guildId, locale);
+  }
+
+  private getCoreDeps() {
+    return {
+      prisma: this.prisma,
+      defaultLocale: this.DEFAULT_LOCALE,
+      toDatabaseError: (prefix: string, error: unknown) =>
+        this.toDatabaseError(prefix, error),
+    };
   }
 
   /**
