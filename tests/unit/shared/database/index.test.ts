@@ -1,4 +1,4 @@
-describe("shared/database/index", () => {
+describe("shared/database/guildConfigRepositoryProvider", () => {
   beforeEach(() => {
     jest.resetModules();
   });
@@ -9,7 +9,7 @@ describe("shared/database/index", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database");
+    const module = await import("@/shared/database/guildConfigRepositoryProvider");
     expect(() => module.getGuildConfigRepository()).toThrow(
       "GuildConfigRepository is not initialized",
     );
@@ -28,7 +28,7 @@ describe("shared/database/index", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database");
+    const module = await import("@/shared/database/guildConfigRepositoryProvider");
 
     const firstA = module.getGuildConfigRepository(prismaA as never);
     const secondA = module.getGuildConfigRepository(prismaA as never);
@@ -52,7 +52,7 @@ describe("shared/database/index", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database");
+    const module = await import("@/shared/database/guildConfigRepositoryProvider");
 
     module.getGuildConfigRepository(prisma as never);
     expect(module.getGuildConfigRepository()).toBe(repoFromPrisma);
@@ -70,7 +70,7 @@ describe("shared/database/index", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database");
+    const module = await import("@/shared/database/guildConfigRepositoryProvider");
 
     module.getGuildConfigRepository(prisma as never);
     module.resetGuildConfigRepositoryCache();
@@ -78,5 +78,31 @@ describe("shared/database/index", () => {
     expect(() => module.getGuildConfigRepository()).toThrow(
       "GuildConfigRepository is not initialized",
     );
+  });
+
+  it("exports provider/repository/types modules", async () => {
+    const providerModule = await import(
+      "@/shared/database/guildConfigRepositoryProvider"
+    );
+    const repositoryModule = await import(
+      "@/shared/database/repositories/guildConfigRepository"
+    );
+    const typesModule = await import("@/shared/database/types");
+
+    expect(providerModule.getGuildConfigRepository).toEqual(expect.any(Function));
+    expect(providerModule.setDefaultGuildConfigRepository).toEqual(
+      expect.any(Function),
+    );
+    expect(providerModule.resetGuildConfigRepositoryCache).toEqual(
+      expect.any(Function),
+    );
+    expect(repositoryModule.createGuildConfigRepository).toEqual(
+      expect.any(Function),
+    );
+    expect(typesModule.BUMP_REMINDER_MENTION_CLEAR_RESULT).toBeDefined();
+    expect(typesModule.BUMP_REMINDER_MENTION_ROLE_RESULT).toBeDefined();
+    expect(typesModule.BUMP_REMINDER_MENTION_USER_ADD_RESULT).toBeDefined();
+    expect(typesModule.BUMP_REMINDER_MENTION_USER_REMOVE_RESULT).toBeDefined();
+    expect(typesModule.BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT).toBeDefined();
   });
 });

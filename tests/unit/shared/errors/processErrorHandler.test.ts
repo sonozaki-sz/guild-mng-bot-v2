@@ -14,10 +14,10 @@ describe("shared/errors/processErrorHandler", () => {
     jest.resetModules();
     jest.clearAllMocks();
 
-    jest.doMock("@/shared/locale", () => ({
+    jest.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
     }));
-    jest.doMock("@/shared/utils", () => ({
+    jest.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
     }));
     jest.doMock("@/shared/errors/errorUtils", () => ({
@@ -111,6 +111,63 @@ describe("shared/errors/processErrorHandler", () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 
+  it("does not exit on operational BaseError from uncaughtException", async () => {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    jest.spyOn(process, "on").mockImplementation(((
+      event: string,
+      listener: (...args: unknown[]) => void,
+    ) => {
+      handlers.set(event, listener);
+      return process;
+    }) as typeof process.on);
+    const exitSpy = jest
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined as never) as typeof process.exit);
+
+    const { BaseError } = await import("@/shared/errors/customErrors");
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGlobalErrorHandlers();
+
+    const uncaughtException = handlers.get("uncaughtException");
+    const operational = new BaseError("ValidationError", "invalid", true);
+    uncaughtException?.(operational);
+
+    expect(logErrorMock).toHaveBeenCalledWith(operational);
+    expect(exitSpy).not.toHaveBeenCalled();
+  });
+
+  it("logs node warning details from warning event", async () => {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    jest.spyOn(process, "on").mockImplementation(((
+      event: string,
+      listener: (...args: unknown[]) => void,
+    ) => {
+      handlers.set(event, listener);
+      return process;
+    }) as typeof process.on);
+
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGlobalErrorHandlers();
+
+    const warningHandler = handlers.get("warning");
+    expect(warningHandler).toBeDefined();
+
+    const warning = new Error("node warning");
+    warning.name = "ExperimentalWarning";
+    warningHandler?.(warning);
+
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      "system:error.node_warning",
+      expect.objectContaining({
+        name: "ExperimentalWarning",
+        message: "node warning",
+        stack: expect.any(String),
+      }),
+    );
+  });
+
   it("registers graceful shutdown once and handles cleanup outcomes", async () => {
     const onceHandlers = new Map<string, () => void>();
     jest.spyOn(process, "once").mockImplementation(((
@@ -153,10 +210,10 @@ describe("shared/errors/processErrorHandler", () => {
       .mockRejectedValue(new Error("cleanup-failed"));
     jest.resetModules();
     jest.clearAllMocks();
-    jest.doMock("@/shared/locale", () => ({
+    jest.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
     }));
-    jest.doMock("@/shared/utils", () => ({
+    jest.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
     }));
     jest.doMock("@/shared/errors/errorUtils", () => ({
@@ -228,5 +285,32 @@ describe("shared/errors/processErrorHandler", () => {
 
     resolveCleanup?.();
     await Promise.resolve();
+  });
+
+  it("exits successfully even when cleanup is not provided", async () => {
+    const onceHandlers = new Map<string, () => void>();
+    jest.spyOn(process, "once").mockImplementation(((
+      event: string,
+      listener: () => void,
+    ) => {
+      onceHandlers.set(event, listener);
+      return process;
+    }) as typeof process.once);
+    const exitSpy = jest
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined as never) as typeof process.exit);
+
+    const { setupGracefulShutdown } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGracefulShutdown();
+
+    onceHandlers.get("SIGINT")?.();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(loggerMock.info).toHaveBeenCalledWith(
+      "system:error.cleanup_complete",
+    );
+    expect(exitSpy).toHaveBeenCalledWith(0);
   });
 });

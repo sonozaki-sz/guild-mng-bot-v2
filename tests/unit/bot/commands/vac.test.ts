@@ -22,11 +22,13 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
 }));
 
 // i18n は固定値化して期待値を安定させる
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
+}));
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));

@@ -227,5 +227,29 @@ describe("Environment Configuration", () => {
       expect(errorSpy).toHaveBeenCalledWith("\nPlease check your .env file.");
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
+
+    it("should exit on non-Zod error during env parsing", () => {
+      process.env.DISCORD_TOKEN = "a".repeat(50);
+      process.env.DISCORD_APP_ID = "1234567890";
+      process.env.NODE_ENV = "test";
+      delete process.env.JWT_SECRET;
+
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+        throw new Error("warn-failed");
+      });
+      const errorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(jest.fn());
+      const exitSpy = jest.spyOn(process, "exit").mockImplementation((() => {
+        throw new Error("EXIT");
+      }) as never);
+
+      expect(() => require("@/shared/config/env")).toThrow("EXIT");
+      expect(warnSpy).toHaveBeenCalled();
+      expect(errorSpy).not.toHaveBeenCalledWith(
+        "❌ Environment variable validation failed:",
+      );
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
   });
 });

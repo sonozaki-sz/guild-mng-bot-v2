@@ -8,7 +8,7 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
 }));
 
 // ローカライズとロガーは副作用を排除する
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => key),
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));

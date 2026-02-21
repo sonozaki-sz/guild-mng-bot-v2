@@ -10,7 +10,7 @@ jest.mock("node-cron", () => ({
   },
 }));
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
@@ -178,6 +178,24 @@ describe("shared/scheduler/jobScheduler", () => {
       "system:scheduler.job_error",
       expect.any(Error),
     );
+  });
+
+  // one-time を同一IDで再登録したとき、既存を削除して新規のみ実行することを検証
+  it("replaces existing one-time job when same id is added", async () => {
+    const oldTask = jest.fn().mockResolvedValue(undefined);
+    const newTask = jest.fn().mockResolvedValue(undefined);
+
+    scheduler.addOneTimeJob("once-dup", 1_000, oldTask);
+    scheduler.addOneTimeJob("once-dup", 1_000, newTask);
+
+    expect(logger.warn).toHaveBeenCalledWith("system:scheduler.job_exists");
+    expect(scheduler.getJobIds()).toEqual(["once-dup"]);
+
+    jest.runOnlyPendingTimers();
+    await Promise.resolve();
+
+    expect(oldTask).not.toHaveBeenCalled();
+    expect(newTask).toHaveBeenCalledTimes(1);
   });
 
   // removeJob は cron/one-time の両方を削除でき、未登録は false を返すことを検証

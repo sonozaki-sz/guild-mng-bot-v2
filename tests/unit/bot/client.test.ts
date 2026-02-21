@@ -1,12 +1,12 @@
-import { Collection, GatewayIntentBits } from "discord.js";
 import { BotClient, createBotClient } from "@/bot/client";
-import { logger } from "@/shared/utils";
+import { logger } from "@/shared/utils/logger";
+import { Collection, GatewayIntentBits } from "discord.js";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => key),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: jest.fn(),
   },

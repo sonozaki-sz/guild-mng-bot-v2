@@ -1,6 +1,5 @@
 describe("bot/handlers/interactionCreate/ui/index", () => {
-  it("re-exports ui handler registries", async () => {
-    const indexModule = await import("@/bot/handlers/interactionCreate/ui");
+  it("exposes ui handler registries", async () => {
     const buttonsModule =
       await import("@/bot/handlers/interactionCreate/ui/buttons");
     const modalsModule =
@@ -8,10 +7,8 @@ describe("bot/handlers/interactionCreate/ui/index", () => {
     const selectMenusModule =
       await import("@/bot/handlers/interactionCreate/ui/selectMenus");
 
-    expect(indexModule.buttonHandlers).toBe(buttonsModule.buttonHandlers);
-    expect(indexModule.modalHandlers).toBe(modalsModule.modalHandlers);
-    expect(indexModule.userSelectHandlers).toBe(
-      selectMenusModule.userSelectHandlers,
-    );
+    expect(buttonsModule.buttonHandlers).toBeDefined();
+    expect(modalsModule.modalHandlers).toBeDefined();
+    expect(selectMenusModule.userSelectHandlers).toBeDefined();
   });
 });

@@ -6,10 +6,14 @@ const scheduleReminderInMemoryMock = jest.fn();
 const createTrackedReminderTaskMock = jest.fn();
 const loggerInfoMock = jest.fn();
 
-jest.mock("@/bot/features/bump-reminder", () => ({
-  toBumpReminderJobId: (...args: unknown[]) => toBumpReminderJobIdMock(...args),
-  toScheduledAt: (...args: unknown[]) => toScheduledAtMock(...args),
-}));
+jest.mock(
+  "@/bot/features/bump-reminder/constants/bumpReminderConstants",
+  () => ({
+    toBumpReminderJobId: (...args: unknown[]) =>
+      toBumpReminderJobIdMock(...args),
+    toScheduledAt: (...args: unknown[]) => toScheduledAtMock(...args),
+  }),
+);
 
 jest.mock(
   "@/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper",
@@ -27,11 +31,11 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },

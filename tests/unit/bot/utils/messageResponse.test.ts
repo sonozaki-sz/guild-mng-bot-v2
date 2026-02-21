@@ -1,7 +1,6 @@
 // tests/unit/utils/messageResponse.test.ts
 // メッセージレスポンスユーティリティのテスト
 
-import { EmbedBuilder } from "discord.js";
 import {
   MessageStatus,
   createErrorEmbed,
@@ -10,7 +9,8 @@ import {
   createSuccessEmbed,
   createWarningEmbed,
 } from "@/bot/utils/messageResponse";
-import { localeManager } from "@/shared/locale";
+import { localeManager } from "@/shared/locale/localeManager";
+import { EmbedBuilder } from "discord.js";
 
 // i18n 依存のタイトル検証に備えてロケールを初期化
 beforeAll(async () => {
@@ -58,6 +58,12 @@ describe("messageResponse", () => {
 
       expect(embed1.data.timestamp).toBeUndefined();
       expect(embed2.data.timestamp).toBeUndefined();
+    });
+
+    it("should omit description when empty string is provided", () => {
+      const embed = createStatusEmbed("info", "Title", "");
+
+      expect(embed.data.description).toBeUndefined();
     });
 
     it("should add fields when fields option is provided", () => {

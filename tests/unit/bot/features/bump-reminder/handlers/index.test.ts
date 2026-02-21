@@ -1,23 +1,19 @@
 describe("bot/features/bump-reminder/handlers/index", () => {
-  it("re-exports handler functions", async () => {
-    const indexModule = await import("@/bot/features/bump-reminder/handlers");
+  it("exposes handler functions", async () => {
     const messageCreateModule =
       await import("@/bot/features/bump-reminder/handlers/bumpMessageCreateHandler");
     const reminderModule =
       await import("@/bot/features/bump-reminder/handlers/bumpReminderHandler");
     const startupModule =
       await import("@/bot/features/bump-reminder/handlers/bumpReminderStartup");
+    const uiModule =
+      await import("@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler");
 
-    expect(indexModule.handleBumpMessageCreate).toBe(
-      messageCreateModule.handleBumpMessageCreate,
-    );
-    expect(indexModule.handleBumpDetected).toBe(
-      reminderModule.handleBumpDetected,
-    );
-    expect(indexModule.sendBumpPanel).toBe(reminderModule.sendBumpPanel);
-    expect(indexModule.sendBumpReminder).toBe(reminderModule.sendBumpReminder);
-    expect(indexModule.restoreBumpRemindersOnStartup).toBe(
-      startupModule.restoreBumpRemindersOnStartup,
-    );
+    expect(messageCreateModule.handleBumpMessageCreate).toBeDefined();
+    expect(reminderModule.handleBumpDetected).toBeDefined();
+    expect(reminderModule.sendBumpPanel).toBeDefined();
+    expect(reminderModule.sendBumpReminder).toBeDefined();
+    expect(startupModule.restoreBumpRemindersOnStartup).toBeDefined();
+    expect(uiModule.bumpPanelButtonHandler).toBeDefined();
   });
 });

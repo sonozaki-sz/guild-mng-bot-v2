@@ -3,11 +3,11 @@
  * Bumpリマインダータイマー管理の統合テスト
  */
 
-import { BumpReminderManager } from "@/bot/features/bump-reminder";
+import { BumpReminderManager } from "@/bot/features/bump-reminder/services/bumpReminderService";
 import { jobScheduler } from "@/shared/scheduler/jobScheduler";
 
 // Logger のモック
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -17,7 +17,7 @@ jest.mock("@/shared/utils", () => ({
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 

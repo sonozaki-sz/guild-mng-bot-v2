@@ -1,4 +1,4 @@
-import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder";
+import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { cancelBumpReminderUsecase } from "@/bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase";
 
 const cancelScheduledReminderMock = jest.fn();
@@ -13,11 +13,11 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     error: (...args: unknown[]) => loggerErrorMock(...args),

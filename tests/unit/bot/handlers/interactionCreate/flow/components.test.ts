@@ -6,11 +6,11 @@ import {
 
 const loggerErrorMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },
@@ -20,7 +20,7 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleInteractionError: jest.fn(),
 }));
 
-jest.mock("@/bot/handlers/interactionCreate/ui", () => ({
+jest.mock("@/bot/handlers/interactionCreate/ui/buttons", () => ({
   buttonHandlers: [
     {
       matches: jest.fn((id: string) => id === "target"),
@@ -31,6 +31,9 @@ jest.mock("@/bot/handlers/interactionCreate/ui", () => ({
       execute: jest.fn().mockResolvedValue(undefined),
     },
   ],
+}));
+
+jest.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => ({
   userSelectHandlers: [
     {
       matches: jest.fn((id: string) => id === "target"),
@@ -47,7 +50,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
   it("executes first matching button handler only", async () => {
     const interaction = { customId: "target" };
     const uiModule = jest.requireMock(
-      "@/bot/handlers/interactionCreate/ui",
+      "@/bot/handlers/interactionCreate/ui/buttons",
     ) as { buttonHandlers: Array<{ execute: jest.Mock }> };
 
     await handleButton(interaction as never);
@@ -61,7 +64,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
   it("delegates button handler error to interaction error handler", async () => {
     const error = new Error("button failed");
     const uiModule = jest.requireMock(
-      "@/bot/handlers/interactionCreate/ui",
+      "@/bot/handlers/interactionCreate/ui/buttons",
     ) as { buttonHandlers: Array<{ execute: jest.Mock }> };
     uiModule.buttonHandlers[0].execute.mockRejectedValueOnce(error);
     const interaction = { customId: "target" };
@@ -75,7 +78,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
   it("executes matching user-select handler", async () => {
     const interaction = { customId: "target" };
     const uiModule = jest.requireMock(
-      "@/bot/handlers/interactionCreate/ui",
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as { userSelectHandlers: Array<{ execute: jest.Mock }> };
 
     await handleUserSelectMenu(interaction as never);

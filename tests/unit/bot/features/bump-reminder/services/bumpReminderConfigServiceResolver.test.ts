@@ -1,7 +1,7 @@
 const createBumpReminderConfigServiceMock = jest.fn();
 const getBumpReminderConfigServiceMock = jest.fn();
 
-jest.mock("@/shared/features/bump-reminder", () => ({
+jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   createBumpReminderConfigService: (...args: unknown[]) =>
     createBumpReminderConfigServiceMock(...args),
   getBumpReminderConfigService: (...args: unknown[]) =>

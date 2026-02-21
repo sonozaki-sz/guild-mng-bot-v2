@@ -10,14 +10,14 @@ const loggerWarnMock = jest.fn();
 const loggerDebugMock = jest.fn();
 const loggerErrorMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, _params?: Record<string, unknown>) =>
     tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     warn: (...args: unknown[]) => loggerWarnMock(...args),
     debug: (...args: unknown[]) => loggerDebugMock(...args),

@@ -2,10 +2,10 @@ import { presentVacConfigShow } from "@/bot/features/vac/commands/presenters/vac
 import { handleVacConfigShow } from "@/bot/features/vac/commands/usecases/vacConfigShow";
 import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
 import { createInfoEmbed } from "@/bot/utils/messageResponse";
-import { ValidationError } from "@/shared/errors";
+import { ValidationError } from "@/shared/errors/customErrors";
 import { MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => key),
 }));
 

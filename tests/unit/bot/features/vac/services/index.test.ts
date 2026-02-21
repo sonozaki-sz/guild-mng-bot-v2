@@ -1,11 +1,10 @@
-describe("bot/features/vac/services/index", () => {
-  it("re-exports vac service APIs", async () => {
-    const indexModule = await import("@/bot/features/vac/services");
+describe("bot/features/vac/services/vacService", () => {
+  it("exports vac service APIs", async () => {
     const serviceModule =
       await import("@/bot/features/vac/services/vacService");
 
-    expect(indexModule.createVacService).toBe(serviceModule.createVacService);
-    expect(indexModule.getVacService).toBe(serviceModule.getVacService);
-    expect(indexModule.VacService).toBe(serviceModule.VacService);
+    expect(serviceModule.createVacService).toEqual(expect.any(Function));
+    expect(serviceModule.getVacService).toEqual(expect.any(Function));
+    expect(serviceModule.VacService).toEqual(expect.any(Function));
   });
 });

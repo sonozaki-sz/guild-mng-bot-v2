@@ -5,11 +5,11 @@ const loggerWarnMock = jest.fn();
 const loggerDebugMock = jest.fn();
 const loggerErrorMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     warn: (...args: unknown[]) => loggerWarnMock(...args),
     debug: (...args: unknown[]) => loggerDebugMock(...args),
@@ -21,7 +21,7 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleInteractionError: jest.fn(),
 }));
 
-jest.mock("@/bot/handlers/interactionCreate/ui", () => ({
+jest.mock("@/bot/handlers/interactionCreate/ui/modals", () => ({
   modalHandlers: [
     {
       matches: jest.fn((id: string) => id.startsWith("vac:")),
@@ -38,7 +38,7 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
   it("warns and returns when no modal handler matches", async () => {
     const interaction = { customId: "unknown", user: { tag: "user#0001" } };
     const uiModule = jest.requireMock(
-      "@/bot/handlers/interactionCreate/ui",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       modalHandlers: Array<{ execute: jest.Mock }>;
     };
@@ -52,7 +52,7 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
   it("executes matching modal handler", async () => {
     const interaction = { customId: "vac:rename", user: { tag: "user#0001" } };
     const uiModule = jest.requireMock(
-      "@/bot/handlers/interactionCreate/ui",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       modalHandlers: Array<{ execute: jest.Mock }>;
     };
@@ -66,7 +66,7 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
   it("delegates modal handler errors", async () => {
     const error = new Error("modal failed");
     const uiModule = jest.requireMock(
-      "@/bot/handlers/interactionCreate/ui",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       modalHandlers: Array<{ execute: jest.Mock }>;
     };

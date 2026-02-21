@@ -15,7 +15,7 @@ import {
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
 } from "@/shared/database/types";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn(() => "db-update-failed"),
 }));
 
@@ -148,6 +148,34 @@ describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
     ).rejects.toMatchObject({ name: "DatabaseError" });
   });
 
+  it("continues when initialization returns false and then succeeds on next snapshot", async () => {
+    fetchSnapshotMock
+      .mockResolvedValueOnce({ recordExists: false, rawConfig: null })
+      .mockResolvedValueOnce({
+        recordExists: true,
+        rawConfig: '{"enabled":true,"mentionUserIds":[]}',
+      });
+    context.safeJsonParse
+      .mockReturnValueOnce(undefined)
+      .mockReturnValueOnce({ enabled: true, mentionUserIds: [] });
+    initializeIfMissingMock.mockResolvedValueOnce(false);
+    casUpdateMock.mockResolvedValueOnce(true);
+
+    await expect(
+      mutateBumpReminderConfigUseCase(
+        context,
+        "guild-init-false",
+        (config) => ({
+          result: BUMP_REMINDER_MENTION_ROLE_RESULT.UPDATED,
+          updatedConfig: { ...config, mentionRoleId: "role-continue" },
+        }),
+      ),
+    ).resolves.toBe(BUMP_REMINDER_MENTION_ROLE_RESULT.UPDATED);
+
+    expect(initializeIfMissingMock).toHaveBeenCalledTimes(1);
+    expect(casUpdateMock).toHaveBeenCalledTimes(1);
+  });
+
   it("handles mention user add/remove result branches", async () => {
     fetchSnapshotMock.mockResolvedValue({
       recordExists: true,
@@ -211,5 +239,87 @@ describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
     ).resolves.toBe(BUMP_REMINDER_MENTION_USER_REMOVE_RESULT.REMOVED);
 
     expect(casUpdateMock).toHaveBeenCalled();
+  });
+
+  it("returns NOT_CONFIGURED for mention users when raw JSON exists but parse fails", async () => {
+    fetchSnapshotMock.mockResolvedValueOnce({
+      recordExists: true,
+      rawConfig: "invalid-json",
+    });
+    context.safeJsonParse.mockReturnValueOnce(undefined);
+
+    await expect(
+      mutateBumpReminderMentionUsersUseCase(
+        context,
+        "guild-raw-invalid",
+        "u1",
+        BUMP_REMINDER_MENTION_USER_MODE.ADD,
+      ),
+    ).resolves.toBe(BUMP_REMINDER_MENTION_USER_ADD_RESULT.NOT_CONFIGURED);
+  });
+
+  it("continues after initialize=false in mention users and then updates", async () => {
+    fetchSnapshotMock
+      .mockResolvedValueOnce({ recordExists: false, rawConfig: null })
+      .mockResolvedValueOnce({
+        recordExists: true,
+        rawConfig: '{"enabled":true,"mentionUserIds":[]}',
+      });
+    context.safeJsonParse
+      .mockReturnValueOnce(undefined)
+      .mockReturnValueOnce({ enabled: true, mentionUserIds: [] });
+    initializeIfMissingMock.mockResolvedValueOnce(false);
+    casUpdateMock.mockResolvedValueOnce(true);
+
+    await expect(
+      mutateBumpReminderMentionUsersUseCase(
+        context,
+        "guild-mention-continue",
+        "u1",
+        BUMP_REMINDER_MENTION_USER_MODE.ADD,
+      ),
+    ).resolves.toBe(BUMP_REMINDER_MENTION_USER_ADD_RESULT.ADDED);
+  });
+
+  it("throws DatabaseError when mention-user CAS keeps conflicting", async () => {
+    fetchSnapshotMock.mockResolvedValue({
+      recordExists: true,
+      rawConfig: '{"enabled":true,"mentionUserIds":[]}',
+    });
+    context.safeJsonParse.mockReturnValue({
+      enabled: true,
+      mentionUserIds: [],
+    });
+    casUpdateMock.mockResolvedValue(false);
+
+    await expect(
+      mutateBumpReminderMentionUsersUseCase(
+        context,
+        "guild-mention-conflict",
+        "u1",
+        BUMP_REMINDER_MENTION_USER_MODE.ADD,
+      ),
+    ).rejects.toMatchObject({ name: "DatabaseError" });
+  });
+
+  it("normalizes non-array mentionUserIds in mention-user mutation", async () => {
+    fetchSnapshotMock.mockResolvedValueOnce({
+      recordExists: true,
+      rawConfig: '{"enabled":true,"mentionUserIds":"invalid"}',
+    });
+    context.safeJsonParse.mockReturnValueOnce({
+      enabled: true,
+      mentionUserIds: "invalid",
+    });
+    casUpdateMock.mockResolvedValueOnce(true);
+
+    await expect(
+      mutateBumpReminderMentionUsersUseCase(
+        context,
+        "guild-non-array",
+        "u1",
+        BUMP_REMINDER_MENTION_USER_MODE.ADD,
+      ),
+    ).resolves.toBe(BUMP_REMINDER_MENTION_USER_ADD_RESULT.ADDED);
   });
 });
