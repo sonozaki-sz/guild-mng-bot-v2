@@ -18,7 +18,7 @@ jest.mock("@/shared/utils/logger", () => ({
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 

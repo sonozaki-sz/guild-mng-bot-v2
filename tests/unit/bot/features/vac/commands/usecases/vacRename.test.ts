@@ -3,7 +3,7 @@ import { executeVacRename } from "@/bot/features/vac/commands/usecases/vacRename
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(
     async (_guildId: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.renamed") {

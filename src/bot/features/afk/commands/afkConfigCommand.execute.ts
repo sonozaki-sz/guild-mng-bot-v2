@@ -7,9 +7,9 @@ import {
   PermissionFlagsBits,
   type ChatInputCommandInteraction,
 } from "discord.js";
-import { ValidationError } from "../../../../shared/errors";
-import { tDefault, tGuild } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { ValidationError } from "../../../../shared/errors/customErrors";
+import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import { getBotGuildConfigRepository } from "../../../services/botGuildConfigRepositoryResolver";
 import {
   createInfoEmbed,

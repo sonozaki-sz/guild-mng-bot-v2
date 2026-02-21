@@ -17,36 +17,42 @@ const setBotVacRepositoryMock = jest.fn();
 const setBotVacServiceMock = jest.fn();
 const localeSetRepositoryMock = jest.fn();
 
-jest.mock("@/shared/database", () => ({
+jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: (...args: unknown[]) =>
     getGuildConfigRepositoryMock(...args),
 }));
 
-jest.mock("@/shared/features/vac", () => ({
+jest.mock("@/shared/features/vac/vacConfigService", () => ({
   getVacConfigService: (...args: unknown[]) => getVacConfigServiceMock(...args),
 }));
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   localeManager: {
     setRepository: (...args: unknown[]) => localeSetRepositoryMock(...args),
   },
 }));
 
-jest.mock("@/bot/features/bump-reminder", () => ({
+jest.mock("@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver", () => ({
   getBumpReminderFeatureConfigService: (...args: unknown[]) =>
     getBumpReminderFeatureConfigServiceMock(...args),
+}));
+
+jest.mock("@/bot/features/bump-reminder/repositories/bumpReminderRepository", () => ({
   getBumpReminderRepository: (...args: unknown[]) =>
     getBumpReminderRepositoryMock(...args),
+}));
+
+jest.mock("@/bot/features/bump-reminder/services/bumpReminderService", () => ({
   getBumpReminderManager: (...args: unknown[]) =>
     getBumpReminderManagerMock(...args),
 }));
 
-jest.mock("@/bot/features/vac", () => ({
+jest.mock("@/bot/features/vac/repositories/vacRepository", () => ({
   createVacRepository: (...args: unknown[]) => createVacRepositoryMock(...args),
   getVacRepository: (...args: unknown[]) => getVacRepositoryMock(...args),
 }));
 
-jest.mock("@/bot/features/vac/services", () => ({
+jest.mock("@/bot/features/vac/services/vacService", () => ({
   getVacService: (...args: unknown[]) => getVacServiceMock(...args),
 }));
 

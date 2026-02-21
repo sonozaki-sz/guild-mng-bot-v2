@@ -1,8 +1,8 @@
 // src/shared/database/stores/usecases/updateBumpReminderConfig.ts
 // BumpReminder設定全体更新ユースケース
 
-import { DatabaseError } from "../../../errors";
-import { tDefault } from "../../../locale";
+import { DatabaseError } from "../../../errors/customErrors";
+import { tDefault } from "../../../locale/localeManager";
 import type { BumpReminderConfig } from "../../types";
 import {
   BUMP_REMINDER_CAS_MAX_RETRIES,

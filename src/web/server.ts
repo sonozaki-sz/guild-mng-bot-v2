@@ -3,13 +3,13 @@
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { env } from "../shared/config";
+import { env } from "../shared/config/env";
 import {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,
-} from "../shared/errors";
-import { localeManager, tDefault } from "../shared/locale";
-import { logger } from "../shared/utils";
+} from "../shared/errors/errorHandler";
+import { localeManager, tDefault } from "../shared/locale/localeManager";
+import { logger } from "../shared/utils/logger";
 import { buildWebApp } from "./webAppBuilder";
 
 // 起動ログに表示するURL組み立て用定数

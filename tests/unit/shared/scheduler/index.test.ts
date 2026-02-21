@@ -1,6 +1,6 @@
-describe("shared/scheduler/index", () => {
-  it("loads module", async () => {
-    const module = await import("@/shared/scheduler");
-    expect(module).toBeDefined();
+describe("shared/scheduler/jobScheduler", () => {
+  it("loads scheduler module", async () => {
+    const module = await import("@/shared/scheduler/jobScheduler");
+    expect(module.jobScheduler).toBeDefined();
   });
 });

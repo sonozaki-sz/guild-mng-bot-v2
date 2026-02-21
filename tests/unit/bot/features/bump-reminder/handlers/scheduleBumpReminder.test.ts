@@ -6,8 +6,9 @@ const getReminderDelayMinutesMock = jest.fn();
 const getBotBumpReminderManagerMock = jest.fn();
 const setReminderMock = jest.fn();
 const sendBumpReminderMock = jest.fn();
+const loggerDebugMock = jest.fn();
 
-jest.mock("@/bot/features/bump-reminder", () => ({
+jest.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
   getReminderDelayMinutes: (...args: unknown[]) =>
     getReminderDelayMinutesMock(...args),
 }));
@@ -23,6 +24,16 @@ jest.mock(
     sendBumpReminder: (...args: unknown[]) => sendBumpReminderMock(...args),
   }),
 );
+
+jest.mock("@/shared/locale/localeManager", () => ({
+  tDefault: (key: string) => key,
+}));
+
+jest.mock("@/shared/utils/logger", () => ({
+  logger: {
+    debug: (...args: unknown[]) => loggerDebugMock(...args),
+  },
+}));
 
 describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", () => {
   beforeEach(() => {
@@ -109,5 +120,79 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
       configService,
       "panel-1",
     );
+  });
+
+  it("logs debug when orphan panel deletion fails", async () => {
+    const fetchMessage = jest.fn().mockRejectedValue(new Error("fetch failed"));
+    const fetchChannel = jest.fn().mockResolvedValue({
+      isTextBased: () => true,
+      messages: { fetch: fetchMessage },
+    });
+
+    const client = { channels: { fetch: fetchChannel } };
+    const configService = { getBumpReminderConfig: jest.fn() };
+    setReminderMock.mockRejectedValueOnce(new Error("set failed"));
+
+    await expect(
+      scheduleBumpReminder(
+        client as never,
+        "guild-1",
+        "channel-1",
+        "msg-1",
+        SERVICE_NAME,
+        configService as never,
+        "panel-1",
+      ),
+    ).rejects.toThrow("set failed");
+
+    expect(loggerDebugMock).toHaveBeenCalledWith(
+      "system:scheduler.bump_reminder_orphaned_panel_delete_failed",
+      expect.any(Error),
+    );
+  });
+
+  it("rethrows without orphan cleanup when panelMessageId is undefined", async () => {
+    const fetchChannel = jest.fn();
+    const client = { channels: { fetch: fetchChannel } };
+    const configService = { getBumpReminderConfig: jest.fn() };
+    setReminderMock.mockRejectedValueOnce(new Error("set failed"));
+
+    await expect(
+      scheduleBumpReminder(
+        client as never,
+        "guild-1",
+        "channel-1",
+        "msg-1",
+        SERVICE_NAME,
+        configService as never,
+        undefined,
+      ),
+    ).rejects.toThrow("set failed");
+
+    expect(fetchChannel).not.toHaveBeenCalled();
+  });
+
+  it("skips panel deletion when fetched channel is not text based", async () => {
+    const fetchChannel = jest.fn().mockResolvedValue({
+      isTextBased: () => false,
+      messages: { fetch: jest.fn() },
+    });
+    const client = { channels: { fetch: fetchChannel } };
+    const configService = { getBumpReminderConfig: jest.fn() };
+    setReminderMock.mockRejectedValueOnce(new Error("set failed"));
+
+    await expect(
+      scheduleBumpReminder(
+        client as never,
+        "guild-1",
+        "channel-1",
+        "msg-1",
+        SERVICE_NAME,
+        configService as never,
+        "panel-1",
+      ),
+    ).rejects.toThrow("set failed");
+
+    expect(fetchChannel).toHaveBeenCalledWith("channel-1");
   });
 });

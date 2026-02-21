@@ -2,10 +2,14 @@
 // VAC機能のビジネスロジックサービス
 
 import { ChannelType, type Channel, type VoiceState } from "discord.js";
-import { tDefault } from "../../../../shared/locale";
-import { executeWithLoggedError, logger } from "../../../../shared/utils";
+import { tDefault } from "../../../../shared/locale/localeManager";
+import { executeWithLoggedError } from "../../../../shared/utils/errorHandling";
+import { logger } from "../../../../shared/utils/logger";
 import type { BotClient } from "../../../client";
-import { getVacRepository, type IVacRepository } from "../repositories";
+import {
+  getVacRepository,
+  type IVacRepository,
+} from "../repositories/vacRepository";
 import { cleanupVacOnStartupUseCase } from "./usecases/cleanupVacOnStartup";
 import { handleVacCreateUseCase } from "./usecases/handleVacCreate";
 import { handleVacDeleteUseCase } from "./usecases/handleVacDelete";

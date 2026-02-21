@@ -3,7 +3,7 @@
 
 import { ChannelType } from "discord.js";
 import type { BotClient } from "../../../../client";
-import type { IVacRepository } from "../../repositories";
+import type { IVacRepository } from "../../repositories/vacRepository";
 
 /**
  * 起動時に不整合なトリガー/作成済みVACチャンネル情報を掃除する

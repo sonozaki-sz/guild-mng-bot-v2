@@ -2,10 +2,11 @@
 // ボタン / ユーザーセレクト処理
 
 import type { ButtonInteraction, UserSelectMenuInteraction } from "discord.js";
-import { tDefault } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { tDefault } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import { handleInteractionError } from "../../../errors/interactionErrorHandler";
-import { buttonHandlers, userSelectHandlers } from "../ui";
+import { buttonHandlers } from "../ui/buttons";
+import { userSelectHandlers } from "../ui/selectMenus";
 
 /**
  * ボタンインタラクションをレジストリ解決して実行する関数

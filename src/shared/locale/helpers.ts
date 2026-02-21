@@ -20,7 +20,7 @@ export async function getGuildTranslator(
   guildId: string,
 ): Promise<GuildTFunction> {
   // 循環依存を避けるため遅延 import で localeManager を取得
-  const { localeManager } = await import("./index");
+  const { localeManager } = await import("./localeManager");
   // guildId に対応する固定 translator（ロケール解決済み）を取得
   const fixedT = await localeManager.getGuildT(guildId);
   // i18next 側の型より実運用側（全NSキー許容）が広いため型を合わせる
@@ -35,7 +35,7 @@ export async function invalidateGuildLocaleCache(
   guildId: string,
 ): Promise<void> {
   // 循環依存を避けるため localeManager を遅延 import
-  const { localeManager } = await import("./index");
+  const { localeManager } = await import("./localeManager");
   // 対象 guild のロケールキャッシュだけを破棄（他ギルドへ影響させない）
   localeManager.invalidateLocaleCache(guildId);
 }

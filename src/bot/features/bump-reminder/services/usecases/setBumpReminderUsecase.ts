@@ -1,14 +1,14 @@
 // src/bot/features/bump-reminder/services/usecases/setBumpReminderUsecase.ts
 // Bumpリマインダー設定のユースケース
 
-import { tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
 import {
   toBumpReminderJobId,
   toScheduledAt,
   type BumpServiceName,
-} from "../../constants";
-import { type IBumpReminderRepository } from "../../repositories";
+} from "../../constants/bumpReminderConstants";
+import { type IBumpReminderRepository } from "../../repositories/types";
 import {
   scheduleReminderInMemory,
   type ScheduledReminderRef,

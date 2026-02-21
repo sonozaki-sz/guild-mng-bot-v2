@@ -1,14 +1,12 @@
 // src/bot/services/botBumpReminderDependencyResolver.ts
 // Bot層でbump-reminder依存を解決するリゾルバ
 
-import type { BumpReminderConfigService } from "../../shared/features/bump-reminder";
-import {
-  type BumpReminderManager,
-  type IBumpReminderRepository,
-} from "../features/bump-reminder";
+import type { BumpReminderConfigService } from "../../shared/features/bump-reminder/bumpReminderConfigService";
+import type { IBumpReminderRepository as BumpReminderRepositoryType } from "../features/bump-reminder/repositories/types";
+import { type BumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
 
 let cachedConfigService: BumpReminderConfigService | undefined;
-let cachedRepository: IBumpReminderRepository | undefined;
+let cachedRepository: BumpReminderRepositoryType | undefined;
 let cachedManager: BumpReminderManager | undefined;
 
 /**
@@ -24,7 +22,7 @@ export function setBotBumpReminderConfigService(
  * Bot層で利用するbump-reminderリポジトリを明示設定する
  */
 export function setBotBumpReminderRepository(
-  repository: IBumpReminderRepository,
+  repository: BumpReminderRepositoryType,
 ): void {
   cachedRepository = repository;
 }
@@ -52,7 +50,7 @@ export function getBotBumpReminderConfigService(): BumpReminderConfigService {
 /**
  * Bot層で利用するbump-reminderリポジトリを取得する
  */
-export function getBotBumpReminderRepository(): IBumpReminderRepository {
+export function getBotBumpReminderRepository(): BumpReminderRepositoryType {
   if (!cachedRepository) {
     throw new Error(
       "BumpReminderRepository is not initialized. Initialize in composition root first.",

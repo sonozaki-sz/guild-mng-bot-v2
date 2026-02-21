@@ -6,7 +6,7 @@ import {
 const getGuildTMock = jest.fn();
 const invalidateLocaleCacheMock = jest.fn();
 
-jest.mock("@/shared/locale/index", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   localeManager: {
     getGuildT: (...args: unknown[]) => getGuildTMock(...args),
     invalidateLocaleCache: (...args: unknown[]) =>

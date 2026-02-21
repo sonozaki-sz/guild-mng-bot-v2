@@ -7,10 +7,10 @@ import {
   type GuildMember,
   type VoiceState,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
-import { sendVacControlPanel } from "../../handlers/ui";
-import type { IVacRepository } from "../../repositories";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
+import { sendVacControlPanel } from "../../handlers/ui/vacControlPanel";
+import type { IVacRepository } from "../../repositories/vacRepository";
 
 const VAC_EVENT = {
   DEFAULT_LIMIT: 99,

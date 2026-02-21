@@ -2,8 +2,8 @@
 // VAC コマンド実行処理
 
 import { ChatInputCommandInteraction } from "discord.js";
-import { ValidationError } from "../../../../shared/errors";
-import { tDefault } from "../../../../shared/locale";
+import { ValidationError } from "../../../../shared/errors/customErrors";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { executeVacLimit } from "./usecases/vacLimit";
 import { executeVacRename } from "./usecases/vacRename";

@@ -2,9 +2,10 @@
 // Bumpリマインダー用リポジトリ
 
 import type { PrismaClient } from "@prisma/client";
-import { tDefault } from "../../../../shared/locale";
-import { executeWithDatabaseError, logger } from "../../../../shared/utils";
-import { type BumpReminderStatus } from "../constants";
+import { tDefault } from "../../../../shared/locale/localeManager";
+import { executeWithDatabaseError } from "../../../../shared/utils/errorHandling";
+import { logger } from "../../../../shared/utils/logger";
+import { type BumpReminderStatus } from "../constants/bumpReminderConstants";
 import type { BumpReminder, IBumpReminderRepository } from "./types";
 import { cleanupOldBumpRemindersUseCase } from "./usecases/cleanupBumpReminders";
 import { createBumpReminderUseCase } from "./usecases/createBumpReminder";

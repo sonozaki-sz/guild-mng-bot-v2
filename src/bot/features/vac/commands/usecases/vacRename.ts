@@ -2,7 +2,7 @@
 // VAC VC名変更ユースケース
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tGuild } from "../../../../../shared/locale";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { resolveVacVoiceChannelForEdit } from "../helpers/vacVoiceChannelResolver";
 import { VAC_COMMAND } from "../vacCommand.constants";

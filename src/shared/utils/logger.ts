@@ -3,7 +3,7 @@
 
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { NODE_ENV, env } from "../config";
+import { NODE_ENV, env } from "../config/env";
 
 // 実行環境を判定し、コンソール出力の粒度を切り替える
 const isDevelopment = env.NODE_ENV === NODE_ENV.DEVELOPMENT;

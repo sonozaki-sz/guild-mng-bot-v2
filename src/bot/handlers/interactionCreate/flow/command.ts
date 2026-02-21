@@ -6,8 +6,8 @@ import {
   type AutocompleteInteraction,
   type ChatInputCommandInteraction,
 } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import type { BotClient } from "../../../client";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 

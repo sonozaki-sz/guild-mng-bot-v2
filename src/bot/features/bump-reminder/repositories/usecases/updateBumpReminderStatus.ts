@@ -2,7 +2,10 @@
 // Bumpリマインダー状態更新ユースケース
 
 import type { PrismaClient } from "@prisma/client";
-import { BUMP_REMINDER_STATUS, type BumpReminderStatus } from "../../constants";
+import {
+  BUMP_REMINDER_STATUS,
+  type BumpReminderStatus,
+} from "../../constants/bumpReminderConstants";
 
 /**
  * 指定リマインダーの状態を更新する

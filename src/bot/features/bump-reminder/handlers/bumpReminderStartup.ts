@@ -1,14 +1,15 @@
 // src/bot/features/bump-reminder/handlers/bumpReminderStartup.ts
 // Bump リマインダーの起動時復元処理
 
-import { type BumpReminderTaskFactory, type BumpServiceName } from "..";
-import { tDefault } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { tDefault } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import type { BotClient } from "../../../client";
 import {
   getBotBumpReminderConfigService,
   getBotBumpReminderManager,
 } from "../../../services/botBumpReminderDependencyResolver";
+import { type BumpServiceName } from "../constants/bumpReminderConstants";
+import { type BumpReminderTaskFactory } from "../services/bumpReminderService";
 import { sendBumpReminder } from "./bumpReminderHandler";
 
 /**

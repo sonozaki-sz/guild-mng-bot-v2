@@ -1,0 +1,82 @@
+name: CI / Deploy
+
+# mainブランチへのpush、またはmain向けPRの作成/更新/再オープン/クローズで実行
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+jobs:
+  # ─────────────────────────────────────────────
+  # CI: 型チェック・テスト（PR・mainどちらでも実行）
+  # ─────────────────────────────────────────────
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: 依存関係のインストール
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma Client 生成
+        run: pnpm db:generate
+
+      - name: 型チェック
+        run: pnpm typecheck
+
+      - name: テスト実行
+        run: pnpm test
+
+  # ─────────────────────────────────────────────
+  # CD: デプロイ（mainへの直接push、またはmain向けPRのマージ完了時）
+  # ─────────────────────────────────────────────
+  deploy:
+    name: Deploy to XServer VPS
+    needs: test
+    runs-on: ubuntu-latest
+    # デプロイ準備完了後に有効化する（VPS契約・Secrets設定後に if: false を削除）
+    if: false
+
+    steps:
+      - name: SSH 経由でデプロイ
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd /opt/guild-mng-bot
+
+            echo "==> 最新コードを取得"
+            git pull origin main
+
+            echo "==> DBマイグレーションを実行"
+            docker compose -f docker-compose.prod.yml run --rm bot \
+              pnpm prisma migrate deploy
+
+            echo "==> イメージを再ビルドして再起動"
+            docker compose -f docker-compose.prod.yml up -d --build
+
+            echo "==> 古いイメージを削除"
+            docker image prune -f
+
+            echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"

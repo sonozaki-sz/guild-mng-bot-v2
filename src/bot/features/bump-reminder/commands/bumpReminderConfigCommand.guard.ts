@@ -5,8 +5,8 @@ import {
   type ChatInputCommandInteraction,
   PermissionFlagsBits,
 } from "discord.js";
-import { ValidationError } from "../../../../shared/errors";
-import { tGuild } from "../../../../shared/locale";
+import { ValidationError } from "../../../../shared/errors/customErrors";
+import { tGuild } from "../../../../shared/locale/localeManager";
 
 /**
  * ManageGuild 権限を検証する共通ガード

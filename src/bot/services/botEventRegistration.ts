@@ -1,8 +1,8 @@
 // src/bot/services/botEventRegistration.ts
 // Botイベント登録の責務を集約
 
-import { tDefault } from "../../shared/locale";
-import { logger } from "../../shared/utils";
+import { tDefault } from "../../shared/locale/localeManager";
+import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
 import { registerBotEvent, type BotEvent } from "../types/discord";
 

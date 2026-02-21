@@ -2,10 +2,14 @@
 // スケジュール到達時のBumpリマインダー送信ユースケース
 
 import type { Client } from "discord.js";
-import { BUMP_SERVICES, type BumpServiceName } from "../..";
-import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder";
-import { getGuildTranslator, tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
+import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
+import { getGuildTranslator } from "../../../../../shared/locale/helpers";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
+import {
+  BUMP_SERVICES,
+  type BumpServiceName,
+} from "../../constants/bumpReminderConstants";
 
 /**
  * スケジュール到達時に Bump リマインダー通知を送信する関数

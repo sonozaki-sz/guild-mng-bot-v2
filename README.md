@@ -25,7 +25,7 @@ Disboard/ディス速のBumpコマンド実行を検知し、2時間後にリマ
 - 通知登録のインタラクティブUI
 - `/bump-reminder-config` コマンドで設定管理
 
-[📖 詳細仕様](docs/BUMP_REMINDER_SPEC.md)
+[📖 詳細仕様](docs/specs/BUMP_REMINDER_SPEC.md)
 
 ### 🎤 AFK機能
 
@@ -35,7 +35,7 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 - `/afk-config` コマンドで機能設定
 - 管理者による柔軟な設定管理
 
-[📖 詳細仕様](docs/AFK_SPEC.md)
+[📖 詳細仕様](docs/specs/AFK_SPEC.md)
 
 ### 🎤 VC自動作成機能（VAC）
 
@@ -44,9 +44,9 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 - トリガーチャンネル参加で専用VCを自動作成
 - 全員退出時に自動削除
 - コントロールパネルでVC設定変更
-- `/vac-config` コマンドで機能設定
+- `/vac-config`／`/vac` コマンドで設定・操作
 
-[📖 詳細仕様](docs/VAC_SPEC.md)
+[📖 詳細仕様](docs/specs/VAC_SPEC.md)
 
 ### 📌 メッセージ固定機能
 
@@ -56,7 +56,9 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 - 新規メッセージ投稿時に自動再送信
 - `/sticky-message` コマンドで管理
 
-[📖 詳細仕様](docs/STICKY_MESSAGE_SPEC.md)
+> 📋 **機能は仕様書作成済みで、現在実装中です**
+
+[📖 詳細仕様](docs/specs/STICKY_MESSAGE_SPEC.md)
 
 ### 👥 メンバーログ機能
 
@@ -65,6 +67,8 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 - 参加・脱退時に詳細情報をEmbed形式で通知
 - カスタムメッセージ設定
 - `/member-log-config` コマンドで設定
+
+> 📋 **機能は仕様書作成済みで、現在実装中です**
 
 [📖 詳細仕様](docs/specs/MEMBER_LOG_SPEC.md)
 
@@ -76,6 +80,8 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 - ユーザー指定、件数指定、チャンネル指定
 - 14日以上前のメッセージにも対応
 
+> 📋 **機能は仕様書作成済みで、現在実装中です**
+
 [📖 詳細仕様](docs/specs/MESSAGE_DELETE_SPEC.md)
 
 ### 🌐 多言語対応
@@ -86,7 +92,7 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 - コマンド、メッセージ、エラー全てを翻訳
 - サーバー単位でのロケール設定
 
-[📖 多言語対応ガイド](docs/I18N_GUIDE.md)
+[📖 多言語対応ガイド](docs/guides/I18N_GUIDE.md)
 
 ### 🖥️ Web UI
 
@@ -248,8 +254,9 @@ guild-mng-bot-v2/
 - [アーキテクチャガイド](docs/guides/ARCHITECTURE.md) - 全体設計方針・依存方向・責務境界
 - [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
 - [開発環境セットアップ](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築とプロジェクト設定の詳細ガイド
+- [Git ワークフロー](docs/guides/GIT_WORKFLOW.md) - ブランチ戦略・コミット規約・PR運用ルール
 - [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
-- [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・`index.ts`運用
+- [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・直接import運用
 - [国際化ガイド](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
 
 ### 機能仕様書
@@ -343,7 +350,8 @@ REST Client拡張機能で「Send Request」をクリックするだけでテス
 - ✅ Phase 0: 環境構築完了
 - ✅ Phase 1: 基盤実装完了（ロガー、Bot基盤、データベース、i18n、テスト）
 - ✅ Bump Reminder機能実装完了
-- 🚧 Phase 2: メッセージシステム統一化、VC自動作成機能、メッセージ固定機能
+- ✅ VAC（VC自動作成）機能実装完了
+- 🚧 Phase 2: メッセージ固定機能、メンバーログ機能、メッセージ削除機能
 
 詳細は [TODO.md](TODO.md) を参照してください。
 
@@ -372,4 +380,4 @@ Apache License 2.0 - 詳細は [LICENSE](LICENSE) を参照
 ---
 
 **開発開始**: 2026年2月
-**最終更新**: 2026年2月19日
+**最終更新**: 2026年2月22日

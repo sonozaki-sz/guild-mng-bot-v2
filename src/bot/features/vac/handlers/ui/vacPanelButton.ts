@@ -12,8 +12,8 @@ import {
   type ButtonInteraction,
   type GuildMember,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale";
-import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
+import { tGuild } from "../../../../../shared/locale/localeManager";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {

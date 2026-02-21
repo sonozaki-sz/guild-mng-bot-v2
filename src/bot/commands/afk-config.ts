@@ -7,9 +7,9 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
-import { getCommandLocalizations } from "../../shared/locale";
+import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
 import { handleCommandError } from "../errors/interactionErrorHandler";
-import { executeAfkConfigCommand } from "../features/afk";
+import { executeAfkConfigCommand } from "../features/afk/commands/afkConfigCommand.execute";
 import type { Command } from "../types/discord";
 
 // AFK 設定コマンドのサブコマンド/オプション名を一元管理する定数

@@ -4,16 +4,17 @@
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import { Routes } from "discord.js";
-import { env } from "../shared/config";
+import { env } from "../shared/config/env";
 import {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,
-} from "../shared/errors";
-import { localeManager, tDefault } from "../shared/locale";
-import { logger, setPrismaClient } from "../shared/utils";
+} from "../shared/errors/errorHandler";
+import { localeManager, tDefault } from "../shared/locale/localeManager";
+import { logger } from "../shared/utils/logger";
+import { setPrismaClient } from "../shared/utils/prisma";
 import { createBotClient } from "./client";
-import { commands } from "./commands";
-import { events } from "./events";
+import { commands } from "./commands/commands";
+import { events } from "./events/events";
 import { initializeBotCompositionRoot } from "./services/botCompositionRoot";
 import { registerBotEvents } from "./services/botEventRegistration";
 

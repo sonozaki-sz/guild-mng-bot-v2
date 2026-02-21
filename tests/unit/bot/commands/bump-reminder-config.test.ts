@@ -16,7 +16,7 @@ const createSuccessEmbedMock = jest.fn((description: string) => ({
 }));
 
 // Bump設定サービス依存を置き換えてコマンド分岐を直接検証する
-jest.mock("@/shared/features/bump-reminder", () => ({
+jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   BUMP_REMINDER_MENTION_CLEAR_RESULT: {
     CLEARED: "cleared",
     NOT_CONFIGURED: "not_configured",
@@ -59,33 +59,27 @@ jest.mock("@/shared/features/bump-reminder", () => ({
   })),
 }));
 
-jest.mock(
-  "@/bot/services/botBumpReminderDependencyResolver",
-  () => ({
-    getBotBumpReminderConfigService: jest.fn(() => ({
-      setBumpReminderEnabled: (...args: unknown[]) =>
-        setBumpReminderEnabledMock(...args),
-      getBumpReminderConfig: (...args: unknown[]) =>
-        getBumpReminderConfigMock(...args),
-      setBumpReminderMentionRole: (...args: unknown[]) =>
-        setBumpReminderMentionRoleMock(...args),
-      addBumpReminderMentionUser: (...args: unknown[]) =>
-        addBumpReminderMentionUserMock(...args),
-      clearBumpReminderMentionUsers: (...args: unknown[]) =>
-        clearBumpReminderMentionUsersMock(...args),
-      clearBumpReminderMentions: (...args: unknown[]) =>
-        clearBumpReminderMentionsMock(...args),
-      removeBumpReminderMentionUser: (...args: unknown[]) =>
-        removeBumpReminderMentionUserMock(...args),
-    })),
-    getBotBumpReminderManager: jest.fn(() => ({
-      cancelReminder: (...args: unknown[]) => cancelReminderMock(...args),
-    })),
-  }),
-);
-
-// BumpReminderManager は cancel 呼び出しのみ検証
-jest.mock("@/bot/features/bump-reminder", () => ({}));
+jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+  getBotBumpReminderConfigService: jest.fn(() => ({
+    setBumpReminderEnabled: (...args: unknown[]) =>
+      setBumpReminderEnabledMock(...args),
+    getBumpReminderConfig: (...args: unknown[]) =>
+      getBumpReminderConfigMock(...args),
+    setBumpReminderMentionRole: (...args: unknown[]) =>
+      setBumpReminderMentionRoleMock(...args),
+    addBumpReminderMentionUser: (...args: unknown[]) =>
+      addBumpReminderMentionUserMock(...args),
+    clearBumpReminderMentionUsers: (...args: unknown[]) =>
+      clearBumpReminderMentionUsersMock(...args),
+    clearBumpReminderMentions: (...args: unknown[]) =>
+      clearBumpReminderMentionsMock(...args),
+    removeBumpReminderMentionUser: (...args: unknown[]) =>
+      removeBumpReminderMentionUserMock(...args),
+  })),
+  getBotBumpReminderManager: jest.fn(() => ({
+    cancelReminder: (...args: unknown[]) => cancelReminderMock(...args),
+  })),
+}));
 
 // 共通エラーハンドラの委譲を確認
 jest.mock("@/bot/errors/interactionErrorHandler", () => ({
@@ -93,11 +87,13 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
 }));
 
 // i18n を固定値化して期待値を安定させる
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
+}));
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));
@@ -111,7 +107,7 @@ jest.mock("@/bot/utils/messageResponse", () => ({
 }));
 
 // ログ出力の副作用を抑止
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn(),

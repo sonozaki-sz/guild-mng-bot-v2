@@ -1,14 +1,14 @@
-import type { IVacRepository } from "@/bot/features/vac/repositories";
+import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
 import { ChannelType } from "discord.js";
 
 const loggerInfoMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },

@@ -21,12 +21,14 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     jest.clearAllMocks();
 
     const getGuildConfigRepositoryMock = jest.fn();
-    jest.doMock("@/shared/database", () => ({
+    jest.doMock("@/shared/database/types", () => ({
       BUMP_REMINDER_MENTION_CLEAR_RESULT: CLEAR,
       BUMP_REMINDER_MENTION_ROLE_RESULT: ROLE,
       BUMP_REMINDER_MENTION_USER_ADD_RESULT: ADD,
       BUMP_REMINDER_MENTION_USER_REMOVE_RESULT: REMOVE,
       BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT: USERS_CLEAR,
+    }));
+    jest.doMock("@/shared/database/guildConfigRepositoryProvider", () => ({
       getGuildConfigRepository: getGuildConfigRepositoryMock,
     }));
 
@@ -83,6 +85,24 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(first).toEqual(module.DEFAULT_BUMP_REMINDER_CONFIG);
     expect(first.mentionUserIds).toEqual([]);
     expect(first.mentionUserIds).not.toBe(second.mentionUserIds);
+  });
+
+  it("returns existing config in getBumpReminderConfigOrDefault when present", async () => {
+    const { module } = await loadModule();
+    const repository = createRepositoryMock();
+    const service = new module.BumpReminderConfigService(repository as never);
+
+    const existing = {
+      enabled: true,
+      channelId: "channel-x",
+      mentionRoleId: "role-x",
+      mentionUserIds: ["user-x"],
+    };
+    repository.getBumpReminderConfig.mockResolvedValueOnce(existing);
+
+    await expect(
+      service.getBumpReminderConfigOrDefault("guild-1"),
+    ).resolves.toEqual(existing);
   });
 
   it("normalizes config before save and delegates repository operations", async () => {

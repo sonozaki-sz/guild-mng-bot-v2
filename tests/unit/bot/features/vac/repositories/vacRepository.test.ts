@@ -1,6 +1,6 @@
 const getVacConfigServiceMock = jest.fn();
 
-jest.mock("@/shared/features/vac", () => ({
+jest.mock("@/shared/features/vac/vacConfigService", () => ({
   getVacConfigService: (repository?: unknown) =>
     getVacConfigServiceMock(repository),
 }));

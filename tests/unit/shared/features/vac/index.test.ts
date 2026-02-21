@@ -9,20 +9,23 @@ const mockRepo = {
   updateVacConfig: jest.fn<Promise<void>, [string, VacConfig]>(),
 };
 
-jest.mock("@/shared/database", () => ({
+jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => mockRepo,
 }));
 
 import {
   DEFAULT_VAC_CONFIG,
+  VacConfigService,
   addCreatedVacChannel,
   addTriggerChannel,
+  createVacConfigService,
   getVacConfigOrDefault,
+  getVacConfigService,
   isManagedVacChannel,
   removeCreatedVacChannel,
   removeTriggerChannel,
   saveVacConfig,
-} from "@/shared/features/vac";
+} from "@/shared/features/vac/vacConfigService";
 
 describe("shared/features/vac/config", () => {
   // VAC設定の取得・更新・重複回避・存在判定の分岐を検証
@@ -31,6 +34,22 @@ describe("shared/features/vac/config", () => {
   // テスト間でモック状態が汚染されないように毎回リセット
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("re-exports all service values", async () => {
+    const serviceModule = await import("@/shared/features/vac/vacConfigService");
+
+    expect(DEFAULT_VAC_CONFIG).toBe(serviceModule.DEFAULT_VAC_CONFIG);
+    expect(VacConfigService).toBe(serviceModule.VacConfigService);
+    expect(createVacConfigService).toBe(serviceModule.createVacConfigService);
+    expect(getVacConfigService).toBe(serviceModule.getVacConfigService);
+    expect(getVacConfigOrDefault).toBe(serviceModule.getVacConfigOrDefault);
+    expect(saveVacConfig).toBe(serviceModule.saveVacConfig);
+    expect(addTriggerChannel).toBe(serviceModule.addTriggerChannel);
+    expect(removeTriggerChannel).toBe(serviceModule.removeTriggerChannel);
+    expect(addCreatedVacChannel).toBe(serviceModule.addCreatedVacChannel);
+    expect(removeCreatedVacChannel).toBe(serviceModule.removeCreatedVacChannel);
+    expect(isManagedVacChannel).toBe(serviceModule.isManagedVacChannel);
   });
 
   it("returns default config when VAC config is missing", async () => {

@@ -2,9 +2,13 @@
 // messageCreate における Bump 検知のユースケース処理
 
 import type { Message } from "discord.js";
-import { BUMP_COMMANDS, BUMP_SERVICES, resolveBumpService } from "..";
-import { NODE_ENV, env } from "../../../../shared/config";
+import { NODE_ENV, env } from "../../../../shared/config/env";
 import type { BotClient } from "../../../client";
+import {
+  BUMP_COMMANDS,
+  BUMP_SERVICES,
+  resolveBumpService,
+} from "../constants/bumpReminderConstants";
 import { handleBumpDetected } from "./bumpReminderHandler";
 
 /**

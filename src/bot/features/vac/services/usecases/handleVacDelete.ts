@@ -2,9 +2,9 @@
 // VAC自動削除ユースケース
 
 import { ChannelType, type VoiceState } from "discord.js";
-import { tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
-import type { IVacRepository } from "../../repositories";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
+import type { IVacRepository } from "../../repositories/vacRepository";
 
 /**
  * 管理対象VACが空室になったときにチャンネルと管理情報を削除する

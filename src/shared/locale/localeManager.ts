@@ -2,16 +2,16 @@
 // Guild別言語対応（i18next版）
 
 import i18next, { type TFunction, type TOptionsBase } from "i18next";
-import { NODE_ENV, env } from "../config";
-import type { IBaseGuildRepository } from "../database";
-import { logger } from "../utils";
+import { NODE_ENV, env } from "../config/env";
+import type { IBaseGuildRepository } from "../database/types";
+import { logger } from "../utils/logger";
 import {
   DEFAULT_LOCALE,
   SUPPORTED_LOCALES,
   type AllParseKeys,
   type SupportedLocale,
 } from "./i18n";
-import { resources } from "./locales";
+import { resources } from "./locales/resources";
 
 /**
  * i18next.t を any なしで呼び出すための型エイリアス

@@ -1,7 +1,7 @@
 const addOneTimeJobMock = jest.fn();
 const removeJobMock = jest.fn();
 
-jest.mock("@/shared/scheduler", () => ({
+jest.mock("@/shared/scheduler/jobScheduler", () => ({
   jobScheduler: {
     addOneTimeJob: (...args: unknown[]) => addOneTimeJobMock(...args),
     removeJob: (...args: unknown[]) => removeJobMock(...args),

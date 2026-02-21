@@ -1,13 +1,15 @@
-import type { ChatInputCommandInteraction } from "discord.js";
 import { pingCommand } from "@/bot/commands/ping";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
+import type { ChatInputCommandInteraction } from "discord.js";
 
 // コマンド・イベント結合検証のため、翻訳とEmbed生成のみ固定化する
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "ping description",
     localizations: { "en-US": "ping description" },
   }),
+}));
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => key),
   tGuild: jest.fn(
     async (
@@ -16,10 +18,10 @@ jest.mock("@/shared/locale", () => ({
       params?: Record<string, unknown>,
     ) => {
       if (key === "commands:ping.embed.measuring") {
-        return "計測中...";
+        return "🏓 計測中...";
       }
       if (key === "commands:ping.embed.response") {
-        return `API:${String(params?.apiLatency)} WS:${String(params?.wsLatency)}`;
+        return `📡 API レイテンシー: **${String(params?.apiLatency)}ms**\n💓 WebSocket Ping: **${String(params?.wsLatency)}ms**`;
       }
       return key;
     },
@@ -105,11 +107,16 @@ describe("integration: interactionCreate + pingCommand", () => {
       "user-1",
       5,
     );
-    expect(interaction.reply).toHaveBeenCalledWith({ content: "計測中..." });
+    expect(interaction.reply).toHaveBeenCalledWith({ content: "🏓 計測中..." });
     expect(interaction.fetchReply).toHaveBeenCalledTimes(1);
     expect(interaction.editReply).toHaveBeenCalledWith({
       content: "",
-      embeds: [{ description: "API:123 WS:42" }],
+      embeds: [
+        {
+          description:
+            "📡 API レイテンシー: **123ms**\n💓 WebSocket Ping: **42ms**",
+        },
+      ],
     });
   });
 });

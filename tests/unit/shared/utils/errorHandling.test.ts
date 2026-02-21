@@ -1,4 +1,4 @@
-import { DatabaseError } from "@/shared/errors";
+import { DatabaseError } from "@/shared/errors/customErrors";
 import {
   executeWithDatabaseError,
   executeWithLoggedError,

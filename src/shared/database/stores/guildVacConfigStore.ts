@@ -2,7 +2,7 @@
 // VAC設定の永続化ストア
 
 import type { PrismaClient } from "@prisma/client";
-import type { VacConfig } from "..";
+import type { VacConfig } from "../types";
 
 /**
  * Guild単位のVAC設定を永続化するストア

@@ -5,10 +5,10 @@ import fastifyCors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import Fastify, { type FastifyInstance } from "fastify";
 import { join } from "path";
-import { NODE_ENV, env } from "../shared/config";
-import { tDefault } from "../shared/locale";
-import { logger } from "../shared/utils";
-import { apiRoutes } from "./routes/api";
+import { NODE_ENV, env } from "../shared/config/env";
+import { tDefault } from "../shared/locale/localeManager";
+import { logger } from "../shared/utils/logger";
+import { apiRoutes } from "./routes/api/apiRoutes";
 import { healthRoute } from "./routes/health";
 
 // Web アプリ構築時に利用する設定値を集約した定数

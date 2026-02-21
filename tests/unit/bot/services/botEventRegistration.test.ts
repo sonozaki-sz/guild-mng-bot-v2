@@ -4,11 +4,11 @@ const loggerInfoMock = jest.fn();
 const loggerDebugMock = jest.fn();
 const registerBotEventMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     debug: (...args: unknown[]) => loggerDebugMock(...args),

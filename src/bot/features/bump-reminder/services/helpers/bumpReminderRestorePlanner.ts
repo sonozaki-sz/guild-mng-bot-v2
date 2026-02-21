@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner.ts
 // bump-reminder 復元時の pending 正規化ヘルパー
 
-import type { BumpReminder } from "../../repositories";
+import type { BumpReminder } from "../../repositories/types";
 
 export interface BumpReminderRestorePlan {
   latestByGuild: Map<string, BumpReminder>;

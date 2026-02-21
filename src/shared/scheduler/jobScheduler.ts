@@ -2,8 +2,8 @@
 // タイマー処理（node-cron + setTimeout）
 
 import cron, { ScheduledTask } from "node-cron";
-import { tDefault } from "../locale";
-import { logger } from "../utils";
+import { tDefault } from "../locale/localeManager";
+import { logger } from "../utils/logger";
 
 interface ScheduledJob {
   id: string;

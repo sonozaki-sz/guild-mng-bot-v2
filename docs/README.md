@@ -2,7 +2,7 @@
 
 > Guild Management Bot v2 のドキュメント一覧
 
-最終更新: 2026年2月21日
+最終更新: 2026年2月22日
 
 ---
 
@@ -75,6 +75,26 @@ docs/
 
 ---
 
+### [DEPLOYMENT_XSERVER.md](guides/DEPLOYMENT_XSERVER.md)
+
+XServer VPS へのデプロイ手順。
+
+**内容:**
+
+- XServer VPS 初期セットアップ（OS・SSH・UFW設定）
+- Docker / Docker Compose によるコンテナ構成
+- Dockerfile と docker-compose.prod.yml の設定
+- DBマイグレーションと初回起動
+- systemd による自動起動設定
+- アップデート手順と運用コマンド
+- Turso Cloud への移行手順（任意）
+- k3s（Kubernetes）への発展構成（学習用）
+- セキュリティチェックリストとトラブルシューティング
+
+**対象:** 運用担当者、デプロイ担当者
+
+---
+
 ### [TESTING_GUIDELINES.md](guides/TESTING_GUIDELINES.md)
 
 テストの方針とガイドライン。
@@ -101,7 +121,7 @@ docs/
 **内容:**
 
 - レイヤ責務（commands / features / shared）の分離ルール
-- featureディレクトリ標準テンプレートと `index.ts` 運用ルール
+- featureディレクトリ標準テンプレートと直接import運用ルール
 - 実装時の基本方針（小さく安全な変更、型安全維持）
 - コメント規約（ファイル先頭、関数、共用定数、処理ブロック）
 - リファクタリング手順（定数切り出し、ルーター化、処理分割）

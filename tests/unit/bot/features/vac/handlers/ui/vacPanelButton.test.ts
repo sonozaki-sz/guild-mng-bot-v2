@@ -1,10 +1,10 @@
-import { safeReply } from "@/bot/utils/interaction";
 import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
+import { safeReply } from "@/bot/utils/interaction";
 
 const isManagedVacChannelMock = jest.fn();
 const sendVacControlPanelMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
 

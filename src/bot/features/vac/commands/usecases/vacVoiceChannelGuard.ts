@@ -2,8 +2,8 @@
 // VAC コマンドの操作対象VCガード
 
 import { ChannelType, type ChatInputCommandInteraction } from "discord.js";
-import { ValidationError } from "../../../../../shared/errors";
-import { tGuild } from "../../../../../shared/locale";
+import { ValidationError } from "../../../../../shared/errors/customErrors";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 
 /**

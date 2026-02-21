@@ -1,6 +1,6 @@
 describe("shared/locale/locales/ja/index", () => {
   it("loads module", async () => {
-    const module = await import("@/shared/locale/locales/ja");
+    const module = await import("@/shared/locale/locales/ja/resources");
     expect(module).toBeDefined();
   });
 });

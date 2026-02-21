@@ -4,12 +4,18 @@ const handleChatInputCommandMock = jest.fn();
 const handleModalSubmitMock = jest.fn();
 const handleUserSelectMenuMock = jest.fn();
 
-jest.mock("@/bot/handlers/interactionCreate/flow", () => ({
+jest.mock("@/bot/handlers/interactionCreate/flow/command", () => ({
   handleAutocomplete: (...args: unknown[]) => handleAutocompleteMock(...args),
-  handleButton: (...args: unknown[]) => handleButtonMock(...args),
   handleChatInputCommand: (...args: unknown[]) =>
     handleChatInputCommandMock(...args),
+}));
+
+jest.mock("@/bot/handlers/interactionCreate/flow/modal", () => ({
   handleModalSubmit: (...args: unknown[]) => handleModalSubmitMock(...args),
+}));
+
+jest.mock("@/bot/handlers/interactionCreate/flow/components", () => ({
+  handleButton: (...args: unknown[]) => handleButtonMock(...args),
   handleUserSelectMenu: (...args: unknown[]) =>
     handleUserSelectMenuMock(...args),
 }));
@@ -21,7 +27,7 @@ describe("bot/handlers/interactionCreate/index", () => {
 
   it("routes chat input command to chat handler", async () => {
     const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate");
+      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
 
     const interaction = {
       client: {},
@@ -40,7 +46,7 @@ describe("bot/handlers/interactionCreate/index", () => {
 
   it("routes user select menu to user select handler", async () => {
     const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate");
+      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
 
     const interaction = {
       client: {},

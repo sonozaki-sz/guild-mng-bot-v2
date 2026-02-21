@@ -120,16 +120,12 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     },
   }));
 
-  jest.doMock("@/shared/database", () => ({
-    getGuildConfigRepository: jest.fn(() => ({ mocked: true })),
-  }));
-
-  jest.doMock("@/shared/errors", () => ({
+  jest.doMock("@/shared/errors/errorHandler", () => ({
     setupGlobalErrorHandlers,
     setupGracefulShutdown,
   }));
 
-  jest.doMock("@/shared/locale", () => ({
+  jest.doMock("@/shared/locale/localeManager", () => ({
     localeManager: {
       initialize: jest.fn().mockResolvedValue(undefined),
       setRepository: jest.fn(),
@@ -137,8 +133,11 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     tDefault: jest.fn((key: string) => key),
   }));
 
-  jest.doMock("@/shared/utils", () => ({
+  jest.doMock("@/shared/utils/logger", () => ({
     logger,
+  }));
+
+  jest.doMock("@/shared/utils/prisma", () => ({
     setPrismaClient: jest.fn(),
   }));
 
@@ -154,11 +153,11 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     createBotClient: jest.fn(() => client),
   }));
 
-  jest.doMock("@/bot/commands", () => ({
+  jest.doMock("@/bot/commands/commands", () => ({
     commands: [command],
   }));
 
-  jest.doMock("@/bot/events", () => ({
+  jest.doMock("@/bot/events/events", () => ({
     events: [event],
   }));
 

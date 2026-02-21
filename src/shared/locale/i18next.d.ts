@@ -2,7 +2,7 @@
 // i18next型定義の拡張
 
 import "i18next";
-import type { TranslationResources } from "./locales";
+import type { TranslationResources } from "./locales/resources";
 
 declare module "i18next" {
   interface CustomTypeOptions {

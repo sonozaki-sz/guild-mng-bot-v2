@@ -6,7 +6,7 @@ import {
 } from "@/shared/database/stores/helpers/bumpReminderConfigCas";
 import { setBumpReminderEnabledUseCase } from "@/shared/database/stores/usecases/setBumpReminderEnabled";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn(() => "update-config-failed"),
 }));
 
@@ -123,5 +123,28 @@ describe("shared/database/stores/usecases/setBumpReminderEnabled", () => {
     await expect(
       setBumpReminderEnabledUseCase(context, "g4", true),
     ).rejects.toMatchObject({ name: "DatabaseError" });
+  });
+
+  it("continues when initialization returns false and succeeds on next snapshot", async () => {
+    fetchSnapshotMock
+      .mockResolvedValueOnce({ recordExists: false, rawConfig: null })
+      .mockResolvedValueOnce({
+        recordExists: true,
+        rawConfig: '{"enabled":false,"channelId":"ch2","mentionUserIds":[]}',
+      });
+    context.safeJsonParse.mockReturnValueOnce(undefined).mockReturnValueOnce({
+      enabled: false,
+      channelId: "ch2",
+      mentionUserIds: [],
+    });
+    initializeIfMissingMock.mockResolvedValueOnce(false);
+    casUpdateMock.mockResolvedValueOnce(true);
+
+    await expect(
+      setBumpReminderEnabledUseCase(context, "g5", true),
+    ).resolves.toBeUndefined();
+
+    expect(initializeIfMissingMock).toHaveBeenCalledTimes(1);
+    expect(casUpdateMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -2,7 +2,7 @@
 // ping コマンド実行処理
 
 import type { ChatInputCommandInteraction } from "discord.js";
-import { tGuild } from "../../../../shared/locale";
+import { tGuild } from "../../../../shared/locale/localeManager";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 
 const PING_I18N_KEYS = {

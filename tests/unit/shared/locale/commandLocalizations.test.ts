@@ -2,7 +2,7 @@ import {
   getCommandLocalizations,
   withLocalization,
 } from "@/shared/locale/commandLocalizations";
-import { resources } from "@/shared/locale/locales";
+import { resources } from "@/shared/locale/locales/resources";
 
 describe("shared/locale/commandLocalizations", () => {
   it("returns ja default and English localization map", () => {

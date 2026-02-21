@@ -1,5 +1,5 @@
 import { executeAfkCommand } from "@/bot/features/afk/commands/afkCommand.execute";
-import { ValidationError } from "@/shared/errors";
+import { ValidationError } from "@/shared/errors/customErrors";
 
 const getAfkConfigMock = jest.fn();
 const tGuildMock = jest.fn();
@@ -15,7 +15,7 @@ jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
   }),
 }));
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
@@ -26,7 +26,7 @@ jest.mock("@/bot/utils/messageResponse", () => ({
     createSuccessEmbedMock(description),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },

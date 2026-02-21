@@ -15,16 +15,19 @@ const cancelPendingByGuildUseCaseMock = jest.fn();
 const cancelPendingByGuildAndChannelUseCaseMock = jest.fn();
 const cleanupOldBumpRemindersUseCaseMock = jest.fn();
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/errorHandling", () => ({
   executeWithDatabaseError: (fn: () => Promise<unknown>, message: string) =>
     executeWithDatabaseErrorMock(fn, message),
+}));
+
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: (...args: unknown[]) => loggerDebugMock(...args),
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 

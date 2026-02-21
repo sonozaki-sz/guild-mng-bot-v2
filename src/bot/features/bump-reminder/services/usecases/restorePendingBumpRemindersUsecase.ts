@@ -1,14 +1,14 @@
 // src/bot/features/bump-reminder/services/usecases/restorePendingBumpRemindersUsecase.ts
 // pending Bumpリマインダー復元のユースケース
 
-import { tDefault } from "../../../../../shared/locale";
-import { logger } from "../../../../../shared/utils";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logger } from "../../../../../shared/utils/logger";
 import {
   BUMP_REMINDER_STATUS,
   isBumpServiceName,
   toBumpReminderJobId,
-} from "../../constants";
-import { type IBumpReminderRepository } from "../../repositories";
+} from "../../constants/bumpReminderConstants";
+import { type IBumpReminderRepository } from "../../repositories/types";
 import { type BumpReminderTaskFactory } from "../bumpReminderService";
 import { createBumpReminderRestorePlan } from "../helpers/bumpReminderRestorePlanner";
 import {

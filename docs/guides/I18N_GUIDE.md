@@ -11,7 +11,7 @@
 botの起動時に自動的に初期化されます。
 
 ```typescript
-import { localeManager } from "@/shared/locale";
+import { localeManager } from "@/shared/locale/localeManager";
 
 // Bot起動時
 await localeManager.initialize();
@@ -66,18 +66,18 @@ const message = guildT("commands:example.success");
 src/shared/locale/
 ├── i18n.ts                    # i18next設定
 ├── i18next.d.ts              # 型定義
-├── LocaleManager.ts          # ロケール管理
-├── index.ts                  # エクスポート
+├── localeManager.ts          # ロケール管理
+├── helpers.ts                # ギルド翻訳ヘルパー
 └── locales/
-    ├── index.ts              # リソースまとめ
+  ├── resources.ts          # リソースまとめ
     ├── ja/                   # 日本語
-    │   ├── index.ts
+  │   ├── resources.ts
     │   ├── common.ts         # 共通
     │   ├── commands.ts       # コマンド
     │   ├── errors.ts         # エラー
     │   └── events.ts         # イベント
     └── en/                   # 英語
-        ├── index.ts
+    ├── resources.ts
         ├── common.ts
         ├── commands.ts
         ├── errors.ts
@@ -150,7 +150,7 @@ const msg = tDefault("common:nonexistent");
 1. `src/shared/locale/i18n.ts` の `SUPPORTED_LOCALES` に追加
 2. `src/shared/locale/locales/{lang}/` ディレクトリを作成
 3. 各名前空間ファイルを作成
-4. `src/shared/locale/locales/index.ts` に追加
+4. `src/shared/locale/locales/resources.ts` に追加
 
 ## 📝 補間（パラメータ）の使い方
 
@@ -170,10 +170,10 @@ const msg = await tGuild(guildId, "events:ready.logged_in", {
 ## 🔄 動的な言語切り替え
 
 ```typescript
-import { changeLanguage } from "@/shared/locale";
+import { localeManager } from "@/shared/locale/localeManager";
 
 // 言語を英語に切り替え
-await changeLanguage("en");
+await localeManager.changeLanguage("en");
 ```
 
 ## 📌 ベストプラクティス

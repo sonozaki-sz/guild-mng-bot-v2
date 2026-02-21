@@ -1,8 +1,8 @@
 // src/shared/database/stores/usecases/mutateBumpReminderConfig.ts
 // BumpReminder設定更新ユースケース
 
-import { DatabaseError } from "../../../errors";
-import { tDefault } from "../../../locale";
+import { DatabaseError } from "../../../errors/customErrors";
+import { tDefault } from "../../../locale/localeManager";
 import {
   BUMP_REMINDER_MENTION_ROLE_RESULT,
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,

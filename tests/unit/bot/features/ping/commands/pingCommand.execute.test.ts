@@ -1,8 +1,8 @@
 import { executePingCommand } from "@/bot/features/ping/commands/pingCommand.execute";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
-import { tGuild } from "@/shared/locale";
+import { tGuild } from "@/shared/locale/localeManager";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(),
 }));
 

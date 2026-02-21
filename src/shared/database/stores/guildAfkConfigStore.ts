@@ -2,7 +2,7 @@
 // AFK設定の永続化ストア
 
 import type { PrismaClient } from "@prisma/client";
-import { DatabaseError } from "../../errors";
+import { DatabaseError } from "../../errors/customErrors";
 import type { AfkConfig } from "../types";
 import {
   AFK_CONFIG_CAS_MAX_RETRIES,

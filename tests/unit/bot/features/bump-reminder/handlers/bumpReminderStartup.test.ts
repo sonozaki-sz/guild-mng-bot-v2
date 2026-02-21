@@ -4,6 +4,7 @@ const getBotBumpReminderConfigServiceMock = jest.fn();
 const getBotBumpReminderManagerMock = jest.fn();
 const restorePendingRemindersMock = jest.fn();
 const loggerErrorMock = jest.fn();
+const sendBumpReminderMock = jest.fn();
 
 jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   getBotBumpReminderConfigService: (...args: unknown[]) =>
@@ -12,10 +13,14 @@ jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
     getBotBumpReminderManagerMock(...args),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },
+}));
+
+jest.mock("@/bot/features/bump-reminder/handlers/bumpReminderHandler", () => ({
+  sendBumpReminder: (...args: unknown[]) => sendBumpReminderMock(...args),
 }));
 
 describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
@@ -53,6 +58,17 @@ describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
       "disboard",
     );
     expect(typeof task).toBe("function");
+
+    await task();
+    expect(sendBumpReminderMock).toHaveBeenCalledWith(
+      client,
+      "guild-1",
+      "channel-1",
+      "msg-1",
+      "disboard",
+      expect.any(Object),
+      "panel-1",
+    );
   });
 
   it("logs and swallows restore error", async () => {

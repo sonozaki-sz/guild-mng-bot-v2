@@ -4,11 +4,11 @@
 import {
   type VacChannelPair,
   type VacConfig,
-} from "../../../../shared/database";
+} from "../../../../shared/database/types";
 import {
   getVacConfigService,
   type VacConfigService,
-} from "../../../../shared/features/vac";
+} from "../../../../shared/features/vac/vacConfigService";
 
 /**
  * VAC 機能が必要とする永続化アクセスの抽象

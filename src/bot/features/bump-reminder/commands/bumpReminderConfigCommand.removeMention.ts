@@ -9,16 +9,16 @@ import {
   MessageFlags,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { ValidationError } from "../../../../shared/errors";
+import { ValidationError } from "../../../../shared/errors/customErrors";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
   BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
   type BumpReminderConfig,
-} from "../../../../shared/features/bump-reminder";
-import { tDefault, tGuild } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+} from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
+import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
 import {
   createErrorEmbed,
