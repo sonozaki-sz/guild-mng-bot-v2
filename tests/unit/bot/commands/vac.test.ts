@@ -9,7 +9,7 @@ const createSuccessEmbedMock = jest.fn((description: string) => ({
 }));
 
 // VAC管理判定のみモック化し、コマンド分岐を直接検証する
-jest.mock("../../../../src/bot/services/botVacDependencyResolver", () => ({
+jest.mock("@/bot/services/botVacDependencyResolver", () => ({
   getBotVacRepository: () => ({
     isManagedVacChannel: (...args: unknown[]) =>
       isManagedVacChannelMock(...args),
@@ -17,12 +17,12 @@ jest.mock("../../../../src/bot/services/botVacDependencyResolver", () => ({
 }));
 
 // 共通エラーハンドラへの委譲を検証する
-jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
+jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
 
 // i18n は固定値化して期待値を安定させる
-jest.mock("../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
@@ -32,13 +32,13 @@ jest.mock("../../../../src/shared/locale", () => ({
 }));
 
 // Embed 生成結果を簡易オブジェクト化
-jest.mock("../../../../src/bot/utils/messageResponse", () => ({
+jest.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
 }));
 
-import { vacCommand } from "../../../../src/bot/commands/vac";
-import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
+import { vacCommand } from "@/bot/commands/vac";
+import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 
 type VacInteraction = {
   guildId: string | null;

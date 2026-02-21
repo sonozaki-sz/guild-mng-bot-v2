@@ -1,28 +1,28 @@
-import { commands } from "../../../../src/bot/commands";
-import { afkCommand } from "../../../../src/bot/commands/afk";
-import { afkConfigCommand } from "../../../../src/bot/commands/afk-config";
-import { bumpReminderConfigCommand } from "../../../../src/bot/commands/bump-reminder-config";
-import { pingCommand } from "../../../../src/bot/commands/ping";
-import { vacCommand } from "../../../../src/bot/commands/vac";
-import { vacConfigCommand } from "../../../../src/bot/commands/vac-config";
+import { commands } from "@/bot/commands";
+import { afkCommand } from "@/bot/commands/afk";
+import { afkConfigCommand } from "@/bot/commands/afk-config";
+import { bumpReminderConfigCommand } from "@/bot/commands/bump-reminder-config";
+import { pingCommand } from "@/bot/commands/ping";
+import { vacCommand } from "@/bot/commands/vac";
+import { vacConfigCommand } from "@/bot/commands/vac-config";
 
 // 各コマンドモジュールを軽量スタブ化して index の配列構成のみを検証する
-jest.mock("../../../../src/bot/commands/afk", () => ({
+jest.mock("@/bot/commands/afk", () => ({
   afkCommand: { data: { name: "afk" } },
 }));
-jest.mock("../../../../src/bot/commands/afk-config", () => ({
+jest.mock("@/bot/commands/afk-config", () => ({
   afkConfigCommand: { data: { name: "afk-config" } },
 }));
-jest.mock("../../../../src/bot/commands/bump-reminder-config", () => ({
+jest.mock("@/bot/commands/bump-reminder-config", () => ({
   bumpReminderConfigCommand: { data: { name: "bump-reminder-config" } },
 }));
-jest.mock("../../../../src/bot/commands/vac", () => ({
+jest.mock("@/bot/commands/vac", () => ({
   vacCommand: { data: { name: "vac" } },
 }));
-jest.mock("../../../../src/bot/commands/vac-config", () => ({
+jest.mock("@/bot/commands/vac-config", () => ({
   vacConfigCommand: { data: { name: "vac-config" } },
 }));
-jest.mock("../../../../src/bot/commands/ping", () => ({
+jest.mock("@/bot/commands/ping", () => ({
   pingCommand: { data: { name: "ping" } },
 }));
 

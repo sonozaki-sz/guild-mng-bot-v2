@@ -2,15 +2,15 @@ import {
   VAC_PANEL_CUSTOM_ID,
   getVacPanelChannelId,
   sendVacControlPanel,
-} from "../../../../src/bot/features/vac/handlers/ui/vacControlPanel";
-import { createInfoEmbed } from "../../../../src/bot/utils/messageResponse";
-import { tGuild } from "../../../../src/shared/locale";
+} from "@/bot/features/vac/handlers/ui/vacControlPanel";
+import { createInfoEmbed } from "@/bot/utils/messageResponse";
+import { tGuild } from "@/shared/locale";
 
-jest.mock("../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
 
-jest.mock("../../../../src/bot/utils/messageResponse", () => ({
+jest.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: jest.fn(
     (description: string, options?: { title?: string }) => ({
       description,

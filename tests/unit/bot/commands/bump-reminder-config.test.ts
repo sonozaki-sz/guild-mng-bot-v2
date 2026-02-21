@@ -16,7 +16,7 @@ const createSuccessEmbedMock = jest.fn((description: string) => ({
 }));
 
 // Bump設定サービス依存を置き換えてコマンド分岐を直接検証する
-jest.mock("../../../../src/shared/features/bump-reminder", () => ({
+jest.mock("@/shared/features/bump-reminder", () => ({
   BUMP_REMINDER_MENTION_CLEAR_RESULT: {
     CLEARED: "cleared",
     NOT_CONFIGURED: "not_configured",
@@ -60,7 +60,7 @@ jest.mock("../../../../src/shared/features/bump-reminder", () => ({
 }));
 
 jest.mock(
-  "../../../../src/bot/services/botBumpReminderDependencyResolver",
+  "@/bot/services/botBumpReminderDependencyResolver",
   () => ({
     getBotBumpReminderConfigService: jest.fn(() => ({
       setBumpReminderEnabled: (...args: unknown[]) =>
@@ -85,15 +85,15 @@ jest.mock(
 );
 
 // BumpReminderManager は cancel 呼び出しのみ検証
-jest.mock("../../../../src/bot/features/bump-reminder", () => ({}));
+jest.mock("@/bot/features/bump-reminder", () => ({}));
 
 // 共通エラーハンドラの委譲を確認
-jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
+jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
 
 // i18n を固定値化して期待値を安定させる
-jest.mock("../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
@@ -103,7 +103,7 @@ jest.mock("../../../../src/shared/locale", () => ({
 }));
 
 // メッセージ生成は簡易オブジェクト化
-jest.mock("../../../../src/bot/utils/messageResponse", () => ({
+jest.mock("@/bot/utils/messageResponse", () => ({
   createErrorEmbed: jest.fn((message: string) => ({ message })),
   createInfoEmbed: jest.fn((message: string) => ({ message })),
   createSuccessEmbed: (description: string) =>
@@ -111,15 +111,15 @@ jest.mock("../../../../src/bot/utils/messageResponse", () => ({
 }));
 
 // ログ出力の副作用を抑止
-jest.mock("../../../../src/shared/utils", () => ({
+jest.mock("@/shared/utils", () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn(),
   },
 }));
 
-import { bumpReminderConfigCommand } from "../../../../src/bot/commands/bump-reminder-config";
-import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
+import { bumpReminderConfigCommand } from "@/bot/commands/bump-reminder-config";
+import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 
 type InteractionLike = {
   guildId: string | null;

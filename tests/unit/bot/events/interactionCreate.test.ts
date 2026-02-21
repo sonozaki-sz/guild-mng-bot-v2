@@ -2,25 +2,25 @@ import { Events, MessageFlags } from "discord.js";
 import {
   handleCommandError,
   handleInteractionError,
-} from "../../../../src/bot/errors/interactionErrorHandler";
-import { interactionCreateEvent } from "../../../../src/bot/events/interactionCreate";
-import { tGuild } from "../../../../src/shared/locale";
-import { logger } from "../../../../src/shared/utils/logger";
+} from "@/bot/errors/interactionErrorHandler";
+import { interactionCreateEvent } from "@/bot/events/interactionCreate";
+import { tGuild } from "@/shared/locale";
+import { logger } from "@/shared/utils/logger";
 
 // ErrorHandler は呼び出し有無の検証に限定する
-jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
+jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
   handleInteractionError: jest.fn(),
 }));
 
 // ローカライズは固定文字列化してアサーションを簡潔にする
-jest.mock("../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
   tGuild: jest.fn(async (_guildId: string, key: string) => `guild:${key}`),
 }));
 
 // ログ出力は副作用回避のためダミー化する
-jest.mock("../../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -30,7 +30,7 @@ jest.mock("../../../../src/shared/utils/logger", () => ({
 }));
 
 // レジストリハンドラはテストごとに挙動を制御できるようダミーを公開する
-jest.mock("../../../../src/bot/handlers/interactionCreate/ui/buttons", () => {
+jest.mock("@/bot/handlers/interactionCreate/ui/buttons", () => {
   const mockButtonHandler = {
     matches: jest.fn(() => false),
     execute: jest.fn().mockResolvedValue(undefined),
@@ -40,7 +40,7 @@ jest.mock("../../../../src/bot/handlers/interactionCreate/ui/buttons", () => {
     __mockButtonHandler: mockButtonHandler,
   };
 });
-jest.mock("../../../../src/bot/handlers/interactionCreate/ui/modals", () => {
+jest.mock("@/bot/handlers/interactionCreate/ui/modals", () => {
   const mockModalHandler = {
     matches: jest.fn(() => false),
     execute: jest.fn().mockResolvedValue(undefined),
@@ -51,7 +51,7 @@ jest.mock("../../../../src/bot/handlers/interactionCreate/ui/modals", () => {
   };
 });
 jest.mock(
-  "../../../../src/bot/handlers/interactionCreate/ui/selectMenus",
+  "@/bot/handlers/interactionCreate/ui/selectMenus",
   () => {
     const mockUserSelectHandler = {
       matches: jest.fn(() => false),
@@ -146,7 +146,7 @@ describe("bot/events/interactionCreate", () => {
   // モーダルは registry の prefix match を優先して実行されることを確認する
   it("routes modal submit to registry handler first", async () => {
     const mockedModalModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/modals",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -171,7 +171,7 @@ describe("bot/events/interactionCreate", () => {
   // modal registry 実行失敗時は interaction error ハンドラへ委譲されることを検証
   it("delegates modal registry handler error to interaction error handler", async () => {
     const mockedModalModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/modals",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -199,7 +199,7 @@ describe("bot/events/interactionCreate", () => {
   // ボタン実行失敗時は handleInteractionError にフォールバックすることを検証する
   it("delegates button handler error to interaction error handler", async () => {
     const mockedButtonModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/buttons",
+      "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __mockButtonHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -362,7 +362,7 @@ describe("bot/events/interactionCreate", () => {
   // modal registry 非一致時は client.modals を使わず警告して終了することを検証
   it("does not use client modal collection when registry has no match", async () => {
     const mockedModalModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/modals",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -388,7 +388,7 @@ describe("bot/events/interactionCreate", () => {
   // modal fallback でも見つからない場合は警告して終了することを検証
   it("warns when modal is unknown in both registry and collection", async () => {
     const mockedModalModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/modals",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -411,7 +411,7 @@ describe("bot/events/interactionCreate", () => {
   // registry 非一致時は fallback モーダルの失敗も発生せず interaction error へ委譲しない
   it("does not delegate modal collection errors when registry has no match", async () => {
     const mockedModalModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/modals",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -436,7 +436,7 @@ describe("bot/events/interactionCreate", () => {
   // user select ハンドラ成功時に execute が呼ばれることを検証
   it("routes user select menu to handler", async () => {
     const mockedSelectModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/selectMenus",
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -460,7 +460,7 @@ describe("bot/events/interactionCreate", () => {
   // user select ハンドラ失敗時は interaction error ハンドラへ委譲することを検証
   it("delegates user select handler error to interaction error handler", async () => {
     const mockedSelectModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/selectMenus",
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -489,7 +489,7 @@ describe("bot/events/interactionCreate", () => {
   // ボタンハンドラ未一致時は何も実行しないことを検証
   it("does nothing when no button handler matches", async () => {
     const mockedButtonModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/buttons",
+      "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __mockButtonHandler: {
         matches: jest.Mock<boolean, [string]>;
@@ -514,7 +514,7 @@ describe("bot/events/interactionCreate", () => {
   // ユーザーセレクトハンドラ未一致時は何も実行しないことを検証
   it("does nothing when no user select handler matches", async () => {
     const mockedSelectModule = jest.requireMock(
-      "../../../../src/bot/handlers/interactionCreate/ui/selectMenus",
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
         matches: jest.Mock<boolean, [string]>;

@@ -3,11 +3,11 @@ import Fastify from "fastify";
 // Prisma クライアント取得処理を差し替えるモック
 const getPrismaClientMock = jest.fn();
 
-jest.mock("../../../../src/shared/utils/prisma", () => ({
+jest.mock("@/shared/utils/prisma", () => ({
   getPrismaClient: () => getPrismaClientMock(),
 }));
 
-import { healthRoute } from "../../../../src/web/routes/health";
+import { healthRoute } from "@/web/routes/health";
 
 describe("web/routes/health", () => {
   // ヘルス/レディネスAPIの成功・失敗分岐を検証

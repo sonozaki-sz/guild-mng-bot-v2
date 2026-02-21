@@ -38,7 +38,7 @@ jest.mock("winston-daily-rotate-file", () => {
 });
 
 // 環境変数のモック
-jest.mock("../../../src/shared/config/env", () => ({
+jest.mock("@/shared/config/env", () => ({
   NODE_ENV: {
     DEVELOPMENT: "development",
     PRODUCTION: "production",
@@ -51,7 +51,7 @@ jest.mock("../../../src/shared/config/env", () => ({
 }));
 
 // i18n のモック
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 
@@ -64,7 +64,7 @@ describe("Logger", () => {
     jest.clearAllMocks();
     // モジュールキャッシュの影響を避けるため isolateModules 内で再読み込み
     jest.isolateModules(() => {
-      const loggerModule = require("../../../src/shared/utils/logger");
+      const loggerModule = require("@/shared/utils/logger");
       logger = loggerModule.logger;
     });
   });
@@ -170,7 +170,7 @@ describe("Logger", () => {
 
   describe("Integration with i18n", () => {
     it("should work with translated messages", () => {
-      const { tDefault } = require("../../../src/shared/locale");
+      const { tDefault } = require("@/shared/locale");
       const message = tDefault("system:shutdown.gracefully");
 
       logger.info(message);

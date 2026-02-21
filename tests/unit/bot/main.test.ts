@@ -111,7 +111,7 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     Routes: routes,
   }));
 
-  jest.doMock("../../../src/shared/config/env", () => ({
+  jest.doMock("@/shared/config/env", () => ({
     env: {
       DATABASE_URL: "file::memory:?cache=shared",
       DISCORD_TOKEN: "test-token",
@@ -120,16 +120,16 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     },
   }));
 
-  jest.doMock("../../../src/shared/database", () => ({
+  jest.doMock("@/shared/database", () => ({
     getGuildConfigRepository: jest.fn(() => ({ mocked: true })),
   }));
 
-  jest.doMock("../../../src/shared/errors", () => ({
+  jest.doMock("@/shared/errors", () => ({
     setupGlobalErrorHandlers,
     setupGracefulShutdown,
   }));
 
-  jest.doMock("../../../src/shared/locale", () => ({
+  jest.doMock("@/shared/locale", () => ({
     localeManager: {
       initialize: jest.fn().mockResolvedValue(undefined),
       setRepository: jest.fn(),
@@ -137,32 +137,32 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
     tDefault: jest.fn((key: string) => key),
   }));
 
-  jest.doMock("../../../src/shared/utils", () => ({
+  jest.doMock("@/shared/utils", () => ({
     logger,
     setPrismaClient: jest.fn(),
   }));
 
-  jest.doMock("../../../src/bot/services/botEventRegistration", () => ({
+  jest.doMock("@/bot/services/botEventRegistration", () => ({
     registerBotEvents,
   }));
 
-  jest.doMock("../../../src/bot/services/botCompositionRoot", () => ({
+  jest.doMock("@/bot/services/botCompositionRoot", () => ({
     initializeBotCompositionRoot: jest.fn(),
   }));
 
-  jest.doMock("../../../src/bot/client", () => ({
+  jest.doMock("@/bot/client", () => ({
     createBotClient: jest.fn(() => client),
   }));
 
-  jest.doMock("../../../src/bot/commands", () => ({
+  jest.doMock("@/bot/commands", () => ({
     commands: [command],
   }));
 
-  jest.doMock("../../../src/bot/events", () => ({
+  jest.doMock("@/bot/events", () => ({
     events: [event],
   }));
 
-  await import("../../../src/bot/main");
+  await import("@/bot/main");
   await flushMicrotasks();
 
   return {

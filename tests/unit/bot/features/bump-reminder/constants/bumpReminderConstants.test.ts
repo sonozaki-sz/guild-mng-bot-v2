@@ -4,7 +4,7 @@ describe("shared/features/bump-reminder/constants", () => {
   async function loadModule(testMode: boolean) {
     jest.resetModules();
     jest.doMock(
-      "../../../../src/shared/config/env",
+      "@/shared/config/env",
       () => ({
         NODE_ENV: {
           DEVELOPMENT: "development",
@@ -20,7 +20,7 @@ describe("shared/features/bump-reminder/constants", () => {
       { virtual: false },
     );
 
-    return import("../../../../src/bot/features/bump-reminder");
+    return import("@/bot/features/bump-reminder");
   }
 
   // モジュールキャッシュとタイマー副作用を各ケースでリセットする

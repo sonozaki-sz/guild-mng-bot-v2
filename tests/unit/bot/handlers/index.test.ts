@@ -1,14 +1,14 @@
-import { bumpPanelButtonHandler } from "../../../../src/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
-import { vacPanelButtonHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelButton";
-import { vacPanelModalHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelModal";
-import { vacPanelUserSelectHandler } from "../../../../src/bot/features/vac/handlers/ui/vacPanelUserSelect";
-import { buttonHandlers } from "../../../../src/bot/handlers/interactionCreate/ui/buttons";
-import { modalHandlers } from "../../../../src/bot/handlers/interactionCreate/ui/modals";
-import { userSelectHandlers } from "../../../../src/bot/handlers/interactionCreate/ui/selectMenus";
+import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
+import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
+import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
+import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
+import { buttonHandlers } from "@/bot/handlers/interactionCreate/ui/buttons";
+import { modalHandlers } from "@/bot/handlers/interactionCreate/ui/modals";
+import { userSelectHandlers } from "@/bot/handlers/interactionCreate/ui/selectMenus";
 
 // 重い依存を避けるため、各ハンドラ本体は最小スタブを注入する
 jest.mock(
-  "../../../../src/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler",
+  "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler",
   () => ({
     bumpPanelButtonHandler: {
       matches: jest.fn(() => false),
@@ -17,7 +17,7 @@ jest.mock(
   }),
 );
 jest.mock(
-  "../../../../src/bot/features/vac/handlers/ui/vacPanelButton",
+  "@/bot/features/vac/handlers/ui/vacPanelButton",
   () => ({
     vacPanelButtonHandler: {
       matches: jest.fn(() => true),
@@ -25,14 +25,14 @@ jest.mock(
     },
   }),
 );
-jest.mock("../../../../src/bot/features/vac/handlers/ui/vacPanelModal", () => ({
+jest.mock("@/bot/features/vac/handlers/ui/vacPanelModal", () => ({
   vacPanelModalHandler: {
     matches: jest.fn(() => true),
     execute: jest.fn(),
   },
 }));
 jest.mock(
-  "../../../../src/bot/features/vac/handlers/ui/vacPanelUserSelect",
+  "@/bot/features/vac/handlers/ui/vacPanelUserSelect",
   () => ({
     vacPanelUserSelectHandler: {
       matches: jest.fn(() => true),

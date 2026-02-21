@@ -1,20 +1,20 @@
 import { MessageFlags } from "discord.js";
-import { bumpPanelButtonHandler } from "../../../../../src/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
-import { getBotBumpReminderConfigService } from "../../../../../src/bot/services/botBumpReminderDependencyResolver";
+import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
+import { getBotBumpReminderConfigService } from "@/bot/services/botBumpReminderDependencyResolver";
 import {
   createErrorEmbed,
   createSuccessEmbed,
   createWarningEmbed,
-} from "../../../../../src/bot/utils/messageResponse";
-import { getGuildTranslator, tDefault } from "../../../../../src/shared/locale";
-import { logger } from "../../../../../src/shared/utils";
+} from "@/bot/utils/messageResponse";
+import { getGuildTranslator, tDefault } from "@/shared/locale";
+import { logger } from "@/shared/utils";
 
 const safeReplyMock = jest.fn();
 const addMentionUserMock = jest.fn();
 const removeMentionUserMock = jest.fn();
 
 // Bump設定サービス依存を切り離し、ハンドラ分岐に集中する
-jest.mock("../../../../../src/shared/features/bump-reminder", () => ({
+jest.mock("@/shared/features/bump-reminder", () => ({
   BUMP_REMINDER_MENTION_USER_ADD_RESULT: {
     ADDED: "added",
     ALREADY_EXISTS: "already_exists",
@@ -28,7 +28,7 @@ jest.mock("../../../../../src/shared/features/bump-reminder", () => ({
 }));
 
 jest.mock(
-  "../../../../../src/bot/services/botBumpReminderDependencyResolver",
+  "@/bot/services/botBumpReminderDependencyResolver",
   () => ({
     getBotBumpReminderConfigService: jest.fn(() => ({
       addBumpReminderMentionUser: (...args: unknown[]) =>
@@ -40,7 +40,7 @@ jest.mock(
 );
 
 // 定数と翻訳を固定化してカスタムID判定と応答内容の検証を安定させる
-jest.mock("../../../../../src/bot/features/bump-reminder", () => ({
+jest.mock("@/bot/features/bump-reminder", () => ({
   BUMP_CONSTANTS: {
     CUSTOM_ID_PREFIX: {
       MENTION_ON: "bump:on:",
@@ -48,21 +48,21 @@ jest.mock("../../../../../src/bot/features/bump-reminder", () => ({
     },
   },
 }));
-jest.mock("../../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: jest.fn((key: string) => key),
   getGuildTranslator: jest.fn(async () => (key: string) => key),
 }));
 
 // interaction 応答は safeReply 経由のみ検証する
-jest.mock("../../../../../src/bot/utils/interaction", () => ({
+jest.mock("@/bot/utils/interaction", () => ({
   safeReply: (...args: unknown[]) => safeReplyMock(...args),
 }));
 
 // ログ・Embed 生成は副作用排除のためダミーにする
-jest.mock("../../../../../src/shared/utils", () => ({
+jest.mock("@/shared/utils", () => ({
   logger: { debug: jest.fn(), error: jest.fn() },
 }));
-jest.mock("../../../../../src/bot/utils/messageResponse", () => ({
+jest.mock("@/bot/utils/messageResponse", () => ({
   createErrorEmbed: jest.fn((message: string) => ({ message })),
   createSuccessEmbed: jest.fn((message: string) => ({ message })),
   createWarningEmbed: jest.fn((message: string) => ({ message })),

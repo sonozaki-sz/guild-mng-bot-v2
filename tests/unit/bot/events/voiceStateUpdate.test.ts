@@ -1,9 +1,9 @@
 import { Events } from "discord.js";
-import { voiceStateUpdateEvent } from "../../../../src/bot/events/voiceStateUpdate";
+import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
 
 const handleVacVoiceStateUpdateMock = jest.fn();
 
-jest.mock("../../../../src/bot/features/vac/handlers", () => ({
+jest.mock("@/bot/features/vac/handlers", () => ({
   handleVacVoiceStateUpdate: (...args: unknown[]) =>
     handleVacVoiceStateUpdateMock(...args),
 }));

@@ -13,7 +13,7 @@ import {
   RateLimitError,
   TimeoutError,
   ValidationError,
-} from "../../../src/shared/errors/customErrors";
+} from "@/shared/errors/customErrors";
 
 describe("CustomErrors", () => {
   // 各エラークラスのプロパティ・継承・運用フラグの挙動を検証
