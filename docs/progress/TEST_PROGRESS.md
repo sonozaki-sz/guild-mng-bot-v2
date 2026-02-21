@@ -2,7 +2,7 @@
 
 > テストの実装状況と今後の計画
 
-最終更新: 2026年2月20日
+最終更新: 2026年2月21日
 
 **関連**: [TODO.md](../../TODO.md) - タスク管理 | [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) - 実装進捗
 
@@ -10,10 +10,10 @@
 
 ## 📊 現在のテスト状況
 
-### 最新テスト実行結果（2026年2月20日）
+### 最新テスト実行結果（2026年2月21日）
 
-- ✅ **全テスト PASSED**: 455/455
-- ✅ **全スイート PASSED**: 39/39
+- ✅ **全テスト PASSED**: 692/692
+- ✅ **全スイート PASSED**: 185/185
 - ⏱️ **実行時間**: ~5秒
 - 📦 **カバレッジ（global）**: lines 44.54% / functions 37.87%（直近 coverage 実行値）
 - 🎯 **対象実装カバレッジ**: `src/bot/client.ts` / `src/bot/main.ts` / `src/bot/commands/bump-reminder-config.ts` / `src/bot/commands/afk.ts` / `src/bot/commands/afk-config.ts` / `src/bot/commands/vac.ts` / `src/bot/commands/vac-config.ts` / `src/bot/commands/ping.ts` / `src/bot/events/clientReady.ts` / `src/bot/events/voiceStateUpdate.ts` / `src/bot/events/interactionCreate.ts` / `src/bot/events/messageCreate.ts` / `src/bot/events/channelDelete.ts` / `src/bot/handlers/buttons/bumpPanel.ts` / `src/bot/handlers/buttons/vacPanel.ts` / `src/bot/handlers/modals/vacPanel.ts` / `src/bot/handlers/selectMenus/vacPanel.ts` / `src/bot/services/VacControlPanel.ts` / `src/bot/services/cooldownManager.ts` / `src/shared/locale/helpers.ts` / `src/shared/features/bump-reminder/constants.ts` / `src/shared/features/bump-reminder/handler.ts` は statements/branches/functions/lines すべて 100%
@@ -39,11 +39,17 @@
 
 ### テスト統計
 
-- **総テスト数**: 455 テスト（全て合格）
-- **テストスイート**: 39 スイート
+- **総テスト数**: 692 テスト（全て合格）
+- **テストスイート**: 185 スイート
 - **全体カバレッジ**: lines 44.54% / functions 37.87%
 - **コアモジュールカバレッジ**: 55-100%
 - **状態**: ✅ すべてのテストが正常に動作中
+
+### src↔tests マッピング監査クローズ（2026年2月21日）
+
+- `src` 対称マッピング監査の残件は **0件としてクローズ**
+- `src/**/*.d.ts`（例: `src/shared/locale/i18next.d.ts`）は監査対象外に統一
+- 根拠: 宣言ファイルは Jest 実行対象ではなく、`*.test.ts` との1:1対応を要求しない
 
 ### モジュール別カバレッジ
 
@@ -578,4 +584,4 @@ Time:        ~6s
 
 ---
 
-**最終更新**: 2026年2月20日
+**最終更新**: 2026年2月21日

@@ -212,6 +212,11 @@
 - [x] **TST-REORG-006**: テストガイド更新（再編後の正式構成反映）
   - 完了条件: `docs/guides/TESTING_GUIDELINES.md` の構成図と命名ルールを更新
 
+**クローズ記録（2026-02-21）**:
+
+- src↔tests マッピング監査の残件は **0件としてクローズ**
+- `src/**/*.d.ts`（例: `src/shared/locale/i18next.d.ts`）は監査対象外（宣言ファイルのため）
+
 ### コード品質
 
 - [ ] ESLintルール厳格化

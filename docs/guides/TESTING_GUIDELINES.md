@@ -28,7 +28,7 @@
 
 ### 現状（2026-02-21）
 
-- テストは全件成功（39 suites / 431 tests）
+- テストは全件成功（185 suites / 692 tests）
 - `unit` / `integration` の配置を `src` 対称へ再編済み
 - `e2e` は次フェーズで実施
 
@@ -76,6 +76,15 @@ describe("ClassName/FunctionName", () => {
 - ファイル名は **camelCase固定にしない**。`src` 側のベース名に一致させる（`kebab-case` を含む）
 - 単体テストは `*.test.ts`、統合テストは `*.integration.test.ts` を使う
 - `src` 参照は原則 `@/` エイリアスを使う
+
+### src↔tests マッピング監査ルール（2026-02-21）
+
+- 監査対象は **実行対象の TypeScript モジュール**（`src/**/*.ts`）とする
+- 次は監査対象外とする
+  - 宣言ファイル: `src/**/*.d.ts`
+  - ビルド生成物・補助ファイル
+- 理由: `.d.ts` は型宣言専用で Jest 実行対象ではなく、`*.test.ts` と 1:1 対応を強制しないため
+- 具体例: `src/shared/locale/i18next.d.ts` はマッピング残件として扱わない
 
 ---
 
