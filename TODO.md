@@ -203,7 +203,7 @@
   - 完了条件: `requirePrismaClient` 依存の暗黙解決を段階的に排除（互換を維持しつつ縮小）
   - コミット例: `refactor: bump-reminder service の暗黙依存を縮退`
 
-- [ ] **SR-005** 大型ファイル分割（usecase単位）
+- [x] **SR-005** 大型ファイル分割（usecase単位）
   - 対象: `bumpReminderHandler.ts`（detect / schedule / send / panel）
   - 完了条件: 入口関数は薄いオーケストレーションのみ
   - コミット例: `refactor: bump-reminder handler を用途別に分割`
