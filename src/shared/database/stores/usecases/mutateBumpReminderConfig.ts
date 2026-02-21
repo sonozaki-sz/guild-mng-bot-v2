@@ -1,3 +1,6 @@
+// src/shared/database/stores/usecases/mutateBumpReminderConfig.ts
+// BumpReminder設定更新ユースケース
+
 import { DatabaseError } from "../../../errors";
 import { tDefault } from "../../../locale";
 import {
@@ -22,6 +25,13 @@ import {
 } from "../helpers/bumpReminderConfigCas";
 import type { BumpReminderStoreContext } from "./bumpReminderStoreContext";
 
+/**
+ * CAS方式でBumpReminder設定を更新する共通ミューテータを実行する
+ * @param context ストア実行コンテキスト
+ * @param guildId 対象ギルドID
+ * @param mutator 設定更新ロジック
+ * @returns 更新結果または未設定結果
+ */
 export async function mutateBumpReminderConfigUseCase<
   TResult extends
     | BumpReminderMentionRoleResult
@@ -86,6 +96,14 @@ export async function mutateBumpReminderConfigUseCase<
   );
 }
 
+/**
+ * ユーザーメンション対象の追加/削除をCAS方式で更新する
+ * @param context ストア実行コンテキスト
+ * @param guildId 対象ギルドID
+ * @param userId 操作対象ユーザーID
+ * @param mode 追加または削除モード
+ * @returns 操作結果
+ */
 export async function mutateBumpReminderMentionUsersUseCase(
   context: BumpReminderStoreContext,
   guildId: string,

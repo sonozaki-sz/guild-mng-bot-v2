@@ -1,7 +1,16 @@
+// src/bot/features/bump-reminder/repositories/usecases/findPendingReminders.ts
+// pending Bumpリマインダー取得ユースケース
+
 import type { PrismaClient } from "@prisma/client";
 import { BUMP_REMINDER_STATUS } from "../../constants";
 import type { BumpReminder } from "../types";
 
+/**
+ * ギルド単位で次回実行予定のpendingリマインダーを1件取得する
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @returns pendingリマインダー（未存在時はnull）
+ */
 export async function findPendingByGuildUseCase(
   prisma: PrismaClient,
   guildId: string,
@@ -19,6 +28,11 @@ export async function findPendingByGuildUseCase(
   return result as BumpReminder | null;
 }
 
+/**
+ * 全ギルドのpendingリマインダーを実行時刻昇順で取得する
+ * @param prisma Prismaクライアント
+ * @returns pendingリマインダー一覧
+ */
 export async function findAllPendingUseCase(
   prisma: PrismaClient,
 ): Promise<BumpReminder[]> {

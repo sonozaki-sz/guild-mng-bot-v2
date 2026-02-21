@@ -3,6 +3,12 @@
 
 import type { PrismaClient } from "@prisma/client";
 
+/**
+ * guildConfig レコードを新規作成する
+ * @param prisma Prismaクライアント
+ * @param data 作成データ
+ * @returns 実行完了
+ */
 export async function createGuildConfigRecord(
   prisma: PrismaClient,
   data: {
@@ -18,6 +24,14 @@ export async function createGuildConfigRecord(
   await prisma.guildConfig.create({ data });
 }
 
+/**
+ * guildConfig レコードを upsert で更新/作成する
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @param updateData 更新データ
+ * @param createData 作成データ
+ * @returns 実行完了
+ */
 export async function upsertGuildConfigRecord(
   prisma: PrismaClient,
   guildId: string,
@@ -34,6 +48,12 @@ export async function upsertGuildConfigRecord(
   });
 }
 
+/**
+ * guildConfig レコードを削除する
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @returns 実行完了
+ */
 export async function deleteGuildConfigRecord(
   prisma: PrismaClient,
   guildId: string,

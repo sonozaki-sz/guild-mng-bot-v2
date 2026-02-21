@@ -26,6 +26,14 @@ export interface EmbedOptions {
   fields?: { name: string; value: string; inline?: boolean }[];
 }
 
+/**
+ * ステータス種別に応じた共通Embedを生成する
+ * @param status 表示ステータス
+ * @param title Embedタイトル
+ * @param description Embed本文
+ * @param options 追加オプション
+ * @returns 生成したEmbed
+ */
 export function createStatusEmbed(
   status: MessageStatus,
   title: string,
@@ -59,6 +67,12 @@ export function createStatusEmbed(
   return embed;
 }
 
+/**
+ * 成功ステータスEmbedを生成する
+ * @param description Embed本文
+ * @param options 追加オプション
+ * @returns 生成したEmbed
+ */
 export function createSuccessEmbed(
   description: string,
   options?: EmbedOptions,
@@ -71,6 +85,12 @@ export function createSuccessEmbed(
   );
 }
 
+/**
+ * 情報ステータスEmbedを生成する
+ * @param description Embed本文
+ * @param options 追加オプション
+ * @returns 生成したEmbed
+ */
 export function createInfoEmbed(
   description: string,
   options?: EmbedOptions,
@@ -83,6 +103,12 @@ export function createInfoEmbed(
   );
 }
 
+/**
+ * 警告ステータスEmbedを生成する
+ * @param description Embed本文
+ * @param options 追加オプション
+ * @returns 生成したEmbed
+ */
 export function createWarningEmbed(
   description: string,
   options?: EmbedOptions,
@@ -95,6 +121,12 @@ export function createWarningEmbed(
   );
 }
 
+/**
+ * エラーステータスEmbedを生成する
+ * @param description Embed本文
+ * @param options 追加オプション
+ * @returns 生成したEmbed
+ */
 export function createErrorEmbed(
   description: string,
   options?: EmbedOptions,

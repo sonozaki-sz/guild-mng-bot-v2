@@ -10,6 +10,12 @@ type AfkConfigSnapshot = {
   rawConfig: string | null;
 };
 
+/**
+ * afkConfig の現在スナップショットを取得する
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @returns レコード存在有無と生JSON
+ */
 export async function fetchAfkConfigSnapshot(
   prisma: PrismaClient,
   guildId: string,
@@ -25,6 +31,15 @@ export async function fetchAfkConfigSnapshot(
   };
 }
 
+/**
+ * afkConfig が未設定のとき初期値を設定する
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @param defaultLocale 既定ロケール
+ * @param nextJson 初期JSON
+ * @param recordExists レコード存在有無
+ * @returns 初期化した場合 true
+ */
 export async function initializeAfkConfigIfMissing(
   prisma: PrismaClient,
   guildId: string,
@@ -57,6 +72,14 @@ export async function initializeAfkConfigIfMissing(
   return true;
 }
 
+/**
+ * 期待値一致時のみ afkConfig を更新する CAS 更新を行う
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @param expectedRawConfig 期待する現行JSON
+ * @param nextJson 更新後JSON
+ * @returns 更新成功時 true
+ */
 export async function casUpdateAfkConfig(
   prisma: PrismaClient,
   guildId: string,

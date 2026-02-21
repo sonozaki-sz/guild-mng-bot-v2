@@ -16,6 +16,12 @@ type AnyInteraction =
   | ModalSubmitInteraction
   | UserSelectMenuInteraction;
 
+/**
+ * 返信済み状態を考慮して reply / followUp を安全に切り替える
+ * @param interaction 対象インタラクション
+ * @param options 返信オプション
+ * @returns 実行完了
+ */
 export async function safeReply(
   interaction: AnyInteraction,
   options: InteractionReplyOptions,

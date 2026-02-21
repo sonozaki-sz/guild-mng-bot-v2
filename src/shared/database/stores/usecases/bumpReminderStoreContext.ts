@@ -1,3 +1,6 @@
+// src/shared/database/stores/usecases/bumpReminderStoreContext.ts
+// BumpReminderストア用コンテキスト型定義
+
 import type { PrismaClient } from "@prisma/client";
 
 export type BumpReminderStoreContext = {

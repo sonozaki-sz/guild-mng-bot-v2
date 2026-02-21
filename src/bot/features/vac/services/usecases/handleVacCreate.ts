@@ -1,3 +1,6 @@
+// src/bot/features/vac/services/usecases/handleVacCreate.ts
+// VAC自動作成ユースケース
+
 import {
   ChannelType,
   PermissionFlagsBits,
@@ -16,6 +19,12 @@ const VAC_EVENT = {
 
 type GuildChannelsCache = GuildMember["guild"]["channels"]["cache"];
 
+/**
+ * トリガーVC参加時に管理対象VACを作成し、参加者を移動する
+ * @param vacRepository VAC設定リポジトリ
+ * @param newState 最新ボイス状態
+ * @returns 実行完了
+ */
 export async function handleVacCreateUseCase(
   vacRepository: IVacRepository,
   newState: VoiceState,
@@ -108,6 +117,12 @@ export async function handleVacCreateUseCase(
   );
 }
 
+/**
+ * 既存チャンネル名と衝突しないVACチャンネル名を生成する
+ * @param member VAC所有者となるメンバー
+ * @param channels ギルド内チャンネルキャッシュ
+ * @returns 一意化されたチャンネル名
+ */
 function buildUniqueChannelName(
   member: GuildMember,
   channels: GuildChannelsCache,

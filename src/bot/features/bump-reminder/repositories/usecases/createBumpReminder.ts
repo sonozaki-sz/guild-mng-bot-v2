@@ -1,7 +1,21 @@
+// src/bot/features/bump-reminder/repositories/usecases/createBumpReminder.ts
+// Bumpリマインダー作成ユースケース
+
 import type { PrismaClient } from "@prisma/client";
 import { BUMP_REMINDER_STATUS } from "../../constants";
 import type { BumpReminder } from "../types";
 
+/**
+ * 新規Bumpリマインダーを作成し、既存pendingをキャンセルする
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @param channelId 対象チャンネルID
+ * @param scheduledAt リマインド予定時刻
+ * @param messageId 元メッセージID
+ * @param panelMessageId パネルメッセージID
+ * @param serviceName 検知サービス名
+ * @returns 作成したリマインダー
+ */
 export async function createBumpReminderUseCase(
   prisma: PrismaClient,
   guildId: string,

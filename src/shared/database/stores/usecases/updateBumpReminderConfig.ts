@@ -1,3 +1,6 @@
+// src/shared/database/stores/usecases/updateBumpReminderConfig.ts
+// BumpReminder設定全体更新ユースケース
+
 import { DatabaseError } from "../../../errors";
 import { tDefault } from "../../../locale";
 import type { BumpReminderConfig } from "../../types";
@@ -9,6 +12,13 @@ import {
 } from "../helpers/bumpReminderConfigCas";
 import type { BumpReminderStoreContext } from "./bumpReminderStoreContext";
 
+/**
+ * BumpReminder設定をCAS方式で丸ごと更新する
+ * @param context ストア実行コンテキスト
+ * @param guildId 対象ギルドID
+ * @param bumpReminderConfig 保存する設定
+ * @returns 実行完了
+ */
 export async function updateBumpReminderConfigUseCase(
   context: BumpReminderStoreContext,
   guildId: string,

@@ -29,6 +29,12 @@ declare module "discord.js" {
   }
 }
 
+/**
+ * BotEvent 定義を discord.js Client へ登録する
+ * @param emitter イベント登録先クライアント
+ * @param event 登録するイベント定義
+ * @returns 実行完了
+ */
 export function registerBotEvent(
   emitter: Client,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

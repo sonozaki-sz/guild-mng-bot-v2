@@ -1,3 +1,6 @@
+// src/shared/database/stores/usecases/setBumpReminderEnabled.ts
+// BumpReminder有効状態更新ユースケース
+
 import { DatabaseError } from "../../../errors";
 import { tDefault } from "../../../locale";
 import type { BumpReminderConfig } from "../../types";
@@ -10,6 +13,14 @@ import {
 } from "../helpers/bumpReminderConfigCas";
 import type { BumpReminderStoreContext } from "./bumpReminderStoreContext";
 
+/**
+ * BumpReminderの有効/無効状態をCAS方式で更新する
+ * @param context ストア実行コンテキスト
+ * @param guildId 対象ギルドID
+ * @param enabled 有効状態
+ * @param channelId 有効化時に設定するチャンネルID
+ * @returns 実行完了
+ */
 export async function setBumpReminderEnabledUseCase(
   context: BumpReminderStoreContext,
   guildId: string,

@@ -23,10 +23,20 @@ type GuildConfigRecord = {
   updatedAt: Date;
 };
 
+/**
+ * undefined 以外の値を JSON 文字列へ変換する
+ * @param value 変換対象値
+ * @returns JSON 文字列（undefined の場合は null）
+ */
 function stringifyIfDefined(value: unknown): string | null {
   return value !== undefined ? JSON.stringify(value) : null;
 }
 
+/**
+ * JSON文字列を安全にパースする
+ * @param json パース対象JSON
+ * @returns パース結果（失敗時は undefined）
+ */
 export function parseJsonSafe<T>(json: string | null): T | undefined {
   if (!json) return undefined;
   try {
@@ -36,6 +46,11 @@ export function parseJsonSafe<T>(json: string | null): T | undefined {
   }
 }
 
+/**
+ * DBレコードをドメインの GuildConfig へ変換する
+ * @param record DBレコード
+ * @returns ドメインモデル
+ */
 export function toGuildConfig(record: GuildConfigRecord): GuildConfig {
   return {
     guildId: record.guildId,
@@ -52,6 +67,12 @@ export function toGuildConfig(record: GuildConfigRecord): GuildConfig {
   };
 }
 
+/**
+ * GuildConfig から create 用DBデータを生成する
+ * @param config ドメイン設定
+ * @param defaultLocale 既定ロケール
+ * @returns create 用データ
+ */
 export function toGuildConfigCreateData(
   config: GuildConfig,
   defaultLocale: string,
@@ -75,6 +96,11 @@ export function toGuildConfigCreateData(
   };
 }
 
+/**
+ * GuildConfig の部分更新データを DB update 形式へ変換する
+ * @param updates 部分更新データ
+ * @returns update 用データ
+ */
 export function toGuildConfigUpdateData(
   updates: Partial<GuildConfig>,
 ): Record<string, unknown> {

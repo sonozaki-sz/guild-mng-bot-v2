@@ -54,10 +54,17 @@ export async function executeAfkConfigCommand(
   }
 }
 
+/**
+ * afk-config set-ch の設定更新を行う
+ * @param interaction コマンド実行インタラクション
+ * @param guildId 実行対象ギルドID
+ * @returns 実行完了を示す Promise
+ */
 async function handleSetChannel(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
+  // 入力チャンネルを取得し、AFK用途で許可する型か検証する
   const channel = interaction.options.getChannel("channel", true);
 
   if (channel.type !== ChannelType.GuildVoice) {
@@ -88,6 +95,12 @@ async function handleSetChannel(
   );
 }
 
+/**
+ * afk-config show の現在設定表示を返す
+ * @param interaction コマンド実行インタラクション
+ * @param guildId 実行対象ギルドID
+ * @returns 実行完了を示す Promise
+ */
 async function handleShowSetting(
   interaction: ChatInputCommandInteraction,
   guildId: string,

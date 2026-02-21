@@ -1,7 +1,16 @@
+// src/bot/features/vac/services/usecases/cleanupVacOnStartup.ts
+// VAC起動時クリーンアップユースケース
+
 import { ChannelType } from "discord.js";
 import type { BotClient } from "../../../../client";
 import type { IVacRepository } from "../../repositories";
 
+/**
+ * 起動時に不整合なトリガー/作成済みVACチャンネル情報を掃除する
+ * @param vacRepository VAC設定リポジトリ
+ * @param client Botクライアント
+ * @returns 実行完了
+ */
 export async function cleanupVacOnStartupUseCase(
   vacRepository: IVacRepository,
   client: BotClient,

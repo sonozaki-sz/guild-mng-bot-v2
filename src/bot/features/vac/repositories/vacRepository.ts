@@ -67,6 +67,10 @@ export function createVacRepository(
   };
 }
 
+/**
+ * 共有VAC設定サービスから既定リポジトリを生成する
+ * @returns 既定のVACリポジトリ
+ */
 function createDefaultVacRepository(): IVacRepository {
   const vacConfigService = getVacConfigService();
   return createVacRepository(vacConfigService);

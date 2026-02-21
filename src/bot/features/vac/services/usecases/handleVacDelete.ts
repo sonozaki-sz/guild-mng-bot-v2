@@ -1,8 +1,17 @@
+// src/bot/features/vac/services/usecases/handleVacDelete.ts
+// VAC自動削除ユースケース
+
 import { ChannelType, type VoiceState } from "discord.js";
 import { tDefault } from "../../../../../shared/locale";
 import { logger } from "../../../../../shared/utils";
 import type { IVacRepository } from "../../repositories";
 
+/**
+ * 管理対象VACが空室になったときにチャンネルと管理情報を削除する
+ * @param vacRepository VAC設定リポジトリ
+ * @param oldState 変更前ボイス状態
+ * @returns 実行完了
+ */
 export async function handleVacDeleteUseCase(
   vacRepository: IVacRepository,
   oldState: VoiceState,

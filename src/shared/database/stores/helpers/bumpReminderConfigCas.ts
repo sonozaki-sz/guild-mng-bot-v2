@@ -11,6 +11,12 @@ type BumpReminderConfigSnapshot = {
   rawConfig: string | null;
 };
 
+/**
+ * bumpReminderConfig の現在スナップショットを取得する
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @returns レコード存在有無と生JSON
+ */
 export async function fetchBumpReminderConfigSnapshot(
   prisma: PrismaClient,
   guildId: string,
@@ -26,6 +32,12 @@ export async function fetchBumpReminderConfigSnapshot(
   };
 }
 
+/**
+ * bumpReminderConfig の初期値を生成する
+ * @param enabled 有効状態
+ * @param channelId 対象チャンネルID
+ * @returns 初期設定
+ */
 export function createInitialBumpReminderConfig(
   enabled = true,
   channelId?: string,
@@ -38,6 +50,15 @@ export function createInitialBumpReminderConfig(
   };
 }
 
+/**
+ * bumpReminderConfig が未設定のとき初期値を設定する
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @param defaultLocale 既定ロケール
+ * @param initialConfig 初期設定
+ * @param recordExists レコード存在有無
+ * @returns 初期化した場合 true
+ */
 export async function initializeBumpReminderConfigIfMissing(
   prisma: PrismaClient,
   guildId: string,
@@ -72,6 +93,14 @@ export async function initializeBumpReminderConfigIfMissing(
   return true;
 }
 
+/**
+ * 期待値一致時のみ bumpReminderConfig を更新する CAS 更新を行う
+ * @param prisma Prismaクライアント
+ * @param guildId 対象ギルドID
+ * @param expectedRawConfig 期待する現行JSON
+ * @param nextConfig 更新後設定またはJSON
+ * @returns 更新成功時 true
+ */
 export async function casUpdateBumpReminderConfig(
   prisma: PrismaClient,
   guildId: string,
