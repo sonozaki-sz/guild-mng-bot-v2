@@ -248,6 +248,7 @@ guild-mng-bot-v2/
 - [アーキテクチャガイド](docs/guides/ARCHITECTURE.md) - 全体設計方針・依存方向・責務境界
 - [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
 - [開発環境セットアップ](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築とプロジェクト設定の詳細ガイド
+- [Git ワークフロー](docs/guides/GIT_WORKFLOW.md) - ブランチ戦略・コミット規約・PR運用ルール
 - [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
 - [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・`index.ts`運用
 - [国際化ガイド](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
