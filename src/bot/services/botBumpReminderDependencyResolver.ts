@@ -3,9 +3,6 @@
 
 import type { BumpReminderConfigService } from "../../shared/features/bump-reminder";
 import {
-  getBumpReminderFeatureConfigService,
-  getBumpReminderManager,
-  getBumpReminderRepository,
   type BumpReminderManager,
   type IBumpReminderRepository,
 } from "../features/bump-reminder";
@@ -43,43 +40,37 @@ export function setBotBumpReminderManager(manager: BumpReminderManager): void {
  * Bot層で利用するbump-reminder設定サービスを取得する
  */
 export function getBotBumpReminderConfigService(): BumpReminderConfigService {
-  return cachedConfigService ?? getBumpReminderFeatureConfigService();
+  if (!cachedConfigService) {
+    throw new Error(
+      "BumpReminderConfigService is not initialized. Initialize in composition root first.",
+    );
+  }
+
+  return cachedConfigService;
 }
 
 /**
  * Bot層で利用するbump-reminderリポジトリを取得する
  */
-export function getBotBumpReminderRepository(
-  prisma?: Parameters<typeof getBumpReminderRepository>[0],
-): IBumpReminderRepository {
-  if (cachedRepository) {
-    return cachedRepository;
-  }
-
-  if (!prisma) {
+export function getBotBumpReminderRepository(): IBumpReminderRepository {
+  if (!cachedRepository) {
     throw new Error(
       "BumpReminderRepository is not initialized. Initialize in composition root first.",
     );
   }
 
-  return getBumpReminderRepository(prisma);
+  return cachedRepository;
 }
 
 /**
  * Bot層で利用するbump-reminderマネージャーを取得する
  */
 export function getBotBumpReminderManager(): BumpReminderManager {
-  if (cachedManager) {
-    return cachedManager;
+  if (!cachedManager) {
+    throw new Error(
+      "BumpReminderManager is not initialized. Initialize in composition root first.",
+    );
   }
 
-  if (cachedRepository) {
-    const manager = getBumpReminderManager(cachedRepository);
-    cachedManager = manager;
-    return manager;
-  }
-
-  throw new Error(
-    "BumpReminderManager is not initialized. Initialize in composition root first.",
-  );
+  return cachedManager;
 }

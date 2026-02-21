@@ -1,10 +1,7 @@
 // src/bot/services/botGuildConfigRepositoryResolver.ts
 // Bot層で利用する GuildConfigRepository の解決
 
-import {
-  getGuildConfigRepository,
-  type IGuildConfigRepository,
-} from "../../shared/database";
+import { type IGuildConfigRepository } from "../../shared/database";
 
 let cachedRepository: IGuildConfigRepository | undefined;
 
@@ -21,5 +18,11 @@ export function setBotGuildConfigRepository(
  * Bot層で利用する GuildConfigRepository を取得する
  */
 export function getBotGuildConfigRepository(): IGuildConfigRepository {
-  return cachedRepository ?? getGuildConfigRepository();
+  if (!cachedRepository) {
+    throw new Error(
+      "GuildConfigRepository is not initialized. Initialize in composition root first.",
+    );
+  }
+
+  return cachedRepository;
 }
