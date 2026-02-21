@@ -248,7 +248,7 @@
   - 完了条件: 呼び出し側で使用するシンボルのみ明示export
   - コミット例: `refactor: feature 内部公開面を最小化`
 
-- [ ] **NS-006** エラー/ログ共通処理の薄いユーティリティ化
+- [x] **NS-006** エラー/ログ共通処理の薄いユーティリティ化
   - 完了条件: repository/service内の重複した try-catch + logger パターンを共通化
   - コミット例: `refactor: error logging 共通処理を抽出`
 
