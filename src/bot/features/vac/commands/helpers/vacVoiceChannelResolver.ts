@@ -1,7 +1,11 @@
 // src/bot/features/vac/commands/helpers/vacVoiceChannelResolver.ts
 // VAC コマンド向けVC解決ヘルパー
 
-import { ChannelType, type ChatInputCommandInteraction } from "discord.js";
+import {
+  ChannelType,
+  type ChatInputCommandInteraction,
+  type VoiceChannel,
+} from "discord.js";
 import { ValidationError } from "../../../../../shared/errors";
 import { tGuild } from "../../../../../shared/locale";
 
@@ -16,7 +20,8 @@ export async function resolveVacVoiceChannelForEdit(
   interaction: ChatInputCommandInteraction,
   guildId: string,
   channelId: string,
-) {
+): Promise<VoiceChannel> {
+  // 指定チャンネルを取得し、編集対象として扱えるかを検証する
   const channel = await interaction.guild?.channels.fetch(channelId);
   if (!channel || channel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
@@ -24,5 +29,6 @@ export async function resolveVacVoiceChannelForEdit(
     );
   }
 
+  // 呼び出し側で safe に edit できるボイスチャンネルのみ返す
   return channel;
 }

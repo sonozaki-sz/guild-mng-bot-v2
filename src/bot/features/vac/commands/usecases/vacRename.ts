@@ -21,6 +21,7 @@ export async function executeVacRename(
 ): Promise<void> {
   // 入力値と対象チャンネルを解決して更新可能か検証
   const newName = interaction.options.getString(VAC_COMMAND.OPTION.NAME, true);
+  // VC解決・型検証は共通ヘルパーへ委譲し、usecase本体は更新処理へ集中させる
   const channel = await resolveVacVoiceChannelForEdit(
     interaction,
     guildId,
