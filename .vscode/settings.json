@@ -19,7 +19,7 @@
   "typescript.tsserver.watchOptions": {
     "watchFile": "useFsEvents",
     "watchDirectory": "useFsEvents",
-    "fallbackPolling": "dynamicPriority",
+    "fallbackPolling": "dynamicPriorityPolling",
     "synchronousWatchDirectory": true
   },
   // エディター設定
@@ -65,13 +65,13 @@
     "**/*.log": true
   },
   // テスト設定
-  "jest.autoRun": "off",
-  "jest.showCoverageOnLoad": false,
   "jest.runMode": "on-demand",
   // Git設定
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
+  // ポート自動転送（高番ポートの大量検出を抑制）
+  "remote.autoForwardPorts": true,
   // ESLint設定
   "eslint.validate": ["javascript", "typescript"],
   "eslint.format.enable": true,
