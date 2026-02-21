@@ -192,7 +192,7 @@
 - [ ] **AS-2** `commands` 層の一部にユースケース実装が同居（例: `vacConfigCommand.execute.ts`）
 - [x] **AS-3** 命名の一貫性に揺れ（`stick` と `sticky` の語彙混在）
 - [ ] **AS-4** `shared/database/index.ts` にグローバルアクセサ依存（`requirePrismaClient`）が残存
-- [ ] **AS-5** `index.ts` の公開境界ルールが feature 間で不均一
+- [x] **AS-5** `index.ts` の公開境界ルールが feature 間で不均一
 
 #### コミット単位タスク（src整備本体）
 
@@ -236,7 +236,7 @@
   - 完了条件: 新規呼び出しで `requirePrismaClient` 非依存、段階移行の互換経路を用意
   - コミット例: `refactor: shared database を明示DI優先へ移行`
 
-- [ ] **SRC-007** feature公開境界を統一（`index.ts` の export を明示限定）
+- [x] **SRC-007** feature公開境界を統一（`index.ts` の export を明示限定）
   - 完了条件: `export *` を段階削除し、外部利用シンボルのみ公開
   - コミット例: `refactor: feature公開APIを明示exportへ統一`
 

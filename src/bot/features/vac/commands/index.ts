@@ -1,8 +1,8 @@
 // src/bot/features/vac/commands/index.ts
 // VAC コマンド実装の公開エントリ
 
-export * from "./vacCommand.constants";
-export * from "./vacCommand.execute";
-export * from "./vacConfigCommand.autocomplete";
-export * from "./vacConfigCommand.constants";
-export * from "./vacConfigCommand.execute";
+export { VAC_COMMAND } from "./vacCommand.constants";
+export { executeVacCommand } from "./vacCommand.execute";
+export { autocompleteVacConfigCommand } from "./vacConfigCommand.autocomplete";
+export { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
+export { executeVacConfigCommand } from "./vacConfigCommand.execute";

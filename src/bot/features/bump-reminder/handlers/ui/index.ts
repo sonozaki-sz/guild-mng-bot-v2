@@ -1,4 +1,4 @@
 // src/bot/features/bump-reminder/handlers/ui/index.ts
 // bump-reminder UI ハンドラーの公開エントリ
 
-export * from "./bumpPanelButtonHandler";
+export { bumpPanelButtonHandler } from "./bumpPanelButtonHandler";
