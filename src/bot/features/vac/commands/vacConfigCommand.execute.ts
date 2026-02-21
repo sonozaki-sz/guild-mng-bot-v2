@@ -6,9 +6,6 @@ import {
   ChatInputCommandInteraction,
   MessageFlags,
   PermissionFlagsBits,
-  type CategoryChannel,
-  type Guild,
-  type VoiceChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors";
 import { tDefault, tGuild } from "../../../../shared/locale";
@@ -18,6 +15,10 @@ import {
   createSuccessEmbed,
 } from "../../../utils/messageResponse";
 import { getVacRepository } from "../repositories";
+import {
+  findTriggerChannelByCategory,
+  resolveTargetCategory,
+} from "./helpers/vacConfigTargetResolver";
 import { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
 
 /**
@@ -210,83 +211,6 @@ async function handleRemoveTrigger(
     embeds: [embed],
     flags: MessageFlags.Ephemeral,
   });
-}
-
-/**
- * 操作対象カテゴリを入力値と実行チャンネル文脈から解決する関数
- * @param guild 参照対象のギルド
- * @param interactionChannelId 実行チャンネルID
- * @param categoryOption コマンド入力カテゴリ値
- * @returns 解決済みカテゴリ（TOP時は null）
- */
-async function resolveTargetCategory(
-  guild: Guild,
-  interactionChannelId: string,
-  categoryOption: string | null,
-): Promise<CategoryChannel | null> {
-  // 未指定時は実行チャンネルの親カテゴリを既定値として採用
-  if (!categoryOption) {
-    const currentChannel = await guild.channels
-      .fetch(interactionChannelId)
-      .catch(() => null);
-    return currentChannel?.parent?.type === ChannelType.GuildCategory
-      ? currentChannel.parent
-      : null;
-  }
-
-  // TOP 指定はカテゴリ未所属（null）として扱う
-  if (categoryOption.toUpperCase() === VAC_CONFIG_COMMAND.TARGET.TOP) {
-    return null;
-  }
-
-  // ID 解決を優先し、見つからない場合のみ名前一致で補完
-  const byId = await guild.channels.fetch(categoryOption).catch(() => null);
-  if (byId?.type === ChannelType.GuildCategory) {
-    return byId;
-  }
-
-  const byName = guild.channels.cache.find(
-    (channel) =>
-      channel.type === ChannelType.GuildCategory &&
-      channel.name.toLowerCase() === categoryOption.toLowerCase(),
-  );
-
-  if (byName?.type === ChannelType.GuildCategory) {
-    return byName;
-  }
-
-  return null;
-}
-
-/**
- * 指定カテゴリに対応する VAC トリガーチャンネルを探索する関数
- * @param guild 参照対象のギルド
- * @param triggerChannelIds 設定済みトリガーチャンネルID一覧
- * @param categoryId 探索対象カテゴリID（TOP時は null）
- * @returns 一致したトリガーチャンネル（未一致時は null）
- */
-async function findTriggerChannelByCategory(
-  guild: Guild,
-  triggerChannelIds: string[],
-  categoryId: string | null,
-): Promise<VoiceChannel | null> {
-  // 設定済みトリガー候補を順に実体解決してカテゴリ一致を判定
-  for (const triggerId of triggerChannelIds) {
-    const channel = await guild.channels.fetch(triggerId).catch(() => null);
-    if (!channel || channel.type !== ChannelType.GuildVoice) {
-      continue;
-    }
-
-    const parentId =
-      channel.parent?.type === ChannelType.GuildCategory
-        ? channel.parent.id
-        : null;
-    if (parentId === categoryId) {
-      return channel;
-    }
-  }
-
-  return null;
 }
 
 /**
