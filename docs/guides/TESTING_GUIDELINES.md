@@ -2,21 +2,13 @@
 
 > Testing Guidelines - テスト設計とベストプラクティス
 
-最終更新: 2026年2月20日
+最終更新: 2026年2月21日
 
 ---
 
 ## 📋 概要
 
-### 目的
-
-このドキュメントは、guild-mng-bot-v2プロジェクトにおけるテストコードの設計方針、ベストプラクティス、および実装ガイドラインを定義します。Jestとts-jestを使用してTypeScriptコードをテストし、品質を保証し、リファクタリングを安全に行うための基準を提供します。
-
-### 対象読者
-
-- プロジェクトの開発者
-- テストコードをレビューする担当者
-- 新規機能を実装する際の参考資料として
+このドキュメントは、guild-mng-bot-v2 におけるテスト設計方針・命名規則・実行方法を定義します。Jest + ts-jest を前提に、回帰を素早く検知できるテスト運用を目的とします。
 
 ---
 
@@ -25,184 +17,142 @@
 ### 基本方針
 
 1. **重要度に基づくテスト**
-   - コアロジック（エラーハンドリング、データベース操作、スケジューラー）は必ずテスト
-   - UIレイヤー（コマンド、イベント）は主要フローをテスト
-   - ユーティリティ関数は可能な限りテスト
-
+   - コアロジック（DB操作・スケジューラー・エラーハンドリング）を優先
+   - UIレイヤー（コマンド・イベント）は主要フローを優先
 2. **テストピラミッド**
-   - ユニットテスト: 70% - 小さな単位で素早く実行
-   - 統合テスト: 25% - モジュール間の連携を検証
-   - E2Eテスト: 5% - 主要なユーザーフローを検証
+   - ユニットテスト 70%
+   - 統合テスト 25%
+   - E2Eテスト 5%（次フェーズ）
+3. **カバレッジ目標**
+   - 全体 70%以上（Statements / Branches / Functions / Lines）
 
-3. **テスト駆動開発（TDD）の推奨**
-   - 新機能実装時は、可能な限りテストを先に書く
-   - バグ修正時は、まず再現テストを書いてから修正
+### 現状（2026-02-21）
 
-4. **カバレッジ目標**
-   - 全体目標: 70%以上（Statements, Branches, Functions, Lines）
-   - コアモジュール: 80%以上
-   - UIレイヤー: 50%以上
-
-### テストの品質基準
-
-- **独立性**: 各テストは他のテストに依存せず、単独で実行可能
-- **再現性**: 同じ条件で常に同じ結果を返す
-- **可読性**: テスト名と構造から意図が明確に理解できる
-- **保守性**: コード変更時に最小限の修正で対応できる
-- **速度**: 全テストが10秒以内に完了する
+- テストは全件成功（39 suites / 431 tests）
+- `unit` / `integration` の配置を `src` 対称へ再編済み
+- `e2e` は次フェーズで実施
 
 ---
 
 ## 🏗️ テスト設計
 
-### テスト構成戦略
-
-#### 1. AAA パターンの遵守
-
-すべてのテストは以下の3部構成で記述：
+### AAA パターン
 
 ```typescript
 test("should do something", () => {
-  // Arrange（準備）: テストデータとモックの準備
+  // Arrange
   const input = "test";
 
-  // Act（実行）: テスト対象の実行
+  // Act
   const result = functionUnderTest(input);
 
-  // Assert（検証）: 結果の検証
+  // Assert
   expect(result).toBe("expected");
 });
 ```
 
-#### 2. モック戦略
+### モック戦略
 
-- **外部依存のモック**: Discord API、データベース、外部サービス
-- **時間依存のモック**: `Date.now()`, タイマー関数
-- **ログ出力のモック**: テスト中のコンソール出力を抑制
-- **環境変数のモック**: テスト用の設定値を注入
+- 外部依存（Discord API / DB / 外部サービス）はモック化
+- 時刻依存は fake timers を優先
+- ログ出力はモックし、テスト出力を安定化
 
-#### 3. テストデータ管理
-
-- **ヘルパー関数の活用**: `testHelpers.ts`で共通のテストデータ生成
-- **Fixture**: 複雑なテストデータは別ファイルで管理
-- **Factory パターン**: モックオブジェクトの生成を関数化
-
-#### 4. テスト命名規則
+### テスト命名規則
 
 ```typescript
 describe("ClassName/FunctionName", () => {
   describe("methodName", () => {
     it("should [期待する動作] when [条件]", () => {
-      // テストコード
-    });
-
-    it("should throw error when [エラー条件]", () => {
-      // エラーケース
+      // test
     });
   });
 });
 ```
 
-### テストスコープ
+### 配置・ファイル名ルール（src対称化）
 
-#### ユニットテスト
-
-- **対象**: 個別の関数、クラス、メソッド
-- **モック**: すべての外部依存をモック化
-- **焦点**: ロジックの正確性、エッジケース、エラーハンドリング
-
-#### 統合テスト
-
-- **対象**: 複数モジュールの連携
-- **モック**: 外部サービスのみモック化
-- **焦点**: モジュール間のインターフェース、データフロー
-
-#### E2Eテスト（今後実装予定）
-
-- **対象**: エンドツーエンドのユーザーフロー
-- **モック**: 最小限（Discord APIのみ）
-- **焦点**: 実際の使用シナリオ、統合動作
+- テスト配置は `tests/unit` / `tests/integration` を維持する
+- 各配下のディレクトリは `src` の構成に対称化する
+- ファイル名は **camelCase固定にしない**。`src` 側のベース名に一致させる（`kebab-case` を含む）
+- 単体テストは `*.test.ts`、統合テストは `*.integration.test.ts` を使う
+- `src` 参照は原則 `@/` エイリアスを使う
 
 ---
 
-## � テストの実行方法
+## ▶️ テストの実行方法
 
 ```bash
-# すべてのテストを実行
+# すべてのテスト
 pnpm test
 
-# ウォッチモードでテストを実行（開発時推奨）
+# ウォッチ実行
 pnpm test:watch
 
-# カバレッジレポート付きでテストを実行
+# カバレッジ付き実行
 pnpm test:coverage
 ```
 
-**実装済みテストと今後の計画**: [TEST_PROGRESS.md](TEST_PROGRESS.md) を参照してください。
+実装状況は [../progress/TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照してください。
 
 ---
 
-## 📁 テストの構成
+## 📁 テスト構成（再編後）
 
-```
+```text
 tests/
-├── setup.ts                             # Jest グローバル設定
-├── tsconfig.json                        # テスト用TypeScript設定
+├── setup.ts
+├── tsconfig.json
 ├── helpers/
-│   └── testHelpers.ts                  # テスト用ヘルパー関数
-├── unit/                               # ユニットテスト
+│   └── testHelpers.ts
+├── unit/                               # src対称（unit）
 │   ├── bot/
 │   │   ├── commands/
-│   │   │   ├── index.test.ts
-│   │   │   └── ping.test.ts
 │   │   ├── events/
-│   │   │   ├── index.test.ts
-│   │   │   └── interactionCreate.test.ts
-│   │   └── handlers/
-│   │       └── index.test.ts
-│   ├── config/
-│   │   └── env.test.ts
-│   ├── errors/
-│   │   ├── CustomErrors.test.ts
-│   │   └── ErrorHandler.test.ts
-│   ├── features/
-│   │   └── vac/
-│   │       └── config.test.ts
-│   ├── scheduler/                      # スケジューラーのテスト
-│   ├── services/
-│   │   └── CooldownManager.test.ts
-│   └── utils/
-│       ├── interaction.test.ts
-│       ├── logger.test.ts
-│       └── messageResponse.test.ts
-├── integration/                        # 統合テスト
+│   │   ├── errors/
+│   │   ├── features/
+│   │   ├── handlers/
+│   │   ├── services/
+│   │   └── utils/
+│   ├── shared/
+│   │   ├── config/
+│   │   ├── errors/
+│   │   ├── features/
+│   │   ├── locale/
+│   │   ├── scheduler/
+│   │   └── utils/
+│   └── web/
+│       ├── middleware/
+│       └── routes/
+├── integration/                        # src対称（integration）
 │   ├── bot/
-│   │   ├── command-event.integration.test.ts
-│   │   └── handler-routing.integration.test.ts
-│   ├── database/
-│   │   ├── GuildConfigRepository.test.ts
-│   │   └── BumpReminderRepository.test.ts
-│   └── scheduler/
-│       └── BumpReminderManager.test.ts
-├── logs/                               # テスト実行時のログ出力
-└── e2e/                                # E2Eテスト（今後実装予定）
+│   │   ├── events/
+│   │   │   ├── interactionCreate.command.integration.test.ts
+│   │   │   └── interactionCreate.routing.integration.test.ts
+│   │   └── features/
+│   │       └── bump-reminder/
+│   │           ├── repositories/bumpReminderRepository.integration.test.ts
+│   │           └── services/bumpReminderService.integration.test.ts
+│   └── shared/
+│       └── database/
+│           └── repositories/guildConfigRepository.integration.test.ts
+└── e2e/                                # 次フェーズ
 ```
 
 ---
 
 ## 🛠️ テストヘルパー
 
-`tests/helpers/testHelpers.ts` には以下のヘルパー関数が用意されています：
+`tests/helpers/testHelpers.ts` の主要ヘルパー:
 
-- `createMockUser()` - Discord ユーザーのモック作成
-- `createMockGuild()` - Discord ギルドのモック作成
-- `createMockMember()` - Discord メンバーのモック作成
-- `createMockTextChannel()` - テキストチャンネルのモック作成
-- `createMockInteraction()` - インタラクションのモック作成
-- `wait()` - 非同期処理の待機
-- `generateSnowflake()` - Discord ID生成
-- `createTestGuildConfig()` - テスト用ギルド設定作成
-- `expectError()` - エラーアサーション
+- `createMockUser()`
+- `createMockGuild()`
+- `createMockMember()`
+- `createMockTextChannel()`
+- `createMockInteraction()`
+- `wait()`
+- `generateSnowflake()`
+- `createTestGuildConfig()`
+- `expectError()`
 
 ---
 
@@ -210,167 +160,13 @@ tests/
 
 ### `jest.config.ts` の主な設定
 
-- **プリセット**: `ts-jest` - TypeScript サポート
-- **テスト環境**: `node` - Node.js 環境
-- **ESM サポート**: モジュール解決の設定
-- **カバレッジしきい値**: 70%（全メトリクス）
-- **セットアップファイル**: `tests/setup.ts`
-- **タイムアウト**: 10秒（デフォルト）
+- プリセット: `ts-jest`
+- テスト環境: `node`
+- セットアップファイル: `tests/setup.ts`
+- タイムアウト: 10秒（デフォルト）
+- `moduleNameMapper` に `@/` エイリアスを設定
 
-### 環境設定
-
-- データベース: メモリ上で実行（`file::memory:?cache=shared`）
-- 環境変数: `tests/setup.ts` で設定
-- ログ出力: テスト中は抑制（エラーログのみ表示）
-
----
-
-## 🎭 モックとスタブ
-
-主要な外部依存関係はモック化されています：
-
-- **Winston (Logger)** - ログ出力をモック、テスト中の出力を抑制
-- **Prisma Client** - データベース操作をモック、メモリDBを使用
-- **i18next** - 翻訳機能をモック、簡易的な翻訳を返す
-- **Discord.js** - Discord API呼び出しをモック、ヘルパー関数で生成
-
----
-
-## 📋 ベストプラクティス
-
-1. **テスト分離**
-   - 各テストは独立して実行可能
-   - `beforeEach` で初期化、`afterEach` でクリーンアップ
-   - グローバル状態への依存を避ける
-
-2. **モック管理**
-   - モックは必要最小限に
-   - `jest.clearAllMocks()` で各テスト後にクリア
-   - スパイ関数で呼び出しを検証
-
-3. **型安全性**
-   - TypeScript の型チェックを活用
-   - `as any` の使用は最小限に
-   - モックにも適切な型を付ける
-
-4. **可読性**
-   - わかりやすいテストケース名
-   - AAA パターンの遵守
-   - 関数単位・処理ブロック単位で「意図」を短い日本語コメントで明示
-
-5. **保守性**
-   - ヘルパー関数の活用で重複を削減
-   - テストの構造を統一
-   - 変更に強い設計
-
----
-
-## 📝 テストコメント規約（2026年2月20日 追加）
-
-テストの意図をレビュー時に即座に把握できるよう、以下を必須とします。
-
-1. **関数単位コメント**
-   - `describe` ごとに「何を検証するまとまりか」を1行で記述
-   - 例: `// 認証ヘッダー検証とトークン一致判定の分岐を検証`
-
-2. **処理ブロック単位コメント**
-   - `beforeEach`/`afterEach`/分岐の前に「なぜその準備・検証をするか」を記述
-   - 例: `// 期限超過分は復元時に即時実行される`
-
-3. **記述ルール**
-   - 日本語で簡潔に（1〜2行）
-   - 実装詳細の説明ではなく、テスト意図・前提・期待結果を書く
-   - 自明な1行処理の逐語説明は避ける
-
----
-
-## 🔍 テスト設計レビュー（2026年2月20日）
-
-### 現状評価
-
-- ✅ テストは全件成功（13 suite / 178 tests）
-- ✅ ユニット・統合（モック中心）で主要ロジックの回帰検知は可能
-- ⚠️ グローバルカバレッジしきい値（70%）は未達（lines 39.03%, functions 36.66%）
-
-### 設計上の主な課題
-
-1. **実時間待ちによるフレーク/遅延リスク**
-   - 対象: `tests/unit/services/cooldownManager.test.ts`
-   - 状況: ✅ 対応済み（fake timers へ移行）
-   - 補足: 実時間待機を排除し、再現性と実行速度を改善
-
-2. **「統合テスト」のモック比率が高い**
-   - 対象: `tests/integration/database/*.test.ts`, `tests/integration/scheduler/*.test.ts`
-   - 外部依存を広くモックしており、実態はコンポーネントテスト寄り
-   - 対応: 実DB（SQLite in-memory）を使う狭い本統合テストを別レイヤーで追加
-
-3. **グローバル副作用の管理強化余地**
-   - 対象: `tests/setup.ts`, `tests/unit/config/env.test.ts`
-   - `global.console` や `process.env` の操作があり、拡張時に汚染リスクがある
-   - 状況: ✅ `env.test.ts` はキー単位復元へ移行済み
-   - 対応: 変更・復元ポリシーを明示し、必要箇所では `beforeEach/afterEach` で局所化
-
-4. **ヘルパー関数の安全性改善余地**
-   - 対象: `tests/helpers/testHelpers.ts` の `expectError`
-   - 状況: ✅ 対応済み（単一実行で型・メッセージを検証）
-   - 補足: 副作用を持つ関数でも検証結果が安定
-
-### 優先アクション（推奨）
-
-1. 本統合テスト（実DB使用）を最小ケースから追加
-2. 低カバレッジ領域（コマンド・イベント・Webルート）へ重点的にテスト追加
-3. `process.env` 変更テストの共通ヘルパー化（キー単位復元の横展開）
-
-### process.env の安全な取り扱い（必須）
-
-`process.env` をテスト内で扱う場合、**オブジェクト再代入を避けてキー単位で復元**する。
-
-```typescript
-const originalEnv = { ...process.env };
-
-const restoreEnv = () => {
-  for (const key of Object.keys(process.env)) {
-    if (!(key in originalEnv)) delete process.env[key];
-  }
-  for (const [key, value] of Object.entries(originalEnv)) {
-    process.env[key] = value;
-  }
-};
-
-beforeEach(() => restoreEnv());
-afterEach(() => restoreEnv());
-```
-
-理由:
-
-- `process.env = {...}` の再代入は参照共有中の副作用を招きやすい
-- キー単位復元は他テストへの汚染を最小化できる
-
----
-
-## ⚠️ トラブルシューティング
-
-### タイムアウトエラー
-
-デフォルトのタイムアウトは10秒に設定されています。非同期処理が長い場合は調整してください：
-
-```typescript
-test("long running test", async () => {
-  // ...
-}, 30000); // 30秒に延長
-```
-
-### Worker process warning
-
-CooldownManagerの定期クリーンアップによる警告です。テストは正常に動作しています。
-
-```
-A worker process has failed to exit gracefully...
-```
-
-### モジュール解決エラー
-
-`jest.config.ts` の `moduleNameMapper` を確認してください：
+### モジュール解決エラー時の確認
 
 ```typescript
 moduleNameMapper: {
@@ -378,48 +174,18 @@ moduleNameMapper: {
 }
 ```
 
-### Prisma Client エラー
+---
 
-テスト前に Prisma Client が生成されているか確認：
+## 📝 テストコメント規約
 
-```bash
-pnpm db:generate
-```
+- `describe` 単位で「何を検証するか」を短く記述
+- `beforeEach` / `afterEach` / 分岐前に「なぜ必要か」を記述
+- 日本語で 1〜2 行、意図・前提・期待結果を中心に書く
 
 ---
 
-## 📈 カバレッジレポート
+## 🔗 関連ドキュメント
 
-カバレッジレポートは `coverage/` ディレクトリに生成されます：
-
-```bash
-# カバレッジ付きでテスト実行
-pnpm test:coverage
-
-# HTMLレポートを開く
-open coverage/lcov-report/index.html
-```
-
-カバレッジレポートで確認できる情報：
-
-- ステートメント カバレッジ
-- ブランチ カバレッジ
-- 関数 カバレッジ
-- ライン カバレッジ
-- 未カバーの行の詳細
-
----
-
-## 🎓 参考リソース
-
-- [Jest Documentation](https://jestjs.io/)
-- [ts-jest Documentation](https://kulshekhar.github.io/ts-jest/)
-- [Testing Best Practices](https://github.com/goldbergyoni/javascript-testing-best-practices)
-
----
-
-## � 関連ドキュメント
-
-- [TEST_PROGRESS.md](TEST_PROGRESS.md): テスト実装進捗と今後の計画
-- [TODO.md](../TODO.md): 開発タスク一覧
-- [README.md](../README.md): プロジェクト概要
+- [../progress/TEST_PROGRESS.md](../progress/TEST_PROGRESS.md): テスト実装進捗
+- [../../TODO.md](../../TODO.md): 開発タスク一覧
+- [../../README.md](../../README.md): プロジェクト概要
