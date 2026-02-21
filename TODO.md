@@ -220,7 +220,7 @@
   - 完了条件: execute は分岐委譲のみ、create/remove/show は別モジュールへ移動
   - コミット例: `refactor: vac-config execute を usecase 分割`
 
-- [ ] **SRC-003** `bumpReminderService.ts` を orchestrator + usecase/helper へ分割
+- [x] **SRC-003** `bumpReminderService.ts` を orchestrator + usecase/helper へ分割
   - 完了条件: manager本体は schedule/cancel/restore の調停のみを担当
   - コミット例: `refactor: bump reminder manager を責務分離`
 
