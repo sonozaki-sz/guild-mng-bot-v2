@@ -231,7 +231,7 @@
   - 完了条件: get/update/mutate系を用途別モジュールへ分離し、store本体は委譲中心にする
   - コミット例: `refactor: bump reminder config store を用途別に分割`
 
-- [ ] **NS-002** `VacService` を create/delete/cleanup usecase へ分割
+- [x] **NS-002** `VacService` を create/delete/cleanup usecase へ分割
   - 完了条件: `VacService` は薄いオーケストレーションのみを保持する
   - コミット例: `refactor: vac service をユースケース単位に分割`
 
