@@ -243,7 +243,7 @@
   - 完了条件: DB repository生成を明示注入経路に寄せ、global accessor依存を段階削減
   - コミット例: `refactor: shared database 依存解決の明示化`
 
-- [ ] **NS-005** feature内部 `index.ts` の過剰 `export *` を抑制
+- [x] **NS-005** feature内部 `index.ts` の過剰 `export *` を抑制
   - 対象: `bot/features/*/{handlers,services,repositories}/index.ts`
   - 完了条件: 呼び出し側で使用するシンボルのみ明示export
   - コミット例: `refactor: feature 内部公開面を最小化`

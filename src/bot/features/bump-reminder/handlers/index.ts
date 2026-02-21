@@ -1,7 +1,11 @@
 // src/bot/features/bump-reminder/handlers/index.ts
 // bump-reminder ハンドラーの公開エントリ
 
-export * from "./bumpMessageCreateHandler";
-export * from "./bumpReminderHandler";
-export * from "./bumpReminderStartup";
-export * from "./ui";
+export { handleBumpMessageCreate } from "./bumpMessageCreateHandler";
+export {
+  handleBumpDetected,
+  sendBumpPanel,
+  sendBumpReminder,
+} from "./bumpReminderHandler";
+export { restoreBumpRemindersOnStartup } from "./bumpReminderStartup";
+export { bumpPanelButtonHandler } from "./ui/bumpPanelButtonHandler";
