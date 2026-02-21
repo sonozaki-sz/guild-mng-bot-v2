@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import { BUMP_REMINDER_STATUS } from "../../constants";
-import type { BumpReminder } from "../bumpReminderRepository";
+import type { BumpReminder } from "../types";
 
 export async function findPendingByGuildUseCase(
   prisma: PrismaClient,

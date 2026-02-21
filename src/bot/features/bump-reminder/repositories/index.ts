@@ -6,7 +6,4 @@ export {
   createBumpReminderRepository,
   getBumpReminderRepository,
 } from "./bumpReminderRepository";
-export type {
-  BumpReminder,
-  IBumpReminderRepository,
-} from "./bumpReminderRepository";
+export type { BumpReminder, IBumpReminderRepository } from "./types";

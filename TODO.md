@@ -228,7 +228,7 @@
   - 完了条件: repository本体からJSON変換・機能別更新責務を分離し、委譲中心へ
   - コミット例: `refactor: guild config repository を facade 化`
 
-- [ ] **SRC-005** `bumpReminderRepository.ts` を query/usecase 単位に再分割
+- [x] **SRC-005** `bumpReminderRepository.ts` を query/usecase 単位に再分割
   - 完了条件: pending取得/状態更新/クリーンアップ/ログ整形を独立モジュール化
   - コミット例: `refactor: bump reminder repository を query 単位で分離`
 
