@@ -1,13 +1,12 @@
-describe("bot/features/vac/index", () => {
-  it("re-exports vac repository APIs", async () => {
-    const indexModule = await import("@/bot/features/vac");
-    const repositoriesModule = await import("@/bot/features/vac/repositories");
+describe("bot/features/vac modules", () => {
+  it("exports vac repository APIs from direct module", async () => {
+    const repositoriesModule = await import(
+      "@/bot/features/vac/repositories/vacRepository"
+    );
 
-    expect(indexModule.createVacRepository).toBe(
-      repositoriesModule.createVacRepository,
+    expect(repositoriesModule.createVacRepository).toEqual(
+      expect.any(Function),
     );
-    expect(indexModule.getVacRepository).toBe(
-      repositoriesModule.getVacRepository,
-    );
+    expect(repositoriesModule.getVacRepository).toEqual(expect.any(Function));
   });
 });

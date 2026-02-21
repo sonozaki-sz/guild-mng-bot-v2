@@ -1,12 +1,8 @@
 describe("bot/features/bump-reminder/handlers/ui/index", () => {
-  it("re-exports bump panel button handler", async () => {
-    const indexModule =
-      await import("@/bot/features/bump-reminder/handlers/ui");
+  it("exposes bump panel button handler", async () => {
     const handlerModule =
       await import("@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler");
 
-    expect(indexModule.bumpPanelButtonHandler).toBe(
-      handlerModule.bumpPanelButtonHandler,
-    );
+    expect(handlerModule.bumpPanelButtonHandler).toBeDefined();
   });
 });

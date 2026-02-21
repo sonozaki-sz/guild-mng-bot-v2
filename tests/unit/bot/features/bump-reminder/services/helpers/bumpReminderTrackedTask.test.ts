@@ -1,13 +1,13 @@
-import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder";
+import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { createTrackedReminderTask } from "@/bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask";
 
 const loggerErrorMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },

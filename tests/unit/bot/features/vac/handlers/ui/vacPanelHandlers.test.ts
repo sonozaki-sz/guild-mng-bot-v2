@@ -10,24 +10,21 @@ const getGuildConfigRepositoryMock = jest.fn(() => ({
 }));
 
 // VAC パネル customId 定数を固定化して matches 判定を検証しやすくする
-jest.mock(
-  "@/bot/features/vac/handlers/ui/vacControlPanel",
-  () => ({
-    VAC_PANEL_CUSTOM_ID: {
-      RENAME_BUTTON_PREFIX: "vac:rename-btn:",
-      LIMIT_BUTTON_PREFIX: "vac:limit-btn:",
-      AFK_BUTTON_PREFIX: "vac:afk-btn:",
-      REFRESH_BUTTON_PREFIX: "vac:refresh-btn:",
-      RENAME_MODAL_PREFIX: "vac:rename-modal:",
-      LIMIT_MODAL_PREFIX: "vac:limit-modal:",
-      AFK_SELECT_PREFIX: "vac:afk-select:",
-      RENAME_INPUT: "rename-input",
-      LIMIT_INPUT: "limit-input",
-    },
-    getVacPanelChannelId: jest.fn(() => "voice-1"),
-    sendVacControlPanel: jest.fn(),
-  }),
-);
+jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+  VAC_PANEL_CUSTOM_ID: {
+    RENAME_BUTTON_PREFIX: "vac:rename-btn:",
+    LIMIT_BUTTON_PREFIX: "vac:limit-btn:",
+    AFK_BUTTON_PREFIX: "vac:afk-btn:",
+    REFRESH_BUTTON_PREFIX: "vac:refresh-btn:",
+    RENAME_MODAL_PREFIX: "vac:rename-modal:",
+    LIMIT_MODAL_PREFIX: "vac:limit-modal:",
+    AFK_SELECT_PREFIX: "vac:afk-select:",
+    RENAME_INPUT: "rename-input",
+    LIMIT_INPUT: "limit-input",
+  },
+  getVacPanelChannelId: jest.fn(() => "voice-1"),
+  sendVacControlPanel: jest.fn(),
+}));
 
 // 外部依存の副作用を抑えるため、呼び出し不要なモジュールはダミー化
 jest.mock("@/bot/services/botVacDependencyResolver", () => ({
@@ -35,19 +32,16 @@ jest.mock("@/bot/services/botVacDependencyResolver", () => ({
     isManagedVacChannel: isManagedVacChannelMock,
   })),
 }));
-jest.mock("@/shared/features/vac", () => ({
+jest.mock("@/shared/features/vac/vacConfigService", () => ({
   isManagedVacChannel: isManagedVacChannelMock,
 }));
-jest.mock(
-  "@/bot/services/botGuildConfigRepositoryResolver",
-  () => ({
-    getBotGuildConfigRepository: jest.fn(() => getGuildConfigRepositoryMock()),
-  }),
-);
-jest.mock("@/shared/database", () => ({
+jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
+  getBotGuildConfigRepository: jest.fn(() => getGuildConfigRepositoryMock()),
+}));
+jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: getGuildConfigRepositoryMock,
 }));
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
 jest.mock("@/bot/utils/interaction", () => ({
@@ -178,7 +172,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -212,7 +206,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -244,7 +238,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -278,7 +272,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -309,7 +303,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -344,7 +338,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -386,7 +380,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -437,7 +431,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -484,7 +478,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -545,7 +539,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -595,7 +589,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -680,7 +674,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -719,7 +713,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -756,7 +750,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -797,7 +791,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -839,7 +833,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -881,7 +875,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -923,7 +917,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -987,14 +981,14 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = jest.requireMock(
-      "@/shared/database",
+      "@/shared/database/guildConfigRepositoryProvider",
     ) as {
       getGuildConfigRepository: jest.Mock;
     };
@@ -1073,7 +1067,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -1106,7 +1100,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -1139,7 +1133,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
@@ -1172,14 +1166,14 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = jest.requireMock(
-      "@/shared/database",
+      "@/shared/database/guildConfigRepositoryProvider",
     ) as {
       getGuildConfigRepository: jest.Mock;
     };
@@ -1217,14 +1211,14 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = jest.requireMock(
-      "@/shared/database",
+      "@/shared/database/guildConfigRepositoryProvider",
     ) as {
       getGuildConfigRepository: jest.Mock;
     };
@@ -1265,14 +1259,14 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = jest.requireMock(
-      "@/shared/database",
+      "@/shared/database/guildConfigRepositoryProvider",
     ) as {
       getGuildConfigRepository: jest.Mock;
     };
@@ -1326,14 +1320,14 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = jest.requireMock(
-      "@/shared/database",
+      "@/shared/database/guildConfigRepositoryProvider",
     ) as {
       getGuildConfigRepository: jest.Mock;
     };
@@ -1394,14 +1388,14 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const featureModule = jest.requireMock(
-      "@/shared/features/vac",
+      "@/shared/features/vac/vacConfigService",
     ) as {
       isManagedVacChannel: jest.Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = jest.requireMock(
-      "@/shared/database",
+      "@/shared/database/guildConfigRepositoryProvider",
     ) as {
       getGuildConfigRepository: jest.Mock;
     };

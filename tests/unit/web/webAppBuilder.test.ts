@@ -29,11 +29,11 @@ describe("web/webAppBuilder", () => {
       __esModule: true,
       default: staticPlugin,
     }));
-    jest.doMock("@/web/routes/api", () => ({ apiRoutes }));
+    jest.doMock("@/web/routes/api/apiRoutes", () => ({ apiRoutes }));
     jest.doMock("@/web/routes/health", () => ({ healthRoute }));
-    jest.doMock("@/shared/locale", () => ({ tDefault }));
-    jest.doMock("@/shared/utils", () => ({ logger }));
-    jest.doMock("@/shared/config", () => ({
+    jest.doMock("@/shared/locale/localeManager", () => ({ tDefault }));
+    jest.doMock("@/shared/utils/logger", () => ({ logger }));
+    jest.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",
@@ -160,5 +160,22 @@ describe("web/webAppBuilder", () => {
       error: "tr:system:web.internal_server_error",
       message: "debug-visible",
     });
+  });
+
+  it("uses empty allow-list when CORS_ORIGIN is undefined in production", async () => {
+    const { module, fastifyInstance } = await setup({
+      nodeEnv: "production",
+      corsOrigin: undefined,
+    });
+
+    await module.buildWebApp("/tmp/base");
+
+    expect(fastifyInstance.register).toHaveBeenCalledWith(
+      expect.any(Function),
+      {
+        origin: [],
+        credentials: true,
+      },
+    );
   });
 });

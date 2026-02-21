@@ -1,6 +1,6 @@
 const vacPanelUserSelectHandlerMock = { name: "vac-select" };
 
-jest.mock("@/bot/features/vac/handlers/ui", () => ({
+jest.mock("@/bot/features/vac/handlers/ui/vacPanelUserSelect", () => ({
   vacPanelUserSelectHandler: vacPanelUserSelectHandlerMock,
 }));
 

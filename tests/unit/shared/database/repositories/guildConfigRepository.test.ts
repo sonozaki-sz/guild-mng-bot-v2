@@ -144,6 +144,7 @@ describe("shared/database/repositories/guildConfigRepository", () => {
   it("delegates feature-specific operations to each store", async () => {
     const {
       module,
+      coreUsecases,
       afkStore,
       bumpStore,
       vacStore,
@@ -185,6 +186,34 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     await repository.getMemberLogConfig("g1");
     await repository.updateMemberLogConfig("g1", { channelId: "x" });
 
+    const stickStoreCtorArgs = (
+      constructors.GuildStickMessageStore as jest.Mock
+    ).mock.calls[0] as unknown[] | undefined;
+    const memberStoreCtorArgs = (
+      constructors.GuildMemberLogConfigStore as jest.Mock
+    ).mock.calls[0] as unknown[] | undefined;
+    expect(stickStoreCtorArgs).toBeDefined();
+    expect(memberStoreCtorArgs).toBeDefined();
+
+    const stickUpdateGuildConfigCallback = stickStoreCtorArgs?.[2];
+    const memberUpdateGuildConfigCallback = memberStoreCtorArgs?.[2];
+    expect(stickUpdateGuildConfigCallback).toEqual(expect.any(Function));
+    expect(memberUpdateGuildConfigCallback).toEqual(expect.any(Function));
+
+    const stickUpdateGuildConfig =
+      stickUpdateGuildConfigCallback as unknown as (
+        guildId: string,
+        updates: unknown,
+      ) => Promise<void>;
+    const memberUpdateGuildConfig =
+      memberUpdateGuildConfigCallback as unknown as (
+        guildId: string,
+        updates: unknown,
+      ) => Promise<void>;
+
+    await stickUpdateGuildConfig("g1", { stickMessages: [] });
+    await memberUpdateGuildConfig("g1", { memberLogChannelId: "ch3" });
+
     expect(constructors.GuildAfkConfigStore).toHaveBeenCalledTimes(1);
     expect(constructors.GuildBumpReminderConfigStore).toHaveBeenCalledTimes(1);
     expect(constructors.GuildVacConfigStore).toHaveBeenCalledTimes(1);
@@ -200,6 +229,24 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     expect(vacStore.getVacConfig).toHaveBeenCalledWith("g1");
     expect(stickStore.getStickMessages).toHaveBeenCalledWith("g1");
     expect(memberStore.getMemberLogConfig).toHaveBeenCalledWith("g1");
+    expect(coreUsecases.updateGuildConfigUsecase).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prisma,
+        defaultLocale: "ja",
+        toDatabaseError: expect.any(Function),
+      }),
+      "g1",
+      { stickMessages: [] },
+    );
+    expect(coreUsecases.updateGuildConfigUsecase).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prisma,
+        defaultLocale: "ja",
+        toDatabaseError: expect.any(Function),
+      }),
+      "g1",
+      { memberLogChannelId: "ch3" },
+    );
   });
 
   it("createGuildConfigRepository returns repository instance", async () => {

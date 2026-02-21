@@ -4,7 +4,7 @@ import {
   fetchAfkConfigSnapshot,
   initializeAfkConfigIfMissing,
 } from "@/shared/database/stores/helpers/afkConfigCas";
-import { DatabaseError } from "@/shared/errors";
+import { DatabaseError } from "@/shared/errors/customErrors";
 
 jest.mock("@/shared/database/stores/helpers/afkConfigCas", () => ({
   AFK_CONFIG_CAS_MAX_RETRIES: 3,
@@ -120,6 +120,39 @@ describe("shared/database/stores/guildAfkConfigStore", () => {
     await expect(
       store.updateAfkConfig("g1", { enabled: true }),
     ).resolves.toBeUndefined();
+    expect(casUpdateMock).toHaveBeenCalledWith(
+      expect.anything(),
+      "g1",
+      raw,
+      '{"enabled":true,"channelId":"x"}',
+    );
+  });
+
+  it("updateAfkConfig continues when initialize returns false, then updates", async () => {
+    const { store, safeJsonParse } = createStore();
+    const raw = '{"enabled":false,"channelId":"x"}';
+    fetchSnapshotMock
+      .mockResolvedValueOnce({
+        recordExists: false,
+        rawConfig: null,
+      })
+      .mockResolvedValueOnce({
+        recordExists: true,
+        rawConfig: raw,
+      });
+    safeJsonParse.mockReturnValueOnce(undefined).mockReturnValueOnce({
+      enabled: false,
+      channelId: "x",
+    });
+    initializeIfMissingMock.mockResolvedValueOnce(false);
+    casUpdateMock.mockResolvedValueOnce(true);
+
+    await expect(
+      store.updateAfkConfig("g1", { enabled: true }),
+    ).resolves.toBeUndefined();
+
+    expect(initializeIfMissingMock).toHaveBeenCalledTimes(1);
+    expect(casUpdateMock).toHaveBeenCalledTimes(1);
     expect(casUpdateMock).toHaveBeenCalledWith(
       expect.anything(),
       "g1",

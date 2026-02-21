@@ -1,6 +1,6 @@
 const vacPanelModalHandlerMock = { name: "vac-modal" };
 
-jest.mock("@/bot/features/vac/handlers/ui", () => ({
+jest.mock("@/bot/features/vac/handlers/ui/vacPanelModal", () => ({
   vacPanelModalHandler: vacPanelModalHandlerMock,
 }));
 

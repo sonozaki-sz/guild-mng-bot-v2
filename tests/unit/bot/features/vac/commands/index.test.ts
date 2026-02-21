@@ -1,6 +1,5 @@
-describe("bot/features/vac/commands/index", () => {
-  it("re-exports vac command modules", async () => {
-    const indexModule = await import("@/bot/features/vac/commands");
+describe("bot/features/vac/commands modules", () => {
+  it("exposes vac command modules", async () => {
     const vacConstants =
       await import("@/bot/features/vac/commands/vacCommand.constants");
     const vacExecute =
@@ -12,16 +11,10 @@ describe("bot/features/vac/commands/index", () => {
     const vacConfigExecute =
       await import("@/bot/features/vac/commands/vacConfigCommand.execute");
 
-    expect(indexModule.VAC_COMMAND).toBe(vacConstants.VAC_COMMAND);
-    expect(indexModule.executeVacCommand).toBe(vacExecute.executeVacCommand);
-    expect(indexModule.autocompleteVacConfigCommand).toBe(
-      vacConfigAutocomplete.autocompleteVacConfigCommand,
-    );
-    expect(indexModule.VAC_CONFIG_COMMAND).toBe(
-      vacConfigConstants.VAC_CONFIG_COMMAND,
-    );
-    expect(indexModule.executeVacConfigCommand).toBe(
-      vacConfigExecute.executeVacConfigCommand,
-    );
+    expect(vacConstants.VAC_COMMAND).toBeDefined();
+    expect(vacExecute.executeVacCommand).toBeDefined();
+    expect(vacConfigAutocomplete.autocompleteVacConfigCommand).toBeDefined();
+    expect(vacConfigConstants.VAC_CONFIG_COMMAND).toBeDefined();
+    expect(vacConfigExecute.executeVacConfigCommand).toBeDefined();
   });
 });

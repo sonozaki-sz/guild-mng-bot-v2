@@ -4,9 +4,9 @@ import {
   sendVacControlPanel,
 } from "@/bot/features/vac/handlers/ui/vacControlPanel";
 import { createInfoEmbed } from "@/bot/utils/messageResponse";
-import { tGuild } from "@/shared/locale";
+import { tGuild } from "@/shared/locale/localeManager";
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
 

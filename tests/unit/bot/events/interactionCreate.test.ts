@@ -1,11 +1,11 @@
-import { Events, MessageFlags } from "discord.js";
 import {
   handleCommandError,
   handleInteractionError,
 } from "@/bot/errors/interactionErrorHandler";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
-import { tGuild } from "@/shared/locale";
+import { tGuild } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
+import { Events, MessageFlags } from "discord.js";
 
 // ErrorHandler は呼び出し有無の検証に限定する
 jest.mock("@/bot/errors/interactionErrorHandler", () => ({
@@ -14,7 +14,7 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
 }));
 
 // ローカライズは固定文字列化してアサーションを簡潔にする
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
   tGuild: jest.fn(async (_guildId: string, key: string) => `guild:${key}`),
 }));
@@ -50,19 +50,16 @@ jest.mock("@/bot/handlers/interactionCreate/ui/modals", () => {
     __mockModalHandler: mockModalHandler,
   };
 });
-jest.mock(
-  "@/bot/handlers/interactionCreate/ui/selectMenus",
-  () => {
-    const mockUserSelectHandler = {
-      matches: jest.fn(() => false),
-      execute: jest.fn().mockResolvedValue(undefined),
-    };
-    return {
-      userSelectHandlers: [mockUserSelectHandler],
-      __mockUserSelectHandler: mockUserSelectHandler,
-    };
-  },
-);
+jest.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => {
+  const mockUserSelectHandler = {
+    matches: jest.fn(() => false),
+    execute: jest.fn().mockResolvedValue(undefined),
+  };
+  return {
+    userSelectHandlers: [mockUserSelectHandler],
+    __mockUserSelectHandler: mockUserSelectHandler,
+  };
+});
 
 type BaseInteraction = {
   client: {

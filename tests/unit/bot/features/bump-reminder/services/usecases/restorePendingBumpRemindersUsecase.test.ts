@@ -1,4 +1,4 @@
-import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder";
+import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { restorePendingBumpRemindersUsecase } from "@/bot/features/bump-reminder/services/usecases/restorePendingBumpRemindersUsecase";
 
 const createBumpReminderRestorePlanMock = jest.fn();
@@ -16,15 +16,19 @@ jest.mock(
   }),
 );
 
-jest.mock("@/bot/features/bump-reminder", () => ({
-  BUMP_REMINDER_STATUS: {
-    PENDING: "pending",
-    SENT: "sent",
-    CANCELLED: "cancelled",
-  },
-  isBumpServiceName: (...args: unknown[]) => isBumpServiceNameMock(...args),
-  toBumpReminderJobId: (...args: unknown[]) => toBumpReminderJobIdMock(...args),
-}));
+jest.mock(
+  "@/bot/features/bump-reminder/constants/bumpReminderConstants",
+  () => ({
+    BUMP_REMINDER_STATUS: {
+      PENDING: "pending",
+      SENT: "sent",
+      CANCELLED: "cancelled",
+    },
+    isBumpServiceName: (...args: unknown[]) => isBumpServiceNameMock(...args),
+    toBumpReminderJobId: (...args: unknown[]) =>
+      toBumpReminderJobIdMock(...args),
+  }),
+);
 
 jest.mock(
   "@/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper",
@@ -42,11 +46,11 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },

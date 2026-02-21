@@ -14,11 +14,11 @@ import {
   ValidationError,
 } from "@/shared/errors/customErrors";
 import { getUserFriendlyMessage, logError } from "@/shared/errors/errorHandler";
-import { logger } from "@/shared/utils";
+import { logger } from "@/shared/utils/logger";
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 
 // Logger のモック
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -28,7 +28,7 @@ jest.mock("@/shared/utils", () => ({
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) => {
     const translations: Record<string, string> = {
       "errors:general.unexpected_production":
@@ -296,6 +296,25 @@ describe("ErrorHandler", () => {
         "custom message",
       );
       expect(embed.data?.title ?? embed.title).toMatch(/^❌/);
+    });
+
+    it("should use general fallback title for regular Error", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        reply: jest.fn().mockResolvedValue(undefined),
+        editReply: jest.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(interaction, new Error("unexpected"));
+
+      expect(interaction.reply).toHaveBeenCalledTimes(1);
+      const payload = interaction.reply.mock.calls[0][0];
+      const embed = payload.embeds[0];
+      expect(embed.data?.title ?? embed.title).toContain(
+        "errors:general.error_title",
+      );
     });
   });
 

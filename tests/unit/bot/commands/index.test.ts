@@ -1,7 +1,7 @@
-import { commands } from "@/bot/commands";
 import { afkCommand } from "@/bot/commands/afk";
 import { afkConfigCommand } from "@/bot/commands/afk-config";
 import { bumpReminderConfigCommand } from "@/bot/commands/bump-reminder-config";
+import { commands } from "@/bot/commands/commands";
 import { pingCommand } from "@/bot/commands/ping";
 import { vacCommand } from "@/bot/commands/vac";
 import { vacConfigCommand } from "@/bot/commands/vac-config";

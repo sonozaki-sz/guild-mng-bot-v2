@@ -1,8 +1,8 @@
-import { ChannelType, Events } from "discord.js";
 import { channelDeleteEvent } from "@/bot/events/channelDelete";
+import { ChannelType, Events } from "discord.js";
 const handleVacChannelDeleteMock = jest.fn();
 
-jest.mock("@/bot/features/vac/handlers", () => ({
+jest.mock("@/bot/features/vac/handlers/vacChannelDelete", () => ({
   handleVacChannelDelete: (...args: unknown[]) =>
     handleVacChannelDeleteMock(...args),
 }));

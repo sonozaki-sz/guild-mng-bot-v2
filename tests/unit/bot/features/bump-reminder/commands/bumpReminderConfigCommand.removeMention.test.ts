@@ -1,17 +1,17 @@
 import { handleBumpReminderConfigRemoveMention } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMention";
-import { ValidationError } from "@/shared/errors";
-import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-reminder";
+import { ValidationError } from "@/shared/errors/customErrors";
+import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-reminder/bumpReminderConfigService";
 
 const ensureManageGuildPermissionMock = jest.fn();
 const getBumpReminderConfigMock = jest.fn();
 const setMentionRoleMock = jest.fn();
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: jest.fn((key: string) => `default:${key}`),
   tGuild: jest.fn(async () => "translated"),
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: { info: jest.fn() },
 }));
 

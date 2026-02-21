@@ -29,7 +29,7 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/database", () => ({
+jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({
     setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
@@ -42,11 +42,13 @@ jest.mock("@/bot/errors/interactionErrorHandler", () => ({
 }));
 
 // i18n を固定値化して期待値を安定させる
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
+}));
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));

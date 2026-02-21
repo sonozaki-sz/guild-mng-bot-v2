@@ -1,11 +1,8 @@
-describe("bot/features/ping/index", () => {
-  it("re-exports ping feature executor", async () => {
-    const indexModule = await import("@/bot/features/ping");
+describe("bot/features/ping command module", () => {
+  it("exposes ping feature executor", async () => {
     const commandModule =
       await import("@/bot/features/ping/commands/pingCommand.execute");
 
-    expect(indexModule.executePingCommand).toBe(
-      commandModule.executePingCommand,
-    );
+    expect(commandModule.executePingCommand).toBeDefined();
   });
 });

@@ -1,10 +1,10 @@
 import { ensureManageGuildPermission } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard";
-import { ValidationError } from "@/shared/errors";
+import { ValidationError } from "@/shared/errors/customErrors";
 import { PermissionFlagsBits } from "discord.js";
 
 const tGuildMock: jest.Mock = jest.fn(async () => "permission required");
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
 }));
 

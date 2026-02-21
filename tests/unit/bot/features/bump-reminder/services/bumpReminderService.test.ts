@@ -1,8 +1,8 @@
 import {
   BumpReminderManager,
   getBumpReminderManager,
-} from "@/bot/features/bump-reminder";
-import { logger } from "@/shared/utils";
+} from "@/bot/features/bump-reminder/services/bumpReminderService";
+import { logger } from "@/shared/utils/logger";
 
 const addOneTimeJobMock = jest.fn();
 const removeJobMock = jest.fn();
@@ -12,11 +12,11 @@ const repositoryMock = {
   updateStatus: jest.fn(),
 };
 
-jest.mock("@/shared/locale", () => ({
+jest.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: jest.fn(),
     debug: jest.fn(),
@@ -403,6 +403,13 @@ describe("shared/features/bump-reminder/manager", () => {
     expect(logger.error).not.toHaveBeenCalledWith(
       "system:scheduler.bump_reminder_task_failed",
       expect.anything(),
+    );
+  });
+
+  // 初期化前に repository なしで取得すると例外になることを検証
+  it("throws when getBumpReminderManager is called before initialization", () => {
+    expect(() => getBumpReminderManager()).toThrow(
+      "BumpReminderManager is not initialized. Initialize in composition root first.",
     );
   });
 

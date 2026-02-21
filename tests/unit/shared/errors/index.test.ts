@@ -1,6 +1,11 @@
 describe("shared/errors/index", () => {
-  it("loads module", async () => {
-    const module = await import("@/shared/errors");
-    expect(module).toBeDefined();
+  it("loads direct error modules", async () => {
+    const customErrors = await import("@/shared/errors/customErrors");
+    const errorHandler = await import("@/shared/errors/errorHandler");
+    const errorUtils = await import("@/shared/errors/errorUtils");
+
+    expect(customErrors).toBeDefined();
+    expect(errorHandler).toBeDefined();
+    expect(errorUtils).toBeDefined();
   });
 });
