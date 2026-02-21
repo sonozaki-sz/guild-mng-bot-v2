@@ -239,7 +239,7 @@
   - 完了条件: pending取得/更新/クリーンアップを内部モジュール化し、重複ロギングを削減
   - コミット例: `refactor: bump reminder repository の責務を整理`
 
-- [ ] **NS-004** shared DBアクセスの暗黙依存を縮退（`requirePrismaClient` 利用面の縮小）
+- [x] **NS-004** shared DBアクセスの暗黙依存を縮退（`requirePrismaClient` 利用面の縮小）
   - 完了条件: DB repository生成を明示注入経路に寄せ、global accessor依存を段階削減
   - コミット例: `refactor: shared database 依存解決の明示化`
 
