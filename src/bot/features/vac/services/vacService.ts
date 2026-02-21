@@ -3,7 +3,7 @@
 
 import { ChannelType, type Channel, type VoiceState } from "discord.js";
 import { tDefault } from "../../../../shared/locale";
-import { logger } from "../../../../shared/utils";
+import { executeWithLoggedError, logger } from "../../../../shared/utils";
 import type { BotClient } from "../../../client";
 import { getVacRepository, type IVacRepository } from "../repositories";
 import { cleanupVacOnStartupUseCase } from "./usecases/cleanupVacOnStartup";
@@ -23,7 +23,7 @@ export class VacService {
     oldState: VoiceState,
     newState: VoiceState,
   ): Promise<void> {
-    try {
+    await executeWithLoggedError(async () => {
       // ギルド外/状態変化なしは対象外
       if (!newState.guild || oldState.channelId === newState.channelId) {
         return;
@@ -33,16 +33,14 @@ export class VacService {
       // 同一イベント内で create/delete を直列に処理し、競合条件を減らす
       await handleVacCreateUseCase(this.vacRepository, newState);
       await handleVacDeleteUseCase(this.vacRepository, oldState);
-    } catch (error) {
-      logger.error(tDefault("system:vac.voice_state_update_failed"), error);
-    }
+    }, tDefault("system:vac.voice_state_update_failed"));
   }
 
   /**
    * channelDelete 時に VAC 設定と管理対象チャンネル情報を同期する
    */
   async handleChannelDelete(channel: Channel): Promise<void> {
-    try {
+    await executeWithLoggedError(async () => {
       // DM チャンネル削除は対象外
       if (channel.isDMBased()) {
         return;
@@ -83,20 +81,16 @@ export class VacService {
           channel.id,
         );
       }
-    } catch (error) {
-      logger.error(tDefault("system:vac.channel_delete_sync_failed"), error);
-    }
+    }, tDefault("system:vac.channel_delete_sync_failed"));
   }
 
   /**
    * Bot 起動時に VAC 設定と実チャンネル状態の不整合を解消する
    */
   async cleanupOnStartup(client: BotClient): Promise<void> {
-    try {
+    await executeWithLoggedError(async () => {
       await cleanupVacOnStartupUseCase(this.vacRepository, client);
-    } catch (error) {
-      logger.error(tDefault("system:vac.startup_cleanup_failed"), error);
-    }
+    }, tDefault("system:vac.startup_cleanup_failed"));
   }
 }
 
