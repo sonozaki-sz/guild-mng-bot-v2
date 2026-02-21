@@ -12,12 +12,14 @@ import {
 } from "../features/bump-reminder";
 import { createVacRepository, getVacRepository } from "../features/vac";
 import { getVacService } from "../features/vac/services";
+import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
 
 /**
  * Botで利用する主要依存を起動時に初期化する
  */
 export function initializeBotCompositionRoot(prisma: PrismaClient): void {
   const guildConfigRepository = getGuildConfigRepository();
+  setBotGuildConfigRepository(guildConfigRepository);
 
   // i18n が guild locale を参照できるよう repository を注入
   localeManager.setRepository(guildConfigRepository);

@@ -270,7 +270,7 @@
     - [x] write系クエリ（save/update/delete）を `repositories/persistence/guildConfigWritePersistence.ts` へ抽出
 - [x] **P5: singleton依存を明示DIへ段階移行**
   - [x] `vac` / `bump-reminder` から factory + 注入経路を整備
-- [ ] **P6: src整備方針（責務分離/構成整理/スリム化）**
+- [x] **P6: src整備方針（責務分離/構成整理/スリム化）**
   - [x] **依存解決の統一（最優先）**
     - [x] `getXxx` 依存を段階的に `createXxx` + 明示注入へ寄せる
     - [x] Composition Root を `bot/main.ts` 起点で明確化（生成責務の分散を抑制）
@@ -278,9 +278,9 @@
     - [x] `bump-reminder`（service/repository/handler）を「ユースケース」「永続化」「スケジューリング」へ分離
     - [x] `vac`（service/command）を「入力解決」「設定更新」「表示整形」へ分離
     - [x] `guildConfigRepository` を機能別ファサード化して責務面積を縮小
-  - [ ] **ディレクトリ境界の明確化**
-    - [ ] `bot/features/*` は Botユースケース層に限定し、shared 直参照の境界ルールを固定
-    - [ ] `shared/database/*` は設定種別（afk/bump/vac/member-log/sticky）単位の独立性を強化
+  - [x] **ディレクトリ境界の明確化**
+    - [x] `bot/features/*` は Botユースケース層に限定し、shared 直参照の境界ルールを固定
+    - [x] `shared/database/*` は設定種別（afk/bump/vac/member-log/sticky）単位の独立性を強化
   - [x] **実施ポリシー**
     - [x] 当面は `src` 整備を優先し、テスト拡充・修正は構成安定後に再開する
 

@@ -6,6 +6,8 @@
   "typescript.tsserver.log": "off",
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.implicitProjectConfig.target": "ES2024",
+  "javascript.implicitProjectConfig.target": "ES2024",
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.suggest.autoImports": true,
