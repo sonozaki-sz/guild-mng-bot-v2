@@ -19,6 +19,7 @@ import {
   findTriggerChannelByCategory,
   resolveTargetCategory,
 } from "./helpers/vacConfigTargetResolver";
+import { presentVacConfigShow } from "./presenters/vacConfigShowPresenter";
 import { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
 
 /**
@@ -230,49 +231,20 @@ async function handleShow(
   }
 
   const config = await getVacRepository().getVacConfigOrDefault(guildId);
-  const topLabel = await tGuild(guildId, "commands:vac-config.embed.top");
-
-  const triggerChannels =
-    config.triggerChannelIds.length > 0
-      ? (
-          await Promise.all(
-            config.triggerChannelIds.map(async (id) => {
-              const channel = await guild.channels.fetch(id).catch(() => null);
-              const categoryLabel =
-                channel?.parent?.type === ChannelType.GuildCategory
-                  ? channel.parent.name
-                  : topLabel;
-              return `<#${id}> (${categoryLabel})`;
-            }),
-          )
-        ).join("\n")
-      : await tGuild(guildId, "commands:vac-config.embed.not_configured");
-
-  const createdVcDetails =
-    config.createdChannels.length > 0
-      ? config.createdChannels
-          .map((item) => `<#${item.voiceChannelId}>(<@${item.ownerId}>)`)
-          .join("\n")
-      : await tGuild(guildId, "commands:vac-config.embed.no_created_vcs");
-
-  const title = await tGuild(guildId, "commands:vac-config.embed.title");
-  const fieldTrigger = await tGuild(
-    guildId,
-    "commands:vac-config.embed.field.trigger_channels",
-  );
-  const fieldCreatedDetails = await tGuild(
-    guildId,
-    "commands:vac-config.embed.field.created_vc_details",
-  );
+  const presentation = await presentVacConfigShow(guild, guildId, config);
 
   // トリガー一覧と作成済みVC一覧を Embed で返す
   const embed = createInfoEmbed("", {
-    title,
+    title: presentation.title,
     fields: [
-      { name: fieldTrigger, value: triggerChannels, inline: false },
       {
-        name: fieldCreatedDetails,
-        value: createdVcDetails,
+        name: presentation.fieldTrigger,
+        value: presentation.triggerChannels,
+        inline: false,
+      },
+      {
+        name: presentation.fieldCreatedDetails,
+        value: presentation.createdVcDetails,
         inline: false,
       },
     ],

@@ -298,7 +298,7 @@
   - 対象: `vacConfigCommand.execute.ts` + `commands/helpers/*`
   - 目標: category解決/trigger探索を helper へ分離
   - コミット例: `refactor: vac-config の入力解決処理を helper に抽出`
-- [ ] **C4: vac-config command の薄型化（2）表示整形の抽出**
+- [x] **C4: vac-config command の薄型化（2）表示整形の抽出**
   - 対象: `vacConfigCommand.execute.ts` + `commands/presenters/*`
   - 目標: show用の整形/Embed生成前段を presenter 化
   - コミット例: `refactor: vac-config 表示整形を presenter に分離`
