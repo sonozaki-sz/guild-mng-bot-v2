@@ -30,15 +30,15 @@ refactor/xxx  ← リファクタリング
 
 ### 各ブランチの役割
 
-| ブランチ     | 説明                                           | 直接push | マージ先    |
-| ------------ | ---------------------------------------------- | -------- | ----------- |
-| `main`       | 本番デプロイ済みコード。CI/CDが自動デプロイする | ❌       | -           |
-| `develop`    | 開発中の統合ブランチ                           | ❌       | `main`      |
-| `feature/*`  | 新機能の開発                                   | ✅       | `develop`   |
-| `fix/*`      | バグ修正                                       | ✅       | `develop`   |
-| `hotfix/*`   | 本番障害の緊急修正                             | ✅       | `main` + `develop` |
-| `docs/*`     | ドキュメントのみの変更                         | ✅       | `develop`   |
-| `refactor/*` | リファクタリング                               | ✅       | `develop`   |
+| ブランチ     | 説明                                            | 直接push | マージ先           |
+| ------------ | ----------------------------------------------- | -------- | ------------------ |
+| `main`       | 本番デプロイ済みコード。CI/CDが自動デプロイする | ❌       | -                  |
+| `develop`    | 開発中の統合ブランチ                            | ❌       | `main`             |
+| `feature/*`  | 新機能の開発                                    | ✅       | `develop`          |
+| `fix/*`      | バグ修正                                        | ✅       | `develop`          |
+| `hotfix/*`   | 本番障害の緊急修正                              | ✅       | `main` + `develop` |
+| `docs/*`     | ドキュメントのみの変更                          | ✅       | `develop`          |
+| `refactor/*` | リファクタリング                                | ✅       | `develop`          |
 
 ---
 
@@ -125,19 +125,19 @@ git checkout -b hotfix/fix-crash-on-empty-guild
 
 ### type 一覧
 
-| type       | 用途                                       | 例                                           |
-| ---------- | ------------------------------------------ | -------------------------------------------- |
-| `feat`     | 新機能の追加                               | `feat(afk): 自動解除機能を追加`              |
-| `fix`      | バグ修正                                   | `fix(bump-reminder): 二重送信を修正`         |
-| `docs`     | ドキュメントのみの変更                     | `docs: GIT_WORKFLOWを追加`                  |
-| `style`    | フォーマット・セミコロン等（動作に無影響） | `style: prettierによる整形`                  |
-| `refactor` | 機能変更・バグ修正を伴わないコード変更     | `refactor(scheduler): 責務を分離`            |
-| `perf`     | パフォーマンス改善                         | `perf(db): クエリにインデックスを追加`       |
+| type       | 用途                                       | 例                                              |
+| ---------- | ------------------------------------------ | ----------------------------------------------- |
+| `feat`     | 新機能の追加                               | `feat(afk): 自動解除機能を追加`                 |
+| `fix`      | バグ修正                                   | `fix(bump-reminder): 二重送信を修正`            |
+| `docs`     | ドキュメントのみの変更                     | `docs: GIT_WORKFLOWを追加`                      |
+| `style`    | フォーマット・セミコロン等（動作に無影響） | `style: prettierによる整形`                     |
+| `refactor` | 機能変更・バグ修正を伴わないコード変更     | `refactor(scheduler): 責務を分離`               |
+| `perf`     | パフォーマンス改善                         | `perf(db): クエリにインデックスを追加`          |
 | `test`     | テストの追加・修正                         | `test(afk): エッジケースのユニットテストを追加` |
-| `chore`    | ビルド・補助ツールの変更                   | `chore: pnpmをアップデート`                  |
-| `ci`       | CI設定の変更                               | `ci: commitlintワークフローを追加`           |
-| `build`    | ビルドシステム・外部依存の変更             | `build: tsconfig.jsonのtargetをES2022に変更` |
-| `revert`   | 過去のコミットを revert                    | `revert: feat(afk): 自動解除機能を追加`     |
+| `chore`    | ビルド・補助ツールの変更                   | `chore: pnpmをアップデート`                     |
+| `ci`       | CI設定の変更                               | `ci: commitlintワークフローを追加`              |
+| `build`    | ビルドシステム・外部依存の変更             | `build: tsconfig.jsonのtargetをES2022に変更`    |
+| `revert`   | 過去のコミットを revert                    | `revert: feat(afk): 自動解除機能を追加`         |
 
 ### scope（省略可）
 
@@ -149,7 +149,7 @@ git checkout -b hotfix/fix-crash-on-empty-guild
 | `bump-reminder`  | Bumpリマインダー               |
 | `member-log`     | 入退室ログ                     |
 | `sticky-message` | スティッキーメッセージ         |
-| `vac`            | VAC（一時不在）                |
+| `vac`            | VAC（VC自動作成機能）          |
 | `scheduler`      | スケジューラー                 |
 | `db`             | データベース・マイグレーション |
 | `web`            | Webサーバー・API               |
@@ -202,13 +202,13 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 <type>/<kebab-case-description>
 ```
 
-| 例 | 用途 |
-|---|---|
-| `feature/bump-reminder-mention-role` | 新機能 |
-| `fix/afk-status-not-cleared` | バグ修正 |
-| `hotfix/crash-on-empty-guild` | 緊急修正 |
-| `refactor/db-repository-split` | リファクタリング |
-| `docs/git-workflow` | ドキュメント |
+| 例                                   | 用途             |
+| ------------------------------------ | ---------------- |
+| `feature/bump-reminder-mention-role` | 新機能           |
+| `fix/afk-status-not-cleared`         | バグ修正         |
+| `hotfix/crash-on-empty-guild`        | 緊急修正         |
+| `refactor/db-repository-split`       | リファクタリング |
+| `docs/git-workflow`                  | ドキュメント     |
 
 - **すべて小文字のkebab-case** を使用
 - 日本語・スペースは使用しない
@@ -229,19 +229,19 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 PR に対して以下の CI が自動で実行される：
 
-| チェック | ワークフロー | 内容 |
-|---|---|---|
-| **Test** | `deploy.yml` | 型チェック + 全テスト実行 |
+| チェック                 | ワークフロー     | 内容                         |
+| ------------------------ | ---------------- | ---------------------------- |
+| **Test**                 | `deploy.yml`     | 型チェック + 全テスト実行    |
 | **Lint Commit Messages** | `commitlint.yml` | コミットメッセージ形式の検証 |
 
 すべて ✅ でないとマージできない（ブランチ保護設定による）。
 
 ### マージ戦略
 
-| マージ先 | 推奨方式 | 理由 |
-|---|---|---|
+| マージ先  | 推奨方式             | 理由                                       |
+| --------- | -------------------- | ------------------------------------------ |
 | `develop` | **Squash and merge** | feature ブランチの細かいコミットをまとめる |
-| `main` | **Merge commit** | リリース履歴を明確に残す |
+| `main`    | **Merge commit**     | リリース履歴を明確に残す                   |
 
 ---
 
@@ -251,19 +251,19 @@ PR に対して以下の CI が自動で実行される：
 
 ### `main` ブランチ
 
-| 設定 | 値 |
-|---|---|
-| Require a pull request before merging | ✅ |
-| Require status checks: `Test`, `Lint Commit Messages` | ✅ |
-| Do not allow bypassing the above settings | ✅ |
+| 設定                                                  | 値  |
+| ----------------------------------------------------- | --- |
+| Require a pull request before merging                 | ✅  |
+| Require status checks: `Test`, `Lint Commit Messages` | ✅  |
+| Do not allow bypassing the above settings             | ✅  |
 
 ### `develop` ブランチ
 
-| 設定 | 値 |
-|---|---|
-| Require a pull request before merging | ✅ |
-| Require status checks: `Test`, `Lint Commit Messages` | ✅ |
-| Do not allow bypassing the above settings | ✅ |
+| 設定                                                  | 値  |
+| ----------------------------------------------------- | --- |
+| Require a pull request before merging                 | ✅  |
+| Require status checks: `Test`, `Lint Commit Messages` | ✅  |
+| Do not allow bypassing the above settings             | ✅  |
 
 ---
 

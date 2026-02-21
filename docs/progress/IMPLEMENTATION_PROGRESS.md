@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年2月20日
+最終更新: 2026年2月22日
 
 ---
 
@@ -111,7 +111,7 @@
   - upsert
   - update
   - トランザクション対応
-- ✅ BumpReminderRepositoryパターン実装（`src/shared/features/bump-reminder/repository.ts`）
+- ✅ BumpReminderRepositoryパターン実装（`src/bot/features/bump-reminder/repositories/bumpReminderRepository.ts`）
   - findPendingByGuild
   - findAllPending
   - create / findById / delete
@@ -130,7 +130,7 @@
   - ジョブ登録・削除
   - Cron式サポート
   - エラーハンドリング
-- ✅ BumpReminderManager（`src/shared/features/bump-reminder/manager.ts`）
+- ✅ BumpReminderService（`src/bot/features/bump-reminder/services/bumpReminderService.ts`）
   - Bumpリマインダースケジュール管理
   - 2時間後自動通知
   - Bot再起動時のスケジュール復元
@@ -165,7 +165,7 @@
 
 #### 定数管理
 
-- ✅ BUMP_CONSTANTS（`src/shared/features/bump-reminder/constants.ts`）
+- ✅ BUMP_CONSTANTS（`src/bot/features/bump-reminder/constants/bumpReminderConstants.ts`）
   - サービス名（DISBOARD、ディス速）
   - BotID、カスタムID接頭辞、ジョブID接頭辞
   - `getReminderDelayMinutes()`（通常120分・TESTモード1分）
@@ -195,7 +195,7 @@
   - Embed検証・サービス名判定
   - Bump検知時のロール/ユーザー登録パネル送信
 - ✅ 2時間後の自動リマインダー通知
-  - BumpReminderManagerによるスケジュール管理
+  - BumpReminderServiceによるスケジュール管理
   - メンション付き通知（ロール/ユーザー）
 - ✅ Bot再起動時のスケジュール復元
   - データベースから未完了タスク取得・スケジュール再登録
@@ -206,19 +206,19 @@
 - ✅ `/bump-reminder-config` コマンド（Embed形式対応済）
   - サブコマンド: enable, disable, set-mention, remove-mention, show
   - インタラクティブUI（Button、Select Menu）
-  - 権限チェック（管理者のみ）・多言語対応
+  - 権限チェック（サーバー管理権限のみ）・多言語対応
 
 **関連ファイル**:
 
 - `src/bot/events/messageCreate.ts`
 - `src/bot/commands/bump-reminder-config.ts`
-- `src/shared/features/bump-reminder/` (constants.ts, repository.ts, manager.ts, handler.ts, index.ts)
+- `src/shared/features/bump-reminder/bumpReminderConfigService.ts`
 - `prisma/schema.prisma` (BumpReminder、GuildConfig)
 
 **テスト**:
 
 - ✅ BumpReminderRepositoryインテグレーションテスト
-- ✅ BumpReminderManagerインテグレーションテスト
+- ✅ BumpReminderServiceインテグレーションテスト
 
 **仕様書**: [docs/specs/BUMP_REMINDER_SPEC.md](../specs/BUMP_REMINDER_SPEC.md)
 
@@ -271,8 +271,8 @@
   - 言語: ja（日本語）、en（英語）
   - フォールバック: ja
 - ✅ 言語リソース
-  - `src/shared/locale/locales/ja/translation.json`
-  - `src/shared/locale/locales/en/translation.json`
+  - `src/shared/locale/locales/ja/resources.ts`
+  - `src/shared/locale/locales/en/resources.ts`
   - コマンド、エラー、メッセージの翻訳
 - ✅ LocaleManager
   - getGuildLocale: ギルドの言語取得
@@ -291,12 +291,13 @@
 - `src/shared/locale/i18n.ts`
 - `src/shared/locale/localeManager.ts`
 - `src/shared/locale/commandLocalizations.ts`
-- `src/shared/locale/locales/ja/translation.json`
-- `src/shared/locale/locales/en/translation.json`
+- `src/shared/locale/locales/resources.ts`
+- `src/shared/locale/locales/ja/resources.ts`
+- `src/shared/locale/locales/en/resources.ts`
 
 **テスト**:
 
-- ⚠️ LocaleManager、commandLocalizationsのテストは未実装
+- ✅ LocaleManager、commandLocalizationsのテスト実装済み
 
 **ガイド**: [docs/guides/I18N_GUIDE.md](../guides/I18N_GUIDE.md)
 
@@ -316,7 +317,7 @@
   - `GET /health`
   - サーバー稼働状態確認
 - ✅ Web API基盤
-  - `/api/index.ts`
+  - `/api/apiRoutes.ts`
   - APIルーティング基盤
 - ✅ 静的ファイル配信
   - `src/web/public/` ディレクトリ
@@ -331,7 +332,7 @@
 **関連ファイル**:
 
 - `src/web/server.ts`
-- `src/web/routes/api/index.ts`
+- `src/web/routes/api/apiRoutes.ts`
 - `src/web/routes/health.ts`
 
 ---
@@ -408,7 +409,7 @@
 - `src/bot/commands/bump-reminder-config.ts`
 - `src/bot/commands/vac-config.ts`
 - `src/bot/commands/vac.ts`
-- `src/bot/commands/index.ts`
+- `src/bot/commands/commands.ts`
 - `src/shared/utils/messageResponse.ts`
 
 ---
@@ -430,10 +431,10 @@
 - `src/bot/events/messageCreate.ts`
 - `src/bot/events/voiceStateUpdate.ts`
 - `src/bot/events/channelDelete.ts`
-- `src/bot/events/index.ts`
-- `src/bot/handlers/buttons/` (bumpPanel.ts, vacPanel.ts)
-- `src/bot/handlers/modals/` (vacPanel.ts)
-- `src/bot/handlers/selectMenus/` (vacPanel.ts)
+- `src/bot/events/events.ts`
+- `src/bot/handlers/interactionCreate/ui/buttons.ts`
+- `src/bot/handlers/interactionCreate/ui/modals.ts`
+- `src/bot/handlers/interactionCreate/ui/selectMenus.ts`
 
 ---
 
@@ -442,16 +443,17 @@
 | サービス            | 説明                               | 状態 | 備考     |
 | ------------------- | ---------------------------------- | ---- | -------- |
 | CooldownManager     | コマンドクールダウン管理           | ✅   | 完全実装 |
-| BumpReminderManager | Bumpリマインダースケジューラー管理 | ✅   | 完全実装 |
+| BumpReminderService | Bumpリマインダースケジューラー管理 | ✅   | 完全実装 |
 | messageResponse     | Embedメッセージユーティリティ      | ✅   | 完全実装 |
 | VacControlPanel     | VAC操作パネル送信ユーティリティ    | ✅   | 完全実装 |
 
 **関連ファイル**:
 
 - `src/bot/services/cooldownManager.ts`
-- `src/bot/services/index.ts`
-- `src/bot/services/VacControlPanel.ts`
-- `src/shared/features/bump-reminder/manager.ts`
+- `src/bot/services/botEventRegistration.ts`
+- `src/bot/services/botCompositionRoot.ts`
+- `src/bot/features/vac/handlers/ui/vacControlPanel.ts`
+- `src/shared/features/bump-reminder/bumpReminderConfigService.ts`
 - `src/shared/utils/messageResponse.ts`
 
 ---
@@ -577,10 +579,11 @@ model BumpReminder {
 
 ### コードベース統計
 
-- **総ファイル数**: ~100+
-- **TypeScriptファイル**: ~80+
-- **テストファイル**: ~15+
-- **総行数**: ~8000+ 行
+- **総ファイル数**: ~120+
+- **TypeScriptファイル**: ~100+（index.ts 撤廃によりバレルファイルを削減済み）
+- **テストファイル**: 185
+- **テスト数**: 805
+- **総行数**: ~10000+ 行
 
 ### コンポーネント統計
 
@@ -617,7 +620,22 @@ model BumpReminder {
 
 ---
 
-**最終更新**: 2026年2月20日
+**最終更新**: 2026年2月22日
+
+---
+
+## ✅ 最近の完了項目 (2026年2月22日 追記分)
+
+### `index.ts`撤廃スプリント（直接import化）
+
+- ✅ `src/bot/commands/index.ts` 削除 → `commands.ts`（コマンドレジストリ）に統一
+- ✅ `src/bot/events/index.ts` 削除 → `events.ts` に統一
+- ✅ `src/bot/features/afk/index.ts`, `commands/index.ts` 削除
+- ✅ `src/bot/features/ping/index.ts`, `commands/index.ts` 削除
+- ✅ `src/bot/features/vac/index.ts`, `commands/index.ts`, `handlers/index.ts`, `handlers/ui/index.ts`, `repositories/index.ts`, `services/index.ts` 削除
+- ✅ `src/bot/features/bump-reminder/` 配下全 `index.ts` 削除（commands, constants, handlers, handlers/ui, repositories, services）
+- ✅ 全ソースまたはテストの `jest.mock()` / `import` を実解決先（直接モジュールパス）へ全面追従
+- ✅ 全テスト（805 tests / 185 suites）の回帰確認完了
 
 ---
 
@@ -629,8 +647,8 @@ model BumpReminder {
 - ✅ `src/bot/events/channelDelete.ts` 実装（削除同期）
 - ✅ `src/bot/commands/vac-config.ts` 実装（create/remove/show）
 - ✅ `src/bot/commands/vac.ts` 実装（vc-rename/vc-limit）
-- ✅ `src/bot/services/VacControlPanel.ts` 実装（操作パネル生成）
-- ✅ `src/bot/handlers/selectMenus/vacPanel.ts` 追加（AFK移動）
+- ✅ `src/bot/features/vac/handlers/ui/vacControlPanel.ts` 実装（操作パネル生成）
+- ✅ `src/bot/features/vac/handlers/ui/vacPanelUserSelect.ts` 追加（AFK移動）
 - ✅ `src/bot/events/clientReady.ts` 起動時VACクリーンアップを追加
 
 ### deprecation対応（Interaction response）
@@ -649,7 +667,7 @@ model BumpReminder {
 
 ### Bumpリマインダー機能のモジュール分離
 
-- ✅ `src/shared/features/bump-reminder/` へ集約
+- ✅ `src/shared/features/bump-reminder/bumpReminderConfigService.ts` へ集約
 - ✅ buttonHandlers/modalHandlers レジストリ方式に移行
 - ✅ `src/shared/database/types.ts` 型定義集約
 - ✅ `getGuildConfigRepository()` 工場関数追加
@@ -670,5 +688,5 @@ model BumpReminder {
 - ✅ `GuildBumpReminderConfigStore.ts` をデータベースセクションへ追記
 - ✅ Bumpリマインダー定数の説明更新（`getReminderDelayMinutes()` / `toScheduledAt()` 等）
 - ✅ データベーススキーマの記述を実際のスキーマ（cuid, JSON統合, @@map）に更新
-- ✅ TEST_PROGRESS.md のテスト数・スイート数・カバレッジを実績値に更新（152テスト / 9スイート / 約46%）
-- ✅ BumpReminderRepository / BumpReminderManager テストを「実装済み」に移動
+- ✅ TEST_PROGRESS.md のテスト数・スイート数を実績値に更新（805テスト / 185スイート）
+- ✅ BumpReminderRepository / BumpReminderService テストを「実装済み」に移動

@@ -2,7 +2,7 @@
 
 > Development Environment Setup Guide - 環境構築とプロジェクト設定の詳細ガイド
 
-最終更新: 2026年2月19日
+最終更新: 2026年2月22日（CI/CD セクションを追加）
 
 ---
 
@@ -375,6 +375,14 @@ pnpm dev
 - **tabSize: 2**: インデント幅を2スペースに統一
 - **rulers: [100]**: 100文字で視覚的なガイドライン
 
+#### ESLint 追加ルール（import境界）
+
+- `src/shared/**/*.ts` では `../locale` / `../utils` / `../errors` / `../database` などの **barrel import を禁止**
+- `shared` 内部は `../locale/localeManager` のように **直接モジュール import** を使う
+- `src/bot/features/**/*.ts` でも `shared/locale` / `shared/utils` / `shared/errors` / `shared/database` の barrel import を禁止
+- `bot/features` 内部では `shared/*/*` の直接モジュール参照を使う（例: `shared/locale/localeManager`）
+- 目的: 依存境界を明確化し、`index.ts` 再エクスポート由来の Functions カバレッジノイズを抑制する
+
 ---
 
 ## 📝 開発スクリプト
@@ -417,6 +425,38 @@ pnpm dev
 | `pnpm lint:fix`     | ESLint自動修正       | コード整形     |
 | `pnpm format`       | Prettier実行         | コード整形     |
 | `pnpm format:check` | Prettierチェックのみ | CI/CD          |
+
+---
+
+## 🤖 CI/CD（GitHub Actions）
+
+`main` ブランチへの push で自動デプロイが行われます。ワークフローファイルは [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) です。
+
+### ワークフローの概要
+
+| ジョブ                    | 実行タイミング                    | 内容                         |
+| ------------------------- | --------------------------------- | ---------------------------- |
+| **Test**                  | main への push / main 向け PR     | 型チェック・テスト           |
+| **Deploy to XServer VPS** | main への push（Test 成功後のみ） | SSH 経由でサーバーへデプロイ |
+
+### 開発者として知っておくこと
+
+- **PR を作成するだけで CI が走ります**。型エラーやテスト失敗はマージ前に検出されます。
+- **main にマージすれば自動デプロイが実行されます**。手動での SSH / デプロイ作業は不要です。
+- テストが失敗するとデプロイはスキップされます。常にテストをグリーンに保ってください。
+
+### 初回セットアップ（管理者のみ）
+
+初回だけ GitHub リポジトリに以下の **Repository Secrets** を追加する必要があります（後から参加したメンバーは不要）。
+
+| Secret 名     | 内容                       |
+| ------------- | -------------------------- |
+| `VPS_HOST`    | サーバーのIPアドレス       |
+| `VPS_USER`    | SSH ユーザー名             |
+| `VPS_SSH_KEY` | SSH 秘密鍵（ed25519 全文） |
+| `VPS_PORT`    | SSH ポート番号（例: `22`） |
+
+設定方法や本番環境のセットアップ詳細は [DEPLOYMENT_XSERVER.md](DEPLOYMENT_XSERVER.md) の「8. GitHub Actions による自動デプロイ」を参照してください。
 
 ---
 

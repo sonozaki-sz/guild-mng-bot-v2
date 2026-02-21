@@ -2,7 +2,7 @@
 
 > テストの実装状況と今後の計画
 
-最終更新: 2026年2月21日
+最終更新: 2026年2月22日
 
 **関連**: [TODO.md](../../TODO.md) - タスク管理 | [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) - 実装進捗
 
@@ -10,20 +10,20 @@
 
 ## 📊 現在のテスト状況
 
-### 最新テスト実行結果（2026年2月21日）
+### 最新テスト実行結果（2026年2月22日）
 
-- ✅ **全テスト PASSED**: 692/692
+- ✅ **全テスト PASSED**: 805/805
 - ✅ **全スイート PASSED**: 185/185
 - ⏱️ **実行時間**: ~5秒
 - 📦 **カバレッジ（global）**: lines 44.54% / functions 37.87%（直近 coverage 実行値）
-- 🎯 **対象実装カバレッジ**: `src/bot/client.ts` / `src/bot/main.ts` / `src/bot/commands/bump-reminder-config.ts` / `src/bot/commands/afk.ts` / `src/bot/commands/afk-config.ts` / `src/bot/commands/vac.ts` / `src/bot/commands/vac-config.ts` / `src/bot/commands/ping.ts` / `src/bot/events/clientReady.ts` / `src/bot/events/voiceStateUpdate.ts` / `src/bot/events/interactionCreate.ts` / `src/bot/events/messageCreate.ts` / `src/bot/events/channelDelete.ts` / `src/bot/handlers/buttons/bumpPanel.ts` / `src/bot/handlers/buttons/vacPanel.ts` / `src/bot/handlers/modals/vacPanel.ts` / `src/bot/handlers/selectMenus/vacPanel.ts` / `src/bot/services/VacControlPanel.ts` / `src/bot/services/cooldownManager.ts` / `src/shared/locale/helpers.ts` / `src/shared/features/bump-reminder/constants.ts` / `src/shared/features/bump-reminder/handler.ts` は statements/branches/functions/lines すべて 100%
+- 🎯 **対象実装カバレッジ**: `src/bot/client.ts` / `src/bot/main.ts` / `src/bot/commands/bump-reminder-config.ts` / `src/bot/commands/afk.ts` / `src/bot/commands/afk-config.ts` / `src/bot/commands/vac.ts` / `src/bot/commands/vac-config.ts` / `src/bot/commands/ping.ts` / `src/bot/events/clientReady.ts` / `src/bot/events/voiceStateUpdate.ts` / `src/bot/events/interactionCreate.ts` / `src/bot/events/messageCreate.ts` / `src/bot/events/channelDelete.ts` / `src/bot/handlers/interactionCreate/ui/buttons.ts` / `src/bot/handlers/interactionCreate/ui/modals.ts` / `src/bot/handlers/interactionCreate/ui/selectMenus.ts` / `src/bot/features/vac/handlers/ui/vacControlPanel.ts` / `src/bot/services/cooldownManager.ts` / `src/shared/locale/helpers.ts` / `src/shared/features/bump-reminder/bumpReminderConfigService.ts` は statements/branches/functions/lines すべて 100%
 - ⚠️ **カバレッジしきい値**: lines/functions が 70% 未達（coverage コマンドは exit code 1）
 
 ### ⏸️ カバレッジ100% 作業ステータス（保留）
 
 - **現在方針**: カバレッジ100%への追加改善は一旦保留
 - **再開時の起点**: `bot events / web routes` の高インパクト領域から再開
-- **直近の完了地点**: `src/shared/features/bump-reminder/repository.ts` focused 100% 達成済み
+- **直近の完了地点**: `src/shared/features/bump-reminder/bumpReminderConfigService.ts` focused 100% 達成済み
 
 **再開チェックリスト（そのまま実行可）**
 
@@ -39,7 +39,7 @@
 
 ### テスト統計
 
-- **総テスト数**: 692 テスト（全て合格）
+- **総テスト数**: 805 テスト（全て合格）
 - **テストスイート**: 185 スイート
 - **全体カバレッジ**: lines 44.54% / functions 37.87%
 - **コアモジュールカバレッジ**: 55-100%
@@ -63,7 +63,7 @@
 | Environment Config     | 67%        | ✅   | 11       |
 | ErrorHandler           | 55%        | ✅   | 14       |
 | BumpReminderRepository | 100%       | ✅   | 26       |
-| BumpReminderManager    | 100%       | ✅   | 21       |
+| BumpReminderService    | 100%       | ✅   | 21       |
 
 **注**: 主要な共有モジュールは十分にテストされています。全体カバレッジが低いのは、コマンド、イベント、Web API等の未テストモジュールが多数あるためです。
 
@@ -75,7 +75,7 @@
 
 #### 1. CooldownManager (92% カバレッジ)
 
-**ファイル**: `tests/unit/services/cooldownManager.test.ts`
+**ファイル**: `tests/unit/bot/services/cooldownManager.test.ts`
 **テスト数**: 16
 
 **カバー範囲**:
@@ -98,7 +98,7 @@
 
 #### 2. CustomErrors (100% カバレッジ)
 
-**ファイル**: `tests/unit/errors/customErrors.test.ts`
+**ファイル**: `tests/unit/shared/errors/customErrors.test.ts`
 **テスト数**: 19
 
 **カバー範囲**:
@@ -119,7 +119,7 @@
 
 #### 3. messageResponse (100% カバレッジ)
 
-**ファイル**: `tests/unit/utils/messageResponse.test.ts`
+**ファイル**: `tests/unit/bot/utils/messageResponse.test.ts`
 **テスト数**: 17
 
 **カバー範囲**:
@@ -140,7 +140,7 @@
 
 #### 4. ErrorHandler (55% カバレッジ)
 
-**ファイル**: `tests/unit/errors/errorHandler.test.ts`
+**ファイル**: `tests/unit/shared/errors/errorHandler.test.ts`
 **テスト数**: 14
 
 **カバー範囲**:
@@ -160,7 +160,7 @@
 
 #### 4. Logger (85% カバレッジ)
 
-**ファイル**: `tests/unit/utils/logger.test.ts`
+**ファイル**: `tests/unit/shared/utils/logger.test.ts`
 **テスト数**: 15
 
 **カバー範囲**:
@@ -181,7 +181,7 @@
 
 #### 5. Environment Configuration (67% カバレッジ)
 
-**ファイル**: `tests/unit/config/env.test.ts`
+**ファイル**: `tests/unit/shared/config/env.test.ts`
 **テスト数**: 11
 
 **カバー範囲**:
@@ -204,7 +204,7 @@
 
 #### 1. GuildConfigRepository (72% カバレッジ)
 
-**ファイル**: `tests/integration/database/guildConfigRepository.test.ts`
+**ファイル**: `tests/integration/shared/database/repositories/guildConfigRepository.integration.test.ts`
 **テスト数**: 30
 
 **カバー範囲**:
@@ -223,7 +223,7 @@
 
 #### 2. BumpReminderRepository (100% カバレッジ)
 
-**ファイル**: `tests/integration/database/bumpReminderRepository.test.ts`
+**ファイル**: `tests/integration/bot/features/bump-reminder/repositories/bumpReminderRepository.integration.test.ts`
 **テスト数**: 26
 
 **カバー範囲**:
@@ -235,9 +235,9 @@
 
 ---
 
-#### 3. BumpReminderManager (100% カバレッジ)
+#### 3. BumpReminderService (100% カバレッジ)
 
-**ファイル**: `tests/integration/scheduler/BumpReminderManager.test.ts`
+**ファイル**: `tests/integration/bot/features/bump-reminder/services/bumpReminderService.integration.test.ts`
 **テスト数**: 10
 
 **カバー範囲**:
@@ -293,17 +293,17 @@
 
 - [src/bot/commands/bump-reminder-config.ts](../../src/bot/commands/bump-reminder-config.ts)
 - [src/bot/events/messageCreate.ts](../../src/bot/events/messageCreate.ts)
-- [src/shared/features/bump-reminder/repository.ts](../../src/shared/features/bump-reminder/repository.ts)
+- [src/shared/features/bump-reminder/bumpReminderConfigService.ts](../../src/shared/features/bump-reminder/bumpReminderConfigService.ts)
 
 ---
 
-### テスト実行結果（2026年2月20日）
+### テスト実行結果（2026年2月22日）
 
 ```
-Test Suites: 39 passed, 39 total
-Tests:       455 passed, 455 total
+Test Suites: 185 passed, 185 total
+Tests:       805 passed, 805 total
 Snapshots:   0 total
-Time:        ~6s
+Time:        ~10s
 ```
 
 ※ 実行時間は環境依存で増減
@@ -315,29 +315,24 @@ Time:        ~6s
 - CooldownManager: 100%
 - GuildConfigRepository: 72%
 - BumpReminderRepository: 100%
-- BumpReminderManager: 100%
+- BumpReminderService: 100%
 - Logger: 85%
 - ErrorHandler: 55%
-- その他コアモジュール: 55-100%（`src/shared/features/bump-reminder/handler.ts` は 100% 到達）
+- その他コアモジュール: 55-100%（`src/shared/features/bump-reminder/bumpReminderConfigService.ts` は 100% 到達）
 
 **状態**: ✅ すべてのテストが正常に動作中
 
 ---
 
-### 直近の反映事項（2026年2月20日）
+### 直近の反映事項（2026年2月22日）
 
-- ✅ 全テストファイルへ日本語コメント規約を適用（関数単位・処理ブロック単位）
-- ✅ `CooldownManager.test.ts` を fake timers ベースに移行（実時間待機を排除）
-- ✅ `BumpReminderManager.test.ts` を fixed system time + fake timers で安定化
-- ✅ `BumpReminderRepository.test.ts` / `GuildConfigRepository.test.ts` の時刻生成を固定基準時刻へ統一
-- ✅ `tests/helpers/testHelpers.ts` の `expectError` を単一実行で型・メッセージ検証する実装へ改善
-- ✅ `tests/unit/config/env.test.ts` の `process.env` をキー単位復元へ変更し、グローバル汚染リスクを低減
-- ✅ bot向けテストを新規追加（`commands/events/handlers` の unit と `interactionCreate` 連携 integration）
-- ✅ `src/shared/features/bump-reminder/handler.ts` 向け unit テストを追加し focused 100% を達成
-- ✅ `src/shared/scheduler/jobScheduler.ts` 向け unit テストを追加（8ケース）
-- ✅ `src/shared/features/bump-reminder/manager.ts` 向け unit テストを追加し focused 100% を達成
-- ✅ `src/shared/features/bump-reminder/repository.ts` の分岐テストを追補し focused 100% を達成（26ケース）
-- 📋 次段階: bot events / web routes など未着手領域を順次拡張
+- ✅ `index.ts`（バレル）を `src/` 配下すべてで撤廃し、直接 import 方針を全面適用
+  - 削除対象: `src/bot/features/*/index.ts`, `src/bot/commands/index.ts`, `src/bot/events/index.ts` など
+  - 入口ファイルは役割名ファイル（`commands.ts`, `events.ts`, `handleInteractionCreate.ts` 等）へ統一
+- ✅ 全テストファイルの `jest.mock()` / `import()` パスを実解決先（直接モジュールパス）へ追従更新
+- ✅ bot/shared/web の全 unit テスト網羅を強化（取りこぼし解消）
+- ✅ 全テストスイートで 805 tests / 185 suites PASS を確認
+- 📋 次段階: E2E初期シナリオ（Bump基本フロー）の実装
 
 ---
 
@@ -532,12 +527,12 @@ Time:        ~6s
 - [x] 環境設定
 - [x] クールダウン管理
 
-### Phase 2: Bot機能のテスト 🚧
+### Phase 2: Bot機能のテスト ✅
 
-- [ ] コマンドのテスト
-- [ ] イベントのテスト
-- [ ] スケジューラーのテスト
-- **目標**: 2026年3月末
+- [x] コマンドのテスト（/ping, /afk, /afk-config, /vac, /vac-config, /bump-reminder-config）
+- [x] イベントのテスト（clientReady, interactionCreate, messageCreate, voiceStateUpdate, channelDelete）
+- [x] スケジューラーのテスト（JobScheduler, VACハンドラ, Bumpハンドラ）
+- **目標**: 2026年3月末 → **完了**: 2026年2月22日
 
 ### Phase 3: Web UIと統合テスト
 
@@ -584,4 +579,4 @@ Time:        ~6s
 
 ---
 
-**最終更新**: 2026年2月21日
+**最終更新**: 2026年2月22日

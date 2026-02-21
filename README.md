@@ -250,7 +250,7 @@ guild-mng-bot-v2/
 - [開発環境セットアップ](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築とプロジェクト設定の詳細ガイド
 - [Git ワークフロー](docs/guides/GIT_WORKFLOW.md) - ブランチ戦略・コミット規約・PR運用ルール
 - [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
-- [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・`index.ts`運用
+- [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・直接import運用
 - [国際化ガイド](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
 
 ### 機能仕様書
