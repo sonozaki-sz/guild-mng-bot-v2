@@ -80,7 +80,8 @@ let vacRepository: IVacRepository | undefined;
 export function getVacRepository(repository?: IVacRepository): IVacRepository {
   // テスト時は外部注入リポジトリを優先
   if (repository) {
-    return repository;
+    vacRepository = repository;
+    return vacRepository;
   }
 
   // 通常実行時は遅延初期化シングルトンを返す

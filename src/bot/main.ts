@@ -5,7 +5,6 @@ import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import { Routes } from "discord.js";
 import { env } from "../shared/config";
-import { getGuildConfigRepository } from "../shared/database";
 import {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,
@@ -15,6 +14,7 @@ import { logger, setPrismaClient } from "../shared/utils";
 import { createBotClient } from "./client";
 import { commands } from "./commands";
 import { events } from "./events";
+import { initializeBotCompositionRoot } from "./services/botCompositionRoot";
 import { registerBotEvents } from "./services/botEventRegistration";
 
 // コマンド登録先（ギルド/グローバル）をログ表示で識別するための定数
@@ -43,8 +43,8 @@ async function startBot() {
   // Prismaクライアントをモジュール内に登録（イベントハンドラーからアクセス可能にする）
   setPrismaClient(prisma);
 
-  // localeManager が guild 設定（言語）を参照できるよう repository を注入
-  localeManager.setRepository(getGuildConfigRepository());
+  // Bot層の依存解決を初期化（Composition Root）
+  initializeBotCompositionRoot(prisma);
 
   // LocaleManagerを初期化
   await localeManager.initialize();

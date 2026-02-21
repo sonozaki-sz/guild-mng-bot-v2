@@ -271,9 +271,9 @@
 - [x] **P5: singleton依存を明示DIへ段階移行**
   - [x] `vac` / `bump-reminder` から factory + 注入経路を整備
 - [ ] **P6: src整備方針（責務分離/構成整理/スリム化）**
-  - [ ] **依存解決の統一（最優先）**
-    - [ ] `getXxx` 依存を段階的に `createXxx` + 明示注入へ寄せる
-    - [ ] Composition Root を `bot/main.ts` 起点で明確化（生成責務の分散を抑制）
+  - [x] **依存解決の統一（最優先）**
+    - [x] `getXxx` 依存を段階的に `createXxx` + 明示注入へ寄せる
+    - [x] Composition Root を `bot/main.ts` 起点で明確化（生成責務の分散を抑制）
   - [x] **高凝集ファイルの分解（効果優先）**
     - [x] `bump-reminder`（service/repository/handler）を「ユースケース」「永続化」「スケジューリング」へ分離
     - [x] `vac`（service/command）を「入力解決」「設定更新」「表示整形」へ分離
