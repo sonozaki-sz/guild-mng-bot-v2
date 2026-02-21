@@ -190,14 +190,30 @@
 
 - [ ] **AS-1** 大型ファイルが残存（`300行級`: `guildConfigRepository.ts`, `bumpReminderService.ts`, `bumpReminderConfigService.ts`, `bumpReminderRepository.ts`, `vacConfigCommand.execute.ts`）
 - [ ] **AS-2** `commands` 層の一部にユースケース実装が同居（例: `vacConfigCommand.execute.ts`）
-- [ ] **AS-3** 命名の一貫性に揺れ（`stick` と `sticky` の語彙混在）
+- [x] **AS-3** 命名の一貫性に揺れ（`stick` と `sticky` の語彙混在）
 - [ ] **AS-4** `shared/database/index.ts` にグローバルアクセサ依存（`requirePrismaClient`）が残存
 - [ ] **AS-5** `index.ts` の公開境界ルールが feature 間で不均一
 
 #### コミット単位タスク（src整備本体）
 
-- [ ] **SRC-001** ディレクトリ・命名規約の基準を固定（`stick` / `sticky` など語彙統一方針を確定）
+- [x] **SRC-001** ディレクトリ・命名規約の基準を固定（`stick` / `sticky` など語彙統一方針を確定）
   - 完了条件: `src` 用の命名ルールを TODO 上で明文化し、対象ファイル一覧を確定
+  - 命名ルール（確定）:
+    - 新規命名・公開APIは **sticky** 系語彙へ統一（feature名、型名、service/store名、関数名）
+    - 既存DBカラム `stickMessages` は **互換維持のため当面据え置き**（移行タスクで adapter/serializer 側吸収）
+    - 一括置換は不可。`SRC-004` と `SRC-006` で互換レイヤーを先に作り、段階移行する
+  - 改名対象ファイル一覧（第1弾）:
+    - `src/shared/database/stores/guildStickMessageStore.ts`
+    - `src/shared/database/types.ts`（`StickMessage` / `IStickMessageRepository`）
+    - `src/shared/database/repositories/guildConfigRepository.ts`（`stickMessageStore` 参照群）
+    - `src/shared/database/repositories/persistence/guildConfigReadPersistence.ts`（`findStickMessagesJson`）
+    - `src/shared/database/repositories/serializers/guildConfigSerializer.ts`（型名・変換ヘルパー）
+  - 改名対象シンボル一覧（第1弾）:
+    - `GuildStickMessageStore` → `GuildStickyMessageStore`
+    - `StickMessage` → `StickyMessage`
+    - `IStickMessageRepository` → `IStickyMessageRepository`
+    - `getStickMessages` / `updateStickMessages` → `getStickyMessages` / `updateStickyMessages`
+    - `findStickMessagesJson` → `findStickyMessagesJson`
   - コミット例: `docs: src命名規約と改名対象を確定`
 
 - [ ] **SRC-002** `vacConfigCommand.execute.ts` をルーター + サブコマンド usecase へ分割
