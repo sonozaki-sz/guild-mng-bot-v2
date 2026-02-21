@@ -1,5 +1,5 @@
-import { JobScheduler } from "../../../src/shared/scheduler/jobScheduler";
-import { logger } from "../../../src/shared/utils/logger";
+import { JobScheduler } from "@/shared/scheduler/jobScheduler";
+import { logger } from "@/shared/utils/logger";
 
 const cronScheduleMock = jest.fn();
 
@@ -10,11 +10,11 @@ jest.mock("node-cron", () => ({
   },
 }));
 
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: jest.fn(),
     debug: jest.fn(),

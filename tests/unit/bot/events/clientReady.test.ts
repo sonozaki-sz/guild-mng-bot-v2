@@ -1,9 +1,9 @@
 import { Events } from "discord.js";
-import { clientReadyEvent } from "../../../../src/bot/events/clientReady";
+import { clientReadyEvent } from "@/bot/events/clientReady";
 
 const handleClientReadyMock = jest.fn();
 
-jest.mock("../../../../src/bot/handlers/clientReadyHandler", () => ({
+jest.mock("@/bot/handlers/clientReadyHandler", () => ({
   handleClientReady: (...args: unknown[]) => handleClientReadyMock(...args),
 }));
 

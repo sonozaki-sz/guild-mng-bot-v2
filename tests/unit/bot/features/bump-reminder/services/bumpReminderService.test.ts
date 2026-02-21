@@ -1,8 +1,8 @@
 import {
   BumpReminderManager,
   getBumpReminderManager,
-} from "../../../../src/bot/features/bump-reminder";
-import { logger } from "../../../../src/shared/utils";
+} from "@/bot/features/bump-reminder";
+import { logger } from "@/shared/utils";
 
 const addOneTimeJobMock = jest.fn();
 const removeJobMock = jest.fn();
@@ -12,11 +12,11 @@ const repositoryMock = {
   updateStatus: jest.fn(),
 };
 
-jest.mock("../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("../../../../src/shared/utils", () => ({
+jest.mock("@/shared/utils", () => ({
   logger: {
     info: jest.fn(),
     debug: jest.fn(),
@@ -25,11 +25,11 @@ jest.mock("../../../../src/shared/utils", () => ({
   },
 }));
 
-jest.mock("../../../../src/shared/utils/prisma", () => ({
+jest.mock("@/shared/utils/prisma", () => ({
   requirePrismaClient: jest.fn(() => ({})),
 }));
 
-jest.mock("../../../../src/shared/scheduler/jobScheduler", () => ({
+jest.mock("@/shared/scheduler/jobScheduler", () => ({
   jobScheduler: {
     addOneTimeJob: (...args: unknown[]) => addOneTimeJobMock(...args),
     removeJob: (...args: unknown[]) => removeJobMock(...args),
@@ -37,7 +37,7 @@ jest.mock("../../../../src/shared/scheduler/jobScheduler", () => ({
 }));
 
 jest.mock(
-  "../../../../src/bot/features/bump-reminder/repositories/bumpReminderRepository",
+  "@/bot/features/bump-reminder/repositories/bumpReminderRepository",
   () => ({
     getBumpReminderRepository: () => repositoryMock,
   }),

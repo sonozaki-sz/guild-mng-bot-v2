@@ -1,9 +1,9 @@
 import { Events } from "discord.js";
-import { messageCreateEvent } from "../../../../src/bot/events/messageCreate";
+import { messageCreateEvent } from "@/bot/events/messageCreate";
 
 const handleBumpMessageCreateMock = jest.fn();
 
-jest.mock("../../../../src/bot/features/bump-reminder/handlers", () => ({
+jest.mock("@/bot/features/bump-reminder/handlers", () => ({
   handleBumpMessageCreate: (...args: unknown[]) =>
     handleBumpMessageCreateMock(...args),
 }));

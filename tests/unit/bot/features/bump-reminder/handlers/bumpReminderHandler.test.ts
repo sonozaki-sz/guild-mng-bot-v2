@@ -2,7 +2,7 @@ import {
   handleBumpDetected,
   sendBumpPanel,
   sendBumpReminder,
-} from "../../../../src/bot/features/bump-reminder/handlers/bumpReminderHandler";
+} from "@/bot/features/bump-reminder/handlers/bumpReminderHandler";
 
 const getBumpReminderConfigServiceMock = jest.fn();
 const getBumpReminderManagerMock = jest.fn();
@@ -31,12 +31,12 @@ const toScheduledAtMock = jest.fn(
   (_delayMinutes: number) => new Date("2026-02-20T01:00:00.000Z"),
 );
 
-jest.mock("../../../../src/shared/features/bump-reminder", () => ({
+jest.mock("@/shared/features/bump-reminder", () => ({
   getBumpReminderConfigService: () => getBumpReminderConfigServiceMock(),
 }));
 
 jest.mock(
-  "../../../../src/bot/services/botBumpReminderDependencyResolver",
+  "@/bot/services/botBumpReminderDependencyResolver",
   () => ({
     getBotBumpReminderConfigService: () =>
       getBotBumpReminderConfigServiceMock(),
@@ -44,20 +44,20 @@ jest.mock(
 );
 
 jest.mock(
-  "../../../../src/bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder",
+  "@/bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder",
   () => ({
     scheduleBumpReminder: (...args: unknown[]) =>
       scheduleBumpReminderMock(...args),
   }),
 );
 
-jest.mock("../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string, options?: Record<string, unknown>) =>
     tDefaultMock(key, options),
   getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
 }));
 
-jest.mock("../../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerMock.info(...args),
     debug: (...args: unknown[]) => loggerMock.debug(...args),
@@ -66,14 +66,14 @@ jest.mock("../../../../src/shared/utils/logger", () => ({
   },
 }));
 
-jest.mock("../../../../src/bot/utils/messageResponse", () => ({
+jest.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: (description: string, options?: { title?: string }) =>
     createInfoEmbedMock(description, options),
 }));
 
-jest.mock("../../../../src/bot/features/bump-reminder", () => {
+jest.mock("@/bot/features/bump-reminder", () => {
   const actual = jest.requireActual(
-    "../../../../src/bot/features/bump-reminder",
+    "@/bot/features/bump-reminder",
   );
   return {
     ...actual,

@@ -4,21 +4,21 @@
  */
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { handleCommandError } from "../../../src/bot/errors/interactionErrorHandler";
-import { NODE_ENV, env } from "../../../src/shared/config/env";
+import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
+import { NODE_ENV, env } from "@/shared/config/env";
 import {
   BaseError,
   DatabaseError,
   ValidationError,
-} from "../../../src/shared/errors/customErrors";
+} from "@/shared/errors/customErrors";
 import {
   getUserFriendlyMessage,
   logError,
-} from "../../../src/shared/errors/errorHandler";
-import { logger } from "../../../src/shared/utils";
+} from "@/shared/errors/errorHandler";
+import { logger } from "@/shared/utils";
 
 // Logger のモック
-jest.mock("../../../src/shared/utils", () => ({
+jest.mock("@/shared/utils", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -28,7 +28,7 @@ jest.mock("../../../src/shared/utils", () => ({
 }));
 
 // i18n のモック
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) => {
     const translations: Record<string, string> = {
       "errors:general.unexpected_production":

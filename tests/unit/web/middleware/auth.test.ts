@@ -1,7 +1,7 @@
 let jwtSecretValue: string | undefined;
 
 // auth ミドルウェア内で参照される env をテスト用に差し替える
-jest.mock("../../../../src/shared/config/env", () => ({
+jest.mock("@/shared/config/env", () => ({
   NODE_ENV: {
     DEVELOPMENT: "development",
     PRODUCTION: "production",
@@ -17,7 +17,7 @@ jest.mock("../../../../src/shared/config/env", () => ({
   },
 }));
 
-import { apiAuthPlugin } from "../../../../src/web/middleware/auth";
+import { apiAuthPlugin } from "@/web/middleware/auth";
 
 describe("web/middleware/auth apiAuthPlugin", () => {
   // Authorizationヘッダー検証とトークン一致判定の分岐を検証

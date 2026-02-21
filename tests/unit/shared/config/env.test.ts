@@ -38,7 +38,7 @@ describe("Environment Configuration", () => {
       process.env.NODE_ENV = "production";
       process.env.JWT_SECRET = "super-secret-key-for-production"; // 本番環境では必須
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.DISCORD_TOKEN).toBe("a".repeat(50));
       expect(env.DISCORD_APP_ID).toBe("1234567890");
@@ -54,7 +54,7 @@ describe("Environment Configuration", () => {
       delete process.env.WEB_PORT;
       delete process.env.WEB_HOST;
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.NODE_ENV).toBe("test"); // setup.tsで設定済み
       expect(env.LOCALE).toBe("ja");
@@ -71,7 +71,7 @@ describe("Environment Configuration", () => {
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.WEB_PORT = "8080";
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.WEB_PORT).toBe(8080);
       expect(typeof env.WEB_PORT).toBe("number");
@@ -94,7 +94,7 @@ describe("Environment Configuration", () => {
           process.env.JWT_SECRET = "test-jwt-secret-for-production";
         }
 
-        const { env } = require("../../../src/shared/config/env");
+        const { env } = require("@/shared/config/env");
         expect(env.NODE_ENV).toBe(nodeEnv);
       });
     });
@@ -110,7 +110,7 @@ describe("Environment Configuration", () => {
         process.env.DISCORD_APP_ID = "1234567890";
         process.env.LOG_LEVEL = level;
 
-        const { env } = require("../../../src/shared/config/env");
+        const { env } = require("@/shared/config/env");
         expect(env.LOG_LEVEL).toBe(level);
       });
     });
@@ -122,7 +122,7 @@ describe("Environment Configuration", () => {
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.DISCORD_GUILD_ID = "9876543210";
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.DISCORD_GUILD_ID).toBe("9876543210");
     });
@@ -132,7 +132,7 @@ describe("Environment Configuration", () => {
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.JWT_SECRET = "my-secret-key";
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.JWT_SECRET).toBe("my-secret-key");
     });
@@ -145,7 +145,7 @@ describe("Environment Configuration", () => {
       process.env.DISCORD_APP_ID = "1234567890";
       // DATABASE_URLはsetup.tsで設定済み
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.DATABASE_URL).toBe("file::memory:?cache=shared");
     });
@@ -155,7 +155,7 @@ describe("Environment Configuration", () => {
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.DATABASE_URL = "file:./custom/path/db.sqlite";
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.DATABASE_URL).toBe("file:./custom/path/db.sqlite");
     });
@@ -168,7 +168,7 @@ describe("Environment Configuration", () => {
       process.env.WEB_PORT = "5000";
       process.env.WEB_HOST = "127.0.0.1";
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.WEB_PORT).toBe(5000);
       expect(env.WEB_HOST).toBe("127.0.0.1");
@@ -181,7 +181,7 @@ describe("Environment Configuration", () => {
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.LOCALE = "en";
 
-      const { env } = require("../../../src/shared/config/env");
+      const { env } = require("@/shared/config/env");
 
       expect(env.LOCALE).toBe("en");
     });

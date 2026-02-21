@@ -20,7 +20,7 @@ const createInfoEmbedMock = jest.fn(
 
 // AFK設定永続化の呼び出しだけをモックし、コマンド分岐を直接検証する
 jest.mock(
-  "../../../../src/bot/services/botGuildConfigRepositoryResolver",
+  "@/bot/services/botGuildConfigRepositoryResolver",
   () => ({
     getBotGuildConfigRepository: () => ({
       setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
@@ -29,7 +29,7 @@ jest.mock(
   }),
 );
 
-jest.mock("../../../../src/shared/database", () => ({
+jest.mock("@/shared/database", () => ({
   getGuildConfigRepository: () => ({
     setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
@@ -37,12 +37,12 @@ jest.mock("../../../../src/shared/database", () => ({
 }));
 
 // 共通エラーハンドラへの委譲可否を確認する
-jest.mock("../../../../src/bot/errors/interactionErrorHandler", () => ({
+jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
 }));
 
 // i18n を固定値化して期待値を安定させる
-jest.mock("../../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
@@ -52,7 +52,7 @@ jest.mock("../../../../src/shared/locale", () => ({
 }));
 
 // メッセージ生成ユーティリティは生成結果を簡易オブジェクトに置換する
-jest.mock("../../../../src/bot/utils/messageResponse", () => ({
+jest.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string, options?: unknown) =>
     createSuccessEmbedMock(description, options),
   createInfoEmbed: (description: string, options?: unknown) =>
@@ -60,14 +60,14 @@ jest.mock("../../../../src/bot/utils/messageResponse", () => ({
 }));
 
 // ログ出力の副作用を抑止
-jest.mock("../../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     info: jest.fn(),
   },
 }));
 
-import { afkConfigCommand } from "../../../../src/bot/commands/afk-config";
-import { handleCommandError } from "../../../../src/bot/errors/interactionErrorHandler";
+import { afkConfigCommand } from "@/bot/commands/afk-config";
+import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 
 type AfkConfigInteraction = {
   guildId: string | null;

@@ -1,12 +1,12 @@
 import {
   getGuildTranslator,
   invalidateGuildLocaleCache,
-} from "../../../src/shared/locale/helpers";
+} from "@/shared/locale/helpers";
 
 const getGuildTMock = jest.fn();
 const invalidateLocaleCacheMock = jest.fn();
 
-jest.mock("../../../src/shared/locale/index", () => ({
+jest.mock("@/shared/locale/index", () => ({
   localeManager: {
     getGuildT: (...args: unknown[]) => getGuildTMock(...args),
     invalidateLocaleCache: (...args: unknown[]) =>

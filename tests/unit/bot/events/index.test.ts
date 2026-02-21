@@ -1,25 +1,25 @@
 import { Events } from "discord.js";
-import { events } from "../../../../src/bot/events";
-import { channelDeleteEvent } from "../../../../src/bot/events/channelDelete";
-import { clientReadyEvent } from "../../../../src/bot/events/clientReady";
-import { interactionCreateEvent } from "../../../../src/bot/events/interactionCreate";
-import { messageCreateEvent } from "../../../../src/bot/events/messageCreate";
-import { voiceStateUpdateEvent } from "../../../../src/bot/events/voiceStateUpdate";
+import { events } from "@/bot/events";
+import { channelDeleteEvent } from "@/bot/events/channelDelete";
+import { clientReadyEvent } from "@/bot/events/clientReady";
+import { interactionCreateEvent } from "@/bot/events/interactionCreate";
+import { messageCreateEvent } from "@/bot/events/messageCreate";
+import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
 
 // 各イベントモジュールをスタブ化し、index の束ね方に焦点を当てる
-jest.mock("../../../../src/bot/events/channelDelete", () => ({
+jest.mock("@/bot/events/channelDelete", () => ({
   channelDeleteEvent: { name: Events.ChannelDelete },
 }));
-jest.mock("../../../../src/bot/events/clientReady", () => ({
+jest.mock("@/bot/events/clientReady", () => ({
   clientReadyEvent: { name: Events.ClientReady },
 }));
-jest.mock("../../../../src/bot/events/interactionCreate", () => ({
+jest.mock("@/bot/events/interactionCreate", () => ({
   interactionCreateEvent: { name: Events.InteractionCreate },
 }));
-jest.mock("../../../../src/bot/events/messageCreate", () => ({
+jest.mock("@/bot/events/messageCreate", () => ({
   messageCreateEvent: { name: Events.MessageCreate },
 }));
-jest.mock("../../../../src/bot/events/voiceStateUpdate", () => ({
+jest.mock("@/bot/events/voiceStateUpdate", () => ({
   voiceStateUpdateEvent: { name: Events.VoiceStateUpdate },
 }));
 

@@ -3,11 +3,11 @@
  * コマンドクールダウン管理のテスト
  */
 
-import { CooldownManager } from "../../../src/bot/services/cooldownManager";
-import { logger } from "../../../src/shared/utils/logger";
+import { CooldownManager } from "@/bot/services/cooldownManager";
+import { logger } from "@/shared/utils/logger";
 
 // Logger のモック
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -17,7 +17,7 @@ jest.mock("../../../src/shared/utils/logger", () => ({
 }));
 
 // i18n のモック
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     `${key}:${JSON.stringify(params || {})}`,
 }));

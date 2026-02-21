@@ -189,6 +189,29 @@
 - 2026-02-21 時点で `pnpm run typecheck` を再実行し、`tsc --noEmit` 成功（`TYPECHECK_OK`）を確認
 - 2026-02-21 時点で `pnpm test --runInBand` を再実行し、`39 suites / 431 tests` 全件PASSを確認
 
+### テスト再編スプリント（src対称化 / コミット単位）🚧 進行中
+
+**合意方針（2026-02-21）**:
+
+- テスト配置は `tests/unit` / `tests/integration` を維持しつつ、各配下で `src` と同じパス構造へ寄せる
+- ファイル名は **camelCase固定にしない**。`src` 側のベース名に一致（`kebab-case` を含む）
+- 今回フェーズは `unit` のみ。`integration` / `e2e` は次フェーズで実施
+
+**コミット単位タスク**:
+
+- [x] **TST-REORG-001**: `tests/unit` の `src` 対称化（移動・改名のみ）
+  - 完了条件: 旧パスから新パスへ移動し、命名を `src` ベース名へ統一
+- [x] **TST-REORG-002**: import / mock 参照の追随修正
+  - 完了条件: `tests/unit` で `src` 参照を `@/` へ統一し、`tests/tsconfig.json` に `paths` を追加
+- [x] **TST-REORG-003**: 回帰確認（テスト実行）
+  - 完了条件: `pnpm test` が全件PASS（`431 passed / 0 failed`）
+- [ ] **TST-REORG-004**: `tests/integration` の `src` 対称化マッピング作成（移動はしない）
+  - 完了条件: 既存 `integration` ファイルの移動先候補と非対応ケースを一覧化
+- [ ] **TST-REORG-005**: `tests/integration` 移動・改名 + 参照追随
+  - 完了条件: `integration` を移行し、`pnpm test` 全件PASS
+- [ ] **TST-REORG-006**: テストガイド更新（再編後の正式構成反映）
+  - 完了条件: `docs/guides/TESTING_GUIDELINES.md` の構成図と命名ルールを更新
+
 ### コード品質
 
 - [ ] ESLintルール厳格化
@@ -260,12 +283,17 @@
 
 ### 直近の推奨作業順序
 
-1. **TST-001: テスト修正フェーズ開始**
+1. **TST-REORG-004: integration対称化のマッピング作成**
 
-- 失敗テストを import/モック追随から優先修正
-- 主要回帰（VAC/Bump）を先に復旧
+- 対象srcが明確なテストと複合テストを切り分ける
+- 非対応ケース（複数モジュール横断）を明文化する
 
-2. **残課題の順次解消**
+2. **TST-REORG-005: integration移行 + 回帰確認**
+
+- 移動・改名・import追随を1コミットで実施
+- `pnpm test` で全件PASSを確認
+
+3. **残課題の順次解消**
 
 - コード品質（未使用コード削減・エラーメッセージ統一）
 - アーキテクチャ（サービス層整理・DI運用の明文化）
@@ -274,5 +302,5 @@
 ---
 
 **最終更新**: 2026年2月21日
-**全体進捗**: src再監査フェーズ完了、次はテスト修正フェーズ
-**次のマイルストーン**: TST-001 テスト修正開始
+**全体進捗**: src再監査完了、テスト再編（unitフェーズ）完了
+**次のマイルストーン**: TST-REORG-004 integrationマッピング作成

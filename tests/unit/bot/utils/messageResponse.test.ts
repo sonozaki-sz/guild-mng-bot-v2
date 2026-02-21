@@ -9,8 +9,8 @@ import {
   createStatusEmbed,
   createSuccessEmbed,
   createWarningEmbed,
-} from "../../../src/bot/utils/messageResponse";
-import { localeManager } from "../../../src/shared/locale";
+} from "@/bot/utils/messageResponse";
+import { localeManager } from "@/shared/locale";
 
 // i18n 依存のタイトル検証に備えてロケールを初期化
 beforeAll(async () => {

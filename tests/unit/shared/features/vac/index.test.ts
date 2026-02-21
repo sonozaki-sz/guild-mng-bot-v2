@@ -1,7 +1,7 @@
 import type {
   VacChannelPair,
   VacConfig,
-} from "../../../../src/shared/database/types";
+} from "@/shared/database/types";
 
 // GuildConfigRepository の VAC 関連メソッドをテスト用にモック
 const mockRepo = {
@@ -9,7 +9,7 @@ const mockRepo = {
   updateVacConfig: jest.fn<Promise<void>, [string, VacConfig]>(),
 };
 
-jest.mock("../../../../src/shared/database", () => ({
+jest.mock("@/shared/database", () => ({
   getGuildConfigRepository: () => mockRepo,
 }));
 
@@ -22,7 +22,7 @@ import {
   removeCreatedVacChannel,
   removeTriggerChannel,
   saveVacConfig,
-} from "../../../../src/shared/features/vac";
+} from "@/shared/features/vac";
 
 describe("shared/features/vac/config", () => {
   // VAC設定の取得・更新・重複回避・存在判定の分岐を検証
