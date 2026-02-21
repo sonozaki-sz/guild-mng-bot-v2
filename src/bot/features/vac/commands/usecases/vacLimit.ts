@@ -1,14 +1,11 @@
 // src/bot/features/vac/commands/usecases/vacLimit.ts
 // VAC VC人数制限変更ユースケース
 
-import {
-  ChannelType,
-  MessageFlags,
-  type ChatInputCommandInteraction,
-} from "discord.js";
+import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors";
 import { tGuild } from "../../../../../shared/locale";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
+import { resolveVacVoiceChannelForEdit } from "../helpers/vacVoiceChannelResolver";
 import { VAC_COMMAND } from "../vacCommand.constants";
 
 /**
@@ -32,12 +29,11 @@ export async function executeVacLimit(
     );
   }
 
-  const channel = await interaction.guild?.channels.fetch(channelId);
-  if (!channel || channel.type !== ChannelType.GuildVoice) {
-    throw new ValidationError(
-      await tGuild(guildId, "errors:vac.not_vac_channel"),
-    );
-  }
+  const channel = await resolveVacVoiceChannelForEdit(
+    interaction,
+    guildId,
+    channelId,
+  );
 
   await channel.edit({ userLimit: limit });
 

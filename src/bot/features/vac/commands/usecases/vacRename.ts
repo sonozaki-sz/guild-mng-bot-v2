@@ -1,14 +1,10 @@
 // src/bot/features/vac/commands/usecases/vacRename.ts
 // VAC VC名変更ユースケース
 
-import {
-  ChannelType,
-  MessageFlags,
-  type ChatInputCommandInteraction,
-} from "discord.js";
-import { ValidationError } from "../../../../../shared/errors";
+import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tGuild } from "../../../../../shared/locale";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
+import { resolveVacVoiceChannelForEdit } from "../helpers/vacVoiceChannelResolver";
 import { VAC_COMMAND } from "../vacCommand.constants";
 
 /**
@@ -25,12 +21,11 @@ export async function executeVacRename(
 ): Promise<void> {
   // 入力値と対象チャンネルを解決して更新可能か検証
   const newName = interaction.options.getString(VAC_COMMAND.OPTION.NAME, true);
-  const channel = await interaction.guild?.channels.fetch(channelId);
-  if (!channel || channel.type !== ChannelType.GuildVoice) {
-    throw new ValidationError(
-      await tGuild(guildId, "errors:vac.not_vac_channel"),
-    );
-  }
+  const channel = await resolveVacVoiceChannelForEdit(
+    interaction,
+    guildId,
+    channelId,
+  );
 
   await channel.edit({ name: newName });
 
