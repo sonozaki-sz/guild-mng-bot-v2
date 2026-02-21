@@ -12,6 +12,11 @@ import {
 } from "../features/bump-reminder";
 import { createVacRepository, getVacRepository } from "../features/vac";
 import { getVacService } from "../features/vac/services";
+import {
+  setBotBumpReminderConfigService,
+  setBotBumpReminderManager,
+  setBotBumpReminderRepository,
+} from "./botBumpReminderDependencyResolver";
 import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
 import {
   setBotVacRepository,
@@ -29,8 +34,14 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
   localeManager.setRepository(guildConfigRepository);
 
   // bump-reminder 設定サービス/ジョブ管理の依存を明示注入で解決
-  getBumpReminderFeatureConfigService(guildConfigRepository);
-  getBumpReminderManager(getBumpReminderRepository(prisma));
+  const bumpReminderConfigService = getBumpReminderFeatureConfigService(
+    guildConfigRepository,
+  );
+  const bumpReminderRepository = getBumpReminderRepository(prisma);
+  const bumpReminderManager = getBumpReminderManager(bumpReminderRepository);
+  setBotBumpReminderConfigService(bumpReminderConfigService);
+  setBotBumpReminderRepository(bumpReminderRepository);
+  setBotBumpReminderManager(bumpReminderManager);
 
   // VAC の設定サービス/リポジトリ/サービスを同一 repository で解決
   const vacConfigService = getVacConfigService(guildConfigRepository);

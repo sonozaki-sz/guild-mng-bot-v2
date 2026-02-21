@@ -187,7 +187,7 @@
 
 #### コミット単位タスク
 
-- [ ] **SR-001** bump-reminder の bot層依存リゾルバ追加
+- [x] **SR-001** bump-reminder の bot層依存リゾルバ追加
   - 完了条件: manager/config-service/repository 参照を bot service resolver で解決可能
   - コミット例: `refactor: bump-reminder 依存解決を bot リゾルバ経由に追加`
 
