@@ -5,8 +5,8 @@ import { safeReply } from "@/bot/utils/interaction";
 type InteractionLike = {
   replied: boolean;
   deferred: boolean;
-  reply: Mock<Promise<void>, [unknown]>;
-  followUp: Mock<Promise<void>, [unknown]>;
+  reply: Mock<(arg: unknown) => Promise<void>>;
+  followUp: Mock<(arg: unknown) => Promise<void>>;
 };
 
 // Interaction の最小モックを生成するヘルパー
@@ -62,7 +62,7 @@ describe("shared/utils/interaction safeReply", () => {
     // 期限切れInteractionは安全に無視されること
     const interaction = createInteraction({
       reply: vi
-        .fn<Promise<void>, [unknown]>()
+        .fn<(arg: unknown) => Promise<void>>()
         .mockRejectedValueOnce(
           createDiscordApiError(RESTJSONErrorCodes.UnknownInteraction),
         ),
@@ -77,7 +77,7 @@ describe("shared/utils/interaction safeReply", () => {
     // 応答済みエラーは再送処理で握りつぶすこと
     const interaction = createInteraction({
       reply: vi
-        .fn<Promise<void>, [unknown]>()
+        .fn<(arg: unknown) => Promise<void>>()
         .mockRejectedValueOnce(
           createDiscordApiError(
             RESTJSONErrorCodes.InteractionHasAlreadyBeenAcknowledged,
@@ -94,7 +94,7 @@ describe("shared/utils/interaction safeReply", () => {
     // 無視対象以外の Discord API エラーは呼び出し元へ送出すること
     const interaction = createInteraction({
       reply: vi
-        .fn<Promise<void>, [unknown]>()
+        .fn<(arg: unknown) => Promise<void>>()
         .mockRejectedValueOnce(
           createDiscordApiError(RESTJSONErrorCodes.UnknownUser),
         ),
@@ -109,7 +109,7 @@ describe("shared/utils/interaction safeReply", () => {
     // DiscordAPIError 以外の例外も握りつぶさず再送出すること
     const interaction = createInteraction({
       reply: vi
-        .fn<Promise<void>, [unknown]>()
+        .fn<(arg: unknown) => Promise<void>>()
         .mockRejectedValueOnce(new Error("unexpected")),
     });
 

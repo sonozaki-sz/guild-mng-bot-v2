@@ -1,8 +1,10 @@
-const handleAutocompleteMock = vi.fn();
-const handleButtonMock = vi.fn();
-const handleChatInputCommandMock = vi.fn();
-const handleModalSubmitMock = vi.fn();
-const handleUserSelectMenuMock = vi.fn();
+import type { Mock } from "vitest";
+
+const handleAutocompleteMock: Mock = vi.fn();
+const handleButtonMock: Mock = vi.fn();
+const handleChatInputCommandMock: Mock = vi.fn();
+const handleModalSubmitMock: Mock = vi.fn();
+const handleUserSelectMenuMock: Mock = vi.fn();
 
 vi.mock("@/bot/handlers/interactionCreate/flow/command", () => ({
   handleAutocomplete: (...args: unknown[]) => handleAutocompleteMock(...args),

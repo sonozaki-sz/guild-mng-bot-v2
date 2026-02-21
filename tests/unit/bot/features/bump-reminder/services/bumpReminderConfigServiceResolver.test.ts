@@ -1,5 +1,7 @@
-const createBumpReminderConfigServiceMock = vi.fn();
-const getBumpReminderConfigServiceMock = vi.fn();
+import type { Mock } from "vitest";
+
+const createBumpReminderConfigServiceMock: Mock = vi.fn();
+const getBumpReminderConfigServiceMock: Mock = vi.fn();
 
 vi.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   createBumpReminderConfigService: (...args: unknown[]) =>

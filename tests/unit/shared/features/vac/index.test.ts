@@ -1,12 +1,10 @@
-import type {
-  VacChannelPair,
-  VacConfig,
-} from "@/shared/database/types";
+import type { VacChannelPair, VacConfig } from "@/shared/database/types";
 
 // GuildConfigRepository の VAC 関連メソッドをテスト用にモック
 const mockRepo = {
-  getVacConfig: vi.fn<Promise<VacConfig | null>, [string]>(),
-  updateVacConfig: vi.fn<Promise<void>, [string, VacConfig]>(),
+  getVacConfig: vi.fn<(guildId: string) => Promise<VacConfig | null>>(),
+  updateVacConfig:
+    vi.fn<(guildId: string, config: VacConfig) => Promise<void>>(),
 };
 
 vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
@@ -37,7 +35,8 @@ describe("shared/features/vac/config", () => {
   });
 
   it("re-exports all service values", async () => {
-    const serviceModule = await import("@/shared/features/vac/vacConfigService");
+    const serviceModule =
+      await import("@/shared/features/vac/vacConfigService");
 
     expect(DEFAULT_VAC_CONFIG).toBe(serviceModule.DEFAULT_VAC_CONFIG);
     expect(VacConfigService).toBe(serviceModule.VacConfigService);

@@ -1,11 +1,21 @@
-const getVacConfigServiceMock = vi.fn();
+import type { Mock } from "vitest";
+
+const getVacConfigServiceMock: Mock = vi.fn();
 
 vi.mock("@/shared/features/vac/vacConfigService", () => ({
   getVacConfigService: (repository?: unknown) =>
     getVacConfigServiceMock(repository),
 }));
 
-function createVacConfigServicePortMock() {
+function createVacConfigServicePortMock(): {
+  getVacConfigOrDefault: Mock;
+  saveVacConfig: Mock;
+  addTriggerChannel: Mock;
+  removeTriggerChannel: Mock;
+  addCreatedVacChannel: Mock;
+  removeCreatedVacChannel: Mock;
+  isManagedVacChannel: Mock;
+} {
   return {
     getVacConfigOrDefault: vi.fn(),
     saveVacConfig: vi.fn(),
@@ -17,7 +27,15 @@ function createVacConfigServicePortMock() {
   };
 }
 
-function createRepositoryMock() {
+function createRepositoryMock(): {
+  getVacConfigOrDefault: Mock;
+  saveVacConfig: Mock;
+  addTriggerChannel: Mock;
+  removeTriggerChannel: Mock;
+  addCreatedVacChannel: Mock;
+  removeCreatedVacChannel: Mock;
+  isManagedVacChannel: Mock;
+} {
   return {
     getVacConfigOrDefault: vi.fn(),
     saveVacConfig: vi.fn(),

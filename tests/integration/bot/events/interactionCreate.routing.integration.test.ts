@@ -58,18 +58,18 @@ type InteractionBase = {
   client: {
     commands: Map<string, unknown>;
     cooldownManager: { check: Mock };
-    modals: Map<string, { execute: Mock<Promise<void>, [unknown]> }>;
+    modals: Map<string, { execute: Mock<(arg: unknown) => Promise<void>> }>;
   };
   customId: string;
   user: { id: string; tag: string };
-  reply: Mock<Promise<void>, [unknown]>;
+  reply: Mock<(arg: unknown) => Promise<void>>;
   commandName: string;
   guildId: string;
-  isChatInputCommand: Mock<boolean, []>;
-  isAutocomplete: Mock<boolean, []>;
-  isModalSubmit: Mock<boolean, []>;
-  isButton: Mock<boolean, []>;
-  isUserSelectMenu: Mock<boolean, []>;
+  isChatInputCommand: Mock<() => boolean>;
+  isAutocomplete: Mock<() => boolean>;
+  isModalSubmit: Mock<() => boolean>;
+  isButton: Mock<() => boolean>;
+  isUserSelectMenu: Mock<() => boolean>;
 };
 
 // interactionCreate の各分岐に使う共通 interaction モック
@@ -108,7 +108,7 @@ describe("integration: interactionCreate handler routing", () => {
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __modalHandler: {
-        execute: Mock<Promise<void>, [unknown]>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -130,7 +130,7 @@ describe("integration: interactionCreate handler routing", () => {
       "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __buttonHandler: {
-        execute: Mock<Promise<void>, [unknown]>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -152,7 +152,7 @@ describe("integration: interactionCreate handler routing", () => {
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __userSelectHandler: {
-        execute: Mock<Promise<void>, [unknown]>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     const error = new Error("select failed");

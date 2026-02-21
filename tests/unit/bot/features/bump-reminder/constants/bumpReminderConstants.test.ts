@@ -3,22 +3,18 @@ describe("shared/features/bump-reminder/constants", () => {
   // TEST_MODE の切り替えを確実に反映させるため、モジュールを都度再読込する
   async function loadModule(testMode: boolean) {
     vi.resetModules();
-    vi.doMock(
-      "@/shared/config/env",
-      () => ({
-        NODE_ENV: {
-          DEVELOPMENT: "development",
-          PRODUCTION: "production",
-          TEST: "test",
-        },
-        env: {
-          NODE_ENV: "test",
-          LOG_LEVEL: "info",
-          TEST_MODE: testMode,
-        },
-      }),
-      { virtual: false },
-    );
+    vi.doMock("@/shared/config/env", () => ({
+      NODE_ENV: {
+        DEVELOPMENT: "development",
+        PRODUCTION: "production",
+        TEST: "test",
+      },
+      env: {
+        NODE_ENV: "test",
+        LOG_LEVEL: "info",
+        TEST_MODE: testMode,
+      },
+    }));
 
     return import("@/bot/features/bump-reminder/constants/bumpReminderConstants");
   }

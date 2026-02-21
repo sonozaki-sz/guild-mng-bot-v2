@@ -77,7 +77,7 @@ type AfkConfigInteraction = {
   channelId: string;
   memberPermissions: { has: Mock };
   options: {
-    getSubcommand: Mock<string, []>;
+    getSubcommand: Mock<() => string>;
     getChannel: Mock;
   };
   reply: Mock;

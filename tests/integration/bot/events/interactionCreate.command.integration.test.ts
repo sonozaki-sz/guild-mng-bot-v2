@@ -55,14 +55,14 @@ type CommandInteraction = {
   guildId: string;
   createdTimestamp: number;
   user: { id: string; tag: string };
-  reply: Mock<Promise<void>, [unknown]>;
-  fetchReply: Mock<Promise<{ createdTimestamp: number }>, []>;
-  editReply: Mock<Promise<void>, [unknown]>;
-  isChatInputCommand: Mock<boolean, []>;
-  isAutocomplete: Mock<boolean, []>;
-  isModalSubmit: Mock<boolean, []>;
-  isButton: Mock<boolean, []>;
-  isUserSelectMenu: Mock<boolean, []>;
+  reply: Mock<(arg: unknown) => Promise<void>>;
+  fetchReply: Mock<() => Promise<{ createdTimestamp: number }>>;
+  editReply: Mock<(arg: unknown) => Promise<void>>;
+  isChatInputCommand: Mock<() => boolean>;
+  isAutocomplete: Mock<() => boolean>;
+  isModalSubmit: Mock<() => boolean>;
+  isButton: Mock<() => boolean>;
+  isUserSelectMenu: Mock<() => boolean>;
 };
 
 // ChatInput 経路の統合検証に必要な最小 interaction を組み立てる

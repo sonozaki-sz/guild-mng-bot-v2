@@ -27,9 +27,9 @@ type MockInteraction = {
   createdTimestamp: number;
   user: { id: string; tag: string };
   client: { ws: { ping: number } };
-  reply: Mock<Promise<void>, [unknown]>;
-  fetchReply: Mock<Promise<{ createdTimestamp: number }>, []>;
-  editReply: Mock<Promise<void>, [unknown]>;
+  reply: Mock<(arg: unknown) => Promise<void>>;
+  fetchReply: Mock<() => Promise<{ createdTimestamp: number }>>;
+  editReply: Mock<(arg: unknown) => Promise<void>>;
 };
 
 // Ping コマンド向けの最小 interaction モックを生成する

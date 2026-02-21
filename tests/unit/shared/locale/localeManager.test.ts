@@ -1,6 +1,8 @@
-const initMock = vi.fn();
-const translateMock = vi.fn();
-const getFixedTMock = vi.fn();
+import type { Mock } from "vitest";
+
+const initMock: Mock = vi.fn();
+const translateMock: Mock = vi.fn();
+const getFixedTMock: Mock = vi.fn();
 
 const loggerMock = {
   info: vi.fn(),

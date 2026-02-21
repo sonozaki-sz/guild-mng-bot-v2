@@ -66,18 +66,18 @@ type BaseInteraction = {
   client: {
     commands: Map<string, unknown>;
     cooldownManager: { check: Mock };
-    modals: Map<string, { execute: Mock<Promise<void>, [unknown]> }>;
+    modals: Map<string, { execute: Mock<(arg: unknown) => Promise<void>> }>;
   };
   commandName: string;
   customId: string;
   guildId: string;
   user: { id: string; tag: string };
-  reply: Mock<Promise<void>, [unknown]>;
-  isChatInputCommand: Mock<boolean, []>;
-  isAutocomplete: Mock<boolean, []>;
-  isModalSubmit: Mock<boolean, []>;
-  isButton: Mock<boolean, []>;
-  isUserSelectMenu: Mock<boolean, []>;
+  reply: Mock<(arg: unknown) => Promise<void>>;
+  isChatInputCommand: Mock<() => boolean>;
+  isAutocomplete: Mock<() => boolean>;
+  isModalSubmit: Mock<() => boolean>;
+  isButton: Mock<() => boolean>;
+  isUserSelectMenu: Mock<() => boolean>;
 };
 
 // interactionCreate 用の最小 interaction を共通化して分岐設定を容易にする
@@ -147,8 +147,8 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: Mock<boolean, [string]>;
-        execute: Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -172,8 +172,8 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: Mock<boolean, [string]>;
-        execute: Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -200,8 +200,8 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __mockButtonHandler: {
-        matches: Mock<boolean, [string]>;
-        execute: Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -363,7 +363,7 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: Mock<boolean, [string]>;
+        matches: Mock<(s: string) => boolean>;
       };
     };
     mockedModalModule.__mockModalHandler.matches.mockReturnValue(false);
@@ -389,7 +389,7 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: Mock<boolean, [string]>;
+        matches: Mock<(s: string) => boolean>;
       };
     };
     mockedModalModule.__mockModalHandler.matches.mockReturnValue(false);
@@ -412,7 +412,7 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: Mock<boolean, [string]>;
+        matches: Mock<(s: string) => boolean>;
       };
     };
     mockedModalModule.__mockModalHandler.matches.mockReturnValue(false);
@@ -437,8 +437,8 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
-        matches: Mock<boolean, [string]>;
-        execute: Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     mockedSelectModule.__mockUserSelectHandler.matches.mockReturnValue(true);
@@ -461,8 +461,8 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
-        matches: Mock<boolean, [string]>;
-        execute: Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     const selectError = new Error("select failed");
@@ -490,8 +490,8 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __mockButtonHandler: {
-        matches: Mock<boolean, [string]>;
-        execute: Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     mockedButtonModule.__mockButtonHandler.matches.mockReturnValue(false);
@@ -515,8 +515,8 @@ describe("bot/events/interactionCreate", () => {
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
-        matches: Mock<boolean, [string]>;
-        execute: Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     mockedSelectModule.__mockUserSelectHandler.matches.mockReturnValue(false);

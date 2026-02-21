@@ -1,19 +1,21 @@
+import type { Mock } from "vitest";
+
 const executeWithDatabaseErrorMock = vi.fn(
   async (fn: () => Promise<unknown>, _message?: string) => fn(),
 );
 
-const loggerDebugMock = vi.fn();
-const loggerInfoMock = vi.fn();
+const loggerDebugMock: Mock = vi.fn();
+const loggerInfoMock: Mock = vi.fn();
 
-const createBumpReminderUseCaseMock = vi.fn();
-const findBumpReminderByIdUseCaseMock = vi.fn();
-const findPendingByGuildUseCaseMock = vi.fn();
-const findAllPendingUseCaseMock = vi.fn();
-const updateReminderStatusUseCaseMock = vi.fn();
-const deleteBumpReminderUseCaseMock = vi.fn();
-const cancelPendingByGuildUseCaseMock = vi.fn();
-const cancelPendingByGuildAndChannelUseCaseMock = vi.fn();
-const cleanupOldBumpRemindersUseCaseMock = vi.fn();
+const createBumpReminderUseCaseMock: Mock = vi.fn();
+const findBumpReminderByIdUseCaseMock: Mock = vi.fn();
+const findPendingByGuildUseCaseMock: Mock = vi.fn();
+const findAllPendingUseCaseMock: Mock = vi.fn();
+const updateReminderStatusUseCaseMock: Mock = vi.fn();
+const deleteBumpReminderUseCaseMock: Mock = vi.fn();
+const cancelPendingByGuildUseCaseMock: Mock = vi.fn();
+const cancelPendingByGuildAndChannelUseCaseMock: Mock = vi.fn();
+const cleanupOldBumpRemindersUseCaseMock: Mock = vi.fn();
 
 vi.mock("@/shared/utils/errorHandling", () => ({
   executeWithDatabaseError: (fn: () => Promise<unknown>, message: string) =>
