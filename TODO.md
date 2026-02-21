@@ -173,106 +173,66 @@
 
 ## 🔧 技術的改善タスク
 
-### src整備スプリント（再定義 / コミット単位）
+### src再監査スプリント（0ベース再確認 / コミット単位）
 
-> 目的: `src/` の責務分離・依存境界・公開面・命名を再固定し、薄い入口 + ユースケース分離 + 明示DIを徹底する。
+> 目的: src整備結果を 0 ベースで再監査し、問題がないことを担保した上でコメント規約・ガイド同期・テスト修正へ進む。
 
 #### 実施ポリシー（厳守）
 
-- [ ] **SP-1: 1コミット1関心**（目安: 3〜8ファイル）
-- [ ] **SP-2: 各コミットで `pnpm run typecheck` を通す**
-- [ ] **SP-3: src整備中はテスト実行しない**（`test` / `test:watch` / `test:coverage` は禁止）
-- [ ] **SP-4: 挙動変更を避ける**（原則リファクタのみ。仕様追加・仕様変更は別コミット）
-- [ ] **SP-5: 互換レイヤー先行で段階移行**（resolver/adapter追加 → 呼び出し側移行 → 旧経路縮退）
-- [ ] **SP-6: 公開面は最小化**（`index.ts` は外部公開シンボルのみ）
+- [ ] **NP-1: 1コミット1関心**（監査/修正/文書同期を混在させない）
+- [ ] **NP-2: 監査・修正コミットごとに `pnpm run typecheck` を通す**
+- [ ] **NP-3: ガイド/TODO同期完了まで `pnpm test` は実行しない**
+- [ ] **NP-4: 監査結果は根拠付きで記録**（対象ファイル・検索結果・観測値）
 
-#### 分析サマリー（現状）
+#### コミット単位タスク（新規）
 
-- [ ] **AS-1** 大型ファイルが残存（`300行級`: `guildConfigRepository.ts`, `bumpReminderService.ts`, `bumpReminderConfigService.ts`, `bumpReminderRepository.ts`, `vacConfigCommand.execute.ts`）
-- [ ] **AS-2** `commands` 層の一部にユースケース実装が同居（例: `vacConfigCommand.execute.ts`）
-- [x] **AS-3** 命名の一貫性に揺れ（`stick` と `sticky` の語彙混在）
-- [ ] **AS-4** `shared/database/index.ts` にグローバルアクセサ依存（`requirePrismaClient`）が残存
-- [x] **AS-5** `index.ts` の公開境界ルールが feature 間で不均一
+- [ ] **AUD-001** TODO再編（旧src整備タスクを廃止し、再監査タスクへ置換）
+  - 完了条件: 旧 `SRC-*` / `POST-*` 群を撤去し、本スプリントへ差し替え
+  - コミット例: `docs(todo): src再監査スプリントへ更新`
 
-#### コミット単位タスク（src整備本体）
+- [ ] **AUD-002** 責務分離の再監査（commands/events/handlers の入口責務）
+  - 完了条件: 入口層が「入力解釈・委譲・共通エラー処理」中心であることを確認し、逸脱を修正
+  - コミット例: `refactor(audit): 入口責務の逸脱を是正`
 
-- [x] **SRC-001** ディレクトリ・命名規約の基準を固定（`stick` / `sticky` など語彙統一方針を確定）
-  - 完了条件: `src` 用の命名ルールを TODO 上で明文化し、対象ファイル一覧を確定
-  - 命名ルール（確定）:
-    - 新規命名・公開APIは **sticky** 系語彙へ統一（feature名、型名、service/store名、関数名）
-    - 既存DBカラム `stickMessages` は **互換維持のため当面据え置き**（移行タスクで adapter/serializer 側吸収）
-    - 一括置換は不可。`SRC-004` と `SRC-006` で互換レイヤーを先に作り、段階移行する
-  - 改名対象ファイル一覧（第1弾）:
-    - `src/shared/database/stores/guildStickMessageStore.ts`
-    - `src/shared/database/types.ts`（`StickMessage` / `IStickMessageRepository`）
-    - `src/shared/database/repositories/guildConfigRepository.ts`（`stickMessageStore` 参照群）
-    - `src/shared/database/repositories/persistence/guildConfigReadPersistence.ts`（`findStickMessagesJson`）
-    - `src/shared/database/repositories/serializers/guildConfigSerializer.ts`（型名・変換ヘルパー）
-  - 改名対象シンボル一覧（第1弾）:
-    - `GuildStickMessageStore` → `GuildStickyMessageStore`
-    - `StickMessage` → `StickyMessage`
-    - `IStickMessageRepository` → `IStickyMessageRepository`
-    - `getStickMessages` / `updateStickMessages` → `getStickyMessages` / `updateStickyMessages`
-    - `findStickMessagesJson` → `findStickyMessagesJson`
-  - コミット例: `docs: src命名規約と改名対象を確定`
+- [ ] **AUD-003** アーキテクチャ/設計パターン/ディレクトリ構成の再監査
+  - 完了条件: 依存方向・feature構成・公開境界の重大逸脱なし、必要なら修正
+  - コミット例: `refactor(audit): 構成逸脱を修正`
 
-- [x] **SRC-002** `vacConfigCommand.execute.ts` をルーター + サブコマンド usecase へ分割
-  - 完了条件: execute は分岐委譲のみ、create/remove/show は別モジュールへ移動
-  - コミット例: `refactor: vac-config execute を usecase 分割`
+- [ ] **AUD-004** ディレクトリ名・ファイル名の妥当性監査
+  - 完了条件: 命名揺れ・用途不一致を洗い出し、許容/修正方針を明確化
+  - コミット例: `docs(audit): 命名妥当性の監査結果を記録`
 
-- [x] **SRC-003** `bumpReminderService.ts` を orchestrator + usecase/helper へ分割
-  - 完了条件: manager本体は schedule/cancel/restore の調停のみを担当
-  - コミット例: `refactor: bump reminder manager を責務分離`
+- [ ] **AUD-005** コードスリム化再点検（未使用/重複/到達不能）
+  - 完了条件: 安全に削減可能な重複・未使用コードを削除
+  - コミット例: `refactor(audit): 重複と未使用コードを削減`
 
-- [x] **SRC-004** `guildConfigRepository.ts` を facade 化し、機能別委譲を徹底
-  - 完了条件: repository本体からJSON変換・機能別更新責務を分離し、委譲中心へ
-  - コミット例: `refactor: guild config repository を facade 化`
+- [ ] **AUD-006** テスト容易性の再監査（DI境界・モック容易性・テスト入口）
+  - 完了条件: テスト困難要因を抽出し、最小の改善または課題化を実施
+  - コミット例: `refactor(testability): テスト容易性を改善`
 
-- [x] **SRC-005** `bumpReminderRepository.ts` を query/usecase 単位に再分割
-  - 完了条件: pending取得/状態更新/クリーンアップ/ログ整形を独立モジュール化
-  - コミット例: `refactor: bump reminder repository を query 単位で分離`
+- [ ] **CMT-001** コメント規約の全量チェック（src全体）
+  - 完了条件: ファイル先頭コメント・関数 `@param/@returns`・意図コメントの不足を機械検出
+  - コミット例: `chore(comment): コメント不足を全量検出`
 
-- [x] **SRC-006** `shared/database/index.ts` の暗黙DIを縮退し明示注入へ寄せる
-  - 完了条件: 新規呼び出しで `requirePrismaClient` 非依存、段階移行の互換経路を用意
-  - コミット例: `refactor: shared database を明示DI優先へ移行`
+- [ ] **CMT-002** コメント規約の不足反映（src全体）
+  - 完了条件: CMT-001 で検出した不足を `src/` 全体へ反映
+  - コミット例: `docs(code): コメント規約をsrc全体へ適用`
 
-- [x] **SRC-007** feature公開境界を統一（`index.ts` の export を明示限定）
-  - 完了条件: `export *` を段階削除し、外部利用シンボルのみ公開
-  - コミット例: `refactor: feature公開APIを明示exportへ統一`
+- [ ] **DOC-001** アーキテクチャガイド同期
+  - 完了条件: `docs/guides/ARCHITECTURE.md` を再監査結果に同期
+  - コミット例: `docs: architecture guide を再監査結果に同期`
 
-- [x] **SRC-008** command/event/handler の入口責務を再点検し、過剰処理を feature へ移譲
-  - 完了条件: 入口層は「入力解釈・委譲・共通エラー処理」に限定
-  - コミット例: `refactor: 入口層の責務を委譲中心に整理`
+- [ ] **DOC-002** 実装ガイドライン同期
+  - 完了条件: `docs/guides/IMPLEMENTATION_GUIDELINES.md` を再監査結果に同期
+  - コミット例: `docs: implementation guidelines を再監査結果に同期`
 
-- [x] **SRC-009** import方向を固定（`bot|web -> shared` のみ）し逆流を検査
-  - 完了条件: 逆依存パターンを検出・解消、例外が必要なら理由を明文化
-  - コミット例: `refactor: import依存方向を固定`
+- [ ] **DOC-003** TODO同期（監査結果・次フェーズ反映）
+  - 完了条件: 監査結果/残課題を TODO に反映し、テスト修正の開始条件を明記
+  - コミット例: `docs(todo): 再監査結果を反映`
 
-- [x] **SRC-010** 未使用コード・到達不能分岐・重複ヘルパーを削減してスリム化
-  - 完了条件: dead code を削除し、既存挙動を維持したままファイル/関数を縮約
-  - コミット例: `refactor: src の未使用コードを削除`
-
-#### src整備完了後タスク（テスト修正は最終フェーズ）
-
-- [x] **POST-001** src再分析で整備状態を確認
-  - 完了条件: `pnpm run typecheck` / `pnpm run lint` が通り、責務境界の重大な崩れがない
-  - コミット例: `chore: src整備後の再分析を実施`
-
-- [x] **POST-002** コメント規約を整備対象ソースへ反映
-  - 完了条件: `src/` 全体でファイル先頭コメント・関数 `@param/@returns`・意図コメントを実装ガイド準拠で適用
-  - コミット例: `docs(code): コメント規約を整備対象へ反映`
-
-- [x] **POST-003** 実装実態をアーキテクチャガイドへ反映
-  - 完了条件: `docs/guides/ARCHITECTURE.md` の依存方向・責務説明・運用境界を更新
-  - コミット例: `docs: architecture guide を現行実装に同期`
-
-- [x] **POST-004** 実装実態を実装ガイドラインへ反映
-  - 完了条件: `docs/guides/IMPLEMENTATION_GUIDELINES.md` の分割方針・運用順序を更新
-  - コミット例: `docs: implementation guidelines を現行実装に同期`
-
-- [ ] **POST-005** テスト修正フェーズへ移行（このフェーズで初めて `pnpm test` を再開）
-  - 完了条件: import/モック破綻を新境界へ追随、主要回帰（VAC/Bump）を優先修正
-  - コミット例: `test: src整備後の境界に合わせてテストを修正`
+- [ ] **TST-001** テスト修正フェーズ開始（ここで `pnpm test` 再開）
+  - 完了条件: 主要失敗テストの修正方針を確定し、最初の回帰修正を実施
+  - コミット例: `test: 再監査後の境界に合わせてテスト修正を開始`
 
 ### コード品質
 
