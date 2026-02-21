@@ -29,6 +29,7 @@ export async function executeVacLimit(
     );
   }
 
+  // VC解決・型検証は共通ヘルパーへ委譲し、limit更新に専念する
   const channel = await resolveVacVoiceChannelForEdit(
     interaction,
     guildId,

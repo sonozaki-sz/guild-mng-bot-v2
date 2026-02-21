@@ -252,23 +252,27 @@
   - 完了条件: dead code を削除し、既存挙動を維持したままファイル/関数を縮約
   - コミット例: `refactor: src の未使用コードを削除`
 
-#### src整備完了後タスク（ここからテスト修正へ移行）
+#### src整備完了後タスク（テスト修正は最終フェーズ）
 
-- [ ] **POST-001** テスト修正フェーズへ移行（このフェーズで初めて `pnpm test` を再開）
-  - 完了条件: import/モック破綻を新境界へ追随、主要回帰（VAC/Bump）を優先修正
-  - コミット例: `test: src整備後の境界に合わせてテストを修正`
+- [x] **POST-001** src再分析で整備状態を確認
+  - 完了条件: `pnpm run typecheck` / `pnpm run lint` が通り、責務境界の重大な崩れがない
+  - コミット例: `chore: src整備後の再分析を実施`
 
-- [ ] **POST-002** コメント規約を `src/` 全体へ反映
+- [x] **POST-002** コメント規約を整備対象ソースへ反映
   - 完了条件: ファイル先頭コメント・関数 `@param/@returns`・意図コメントを実装ガイド準拠で適用
-  - コミット例: `docs(code): src へコメント規約を適用`
+  - コミット例: `docs(code): コメント規約を整備対象へ反映`
 
-- [ ] **POST-003** 実装実態をアーキテクチャガイドへ反映
-  - 完了条件: `docs/guides/ARCHITECTURE.md` の構成図・依存方向・責務説明を更新
+- [x] **POST-003** 実装実態をアーキテクチャガイドへ反映
+  - 完了条件: `docs/guides/ARCHITECTURE.md` の依存方向・責務説明・運用境界を更新
   - コミット例: `docs: architecture guide を現行実装に同期`
 
-- [ ] **POST-004** 実装実態を実装ガイドラインへ反映
-  - 完了条件: `docs/guides/IMPLEMENTATION_GUIDELINES.md` の分割方針・命名規約・運用手順を更新
+- [x] **POST-004** 実装実態を実装ガイドラインへ反映
+  - 完了条件: `docs/guides/IMPLEMENTATION_GUIDELINES.md` の分割方針・運用順序を更新
   - コミット例: `docs: implementation guidelines を現行実装に同期`
+
+- [ ] **POST-005** テスト修正フェーズへ移行（このフェーズで初めて `pnpm test` を再開）
+  - 完了条件: import/モック破綻を新境界へ追随、主要回帰（VAC/Bump）を優先修正
+  - コミット例: `test: src整備後の境界に合わせてテストを修正`
 
 ### コード品質
 
