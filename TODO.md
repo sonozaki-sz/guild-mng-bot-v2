@@ -216,7 +216,7 @@
     - `findStickMessagesJson` → `findStickyMessagesJson`
   - コミット例: `docs: src命名規約と改名対象を確定`
 
-- [ ] **SRC-002** `vacConfigCommand.execute.ts` をルーター + サブコマンド usecase へ分割
+- [x] **SRC-002** `vacConfigCommand.execute.ts` をルーター + サブコマンド usecase へ分割
   - 完了条件: execute は分岐委譲のみ、create/remove/show は別モジュールへ移動
   - コミット例: `refactor: vac-config execute を usecase 分割`
 

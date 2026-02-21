@@ -1,25 +1,13 @@
 // src/bot/features/vac/commands/vacConfigCommand.execute.ts
 // VAC 設定コマンド実行処理
 
-import {
-  ChannelType,
-  ChatInputCommandInteraction,
-  MessageFlags,
-  PermissionFlagsBits,
-} from "discord.js";
+import { ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js";
 import { ValidationError } from "../../../../shared/errors";
-import { tDefault, tGuild } from "../../../../shared/locale";
+import { tDefault } from "../../../../shared/locale";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
-import { getBotVacRepository } from "../../../services/botVacDependencyResolver";
-import {
-  createInfoEmbed,
-  createSuccessEmbed,
-} from "../../../utils/messageResponse";
-import {
-  findTriggerChannelByCategory,
-  resolveTargetCategory,
-} from "./helpers/vacConfigTargetResolver";
-import { presentVacConfigShow } from "./presenters/vacConfigShowPresenter";
+import { handleVacConfigCreateTrigger } from "./usecases/vacConfigCreateTrigger";
+import { handleVacConfigRemoveTrigger } from "./usecases/vacConfigRemoveTrigger";
+import { handleVacConfigShow } from "./usecases/vacConfigShow";
 import { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
 
 /**
@@ -44,13 +32,13 @@ export async function executeVacConfigCommand(
     const subcommand = interaction.options.getSubcommand();
     switch (subcommand) {
       case VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER:
-        await handleCreateTrigger(interaction, guildId);
+        await handleVacConfigCreateTrigger(interaction, guildId);
         break;
       case VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER:
-        await handleRemoveTrigger(interaction, guildId);
+        await handleVacConfigRemoveTrigger(interaction, guildId);
         break;
       case VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW:
-        await handleShow(interaction, guildId);
+        await handleVacConfigShow(interaction, guildId);
         break;
       default:
         throw new ValidationError(
@@ -78,181 +66,4 @@ function ensureManageGuildPermission(
       tDefault("errors:permission.manage_guild_required", { guildId }),
     );
   }
-}
-
-/**
- * トリガーチャンネル作成処理
- * @param interaction コマンド実行インタラクション
- * @param guildId 実行対象ギルドID
- * @returns 実行完了を示す Promise
- */
-async function handleCreateTrigger(
-  interaction: ChatInputCommandInteraction,
-  guildId: string,
-): Promise<void> {
-  // 実行コンテキストから対象カテゴリを解決
-  const guild = interaction.guild;
-  if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
-  }
-
-  const categoryOption = interaction.options.getString(
-    VAC_CONFIG_COMMAND.OPTION.CATEGORY,
-  );
-  const category = await resolveTargetCategory(
-    guild,
-    interaction.channelId,
-    categoryOption,
-  );
-  const targetCategoryId = category?.id ?? null;
-
-  const config = await getBotVacRepository().getVacConfigOrDefault(guildId);
-  // 同一カテゴリへの重複トリガー作成を防止
-  const existingTrigger = await findTriggerChannelByCategory(
-    guild,
-    config.triggerChannelIds,
-    targetCategoryId,
-  );
-  if (existingTrigger) {
-    throw new ValidationError(
-      await tGuild(guildId, "errors:vac.already_exists"),
-    );
-  }
-
-  // カテゴリ上限に達している場合は作成を中止
-  if (
-    category &&
-    category.children.cache.size >= VAC_CONFIG_COMMAND.CATEGORY_CHANNEL_LIMIT
-  ) {
-    throw new ValidationError(
-      await tGuild(guildId, "errors:vac.category_full"),
-    );
-  }
-
-  // 実チャンネル作成後に設定へ反映して整合を保つ
-  const triggerChannel = await guild.channels.create({
-    name: VAC_CONFIG_COMMAND.TRIGGER_CHANNEL_NAME,
-    type: ChannelType.GuildVoice,
-    parent: category?.id ?? null,
-  });
-
-  // 作成したトリガーVCを設定へ反映して永続化する
-  await getBotVacRepository().addTriggerChannel(guildId, triggerChannel.id);
-
-  const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vac-config.embed.trigger_created", {
-      channel: `<#${triggerChannel.id}>`,
-    }),
-  );
-  // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える
-  await interaction.reply({
-    embeds: [embed],
-    flags: MessageFlags.Ephemeral,
-  });
-}
-
-/**
- * トリガーチャンネル削除処理
- * @param interaction コマンド実行インタラクション
- * @param guildId 実行対象ギルドID
- * @returns 実行完了を示す Promise
- */
-async function handleRemoveTrigger(
-  interaction: ChatInputCommandInteraction,
-  guildId: string,
-): Promise<void> {
-  // 実行コンテキストから対象カテゴリを解決
-  const guild = interaction.guild;
-  if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
-  }
-
-  const categoryOption = interaction.options.getString(
-    VAC_CONFIG_COMMAND.OPTION.CATEGORY,
-  );
-  const category = await resolveTargetCategory(
-    guild,
-    interaction.channelId,
-    categoryOption,
-  );
-  const targetCategoryId = category?.id ?? null;
-
-  // 設定上の対象トリガーを特定
-  const config = await getBotVacRepository().getVacConfigOrDefault(guildId);
-  const triggerChannel = await findTriggerChannelByCategory(
-    guild,
-    config.triggerChannelIds,
-    targetCategoryId,
-  );
-
-  if (!triggerChannel) {
-    throw new ValidationError(
-      await tGuild(guildId, "errors:vac.trigger_not_found"),
-      await tGuild(guildId, "commands:vac-config.embed.remove_error_title"),
-    );
-  }
-
-  // 設定を先に更新し、実体削除は後続で試行する
-  await getBotVacRepository().removeTriggerChannel(guildId, triggerChannel.id);
-
-  const guildChannel = await interaction.guild?.channels
-    .fetch(triggerChannel.id)
-    .catch(() => null);
-  if (guildChannel && guildChannel.type === ChannelType.GuildVoice) {
-    await guildChannel.delete();
-  }
-
-  const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vac-config.embed.trigger_removed", {
-      channel: `#${triggerChannel.name}`,
-    }),
-  );
-  // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える
-  await interaction.reply({
-    embeds: [embed],
-    flags: MessageFlags.Ephemeral,
-  });
-}
-
-/**
- * 現在のVAC設定表示処理
- * @param interaction コマンド実行インタラクション
- * @param guildId 実行対象ギルドID
- * @returns 実行完了を示す Promise
- */
-async function handleShow(
-  interaction: ChatInputCommandInteraction,
-  guildId: string,
-): Promise<void> {
-  // 最新設定を読み込み、表示用の文字列へ整形
-  const guild = interaction.guild;
-  if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
-  }
-
-  const config = await getBotVacRepository().getVacConfigOrDefault(guildId);
-  const presentation = await presentVacConfigShow(guild, guildId, config);
-
-  // トリガー一覧と作成済みVC一覧を Embed で返す
-  const embed = createInfoEmbed("", {
-    title: presentation.title,
-    fields: [
-      {
-        name: presentation.fieldTrigger,
-        value: presentation.triggerChannels,
-        inline: false,
-      },
-      {
-        name: presentation.fieldCreatedDetails,
-        value: presentation.createdVcDetails,
-        inline: false,
-      },
-    ],
-  });
-
-  // 設定表示も管理操作のため Ephemeral で返す
-  await interaction.reply({
-    embeds: [embed],
-    flags: MessageFlags.Ephemeral,
-  });
 }
