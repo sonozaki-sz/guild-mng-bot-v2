@@ -294,7 +294,7 @@
   - 対象: `vacRepository` / `vacService`
   - 目標: default 経路を factory ベースへ寄せ、生成責務を統一
   - コミット例: `refactor: vac の依存解決を service factory 経由へ統一`
-- [ ] **C3: vac-config command の薄型化（1）入力解決の抽出**
+- [x] **C3: vac-config command の薄型化（1）入力解決の抽出**
   - 対象: `vacConfigCommand.execute.ts` + `commands/helpers/*`
   - 目標: category解決/trigger探索を helper へ分離
   - コミット例: `refactor: vac-config の入力解決処理を helper に抽出`
