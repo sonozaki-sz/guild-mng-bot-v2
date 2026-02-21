@@ -1,182 +1,83 @@
-/**
- * Logger Unit Tests
- * Winston ロガーの設定テスト
- */
-
-import type winston from "winston";
-
-// Winston のモック
-const mockInfo = jest.fn();
-const mockError = jest.fn();
-const mockWarn = jest.fn();
-const mockDebug = jest.fn();
-
-const mockLogger = {
-  info: mockInfo,
-  error: mockError,
-  warn: mockWarn,
-  debug: mockDebug,
-  level: "info",
-} as unknown as winston.Logger;
-
-jest.mock("winston", () => ({
-  createLogger: jest.fn(() => mockLogger),
-  format: {
-    combine: jest.fn(),
-    timestamp: jest.fn(),
-    errors: jest.fn(),
-    printf: jest.fn(),
-    colorize: jest.fn(),
-  },
-  transports: {
-    Console: jest.fn(),
-  },
-}));
-
-jest.mock("winston-daily-rotate-file", () => {
-  return jest.fn();
-});
-
-// 環境変数のモック
-jest.mock("@/shared/config/env", () => ({
-  NODE_ENV: {
-    DEVELOPMENT: "development",
-    PRODUCTION: "production",
-    TEST: "test",
-  },
-  env: {
-    NODE_ENV: "test",
-    LOG_LEVEL: "debug",
-  },
-}));
-
-// i18n のモック
-jest.mock("@/shared/locale", () => ({
-  tDefault: (key: string) => `mocked:${key}`,
-}));
-
 describe("Logger", () => {
-  // ロガーAPIの呼び出し委譲と入力ハンドリングを検証
-  let logger: winston.Logger;
+  const loadLoggerModule = async (
+    nodeEnv: "development" | "production" | "test",
+    logLevel?: string,
+  ) => {
+    jest.resetModules();
 
-  // 各テストの前にモック呼び出し履歴を初期化し、loggerモジュールを読み直す
-  beforeEach(() => {
-    jest.clearAllMocks();
-    // モジュールキャッシュの影響を避けるため isolateModules 内で再読み込み
-    jest.isolateModules(() => {
-      const loggerModule = require("@/shared/utils/logger");
-      logger = loggerModule.logger;
-    });
+    const consoleTransportMock = jest.fn();
+    const dailyRotateMock = jest.fn();
+    const createLoggerMock = jest.fn((options) => ({ ...options }));
+
+    const winstonMock = {
+      createLogger: createLoggerMock,
+      format: {
+        combine: jest.fn((...parts) => ({ type: "combine", parts })),
+        timestamp: jest.fn((opts) => ({ type: "timestamp", opts })),
+        printf: jest.fn((fn) => ({ type: "printf", fn })),
+        colorize: jest.fn(() => ({ type: "colorize" })),
+      },
+      transports: {
+        Console: consoleTransportMock,
+      },
+    };
+
+    jest.doMock("winston", () => ({ __esModule: true, default: winstonMock }));
+    jest.doMock("winston-daily-rotate-file", () => ({
+      __esModule: true,
+      default: dailyRotateMock,
+    }));
+    jest.doMock("@/shared/config", () => ({
+      NODE_ENV: {
+        DEVELOPMENT: "development",
+        PRODUCTION: "production",
+        TEST: "test",
+      },
+      env: {
+        NODE_ENV: nodeEnv,
+        LOG_LEVEL: logLevel,
+      },
+    }));
+
+    const module = await import("@/shared/utils/logger");
+    return {
+      module,
+      winstonMock,
+      createLoggerMock,
+      consoleTransportMock,
+      dailyRotateMock,
+    };
+  };
+
+  it("configures development logger with debug-level console and two rotate files", async () => {
+    const { module, createLoggerMock, consoleTransportMock, dailyRotateMock } =
+      await loadLoggerModule("development", "debug");
+
+    expect(module.logger).toBeDefined();
+    expect(dailyRotateMock).toHaveBeenCalledTimes(2);
+    expect(consoleTransportMock).toHaveBeenCalledTimes(1);
+    expect(consoleTransportMock).toHaveBeenCalledWith(
+      expect.objectContaining({ level: "debug" }),
+    );
+
+    const createLoggerArgs = createLoggerMock.mock.calls[0][0];
+    expect(createLoggerArgs.level).toBe("debug");
+    expect(createLoggerArgs.exitOnError).toBe(false);
+    expect(createLoggerArgs.transports).toHaveLength(3);
   });
 
-  describe("Logging Methods", () => {
-    it("should call info method", () => {
-      logger.info("Test info message");
-      expect(mockInfo).toHaveBeenCalledWith("Test info message");
-    });
+  it("configures non-development logger with info-level console and defaults", async () => {
+    const { createLoggerMock, consoleTransportMock, dailyRotateMock } =
+      await loadLoggerModule("production", undefined);
 
-    it("should call error method", () => {
-      logger.error("Test error message");
-      expect(mockError).toHaveBeenCalledWith("Test error message");
-    });
+    expect(dailyRotateMock).toHaveBeenCalledTimes(2);
+    expect(consoleTransportMock).toHaveBeenCalledTimes(1);
+    expect(consoleTransportMock).toHaveBeenCalledWith(
+      expect.objectContaining({ level: "info" }),
+    );
 
-    it("should call warn method", () => {
-      logger.warn("Test warning message");
-      expect(mockWarn).toHaveBeenCalledWith("Test warning message");
-    });
-
-    it("should call debug method", () => {
-      logger.debug("Test debug message");
-      expect(mockDebug).toHaveBeenCalledWith("Test debug message");
-    });
-  });
-
-  describe("Log Levels", () => {
-    it("should have correct log level set", () => {
-      expect(logger.level).toBe("info");
-    });
-  });
-
-  describe("Complex Messages", () => {
-    it("should handle objects in log messages", () => {
-      const logData = { userId: "123", action: "test" };
-      logger.info("User action", logData);
-      expect(mockInfo).toHaveBeenCalled();
-    });
-
-    it("should handle errors with stack traces", () => {
-      const error = new Error("Test error");
-      logger.error("Error occurred", error);
-      expect(mockError).toHaveBeenCalled();
-    });
-
-    it("should handle multiple arguments", () => {
-      logger.info("Multiple", "arguments", "test");
-      expect(mockInfo).toHaveBeenCalled();
-    });
-  });
-
-  describe("Message Formatting", () => {
-    it("should log structured data", () => {
-      const metadata = {
-        timestamp: new Date().toISOString(),
-        service: "bot",
-        environment: "test",
-      };
-
-      logger.info("Structured log", metadata);
-      expect(mockInfo).toHaveBeenCalled();
-    });
-
-    it("should handle empty messages", () => {
-      logger.info("");
-      expect(mockInfo).toHaveBeenCalledWith("");
-    });
-  });
-
-  describe("Error Scenarios", () => {
-    it("should log error with stack trace", () => {
-      const error = new Error("Critical error");
-      error.stack = "Error stack trace";
-
-      logger.error("System error", { error });
-      expect(mockError).toHaveBeenCalled();
-    });
-
-    it("should handle null and undefined", () => {
-      logger.info("Null test", null);
-      logger.info("Undefined test", undefined);
-      expect(mockInfo).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  describe("Performance", () => {
-    it("should handle rapid successive logs", () => {
-      // 連続ログ出力時に呼び出し漏れがないことを確認
-      for (let i = 0; i < 100; i++) {
-        logger.info(`Message ${i}`);
-      }
-      expect(mockInfo).toHaveBeenCalledTimes(100);
-    });
-
-    it("should handle large objects", () => {
-      const largeObject = {
-        data: new Array(1000).fill({ key: "value", nested: { deep: true } }),
-      };
-      logger.info("Large object", largeObject);
-      expect(mockInfo).toHaveBeenCalled();
-    });
-  });
-
-  describe("Integration with i18n", () => {
-    it("should work with translated messages", () => {
-      const { tDefault } = require("@/shared/locale");
-      const message = tDefault("system:shutdown.gracefully");
-
-      logger.info(message);
-      expect(mockInfo).toHaveBeenCalledWith(
-        "mocked:system:shutdown.gracefully",
-      );
-    });
+    const createLoggerArgs = createLoggerMock.mock.calls[0][0];
+    expect(createLoggerArgs.level).toBe("info");
+    expect(createLoggerArgs.transports).toHaveLength(3);
   });
 });

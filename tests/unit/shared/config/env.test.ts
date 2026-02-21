@@ -186,4 +186,46 @@ describe("Environment Configuration", () => {
       expect(env.LOCALE).toBe("en");
     });
   });
+
+  describe("Warning and Failure Paths", () => {
+    it("should warn when JWT_SECRET is missing in non-production", () => {
+      process.env.DISCORD_TOKEN = "a".repeat(50);
+      process.env.DISCORD_APP_ID = "1234567890";
+      process.env.NODE_ENV = "test";
+      delete process.env.JWT_SECRET;
+
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(jest.fn());
+
+      const { env } = require("@/shared/config/env");
+
+      expect(env.NODE_ENV).toBe("test");
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("JWT_SECRET is not set"),
+      );
+    });
+
+    it("should log validation errors and exit when production JWT_SECRET is missing", () => {
+      process.env.DISCORD_TOKEN = "a".repeat(50);
+      process.env.DISCORD_APP_ID = "1234567890";
+      process.env.NODE_ENV = "production";
+      delete process.env.JWT_SECRET;
+
+      const errorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(jest.fn());
+      const exitSpy = jest.spyOn(process, "exit").mockImplementation((() => {
+        throw new Error("EXIT");
+      }) as never);
+
+      expect(() => require("@/shared/config/env")).toThrow("EXIT");
+      expect(errorSpy).toHaveBeenCalledWith(
+        "❌ Environment variable validation failed:",
+      );
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("JWT_SECRET is required in production"),
+      );
+      expect(errorSpy).toHaveBeenCalledWith("\nPlease check your .env file.");
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+  });
 });

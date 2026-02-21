@@ -1,6 +1,142 @@
+import { GuildAfkConfigStore } from "@/shared/database/stores/guildAfkConfigStore";
+import {
+  casUpdateAfkConfig,
+  fetchAfkConfigSnapshot,
+  initializeAfkConfigIfMissing,
+} from "@/shared/database/stores/helpers/afkConfigCas";
+import { DatabaseError } from "@/shared/errors";
+
+jest.mock("@/shared/database/stores/helpers/afkConfigCas", () => ({
+  AFK_CONFIG_CAS_MAX_RETRIES: 3,
+  fetchAfkConfigSnapshot: jest.fn(),
+  initializeAfkConfigIfMissing: jest.fn(),
+  casUpdateAfkConfig: jest.fn(),
+}));
+
 describe("shared/database/stores/guildAfkConfigStore", () => {
-  it("loads module", async () => {
-    const module = await import("@/shared/database/stores/guildAfkConfigStore");
-    expect(module).toBeDefined();
+  const fetchSnapshotMock = fetchAfkConfigSnapshot as jest.MockedFunction<
+    typeof fetchAfkConfigSnapshot
+  >;
+  const initializeIfMissingMock =
+    initializeAfkConfigIfMissing as jest.MockedFunction<
+      typeof initializeAfkConfigIfMissing
+    >;
+  const casUpdateMock = casUpdateAfkConfig as jest.MockedFunction<
+    typeof casUpdateAfkConfig
+  >;
+
+  const createStore = () => {
+    const prisma = {
+      guildConfig: {
+        findUnique: jest.fn(),
+      },
+    };
+    const safeJsonParse = jest.fn();
+
+    const store = new GuildAfkConfigStore(prisma as never, "ja", safeJsonParse);
+    return { store, prisma, safeJsonParse };
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("getAfkConfig returns parsed config or null", async () => {
+    const { store, prisma, safeJsonParse } = createStore();
+    prisma.guildConfig.findUnique.mockResolvedValueOnce({ afkConfig: "{}" });
+    safeJsonParse.mockReturnValueOnce({ enabled: true });
+
+    await expect(store.getAfkConfig("g1")).resolves.toEqual({ enabled: true });
+    expect(prisma.guildConfig.findUnique).toHaveBeenCalledWith({
+      where: { guildId: "g1" },
+      select: { afkConfig: true },
+    });
+
+    prisma.guildConfig.findUnique.mockResolvedValueOnce(null);
+    safeJsonParse.mockReturnValueOnce(undefined);
+    await expect(store.getAfkConfig("g2")).resolves.toBeNull();
+  });
+
+  it("setAfkChannel delegates to updateAfkConfig with enabled=true", async () => {
+    const { store } = createStore();
+    const spy = jest
+      .spyOn(store, "updateAfkConfig")
+      .mockResolvedValue(undefined);
+
+    await store.setAfkChannel("g1", "channel-1");
+    expect(spy).toHaveBeenCalledWith("g1", {
+      enabled: true,
+      channelId: "channel-1",
+    });
+  });
+
+  it("updateAfkConfig initializes when config is missing", async () => {
+    const { store, safeJsonParse } = createStore();
+    fetchSnapshotMock.mockResolvedValueOnce({
+      recordExists: false,
+      rawConfig: null,
+    });
+    safeJsonParse.mockReturnValueOnce(undefined);
+    initializeIfMissingMock.mockResolvedValueOnce(true);
+
+    await expect(
+      store.updateAfkConfig("g1", { enabled: true, channelId: "x" }),
+    ).resolves.toBeUndefined();
+
+    expect(initializeIfMissingMock).toHaveBeenCalledWith(
+      expect.anything(),
+      "g1",
+      "ja",
+      JSON.stringify({ enabled: true, channelId: "x" }),
+      false,
+    );
+  });
+
+  it("updateAfkConfig returns early when merged config does not change", async () => {
+    const { store, safeJsonParse } = createStore();
+    const raw = '{"enabled":true,"channelId":"x"}';
+    fetchSnapshotMock.mockResolvedValueOnce({
+      recordExists: true,
+      rawConfig: raw,
+    });
+    safeJsonParse.mockReturnValueOnce({ enabled: true, channelId: "x" });
+
+    await expect(
+      store.updateAfkConfig("g1", { enabled: true, channelId: "x" }),
+    ).resolves.toBeUndefined();
+    expect(casUpdateMock).not.toHaveBeenCalled();
+  });
+
+  it("updateAfkConfig performs CAS update and succeeds", async () => {
+    const { store, safeJsonParse } = createStore();
+    const raw = '{"enabled":false,"channelId":"x"}';
+    fetchSnapshotMock.mockResolvedValueOnce({
+      recordExists: true,
+      rawConfig: raw,
+    });
+    safeJsonParse.mockReturnValueOnce({ enabled: false, channelId: "x" });
+    casUpdateMock.mockResolvedValueOnce(true);
+
+    await expect(
+      store.updateAfkConfig("g1", { enabled: true }),
+    ).resolves.toBeUndefined();
+    expect(casUpdateMock).toHaveBeenCalledWith(
+      expect.anything(),
+      "g1",
+      raw,
+      '{"enabled":true,"channelId":"x"}',
+    );
+  });
+
+  it("updateAfkConfig throws DatabaseError when conflicts persist", async () => {
+    const { store, safeJsonParse } = createStore();
+    const raw = '{"enabled":false}';
+    fetchSnapshotMock.mockResolvedValue({ recordExists: true, rawConfig: raw });
+    safeJsonParse.mockReturnValue({ enabled: false });
+    casUpdateMock.mockResolvedValue(false);
+
+    await expect(
+      store.updateAfkConfig("g1", { enabled: true }),
+    ).rejects.toBeInstanceOf(DatabaseError);
   });
 });
