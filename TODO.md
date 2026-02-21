@@ -173,84 +173,86 @@
 
 ## 🔧 技術的改善タスク
 
-### src整備スプリント（第1フェーズ / 完了）
+### src整備スプリント（再定義 / コミット単位）
 
-> 目的: 責務分離・依存境界・ディレクトリ構成を固定し、既存実装をテストしやすい構造へ収束させる。
+> 目的: `src/` の責務分離・依存境界・公開面・命名を再固定し、薄い入口 + ユースケース分離 + 明示DIを徹底する。
 
-#### 実施ポリシー
+#### 実施ポリシー（厳守）
 
-- [ ] **P-1: 1コミット1関心**（目安: 3〜8ファイル）
-- [ ] **P-2: 各コミットで `pnpm run typecheck` を通す**
-- [ ] **P-3: 互換レイヤー先行**（resolver追加 → 呼び出し側移行 → 旧fallback縮退）
-- [ ] **P-4: 挙動変更を避ける**（原則リファクタのみ。仕様変更は別コミット）
-- [ ] **P-5: テスト修正はsrc安定後に集中実施**
+- [ ] **SP-1: 1コミット1関心**（目安: 3〜8ファイル）
+- [ ] **SP-2: 各コミットで `pnpm run typecheck` を通す**
+- [ ] **SP-3: src整備中はテスト実行しない**（`test` / `test:watch` / `test:coverage` は禁止）
+- [ ] **SP-4: 挙動変更を避ける**（原則リファクタのみ。仕様追加・仕様変更は別コミット）
+- [ ] **SP-5: 互換レイヤー先行で段階移行**（resolver/adapter追加 → 呼び出し側移行 → 旧経路縮退）
+- [ ] **SP-6: 公開面は最小化**（`index.ts` は外部公開シンボルのみ）
 
-#### コミット単位タスク
+#### 分析サマリー（現状）
 
-- [x] **SR-001** bump-reminder の bot層依存リゾルバ追加
-  - 完了条件: manager/config-service/repository 参照を bot service resolver で解決可能
-  - コミット例: `refactor: bump-reminder 依存解決を bot リゾルバ経由に追加`
+- [ ] **AS-1** 大型ファイルが残存（`300行級`: `guildConfigRepository.ts`, `bumpReminderService.ts`, `bumpReminderConfigService.ts`, `bumpReminderRepository.ts`, `vacConfigCommand.execute.ts`）
+- [ ] **AS-2** `commands` 層の一部にユースケース実装が同居（例: `vacConfigCommand.execute.ts`）
+- [ ] **AS-3** 命名の一貫性に揺れ（`stick` と `sticky` の語彙混在）
+- [ ] **AS-4** `shared/database/index.ts` にグローバルアクセサ依存（`requirePrismaClient`）が残存
+- [ ] **AS-5** `index.ts` の公開境界ルールが feature 間で不均一
 
-- [x] **SR-002** bump-reminder handlers を resolver 経由へ移行
-  - 完了条件: startup/detected/panel 系で direct `getBumpReminder*` 呼び出しを解消
-  - コミット例: `refactor: bump-reminder handlers の依存取得を統一`
+#### コミット単位タスク（src整備本体）
 
-- [x] **SR-003** bump-reminder commands を resolver 経由へ移行
-  - 完了条件: config command 系の依存取得を bot service resolver へ統一
-  - コミット例: `refactor: bump-reminder commands の依存境界を統一`
+- [ ] **SRC-001** ディレクトリ・命名規約の基準を固定（`stick` / `sticky` など語彙統一方針を確定）
+  - 完了条件: `src` 用の命名ルールを TODO 上で明文化し、対象ファイル一覧を確定
+  - コミット例: `docs: src命名規約と改名対象を確定`
 
-- [x] **SR-004** bump-reminder service の fallback 経路を縮退
-  - 完了条件: `requirePrismaClient` 依存の暗黙解決を段階的に排除（互換を維持しつつ縮小）
-  - コミット例: `refactor: bump-reminder service の暗黙依存を縮退`
+- [ ] **SRC-002** `vacConfigCommand.execute.ts` をルーター + サブコマンド usecase へ分割
+  - 完了条件: execute は分岐委譲のみ、create/remove/show は別モジュールへ移動
+  - コミット例: `refactor: vac-config execute を usecase 分割`
 
-- [x] **SR-005** 大型ファイル分割（usecase単位）
-  - 対象: `bumpReminderHandler.ts`（detect / schedule / send / panel）
-  - 完了条件: 入口関数は薄いオーケストレーションのみ
-  - コミット例: `refactor: bump-reminder handler を用途別に分割`
+- [ ] **SRC-003** `bumpReminderService.ts` を orchestrator + usecase/helper へ分割
+  - 完了条件: manager本体は schedule/cancel/restore の調停のみを担当
+  - コミット例: `refactor: bump reminder manager を責務分離`
 
-- [x] **SR-006** エクスポート境界の整理（過剰 re-export 抑制）
-  - 対象: `bot/features/*/index.ts` の公開面
-  - 完了条件: 呼び出し側が必要最小の公開APIのみ参照
-  - コミット例: `refactor: feature index の公開境界を最小化`
+- [ ] **SRC-004** `guildConfigRepository.ts` を facade 化し、機能別委譲を徹底
+  - 完了条件: repository本体からJSON変換・機能別更新責務を分離し、委譲中心へ
+  - コミット例: `refactor: guild config repository を facade 化`
 
-### src整備スプリント（第2フェーズ / コミット単位）
+- [ ] **SRC-005** `bumpReminderRepository.ts` を query/usecase 単位に再分割
+  - 完了条件: pending取得/状態更新/クリーンアップ/ログ整形を独立モジュール化
+  - コミット例: `refactor: bump reminder repository を query 単位で分離`
 
-> 目的: 大型ファイルの責務分離を進め、shared層の暗黙依存をさらに削減し、feature内部公開面も最小化する。
+- [ ] **SRC-006** `shared/database/index.ts` の暗黙DIを縮退し明示注入へ寄せる
+  - 完了条件: 新規呼び出しで `requirePrismaClient` 非依存、段階移行の互換経路を用意
+  - コミット例: `refactor: shared database を明示DI優先へ移行`
 
-#### 実施ポリシー（第2フェーズ）
+- [ ] **SRC-007** feature公開境界を統一（`index.ts` の export を明示限定）
+  - 完了条件: `export *` を段階削除し、外部利用シンボルのみ公開
+  - コミット例: `refactor: feature公開APIを明示exportへ統一`
 
-- [ ] **P2-1: 1コミット1関心**（目安: 3〜8ファイル）
-- [ ] **P2-2: 各コミットで `pnpm run typecheck` を通す**
-- [ ] **P2-3: 挙動変更を避ける**（原則リファクタのみ。仕様変更は別コミット）
-- [ ] **P2-4: 公開境界の縮小を優先**（不要な re-export を段階削除）
-- [ ] **P2-5: テスト修正はフェーズ完了後に集中実施**
+- [ ] **SRC-008** command/event/handler の入口責務を再点検し、過剰処理を feature へ移譲
+  - 完了条件: 入口層は「入力解釈・委譲・共通エラー処理」に限定
+  - コミット例: `refactor: 入口層の責務を委譲中心に整理`
 
-#### コミット単位タスク（第2フェーズ）
+- [ ] **SRC-009** import方向を固定（`bot|web -> shared` のみ）し逆流を検査
+  - 完了条件: 逆依存パターンを検出・解消、例外が必要なら理由を明文化
+  - コミット例: `refactor: import依存方向を固定`
 
-- [x] **NS-001** `GuildBumpReminderConfigStore` をCAS更新ユースケースへ分割
-  - 完了条件: get/update/mutate系を用途別モジュールへ分離し、store本体は委譲中心にする
-  - コミット例: `refactor: bump reminder config store を用途別に分割`
+- [ ] **SRC-010** 未使用コード・到達不能分岐・重複ヘルパーを削減してスリム化
+  - 完了条件: dead code を削除し、既存挙動を維持したままファイル/関数を縮約
+  - コミット例: `refactor: src の未使用コードを削除`
 
-- [x] **NS-002** `VacService` を create/delete/cleanup usecase へ分割
-  - 完了条件: `VacService` は薄いオーケストレーションのみを保持する
-  - コミット例: `refactor: vac service をユースケース単位に分割`
+#### src整備完了後タスク（ここからテスト修正へ移行）
 
-- [x] **NS-003** `BumpReminderRepository` のクエリ責務を分割
-  - 完了条件: pending取得/更新/クリーンアップを内部モジュール化し、重複ロギングを削減
-  - コミット例: `refactor: bump reminder repository の責務を整理`
+- [ ] **POST-001** テスト修正フェーズへ移行（このフェーズで初めて `pnpm test` を再開）
+  - 完了条件: import/モック破綻を新境界へ追随、主要回帰（VAC/Bump）を優先修正
+  - コミット例: `test: src整備後の境界に合わせてテストを修正`
 
-- [x] **NS-004** shared DBアクセスの暗黙依存を縮退（`requirePrismaClient` 利用面の縮小）
-  - 完了条件: DB repository生成を明示注入経路に寄せ、global accessor依存を段階削減
-  - コミット例: `refactor: shared database 依存解決の明示化`
+- [ ] **POST-002** コメント規約を `src/` 全体へ反映
+  - 完了条件: ファイル先頭コメント・関数 `@param/@returns`・意図コメントを実装ガイド準拠で適用
+  - コミット例: `docs(code): src へコメント規約を適用`
 
-- [x] **NS-005** feature内部 `index.ts` の過剰 `export *` を抑制
-  - 対象: `bot/features/*/{handlers,services,repositories}/index.ts`
-  - 完了条件: 呼び出し側で使用するシンボルのみ明示export
-  - コミット例: `refactor: feature 内部公開面を最小化`
+- [ ] **POST-003** 実装実態をアーキテクチャガイドへ反映
+  - 完了条件: `docs/guides/ARCHITECTURE.md` の構成図・依存方向・責務説明を更新
+  - コミット例: `docs: architecture guide を現行実装に同期`
 
-- [x] **NS-006** エラー/ログ共通処理の薄いユーティリティ化
-  - 完了条件: repository/service内の重複した try-catch + logger パターンを共通化
-  - コミット例: `refactor: error logging 共通処理を抽出`
+- [ ] **POST-004** 実装実態を実装ガイドラインへ反映
+  - 完了条件: `docs/guides/IMPLEMENTATION_GUIDELINES.md` の分割方針・命名規約・運用手順を更新
+  - コミット例: `docs: implementation guidelines を現行実装に同期`
 
 ### コード品質
 
@@ -323,23 +325,28 @@
 
 ### 直近の推奨作業順序
 
-1. **src整備スプリント第2フェーズの実施（NS-001〜NS-006）**
+1. **src整備スプリント（SRC-001〜SRC-010）を順次実施**
 
-- store/service/repository の大型ファイル分割
-- shared層の暗黙依存の段階縮退
-- feature内部公開境界の最小化
+- `src` 整備中は `typecheck` のみ実施（テスト実行は不可）
+- 大型ファイル分割・明示DI化・公開境界最小化・命名統一を優先
 
-2. **既存実装のテスト修正（src安定後）**
-   - 既存ユニットテストの import/モックを新境界へ追随
-   - VAC/Bump の回帰テストを優先
-   - `typecheck` + `test` を通して基準化
+2. **src整備完了後にテスト修正フェーズ（POST-001）へ移行**
 
-3. **主要機能実装へ復帰（1.2 / 1.3 / 1.4）**
+- 既存ユニットテストの import/モックを新境界へ追随
+- VAC/Bump の回帰テストを優先
+- `typecheck` + `test` を通して基準化
+
+3. **コメント規約反映（POST-002）→ ガイド更新（POST-003/004）**
+
+- `src/` にコメント規約を適用
+- アーキテクチャガイド / 実装ガイドラインを現行実装に同期
+
+4. **主要機能実装へ復帰（1.2 / 1.3 / 1.4）**
    - メッセージ固定
    - メンバーログ
    - メッセージ削除
 
-4. **デプロイ準備の着手条件確認（bot層完了後）**
+5. **デプロイ準備の着手条件確認（bot層完了後）**
    - 1〜3の未完了タスクを解消
    - E2Eテスト（主要機能）を通過
    - カバレッジ目標を達成
@@ -348,4 +355,4 @@
 
 **最終更新**: 2026年2月21日
 **全体進捗**: 残54件（bot優先30件 / デプロイ12件 / Web凍結12件）
-**次のマイルストーン**: src整備スプリント第2フェーズ着手（NS-001〜NS-006）
+**次のマイルストーン**: src整備スプリント実行（SRC-001〜SRC-010）
