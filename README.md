@@ -53,10 +53,9 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 重要メッセージをチャンネル最下部に自動的に再送信して固定表示する機能です。
 
 - 指定メッセージを常にチャンネル最下部に表示
-- 新規メッセージ投稿時に自動再送信
-- `/sticky-message` コマンドで管理
-
-> 📋 **機能は仕様書作成済みで、現在実装中です**
+- 新規メッセージ投稿時に自動再送信（デバウンス5秒）
+- `/sticky-message` コマンドで管理（set / remove / update / view）
+- プレーンテキスト・Embed形式両対応
 
 [📖 詳細仕様](docs/specs/STICKY_MESSAGE_SPEC.md)
 
@@ -137,7 +136,7 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 
 ### 開発ツール
 
-- **Jest** - テストフレームワーク
+- **Vitest** - テストフレームワーク（ユニット・インテグレーション・E2E）
 - **ESLint + Prettier** - コード品質とフォーマット
 - **tsx** - TypeScript高速実行
 - **tsc-watch** - ファイル監視ビルド
@@ -226,7 +225,7 @@ guild-mng-bot-v2/
 │   │   ├── client.ts
 │   │   ├── commands/         # スラッシュコマンド定義
 │   │   ├── events/           # イベントハンドラ
-│   │   ├── features/         # 機能モジュール（afk / vac / bump-reminder / ping）
+│   │   ├── features/         # 機能モジュール（機能ごとのユースケース・ハンドラ・リポジトリ）
 │   │   ├── handlers/         # インタラクション処理フロー
 │   │   ├── services/         # Bot起動・依存解決
 │   │   ├── errors/           # エラーハンドラ
@@ -241,7 +240,7 @@ guild-mng-bot-v2/
 │   └── shared/               # 共有コード
 │       ├── config/           # 環境変数定義
 │       ├── database/         # Repository・Store・型定義
-│       ├── features/         # 共有サービス（vac / bump-reminder）
+        ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
 │       ├── locale/           # i18n（i18next）
 │       ├── scheduler/        # ジョブスケジューラ
 │       ├── errors/           # カスタムエラー・エラーハンドラ
@@ -360,7 +359,8 @@ REST Client拡張機能で「Send Request」をクリックするだけでテス
 - ✅ Phase 1: 基盤実装完了（ロガー、Bot基盤、データベース、i18n、テスト）
 - ✅ Bump Reminder機能実装完了
 - ✅ VAC（VC自動作成）機能実装完了
-- 🚧 Phase 2: メッセージ固定機能、メンバーログ機能、メッセージ削除機能
+- ✅ メッセージ固定機能実装完了（set/remove/update/view）
+- 🚧 Phase 2: メンバーログ機能、メッセージ削除機能
 
 詳細は [TODO.md](TODO.md) を参照してください。
 
@@ -389,4 +389,4 @@ Apache License 2.0 - 詳細は [LICENSE](LICENSE) を参照
 ---
 
 **開発開始**: 2026年2月
-**最終更新**: 2026年2月22日
+**最終更新**: 2026年2月22日（sticky-message 実装完了）

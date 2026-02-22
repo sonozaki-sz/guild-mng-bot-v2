@@ -47,7 +47,18 @@ model BumpReminder {
   @@map("bump_reminders")
 }
 
-// 将来的に追加予定のモデル
-// - VacConfig (VC自動作成設定)
-// - StickyMessageConfig (固定メッセージ設定)
-// - LeaveMemberLogConfig (退出ログ設定)
+// Sticky Message (スティッキーメッセージ)
+model StickyMessage {
+  id            String   @id @default(cuid())
+  guildId       String   @map("guild_id")
+  channelId     String   @unique @map("channel_id")
+  content       String
+  embedData     String?  @map("embed_data") // JSON文字列
+  updatedBy     String?  @map("updated_by") // 最終設定・更新者の Discord ユーザーID
+  lastMessageId String?  @map("last_message_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([guildId])
+  @@map("sticky_messages")
+}

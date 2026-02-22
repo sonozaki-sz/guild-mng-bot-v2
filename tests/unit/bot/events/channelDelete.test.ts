@@ -1,11 +1,20 @@
 import { channelDeleteEvent } from "@/bot/events/channelDelete";
 import { ChannelType, Events } from "discord.js";
 const handleVacChannelDeleteMock = vi.fn();
+const handleStickyMessageChannelDeleteMock = vi.fn();
 
 vi.mock("@/bot/features/vac/handlers/vacChannelDelete", () => ({
   handleVacChannelDelete: (...args: unknown[]) =>
     handleVacChannelDeleteMock(...args),
 }));
+
+vi.mock(
+  "@/bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler",
+  () => ({
+    handleStickyMessageChannelDelete: (...args: unknown[]) =>
+      handleStickyMessageChannelDeleteMock(...args),
+  }),
+);
 
 type ChannelLike = {
   guildId: string;
@@ -43,5 +52,14 @@ describe("bot/events/channelDelete", () => {
     await channelDeleteEvent.execute(channel as never);
 
     expect(handleVacChannelDeleteMock).toHaveBeenCalledWith(channel);
+  });
+
+  // スティッキーメッセージのクリーンアップハンドラーへ委譲されることを検証
+  it("delegates channel to sticky-message channel-delete handler", async () => {
+    const channel = createChannel({ type: ChannelType.GuildText });
+
+    await channelDeleteEvent.execute(channel as never);
+
+    expect(handleStickyMessageChannelDeleteMock).toHaveBeenCalledWith(channel);
   });
 });

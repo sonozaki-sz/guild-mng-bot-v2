@@ -3,6 +3,7 @@ import { afkConfigCommand } from "@/bot/commands/afk-config";
 import { bumpReminderConfigCommand } from "@/bot/commands/bump-reminder-config";
 import { commands } from "@/bot/commands/commands";
 import { pingCommand } from "@/bot/commands/ping";
+import { stickyMessageCommand } from "@/bot/commands/sticky-message";
 import { vacCommand } from "@/bot/commands/vac";
 import { vacConfigCommand } from "@/bot/commands/vac-config";
 
@@ -15,6 +16,9 @@ vi.mock("@/bot/commands/afk-config", () => ({
 }));
 vi.mock("@/bot/commands/bump-reminder-config", () => ({
   bumpReminderConfigCommand: { data: { name: "bump-reminder-config" } },
+}));
+vi.mock("@/bot/commands/sticky-message", () => ({
+  stickyMessageCommand: { data: { name: "sticky-message" } },
 }));
 vi.mock("@/bot/commands/vac", () => ({
   vacCommand: { data: { name: "vac" } },
@@ -33,6 +37,7 @@ describe("bot/commands index", () => {
       afkCommand,
       afkConfigCommand,
       bumpReminderConfigCommand,
+      stickyMessageCommand,
       vacCommand,
       vacConfigCommand,
       pingCommand,

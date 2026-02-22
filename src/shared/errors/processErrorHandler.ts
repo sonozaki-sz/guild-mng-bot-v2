@@ -28,6 +28,15 @@ const PROCESS_ERROR_CONSTANTS = {
   },
 } as const;
 
+/**
+ * 依存ライブラリ由来の既知 DeprecationWarning コード
+ * これらは自コードでは修正できないため記録をスキップする
+ */
+const IGNORED_DEPRECATION_CODES = new Set([
+  // TODO: discord.js が punycode 依存を解消したら DEP0040 を削除する
+  "DEP0040", // punycode（discord.js 依存のライブラリが使用）
+]);
+
 // setupGlobalErrorHandlers の重複登録を防ぐフラグ
 let _globalHandlersRegistered = false;
 // setupGracefulShutdown の重複登録を防ぐフラグ
@@ -76,10 +85,16 @@ export const setupGlobalErrorHandlers = (): void => {
     },
   );
 
-  // Node 警告を記録
+  // Node 警告を記録（依存ライブラリ由来の既知 DeprecationWarning は無視）
   process.on(
     PROCESS_ERROR_CONSTANTS.PROCESS_EVENT.WARNING,
-    (warning: Error) => {
+    (warning: Error & { code?: string }) => {
+      if (
+        warning.name === "DeprecationWarning" &&
+        IGNORED_DEPRECATION_CODES.has(warning.code ?? "")
+      ) {
+        return;
+      }
       logger.warn(tDefault("system:error.node_warning"), {
         name: warning.name,
         message: warning.message,

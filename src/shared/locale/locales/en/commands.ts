@@ -139,6 +139,91 @@ export const commands = {
   "vac.panel.limit_button": "Change User Limit",
   "vac.panel.afk_button": "Move Members to AFK",
   "vac.panel.refresh_button": "Move Panel to Bottom",
+
+  // Sticky Message command
+  "sticky-message.description":
+    "Manage sticky messages (pinned to channel bottom) — requires Manage Channels",
+  // set subcommand
+  "sticky-message.set.description": "Set a sticky message (modal input)",
+  "sticky-message.set.channel.description":
+    "Text channel to set the sticky message in (defaults to this channel)",
+  "sticky-message.set.embed.description":
+    "Set as embed format (true: embed modal / false: plain text modal)",
+  // set plain text modal
+  "sticky-message.set.modal.title": "Enter sticky message content",
+  "sticky-message.set.modal.message.label": "Message content",
+  "sticky-message.set.modal.message.placeholder":
+    "Supports multiple lines (max 2000 characters)",
+  // set embed modal
+  "sticky-message.set.embed-modal.title": "Set embed sticky message",
+  "sticky-message.set.embed-modal.embed-title.label": "Title",
+  "sticky-message.set.embed-modal.embed-title.placeholder":
+    "Embed title (optional)",
+  "sticky-message.set.embed-modal.embed-description.label": "Description",
+  "sticky-message.set.embed-modal.embed-description.placeholder":
+    "Embed body text (leave blank for none)",
+  "sticky-message.set.embed-modal.embed-color.label": "Color code",
+  "sticky-message.set.embed-modal.embed-color.placeholder":
+    "#5865F2 or 0x5865F2 (leave blank for default)",
+  "sticky-message.set.success.title": "Done",
+  "sticky-message.set.success.description": "Sticky message has been set.",
+  "sticky-message.set.alreadyExists.title": "Warning",
+  "sticky-message.set.alreadyExists.description":
+    "A sticky message is already configured for this channel. Remove it first before setting a new one.",
+  // remove subcommand
+  "sticky-message.remove.description": "Remove a sticky message",
+  "sticky-message.remove.channel.description":
+    "Text channel to remove the sticky message from",
+  "sticky-message.remove.success.title": "Removed",
+  "sticky-message.remove.success.description":
+    "Sticky message has been removed.",
+  "sticky-message.remove.notFound.title": "Not Found",
+  "sticky-message.remove.notFound.description":
+    "No sticky message is configured for this channel.",
+
+  // errors
+  "sticky-message.errors.permissionDenied":
+    "You do not have permission to do this. Manage Channels permission is required.",
+  "sticky-message.errors.emptyMessage": "Please enter a message.",
+  "sticky-message.errors.text_channel_only":
+    "Sticky messages can only be set in text channels.",
+  "sticky-message.errors.failed":
+    "An error occurred while managing the sticky message.",
+  // view subcommand
+  "sticky-message.view.description":
+    "View sticky message settings (channel select UI)",
+  "sticky-message.view.title": "Sticky Message Settings",
+  "sticky-message.view.select.placeholder": "Select a channel",
+  "sticky-message.view.notFound.title": "Not Configured",
+  "sticky-message.view.empty":
+    "No sticky messages are configured for any channel.",
+  "sticky-message.view.field.channel": "Channel",
+  "sticky-message.view.field.format": "Format",
+  "sticky-message.view.field.format_plain": "Plain text",
+  "sticky-message.view.field.format_embed": "Embed",
+  "sticky-message.view.field.updated_at": "Last updated",
+  "sticky-message.view.field.updated_by": "Set by",
+  "sticky-message.view.field.content": "Message content",
+  "sticky-message.view.field.embed_title": "Embed title",
+  "sticky-message.view.field.embed_color": "Embed color",
+  // update subcommand
+  "sticky-message.update.description":
+    "Update the content of an existing sticky message (modal input)",
+  "sticky-message.update.channel.description":
+    "Channel whose sticky message to update (defaults to this channel)",
+  "sticky-message.update.embed.description":
+    "Update as embed format (true: embed modal / false: plain text modal)",
+  // update plain text modal
+  "sticky-message.update.modal.title": "Update sticky message",
+  "sticky-message.update.modal.message.label": "Message content",
+  "sticky-message.update.modal.message.placeholder":
+    "Supports multiple lines (max 2000 characters)",
+  // update embed modal
+  "sticky-message.update.embed-modal.title": "Update embed sticky message",
+  "sticky-message.update.success.title": "Updated",
+  "sticky-message.update.success.description":
+    "Sticky message has been updated.",
+  "sticky-message.update.notFound.title": "Not Configured",
 } as const;
 
 export type CommandsTranslations = typeof commands;

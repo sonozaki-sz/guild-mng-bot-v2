@@ -5,6 +5,7 @@ const handleButtonMock: Mock = vi.fn();
 const handleChatInputCommandMock: Mock = vi.fn();
 const handleModalSubmitMock: Mock = vi.fn();
 const handleUserSelectMenuMock: Mock = vi.fn();
+const handleStringSelectMenuMock: Mock = vi.fn();
 
 vi.mock("@/bot/handlers/interactionCreate/flow/command", () => ({
   handleAutocomplete: (...args: unknown[]) => handleAutocompleteMock(...args),
@@ -20,6 +21,8 @@ vi.mock("@/bot/handlers/interactionCreate/flow/components", () => ({
   handleButton: (...args: unknown[]) => handleButtonMock(...args),
   handleUserSelectMenu: (...args: unknown[]) =>
     handleUserSelectMenuMock(...args),
+  handleStringSelectMenu: (...args: unknown[]) =>
+    handleStringSelectMenuMock(...args),
 }));
 
 describe("bot/handlers/interactionCreate/index", () => {
@@ -57,11 +60,32 @@ describe("bot/handlers/interactionCreate/index", () => {
       isModalSubmit: () => false,
       isButton: () => false,
       isUserSelectMenu: () => true,
+      isStringSelectMenu: () => false,
     };
 
     await handleInteractionCreate(interaction as never);
 
     expect(handleUserSelectMenuMock).toHaveBeenCalledTimes(1);
     expect(handleButtonMock).not.toHaveBeenCalled();
+  });
+
+  it("routes string select menu to string select handler", async () => {
+    const { handleInteractionCreate } =
+      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+
+    const interaction = {
+      client: {},
+      isChatInputCommand: () => false,
+      isAutocomplete: () => false,
+      isModalSubmit: () => false,
+      isButton: () => false,
+      isUserSelectMenu: () => false,
+      isStringSelectMenu: () => true,
+    };
+
+    await handleInteractionCreate(interaction as never);
+
+    expect(handleStringSelectMenuMock).toHaveBeenCalledTimes(1);
+    expect(handleUserSelectMenuMock).not.toHaveBeenCalled();
   });
 });

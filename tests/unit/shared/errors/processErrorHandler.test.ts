@@ -168,6 +168,36 @@ describe("shared/errors/processErrorHandler", () => {
     );
   });
 
+  it("ignores known DeprecationWarning codes (DEP0040 punycode)", async () => {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    vi.spyOn(process, "on").mockImplementation(((
+      event: string,
+      listener: (...args: unknown[]) => void,
+    ) => {
+      handlers.set(event, listener);
+      return process;
+    }) as typeof process.on);
+
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGlobalErrorHandlers();
+
+    const warningHandler = handlers.get("warning");
+    expect(warningHandler).toBeDefined();
+
+    const deprecation = Object.assign(
+      new Error("The `punycode` module is deprecated."),
+      {
+        name: "DeprecationWarning",
+        code: "DEP0040",
+      },
+    );
+    warningHandler?.(deprecation);
+
+    // DEP0040 は無視するため warn が呼ばれないこと
+    expect(loggerMock.warn).not.toHaveBeenCalled();
+  });
+
   it("registers graceful shutdown once and handles cleanup outcomes", async () => {
     const onceHandlers = new Map<string, () => void>();
     vi.spyOn(process, "once").mockImplementation(((
@@ -256,9 +286,9 @@ describe("shared/errors/processErrorHandler", () => {
       onceHandlers.set(event, listener);
       return process;
     }) as typeof process.once);
-    vi
-      .spyOn(process, "exit")
-      .mockImplementation((() => undefined as never) as typeof process.exit);
+    vi.spyOn(process, "exit").mockImplementation(
+      (() => undefined as never) as typeof process.exit,
+    );
 
     let resolveCleanup: (() => void) | undefined;
     const cleanup = vi.fn(

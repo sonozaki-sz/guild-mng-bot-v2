@@ -2,7 +2,7 @@
 
 > プロジェクト全体のタスク管理と残件リスト
 
-最終更新: 2026年2月22日
+最終更新: 2026年2月22日（sticky-message 実装完了）
 
 ---
 
@@ -10,8 +10,8 @@
 
 ### 残タスク統計
 
-- 残タスク合計: **52件**
-- bot優先対象（1～3）: **28件**
+- 残タスク合計: **48件**
+- bot優先対象（1～3）: **24件**
 - デプロイ・運用（4）: **12件**
 - Web UI実装（5 / 凍結中）: **12件**
 
@@ -19,7 +19,7 @@
 
 | No. | 内容               | 残件 | 状態 |
 | --- | ------------------ | ---- | ---- |
-| 1   | 主要機能実装       | 14   | 🚧   |
+| 1   | 主要機能実装       | 10   | 🚧   |
 | 2   | 基本コマンド追加   | 6    | 📋   |
 | 3   | テスト・品質向上   | 8    | 🚧   |
 | 4   | デプロイ・運用     | 12   | 📋   |
@@ -42,12 +42,14 @@
 
 **仕様書**: [docs/specs/VAC_SPEC.md](docs/specs/VAC_SPEC.md)
 
-#### 1.2 メッセージ固定機能 - 残4件
+#### 1.2 メッセージ固定機能 - ✅ 完了
 
-- [ ] `/sticky-message` コマンド実装（set、remove、list）
-- [ ] messageCreateイベントでの自動再送信ロジック
-- [ ] Prisma Schema更新（StickyMessage）
-- [ ] テスト実装
+- [x] `/sticky-message` コマンド実装（set、remove、update、view）
+- [x] messageCreateイベントでの自動再送信ロジック（`StickyMessageResendService`）
+- [x] Prisma Schema更新（StickyMessage テーブル、`updatedBy` フィールド含む）
+- [x] `updatedBy` フィールド: 設定・更新時の操作ユーザー ID を保存し view で `<@userId>` 表示
+- [x] DB アクセスを shared/features ・ configService 経由に統一（commit `1c197d4`）
+- [x] テスト実装
 
 **仕様書**: [docs/specs/STICKY_MESSAGE_SPEC.md](docs/specs/STICKY_MESSAGE_SPEC.md)
 
@@ -83,7 +85,7 @@
 
 ### 3. テスト・品質向上 - 残8件
 
-**状況**: ユニットテスト＋インテグレーションテストで805テスト実装済み（185 suites, 全件PASS）。
+**状況**: ユニットテスト＋インテグレーションテストで821テスト実装済み（188 suites, 全件PASS）。
 
 #### 3.1 テストカバレッジ向上 - 残4件
 
@@ -314,5 +316,5 @@
 ---
 
 **最終更新**: 2026年2月22日
-**全体進捗**: src再監査完了、テスト再編（unit/integrationフェーズ）完了、`index.ts`撤廃スプリント完了
-**次のマイルストーン**: E2E初期シナリオ（Bump）追加
+**全体進捗**: src再監査完了、テスト再編（unit/integrationフェーズ）完了、`index.ts`撃廣スプリント完了、メッセージ固定機能実装完了（DBアクセス shared 層経由に統一）
+**次のマイルストーン**: メンバーログ機能実装

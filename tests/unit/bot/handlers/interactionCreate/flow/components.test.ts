@@ -1,9 +1,10 @@
-import type { Mock } from "vitest";
 import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
 import {
   handleButton,
+  handleStringSelectMenu,
   handleUserSelectMenu,
 } from "@/bot/handlers/interactionCreate/flow/components";
+import type { Mock } from "vitest";
 
 const loggerErrorMock = vi.fn();
 
@@ -41,6 +42,12 @@ vi.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => ({
       execute: vi.fn().mockResolvedValue(undefined),
     },
   ],
+  stringSelectHandlers: [
+    {
+      matches: vi.fn((id: string) => id === "target"),
+      execute: vi.fn().mockResolvedValue(undefined),
+    },
+  ],
 }));
 
 describe("bot/handlers/interactionCreate/flow/components", () => {
@@ -50,9 +57,9 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
 
   it("executes first matching button handler only", async () => {
     const interaction = { customId: "target" };
-    const uiModule = await vi.importMock(
+    const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
-    ) as { buttonHandlers: Array<{ execute: Mock }> };
+    )) as { buttonHandlers: Array<{ execute: Mock }> };
 
     await handleButton(interaction as never);
 
@@ -64,9 +71,9 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
 
   it("delegates button handler error to interaction error handler", async () => {
     const error = new Error("button failed");
-    const uiModule = await vi.importMock(
+    const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
-    ) as { buttonHandlers: Array<{ execute: Mock }> };
+    )) as { buttonHandlers: Array<{ execute: Mock }> };
     uiModule.buttonHandlers[0].execute.mockRejectedValueOnce(error);
     const interaction = { customId: "target" };
 
@@ -78,13 +85,26 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
 
   it("executes matching user-select handler", async () => {
     const interaction = { customId: "target" };
-    const uiModule = await vi.importMock(
+    const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
-    ) as { userSelectHandlers: Array<{ execute: Mock }> };
+    )) as { userSelectHandlers: Array<{ execute: Mock }> };
 
     await handleUserSelectMenu(interaction as never);
 
     expect(uiModule.userSelectHandlers[0].execute).toHaveBeenCalledWith(
+      interaction,
+    );
+  });
+
+  it("executes matching string-select handler", async () => {
+    const interaction = { customId: "target" };
+    const uiModule = (await vi.importMock(
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
+    )) as { stringSelectHandlers: Array<{ execute: Mock }> };
+
+    await handleStringSelectMenu(interaction as never);
+
+    expect(uiModule.stringSelectHandlers[0].execute).toHaveBeenCalledWith(
       interaction,
     );
   });

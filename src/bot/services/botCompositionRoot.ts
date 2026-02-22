@@ -3,14 +3,18 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
 import { localeManager } from "../../shared/locale/localeManager";
 import { getBumpReminderRepository } from "../features/bump-reminder/repositories/bumpReminderRepository";
-import {
-  getBumpReminderFeatureConfigService,
-} from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
+import { getBumpReminderFeatureConfigService } from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
 import { getBumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
-import { createVacRepository, getVacRepository } from "../features/vac/repositories/vacRepository";
+import { getStickyMessageRepository } from "../features/sticky-message/repositories/stickyMessageRepository";
+import { getStickyMessageResendService } from "../features/sticky-message/services/stickyMessageResendService";
+import {
+  createVacRepository,
+  getVacRepository,
+} from "../features/vac/repositories/vacRepository";
 import { getVacService } from "../features/vac/services/vacService";
 import {
   setBotBumpReminderConfigService,
@@ -18,6 +22,11 @@ import {
   setBotBumpReminderRepository,
 } from "./botBumpReminderDependencyResolver";
 import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
+import {
+  setBotStickyMessageConfigService,
+  setBotStickyMessageRepository,
+  setBotStickyMessageResendService,
+} from "./botStickyMessageDependencyResolver";
 import {
   setBotVacRepository,
   setBotVacService,
@@ -50,4 +59,16 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
   const vacService = getVacService(vacRepository);
   setBotVacRepository(vacRepository);
   setBotVacService(vacService);
+
+  // StickyMessage のリポジトリ/設定サービス/再送信サービスを初期化
+  const stickyMessageRepository = getStickyMessageRepository(prisma);
+  const stickyMessageConfigService = createStickyMessageConfigService(
+    stickyMessageRepository,
+  );
+  const stickyMessageResendService = getStickyMessageResendService(
+    stickyMessageRepository,
+  );
+  setBotStickyMessageRepository(stickyMessageRepository);
+  setBotStickyMessageConfigService(stickyMessageConfigService);
+  setBotStickyMessageResendService(stickyMessageResendService);
 }

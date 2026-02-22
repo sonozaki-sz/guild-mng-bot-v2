@@ -3,12 +3,10 @@
 
 import type { Interaction } from "discord.js";
 import type { BotClient } from "../../client";
-import {
-  handleAutocomplete,
-  handleChatInputCommand,
-} from "./flow/command";
+import { handleAutocomplete, handleChatInputCommand } from "./flow/command";
 import {
   handleButton,
+  handleStringSelectMenu,
   handleUserSelectMenu,
 } from "./flow/components";
 import { handleModalSubmit } from "./flow/modal";
@@ -45,5 +43,10 @@ export async function handleInteractionCreate(
 
   if (interaction.isUserSelectMenu()) {
     await handleUserSelectMenu(interaction);
+    return;
+  }
+
+  if (interaction.isStringSelectMenu()) {
+    await handleStringSelectMenu(interaction);
   }
 }

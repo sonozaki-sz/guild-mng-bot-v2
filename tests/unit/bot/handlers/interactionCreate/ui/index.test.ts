@@ -10,5 +10,6 @@ describe("bot/handlers/interactionCreate/ui/index", () => {
     expect(buttonsModule.buttonHandlers).toBeDefined();
     expect(modalsModule.modalHandlers).toBeDefined();
     expect(selectMenusModule.userSelectHandlers).toBeDefined();
+    expect(selectMenusModule.stringSelectHandlers).toBeDefined();
   });
 });

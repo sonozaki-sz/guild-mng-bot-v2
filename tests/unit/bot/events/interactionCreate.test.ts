@@ -1,4 +1,3 @@
-import type { Mock } from "vitest";
 import {
   handleCommandError,
   handleInteractionError,
@@ -7,6 +6,7 @@ import { interactionCreateEvent } from "@/bot/events/interactionCreate";
 import { tGuild } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
 import { Events, MessageFlags } from "discord.js";
+import type { Mock } from "vitest";
 
 // ErrorHandler は呼び出し有無の検証に限定する
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({
@@ -56,9 +56,15 @@ vi.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => {
     matches: vi.fn(() => false),
     execute: vi.fn().mockResolvedValue(undefined),
   };
+  const mockStringSelectHandler = {
+    matches: vi.fn(() => false),
+    execute: vi.fn().mockResolvedValue(undefined),
+  };
   return {
     userSelectHandlers: [mockUserSelectHandler],
     __mockUserSelectHandler: mockUserSelectHandler,
+    stringSelectHandlers: [mockStringSelectHandler],
+    __mockStringSelectHandler: mockStringSelectHandler,
   };
 });
 
@@ -78,6 +84,7 @@ type BaseInteraction = {
   isModalSubmit: Mock<() => boolean>;
   isButton: Mock<() => boolean>;
   isUserSelectMenu: Mock<() => boolean>;
+  isStringSelectMenu: Mock<() => boolean>;
 };
 
 // interactionCreate 用の最小 interaction を共通化して分岐設定を容易にする
@@ -100,6 +107,7 @@ function createInteraction(
     isModalSubmit: vi.fn(() => false),
     isButton: vi.fn(() => false),
     isUserSelectMenu: vi.fn(() => false),
+    isStringSelectMenu: vi.fn(() => false),
     ...overrides,
   };
 }
@@ -143,9 +151,9 @@ describe("bot/events/interactionCreate", () => {
 
   // モーダルは registry の prefix match を優先して実行されることを確認する
   it("routes modal submit to registry handler first", async () => {
-    const mockedModalModule = await vi.importMock(
+    const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       __mockModalHandler: {
         matches: Mock<(s: string) => boolean>;
         execute: Mock<(arg: unknown) => Promise<void>>;
@@ -168,9 +176,9 @@ describe("bot/events/interactionCreate", () => {
 
   // modal registry 実行失敗時は interaction error ハンドラへ委譲されることを検証
   it("delegates modal registry handler error to interaction error handler", async () => {
-    const mockedModalModule = await vi.importMock(
+    const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       __mockModalHandler: {
         matches: Mock<(s: string) => boolean>;
         execute: Mock<(arg: unknown) => Promise<void>>;
@@ -196,9 +204,9 @@ describe("bot/events/interactionCreate", () => {
 
   // ボタン実行失敗時は handleInteractionError にフォールバックすることを検証する
   it("delegates button handler error to interaction error handler", async () => {
-    const mockedButtonModule = await vi.importMock(
+    const mockedButtonModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
-    ) as {
+    )) as {
       __mockButtonHandler: {
         matches: Mock<(s: string) => boolean>;
         execute: Mock<(arg: unknown) => Promise<void>>;
@@ -359,9 +367,9 @@ describe("bot/events/interactionCreate", () => {
 
   // modal registry 非一致時は client.modals を使わず警告して終了することを検証
   it("does not use client modal collection when registry has no match", async () => {
-    const mockedModalModule = await vi.importMock(
+    const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       __mockModalHandler: {
         matches: Mock<(s: string) => boolean>;
       };
@@ -385,9 +393,9 @@ describe("bot/events/interactionCreate", () => {
 
   // modal fallback でも見つからない場合は警告して終了することを検証
   it("warns when modal is unknown in both registry and collection", async () => {
-    const mockedModalModule = await vi.importMock(
+    const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       __mockModalHandler: {
         matches: Mock<(s: string) => boolean>;
       };
@@ -408,9 +416,9 @@ describe("bot/events/interactionCreate", () => {
 
   // registry 非一致時は fallback モーダルの失敗も発生せず interaction error へ委譲しない
   it("does not delegate modal collection errors when registry has no match", async () => {
-    const mockedModalModule = await vi.importMock(
+    const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       __mockModalHandler: {
         matches: Mock<(s: string) => boolean>;
       };
@@ -433,9 +441,9 @@ describe("bot/events/interactionCreate", () => {
 
   // user select ハンドラ成功時に execute が呼ばれることを検証
   it("routes user select menu to handler", async () => {
-    const mockedSelectModule = await vi.importMock(
+    const mockedSelectModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
-    ) as {
+    )) as {
       __mockUserSelectHandler: {
         matches: Mock<(s: string) => boolean>;
         execute: Mock<(arg: unknown) => Promise<void>>;
@@ -457,9 +465,9 @@ describe("bot/events/interactionCreate", () => {
 
   // user select ハンドラ失敗時は interaction error ハンドラへ委譲することを検証
   it("delegates user select handler error to interaction error handler", async () => {
-    const mockedSelectModule = await vi.importMock(
+    const mockedSelectModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
-    ) as {
+    )) as {
       __mockUserSelectHandler: {
         matches: Mock<(s: string) => boolean>;
         execute: Mock<(arg: unknown) => Promise<void>>;
@@ -486,9 +494,9 @@ describe("bot/events/interactionCreate", () => {
 
   // ボタンハンドラ未一致時は何も実行しないことを検証
   it("does nothing when no button handler matches", async () => {
-    const mockedButtonModule = await vi.importMock(
+    const mockedButtonModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
-    ) as {
+    )) as {
       __mockButtonHandler: {
         matches: Mock<(s: string) => boolean>;
         execute: Mock<(arg: unknown) => Promise<void>>;
@@ -511,9 +519,9 @@ describe("bot/events/interactionCreate", () => {
 
   // ユーザーセレクトハンドラ未一致時は何も実行しないことを検証
   it("does nothing when no user select handler matches", async () => {
-    const mockedSelectModule = await vi.importMock(
+    const mockedSelectModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
-    ) as {
+    )) as {
       __mockUserSelectHandler: {
         matches: Mock<(s: string) => boolean>;
         execute: Mock<(arg: unknown) => Promise<void>>;

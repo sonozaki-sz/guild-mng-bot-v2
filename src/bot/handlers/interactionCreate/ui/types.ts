@@ -4,6 +4,7 @@
 import type {
   ButtonInteraction,
   ModalSubmitInteraction,
+  StringSelectMenuInteraction,
   UserSelectMenuInteraction,
 } from "discord.js";
 
@@ -26,4 +27,11 @@ export interface UserSelectHandler {
   matches: (customId: string) => boolean;
   // 対象ユーザー選択 interaction の処理本体
   execute: (interaction: UserSelectMenuInteraction) => Promise<void>;
+}
+
+export interface StringSelectHandler {
+  // customId がこのハンドラ対象かを判定
+  matches: (customId: string) => boolean;
+  // 対象文字列選択 interaction の処理本体
+  execute: (interaction: StringSelectMenuInteraction) => Promise<void>;
 }

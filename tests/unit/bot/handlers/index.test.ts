@@ -1,4 +1,8 @@
 import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
+import { stickyMessageSetEmbedModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler";
+import { stickyMessageSetModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler";
+import { stickyMessageUpdateEmbedModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler";
+import { stickyMessageUpdateModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler";
 import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
 import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
 import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
@@ -16,15 +20,12 @@ vi.mock(
     },
   }),
 );
-vi.mock(
-  "@/bot/features/vac/handlers/ui/vacPanelButton",
-  () => ({
-    vacPanelButtonHandler: {
-      matches: vi.fn(() => true),
-      execute: vi.fn(),
-    },
-  }),
-);
+vi.mock("@/bot/features/vac/handlers/ui/vacPanelButton", () => ({
+  vacPanelButtonHandler: {
+    matches: vi.fn(() => true),
+    execute: vi.fn(),
+  },
+}));
 vi.mock("@/bot/features/vac/handlers/ui/vacPanelModal", () => ({
   vacPanelModalHandler: {
     matches: vi.fn(() => true),
@@ -32,14 +33,47 @@ vi.mock("@/bot/features/vac/handlers/ui/vacPanelModal", () => ({
   },
 }));
 vi.mock(
-  "@/bot/features/vac/handlers/ui/vacPanelUserSelect",
+  "@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
   () => ({
-    vacPanelUserSelectHandler: {
+    stickyMessageSetModalHandler: {
       matches: vi.fn(() => true),
       execute: vi.fn(),
     },
   }),
 );
+vi.mock(
+  "@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler",
+  () => ({
+    stickyMessageSetEmbedModalHandler: {
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
+    },
+  }),
+);
+vi.mock(
+  "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler",
+  () => ({
+    stickyMessageUpdateModalHandler: {
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
+    },
+  }),
+);
+vi.mock(
+  "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler",
+  () => ({
+    stickyMessageUpdateEmbedModalHandler: {
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
+    },
+  }),
+);
+vi.mock("@/bot/features/vac/handlers/ui/vacPanelUserSelect", () => ({
+  vacPanelUserSelectHandler: {
+    matches: vi.fn(() => true),
+    execute: vi.fn(),
+  },
+}));
 
 describe("bot/handlers/interactionCreate/ui", () => {
   // ボタンレジストリに想定ハンドラが登録済みであることを検証する
@@ -50,9 +84,15 @@ describe("bot/handlers/interactionCreate/ui", () => {
     ]);
   });
 
-  // モーダルレジストリに VAC ハンドラが登録されることを検証する
+  // モーダルレジストリに全ハンドラが登録されることを検証する
   it("exports modal handlers", () => {
-    expect(modalHandlers).toEqual([vacPanelModalHandler]);
+    expect(modalHandlers).toEqual([
+      vacPanelModalHandler,
+      stickyMessageSetModalHandler,
+      stickyMessageSetEmbedModalHandler,
+      stickyMessageUpdateModalHandler,
+      stickyMessageUpdateEmbedModalHandler,
+    ]);
   });
 
   // ユーザーセレクトレジストリに VAC ハンドラが登録されることを検証する
