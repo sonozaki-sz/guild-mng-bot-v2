@@ -16,7 +16,7 @@ import type { Command } from "../types/discord";
 const AFK_CONFIG_COMMAND = {
   NAME: "afk-config",
   SUBCOMMAND: {
-    SET_CHANNEL: "set-ch",
+    SET_CHANNEL: "set-channel",
     VIEW: "view",
   },
   OPTION: {
@@ -31,9 +31,11 @@ export const afkConfigCommand: Command = {
   data: (() => {
     // 各ロケール文言を先に解決して SlashCommandBuilder へ流し込む
     const cmdDesc = getCommandLocalizations("afk-config.description");
-    const setChDesc = getCommandLocalizations("afk-config.set-ch.description");
+    const setChannelDesc = getCommandLocalizations(
+      "afk-config.set-channel.description",
+    );
     const channelDesc = getCommandLocalizations(
-      "afk-config.set-ch.channel.description",
+      "afk-config.set-channel.channel.description",
     );
     const viewDesc = getCommandLocalizations("afk-config.view.description");
 
@@ -48,8 +50,8 @@ export const afkConfigCommand: Command = {
           // AFK チャンネル設定
           subcommand
             .setName(AFK_CONFIG_COMMAND.SUBCOMMAND.SET_CHANNEL)
-            .setDescription(setChDesc.ja)
-            .setDescriptionLocalizations(setChDesc.localizations)
+            .setDescription(setChannelDesc.ja)
+            .setDescriptionLocalizations(setChannelDesc.localizations)
             .addChannelOption((option) =>
               option
                 .setName(AFK_CONFIG_COMMAND.OPTION.CHANNEL)

@@ -20,8 +20,8 @@ export const commands = {
   // AFK config command
   // Admin-only AFK configuration labels and result text
   "afk-config.description": "Configure AFK feature (administrators only)",
-  "afk-config.set-ch.description": "Configure AFK channel",
-  "afk-config.set-ch.channel.description": "AFK channel (voice channel)",
+  "afk-config.set-channel.description": "Configure AFK channel",
+  "afk-config.set-channel.channel.description": "AFK channel (voice channel)",
   "afk-config.view.description": "Show current settings",
   "afk-config.embed.title": "AFK",
   "afk-config.embed.success_title": "Settings Updated",

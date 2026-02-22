@@ -66,7 +66,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
   });
 
   it("throws ValidationError when member lacks manage-guild permission", async () => {
-    const interaction = createInteraction("set-ch");
+    const interaction = createInteraction("set-channel");
     interaction.memberPermissions.has.mockReturnValue(false);
 
     await expect(
@@ -77,8 +77,8 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
     );
   });
 
-  it("sets AFK channel and replies success on set-ch", async () => {
-    const interaction = createInteraction("set-ch");
+  it("sets AFK channel and replies success on set-channel", async () => {
+    const interaction = createInteraction("set-channel");
 
     await executeAfkConfigCommand(interaction as never);
 

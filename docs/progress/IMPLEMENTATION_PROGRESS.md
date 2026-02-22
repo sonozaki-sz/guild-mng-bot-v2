@@ -237,7 +237,7 @@
   - エラーハンドリング
   - 多言語対応
 - ✅ `/afk-config` コマンド
-  - サブコマンド: set-ch, show
+  - サブコマンド: set-channel, show
   - AFKチャンネル設定
   - 現在の設定表示
   - Select Menuによるチャンネル選択UI
@@ -683,7 +683,7 @@ model BumpReminder {
 
 - ✅ docs/guides/ARCHITECTURE.md 新規作成（アーキテクチャ・設計概要）
 - ✅ bump-reminder-config サブコマンド名修正: `start/stop` → `enable/disable`
-- ✅ afk-config サブコマンド名修正: `set-channel` → `set-ch`
+- ✅ afk-config サブコマンド名修正: `set-channel` → `set-ch` → `set-channel` (統一)
 - ✅ AFK データベース保存フィールド修正: `afkChannelId` → `afkConfig (JSON)`
 - ✅ `GuildBumpReminderConfigStore.ts` をデータベースセクションへ追記
 - ✅ Bumpリマインダー定数の説明更新（`getReminderDelayMinutes()` / `toScheduledAt()` 等）
