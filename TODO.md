@@ -46,7 +46,9 @@
 
 - [x] `/sticky-message` コマンド実装（set、remove、update、view）
 - [x] messageCreateイベントでの自動再送信ロジック（`StickyMessageResendService`）
-- [x] Prisma Schema更新（StickyMessage）
+- [x] Prisma Schema更新（StickyMessage テーブル、`updatedBy` フィールド含む）
+- [x] `updatedBy` フィールド: 設定・更新時の操作ユーザー ID を保存し view で `<@userId>` 表示
+- [x] DB アクセスを shared/features ・ configService 経由に統一（commit `1c197d4`）
 - [x] テスト実装
 
 **仕様書**: [docs/specs/STICKY_MESSAGE_SPEC.md](docs/specs/STICKY_MESSAGE_SPEC.md)
@@ -83,7 +85,7 @@
 
 ### 3. テスト・品質向上 - 残8件
 
-**状況**: ユニットテスト＋インテグレーションテストで816テスト実装済み（187 suites, 全件PASS）。
+**状況**: ユニットテスト＋インテグレーションテストで821テスト実装済み（188 suites, 全件PASS）。
 
 #### 3.1 テストカバレッジ向上 - 残4件
 
@@ -314,5 +316,5 @@
 ---
 
 **最終更新**: 2026年2月22日
-**全体進捗**: src再監査完了、テスト再編（unit/integrationフェーズ）完了、`index.ts`撤廃スプリント完了、メッセージ固定機能実装完了
+**全体進捗**: src再監査完了、テスト再編（unit/integrationフェーズ）完了、`index.ts`撃廣スプリント完了、メッセージ固定機能実装完了（DBアクセス shared 層経由に統一）
 **次のマイルストーン**: メンバーログ機能実装

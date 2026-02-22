@@ -136,7 +136,7 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 
 ### 開発ツール
 
-- **Jest** - テストフレームワーク
+- **Vitest** - テストフレームワーク（ユニット・インテグレーション・E2E）
 - **ESLint + Prettier** - コード品質とフォーマット
 - **tsx** - TypeScript高速実行
 - **tsc-watch** - ファイル監視ビルド
@@ -240,7 +240,7 @@ guild-mng-bot-v2/
 │   └── shared/               # 共有コード
 │       ├── config/           # 環境変数定義
 │       ├── database/         # Repository・Store・型定義
-│       ├── features/         # 共有サービス（vac / bump-reminder）
+        ├── features/         # 共有サービス（vac / bump-reminder / sticky-message）
 │       ├── locale/           # i18n（i18next）
 │       ├── scheduler/        # ジョブスケジューラ
 │       ├── errors/           # カスタムエラー・エラーハンドラ

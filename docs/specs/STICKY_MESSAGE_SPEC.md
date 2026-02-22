@@ -262,20 +262,23 @@
 **表示例（チャンネル選択後）:**
 
 ```
-📌 スティッキーメッセージ設定
+スティッキーメッセージ設定
 
-チャンネル  : #rules
-形式        : Embed
-設定日時    : 2026年2月22日 10:30
+チャンネル    : #rules
+形式          : Embed
+設定日時      : 2026年2月22日 10:30
+最終更新者    : @username
 
 メッセージ内容
 ───────────────────────────
 このチャンネルではルールを守ってください
 ───────────────────────────
 
-Embedタイトル: サーバールール
-Embedカラー  : #008969
+Embedタイトル : サーバールール
+Embedカラー   : #008969
 ```
+
+> `最終更新者` は `<@userId>` メンション形式で表示（設定者が不明な場合は表示しない）。
 
 **処理:**
 
@@ -382,6 +385,7 @@ async function handleMessageCreate(message: Message) {
 | `channel_id`      | String   | チャンネルID                       | NOT NULL, UNIQUE |
 | `content`         | String   | メッセージ内容（プレーンテキスト） | NOT NULL         |
 | `embed_data`      | String?  | Embedデータ（JSON 文字列）         | NULLABLE         |
+| `updated_by`      | String?  | 最後に更新したユーザーID           | NULLABLE         |
 | `last_message_id` | String?  | 最後に送信したメッセージID         | NULLABLE         |
 | `created_at`      | DateTime | 作成日時                           | DEFAULT NOW()    |
 | `updated_at`      | DateTime | 更新日時                           | AUTO UPDATE      |
@@ -405,6 +409,7 @@ model StickyMessage {
   channelId     String   @unique @map("channel_id")
   content       String
   embedData     String?  @map("embed_data")
+  updatedBy     String?  @map("updated_by")
   lastMessageId String?  @map("last_message_id")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
@@ -529,6 +534,7 @@ function hasPermission(member: GuildMember): boolean {
 "sticky-message.view.field.content": "メッセージ内容"
 "sticky-message.view.field.embed_title": "Embedタイトル"
 "sticky-message.view.field.embed_color": "Embedカラー"
+"sticky-message.view.field.updated_by": "最終更新者"
 
 // エラー共通
 "sticky-message.errors.permissionDenied": "この操作を実行する権限がありません。チャンネル管理権限が必要です。"
@@ -634,6 +640,45 @@ function hasPermission(member: GuildMember): boolean {
    - スティッキーメッセージの保存・取得・削除
    - `updateContent()` による内容更新
    - `updateLastMessageId()` の更新
+
+---
+
+## ✅ 実装状況（2026-02-22 時点）
+
+| 項目                              | 状態    | 備考                                                                                                |
+| --------------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `/sticky-message set` コマンド    | ✅ 完了 | プレーンテキスト／Embed 両対応、モーダル入力                                                        |
+| `/sticky-message remove` コマンド | ✅ 完了 | Discord 側メッセージ削除 + DB 削除                                                                  |
+| `/sticky-message update` コマンド | ✅ 完了 | 差分更新（未指定フィールドは既存値引き継ぎ）                                                        |
+| `/sticky-message view` コマンド   | ✅ 完了 | セレクトメニュー + Embed 詳細表示                                                                   |
+| 自動再送信（messageCreate）       | ✅ 完了 | デバウンス 5 秒、`StickyMessageResendService`                                                       |
+| チャンネル削除時クリーンアップ    | ✅ 完了 | `channelDelete` → DB レコード削除 + タイマーキャンセル                                              |
+| `updatedBy` フィールド追跡        | ✅ 完了 | 設定・更新時に操作ユーザー ID を保存し view で `<@userId>` 表示                                     |
+| DB アクセス shared 層経由         | ✅ 完了 | `StickyMessageConfigService`（`src/shared/features/sticky-message/`）経由に統一（commit `1c197d4`） |
+| 多言語対応（i18n）                | ✅ 完了 | `ja` / `en` 翻訳キー実装済み                                                                        |
+| ユニットテスト                    | ✅ 完了 | 188 test suites / 821 tests 全件 PASS                                                               |
+| インテグレーションテスト          | ✅ 完了 | リポジトリ DB 連携テスト実装済み                                                                    |
+
+### アーキテクチャ補足
+
+```
+src/shared/database/types.ts          ← StickyMessage エンティティ / IStickyMessageRepository
+src/shared/features/sticky-message/
+  └─ stickyMessageConfigService.ts    ← StickyMessageConfigService（thin wrapper）
+src/bot/features/sticky-message/
+  ├─ repositories/
+  │   └─ stickyMessageRepository.ts  ← IStickyMessageRepository 実装
+  ├─ services/
+  │   └─ stickyMessageResendService.ts
+  ├─ handlers/
+  │   ├─ stickyMessageChannelDeleteHandler.ts
+  │   └─ ui/ （set/update/view のモーダル・セレクトハンドラ）
+  └─ commands/usecases/
+      └─ stickyMessageSet/Remove/Update/View.ts
+src/bot/services/
+  ├─ botStickyMessageDependencyResolver.ts ← getBotStickyMessageConfigService()
+  └─ botCompositionRoot.ts               ← DI 組み立て
+```
 
 ---
 

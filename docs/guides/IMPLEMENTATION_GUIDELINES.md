@@ -90,6 +90,50 @@
 - Bot/Web 両方で再利用する実装のみ配置
 - `shared` から `bot` / `web` へ逆依存しない
 
+### shared/features 経由の DB アクセス（2026-02-22 追加）
+
+Bot 層のハンドラー・ユースケースが DB へアクセスする際は、必ず `src/shared/features/<feature>/` の `configService` 経由で行う。
+リポジトリ実装を Bot 層のハンドラーから直接取得・呼び出すことを **禁止** する。
+
+**正しいアクセス経路:**
+
+```
+src/bot/features/<feature>/handlers/**
+  └─ getBotXxxConfigService()       ← botXxxDependencyResolver
+       └─ XxxConfigService          ← src/shared/features/xxx/xxxConfigService.ts
+            └─ IXxxRepository       ← src/shared/database/types.ts（インターフェース定義）
+                 └─ XxxRepository   ← src/bot/features/xxx/repositories/xxxRepository.ts（実装）
+```
+
+**新機能追加時の必須手順:**
+
+1. `src/shared/database/types.ts` に `XxxEntity` インターフェースと `IXxxRepository` インターフェースを定義
+2. `src/shared/features/xxx/xxxConfigService.ts` を新規作成し `XxxConfigService` クラスと `createXxxConfigService` / `setXxxConfigService` / `getXxxConfigService` をエクスポート
+3. `src/bot/features/xxx/repositories/xxxRepository.ts` で `IXxxRepository` を実装
+4. `src/bot/services/botXxxDependencyResolver.ts` に `setBotXxxConfigService` / `getBotXxxConfigService` を追加
+5. `src/bot/services/botCompositionRoot.ts` で `createXxxConfigService(repository)` を呼び出して登録
+6. ハンドラーは `getBotXxxConfigService()` 経由のみでサービスを取得する
+
+**違反例（禁止）:**
+
+```typescript
+// ❌ リポジトリを直接取得して操作
+import { getBotXxxRepository } from "@/bot/services/botXxxDependencyResolver";
+const repo = getBotXxxRepository();
+await repo.findByChannel(channelId);
+```
+
+**正例:**
+
+```typescript
+// ✅ configService 経由でアクセス
+import { getBotXxxConfigService } from "@/bot/services/botXxxDependencyResolver";
+const service = getBotXxxConfigService();
+await service.findByChannel(channelId);
+```
+
+> **背景**: sticky-message 機能の初期実装でハンドラーがリポジトリを直接参照していたため、後からリファクタリングが必要になった事例（2026-02-22 修正: commit `1c197d4`）。再発防止のためルール化した。
+
 ### feature ディレクトリ標準テンプレート
 
 ```text
@@ -253,6 +297,8 @@ src整備スプリントでは、次の順序を固定する。
 
 - [ ] 変更責務は適切なレイヤに配置されている
 - [ ] `commands` に業務ロジックが残っていない
+- [ ] DB アクセスは `getBotXxxConfigService()` 経由（ハンドラーからリポジトリを直接呼ぶな）
+- [ ] 新機能の `ConfigService` / `IXxxRepository` が `src/shared/` に定義されている
 - [ ] ファイル名は命名規則に従っている（基本 camelCase / SlashCommand 系は kebab-case）
 - [ ] ディレクトリ名は kebab-case になっている
 - [ ] ファイル先頭コメントがある
