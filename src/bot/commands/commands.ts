@@ -6,6 +6,7 @@ import { afkCommand } from "./afk";
 import { afkConfigCommand } from "./afk-config";
 import { bumpReminderConfigCommand } from "./bump-reminder-config";
 import { pingCommand } from "./ping";
+import { stickyMessageCommand } from "./sticky-message";
 import { vacCommand } from "./vac";
 import { vacConfigCommand } from "./vac-config";
 
@@ -17,6 +18,7 @@ export const commands: Command[] = [
   afkCommand,
   afkConfigCommand,
   bumpReminderConfigCommand,
+  stickyMessageCommand,
   vacCommand,
   vacConfigCommand,
   pingCommand,

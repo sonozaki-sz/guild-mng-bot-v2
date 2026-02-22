@@ -139,6 +139,47 @@ export const commands = {
   "vac.panel.limit_button": "Change User Limit",
   "vac.panel.afk_button": "Move Members to AFK",
   "vac.panel.refresh_button": "Move Panel to Bottom",
+
+  // Sticky Message command
+  "sticky-message.description":
+    "Manage sticky messages (pinned to channel bottom) — requires Manage Channels",
+  // set subcommand
+  "sticky-message.set.description": "Set a sticky message",
+  "sticky-message.set.channel.description":
+    "Text channel to set the sticky message in",
+  "sticky-message.set.message.description": "Message content (plain text)",
+  "sticky-message.set.use-embed.description": "Display as embed",
+  "sticky-message.set.embed-title.description": "Embed title",
+  "sticky-message.set.embed-description.description": "Embed description",
+  "sticky-message.set.embed-color.description":
+    "Embed color code (e.g. #5865F2 or 0x5865F2)",
+  "sticky-message.set.success.title": "Done",
+  "sticky-message.set.success.description": "Sticky message has been set.",
+  "sticky-message.set.alreadyExists.title": "Warning",
+  "sticky-message.set.alreadyExists.description":
+    "A sticky message is already configured for this channel. Remove it first before setting a new one.",
+  // remove subcommand
+  "sticky-message.remove.description": "Remove a sticky message",
+  "sticky-message.remove.channel.description":
+    "Text channel to remove the sticky message from",
+  "sticky-message.remove.success.title": "Removed",
+  "sticky-message.remove.success.description":
+    "Sticky message has been removed.",
+  "sticky-message.remove.notFound.title": "Not Found",
+  "sticky-message.remove.notFound.description":
+    "No sticky message is configured for this channel.",
+  // list subcommand
+  "sticky-message.list.description": "List all configured sticky messages",
+  "sticky-message.list.title": "Sticky Messages",
+  "sticky-message.list.empty": "No sticky messages are configured.",
+  // errors
+  "sticky-message.errors.permissionDenied":
+    "You do not have permission to do this. Manage Channels permission is required.",
+  "sticky-message.errors.emptyMessage": "Please enter a message.",
+  "sticky-message.errors.text_channel_only":
+    "Sticky messages can only be set in text channels.",
+  "sticky-message.errors.failed":
+    "An error occurred while managing the sticky message.",
 } as const;
 
 export type CommandsTranslations = typeof commands;

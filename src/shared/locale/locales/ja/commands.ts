@@ -139,6 +139,49 @@ export const commands = {
   "vac.panel.limit_button": "人数制限を変更",
   "vac.panel.afk_button": "メンバーをAFKに移動",
   "vac.panel.refresh_button": "パネルを最下部に移動",
+
+  // スティッキーメッセージコマンド
+  "sticky-message.description":
+    "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）",
+  // set サブコマンド
+  "sticky-message.set.description": "スティッキーメッセージを設定",
+  "sticky-message.set.channel.description":
+    "スティッキーメッセージを設定するテキストチャンネル",
+  "sticky-message.set.message.description":
+    "メッセージ内容（プレーンテキスト）",
+  "sticky-message.set.use-embed.description": "Embed形式で表示する",
+  "sticky-message.set.embed-title.description": "Embedタイトル",
+  "sticky-message.set.embed-description.description": "Embed説明文",
+  "sticky-message.set.embed-color.description":
+    "Embedカラーコード（例: #5865F2 または 0x5865F2）",
+  "sticky-message.set.success.title": "設定完了",
+  "sticky-message.set.success.description":
+    "スティッキーメッセージを設定しました。",
+  "sticky-message.set.alreadyExists.title": "警告",
+  "sticky-message.set.alreadyExists.description":
+    "既にスティッキーメッセージが設定されています。削除してから再度設定してください。",
+  // remove サブコマンド
+  "sticky-message.remove.description": "スティッキーメッセージを削除",
+  "sticky-message.remove.channel.description":
+    "スティッキーメッセージを削除するテキストチャンネル",
+  "sticky-message.remove.success.title": "削除完了",
+  "sticky-message.remove.success.description":
+    "スティッキーメッセージを削除しました。",
+  "sticky-message.remove.notFound.title": "未設定",
+  "sticky-message.remove.notFound.description":
+    "このチャンネルにはスティッキーメッセージが設定されていません。",
+  // list サブコマンド
+  "sticky-message.list.description": "設定中のスティッキーメッセージ一覧を表示",
+  "sticky-message.list.title": "スティッキーメッセージ一覧",
+  "sticky-message.list.empty": "スティッキーメッセージは設定されていません。",
+  // エラー
+  "sticky-message.errors.permissionDenied":
+    "この操作を実行する権限がありません。チャンネル管理権限が必要です。",
+  "sticky-message.errors.emptyMessage": "メッセージ内容を入力してください。",
+  "sticky-message.errors.text_channel_only":
+    "テキストチャンネルにのみ設定できます。",
+  "sticky-message.errors.failed":
+    "スティッキーメッセージの操作中にエラーが発生しました。",
 } as const;
 
 export type CommandsTranslations = typeof commands;
