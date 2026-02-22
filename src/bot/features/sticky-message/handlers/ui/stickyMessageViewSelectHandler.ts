@@ -1,11 +1,14 @@
 // src/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler.ts
 // sticky-message view コマンドが送信した StringSelectMenu の選択応答を処理する
 
-import { EmbedBuilder, type StringSelectMenuInteraction } from "discord.js";
+import { type StringSelectMenuInteraction } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
-import { createWarningEmbed } from "../../../../utils/messageResponse";
+import {
+  createInfoEmbed,
+  createWarningEmbed,
+} from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../../commands/stickyMessageCommand.constants";
 
 /** Embed コンテンツプレビューの最大文字数 */
@@ -60,20 +63,6 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       return;
     }
 
-    const embed = new EmbedBuilder()
-      .setColor(0x008969)
-      .setTitle(
-        `📌 ${await tGuild(guildId, "commands:sticky-message.view.title")}`,
-      )
-      .setTimestamp(sticky.updatedAt);
-
-    // チャンネル情報
-    embed.addFields({
-      name: await tGuild(guildId, "commands:sticky-message.view.field.channel"),
-      value: `<#${sticky.channelId}>`,
-      inline: true,
-    });
-
     // 形式（プレーン or Embed）
     const format = sticky.embedData
       ? await tGuild(guildId, "commands:sticky-message.view.field.format_embed")
@@ -81,34 +70,37 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
           guildId,
           "commands:sticky-message.view.field.format_plain",
         );
-    embed.addFields({
-      name: await tGuild(guildId, "commands:sticky-message.view.field.format"),
-      value: format,
-      inline: true,
-    });
 
-    // 最終更新日時
-    embed.addFields({
-      name: await tGuild(
-        guildId,
-        "commands:sticky-message.view.field.updated_at",
-      ),
-      value: `<t:${Math.floor(sticky.updatedAt.getTime() / 1000)}:f>`,
-      inline: true,
-    });
+    // フィールド構築: 1段目（チャンネル/形式/更新日）→ 2段目（Embedメタ）→ 3段目（内容）
+    const fields: { name: string; value: string; inline?: boolean }[] = [
+      {
+        name: await tGuild(
+          guildId,
+          "commands:sticky-message.view.field.channel",
+        ),
+        value: `<#${sticky.channelId}>`,
+        inline: true,
+      },
+      {
+        name: await tGuild(
+          guildId,
+          "commands:sticky-message.view.field.format",
+        ),
+        value: format,
+        inline: true,
+      },
+      {
+        name: await tGuild(
+          guildId,
+          "commands:sticky-message.view.field.updated_at",
+        ),
+        value: `<t:${Math.floor(sticky.updatedAt.getTime() / 1000)}:f>`,
+        inline: true,
+      },
+    ];
 
-    // テキスト内容プレビュー
-    const preview =
-      sticky.content.length > PREVIEW_MAX
-        ? `${sticky.content.substring(0, PREVIEW_MAX)}...`
-        : sticky.content;
-    embed.addFields({
-      name: await tGuild(guildId, "commands:sticky-message.view.field.content"),
-      value: `\`\`\`\n${preview}\n\`\`\``,
-      inline: false,
-    });
-
-    // Embed メタ情報（設定されている場合のみ）
+    // 2段目: Embed メタ情報（設定されている場合のみ中段に挿入）
+    let embedColor: number | undefined;
     if (sticky.embedData) {
       try {
         const parsed = JSON.parse(sticky.embedData) as {
@@ -116,7 +108,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
           color?: number;
         };
         if (parsed.title) {
-          embed.addFields({
+          fields.push({
             name: await tGuild(
               guildId,
               "commands:sticky-message.view.field.embed_title",
@@ -126,11 +118,13 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
           });
         }
         if (parsed.color !== undefined) {
-          embed.addFields({
+          embedColor = parsed.color;
+          fields.push({
             name: await tGuild(
               guildId,
               "commands:sticky-message.view.field.embed_color",
             ),
+            // カラーコードを色付きサムネイルとして表示（hex文字列）
             value: `#${parsed.color.toString(16).toUpperCase().padStart(6, "0")}`,
             inline: true,
           });
@@ -139,6 +133,34 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
         // JSON パース失敗は無視
       }
     }
+
+    // 3段目: テキスト内容プレビュー（常に末尾）
+    const preview =
+      sticky.content.length > PREVIEW_MAX
+        ? `${sticky.content.substring(0, PREVIEW_MAX)}...`
+        : sticky.content;
+    fields.push({
+      name: await tGuild(guildId, "commands:sticky-message.view.field.content"),
+      value: `\`\`\`\n${preview}\n\`\`\``,
+      inline: false,
+    });
+
+    // createInfoEmbed で構築し、スティッキーの Embed カラーがあればそれで上書き
+    const embed = createInfoEmbed("", {
+      title: `📌 ${await tGuild(guildId, "commands:sticky-message.view.title")}`,
+      timestamp: true,
+      fields,
+    });
+    if (embedColor !== undefined) {
+      embed.setColor(embedColor);
+    }
+    // タイムスタンプをスティッキーの最終更新日時で上書き
+    embed.setTimestamp(sticky.updatedAt);
+    // 実行者をアイコン付きフッターに表示
+    embed.setFooter({
+      text: interaction.user.username,
+      iconURL: interaction.user.displayAvatarURL(),
+    });
 
     // セレクトメニューを非表示にして詳細 Embed に置き換える
     await interaction.update({
