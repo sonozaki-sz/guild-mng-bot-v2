@@ -78,19 +78,19 @@ jobs:
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
 
-      - name: Portainer Webhook でコンテナを再デプロイ
+      - name: SSH で VPS にデプロイ（イメージ更新 + コンテナ再起動）
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: IMAGE_TAG
+          script: |
+            set -e
+            # 最新イメージを取得（GHCR パブリックのため認証不要）
+            docker pull "$IMAGE_TAG"
+            # コンテナを再起動して新イメージを適用
+            docker restart guild-mng-bot-v2
+            echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
         env:
-          PORTAINER_WEBHOOK_URL: ${{ secrets.PORTAINER_WEBHOOK_URL }}
-        run: |
-          if [ -z "$PORTAINER_WEBHOOK_URL" ]; then
-            echo "==> PORTAINER_WEBHOOK_URL 未設定のためスキップします"
-            exit 0
-          fi
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "$PORTAINER_WEBHOOK_URL")
-          if [ "$HTTP_CODE" != "204" ]; then
-            echo "Webhook failed with HTTP $HTTP_CODE"
-            exit 1
-          fi
-          echo "==> Portainer webhook triggered (HTTP $HTTP_CODE)"
-          echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+          IMAGE_TAG: ghcr.io/${{ github.repository }}:latest

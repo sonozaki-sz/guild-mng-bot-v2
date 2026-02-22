@@ -4,8 +4,10 @@
 FROM node:24-slim AS base
 WORKDIR /app
 
-# OS パッケージを最新化してセキュリティ脆弱性を修正
-RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+# OS パッケージを最新化してセキュリティ脆弱性を修正 + OpenSSL（Prisma が必要）
+RUN apt-get update && apt-get upgrade -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 # pnpm のインストール
 RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
@@ -26,8 +28,10 @@ RUN pnpm run build
 FROM node:24-slim AS runner
 WORKDIR /app
 
-# OS パッケージを最新化してセキュリティ脆弱性を修正
-RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+# OS パッケージを最新化してセキュリティ脆弱性を修正 + OpenSSL（Prisma が必要）
+RUN apt-get update && apt-get upgrade -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 

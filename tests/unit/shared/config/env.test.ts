@@ -89,9 +89,9 @@ describe("Environment Configuration", () => {
         process.env.DISCORD_TOKEN = "a".repeat(50);
         process.env.DISCORD_APP_ID = "1234567890";
         process.env.NODE_ENV = nodeEnv;
-        // 本番環境ではJWT_SECRETが必須
+        // NODE_ENV = production だが JWT_SECRET なしでも起動できる（チェックは server.ts に委譲）
         if (nodeEnv === "production") {
-          process.env.JWT_SECRET = "test-jwt-secret-for-production";
+          delete process.env.JWT_SECRET;
         }
 
         const { env } = await import("@/shared/config/env");
@@ -188,7 +188,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Warning and Failure Paths", () => {
-    it("should warn when JWT_SECRET is missing in non-production", async () => {
+    it("should warn when JWT_SECRET is missing in any environment", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "test";
@@ -204,26 +204,26 @@ describe("Environment Configuration", () => {
       );
     });
 
-    it("should log validation errors and exit when production JWT_SECRET is missing", async () => {
+    it("should warn (not exit) when production JWT_SECRET is missing", async () => {
+      // JWT_SECRET の必須チェックは server.ts に委譲されたため、env.ts 単体では exit しない
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "production";
       delete process.env.JWT_SECRET;
 
-      const errorSpy = vi.spyOn(console, "error").mockImplementation(vi.fn());
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
       const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
         throw new Error("EXIT");
       }) as never);
 
-      await expect(import("@/shared/config/env")).rejects.toThrow("EXIT");
-      expect(errorSpy).toHaveBeenCalledWith(
-        "❌ Environment variable validation failed:",
+      const { env } = await import("@/shared/config/env");
+
+      expect(env.NODE_ENV).toBe("production");
+      expect(env.JWT_SECRET).toBeUndefined();
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("JWT_SECRET is not set"),
       );
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining("JWT_SECRET is required in production"),
-      );
-      expect(errorSpy).toHaveBeenCalledWith("\nPlease check your .env file.");
-      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(exitSpy).not.toHaveBeenCalled();
     });
 
     it("should exit on non-Zod error during env parsing", async () => {
