@@ -55,21 +55,11 @@ const envSchema = z.object({
 const parseEnv = () => {
   try {
     // 1) 依存関係を含む追加検証 2) 実環境変数をパース
-    const result = envSchema
-      .superRefine((data, ctx) => {
-        // 本番では JWT_SECRET を必須化（Web API認証の安全性確保）
-        if (data.NODE_ENV === NODE_ENV.PRODUCTION && !data.JWT_SECRET) {
-          ctx.addIssue({
-            code: "custom",
-            message: "JWT_SECRET is required in production",
-            path: ["JWT_SECRET"],
-          });
-        }
-      })
-      .parse(process.env);
+    const result = envSchema.parse(process.env);
 
-    // 開発・テスト環境でも JWT_SECRET 未設定を警告（Web API 認証が無効になる）
-    if (result.NODE_ENV !== NODE_ENV.PRODUCTION && !result.JWT_SECRET) {
+    // JWT_SECRET 未設定を警告（Web API 認証が無効になる）
+    // 本番環境の必須チェックは Web サーバー起動時に行う（bot 単体起動では不要なため）
+    if (!result.JWT_SECRET) {
       console.warn(
         "⚠️  JWT_SECRET is not set — Web API authentication is DISABLED. " +
           "Set JWT_SECRET in .env to enable API authorization.",

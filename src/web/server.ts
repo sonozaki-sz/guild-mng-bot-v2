@@ -31,6 +31,16 @@ const __dirname = dirname(__filename);
  * Webサーバーを初期化して起動する
  */
 async function startWebServer() {
+  // 本番では JWT_SECRET を必須化（Web API 認証の安全性確保）
+  if (env.NODE_ENV === "production" && !env.JWT_SECRET) {
+    console.error(
+      "❌ Environment variable validation failed:\n" +
+        "  - JWT_SECRET: JWT_SECRET is required in production\n" +
+        "\nPlease check your .env file.",
+    );
+    process.exit(1);
+  }
+
   // 翻訳リソース初期化（起動ログ/エラーメッセージで利用）
   await localeManager.initialize();
   // Fastify アプリ本体を構築
