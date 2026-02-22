@@ -1,4 +1,3 @@
-import type { Mock } from "vitest";
 import {
   findTriggerChannelByCategory,
   resolveTargetCategory,
@@ -8,6 +7,7 @@ import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, MessageFlags } from "discord.js";
+import type { Mock } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
@@ -19,16 +19,15 @@ vi.mock("@/bot/services/botVacDependencyResolver", () => ({
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: vi.fn((description: string) => ({ description })),
+  createSuccessEmbed: vi.fn((description: string, _options?: object) => ({
+    description,
+  })),
 }));
 
-vi.mock(
-  "@/bot/features/vac/commands/helpers/vacConfigTargetResolver",
-  () => ({
-    resolveTargetCategory: vi.fn(),
-    findTriggerChannelByCategory: vi.fn(),
-  }),
-);
+vi.mock("@/bot/features/vac/commands/helpers/vacConfigTargetResolver", () => ({
+  resolveTargetCategory: vi.fn(),
+  findTriggerChannelByCategory: vi.fn(),
+}));
 
 describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
   // remove-trigger-vc のガード分岐と削除フローを検証する
@@ -105,6 +104,7 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     expect(deleteMock).toHaveBeenCalledTimes(1);
     expect(createSuccessEmbed).toHaveBeenCalledWith(
       "commands:vac-config.embed.trigger_removed",
+      { title: "commands:vac-config.embed.success_title" },
     );
     expect(reply).toHaveBeenCalledWith({
       embeds: [{ description: "commands:vac-config.embed.trigger_removed" }],
