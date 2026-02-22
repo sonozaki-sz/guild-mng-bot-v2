@@ -33,7 +33,7 @@ refactor/xxx  ← リファクタリング
 | ブランチ     | 説明                                            | 直接push | マージ先           |
 | ------------ | ----------------------------------------------- | -------- | ------------------ |
 | `main`       | 本番デプロイ済みコード。CI/CDが自動デプロイする | ❌       | -                  |
-| `develop`    | 開発中の統合ブランチ                            | ❌       | `main`             |
+| `develop`    | 開発中の統合ブランチ                            | ✅       | `main`             |
 | `feature/*`  | 新機能の開発                                    | ✅       | `develop`          |
 | `fix/*`      | バグ修正                                        | ✅       | `develop`          |
 | `hotfix/*`   | 本番障害の緊急修正                              | ✅       | `main` + `develop` |
@@ -44,46 +44,38 @@ refactor/xxx  ← リファクタリング
 
 ## 🔄 通常の開発フロー
 
-### 1. 作業ブランチの作成
+### 1. 開発・コミット
 
-**常に `develop` から分岐すること。**
+小規模変更は `develop` に直接コミットして構わない。
 
 ```bash
 # developを最新化
 git checkout develop
 git pull origin develop
 
-# 作業ブランチを作成
-git checkout -b feature/bump-reminder-mention-role
-# または
-git checkout -b fix/afk-status-not-cleared
-```
-
-### 2. 開発・コミット
-
-```bash
-# 変更をステージング
+# 変更をステージング・コミット
 git add src/bot/features/bump-reminder/
-
-# コミット（後述のConventional Commits形式で）
 git commit -m "feat(bump-reminder): メンションロール設定機能を追加"
 ```
 
-### 3. リモートへのpush
+大きめの変更・実験的な変更はフィーチャーブランチを使う（任意）。
 
 ```bash
-git push origin feature/bump-reminder-mention-role
+git checkout -b feature/bump-reminder-mention-role
+# ... 開発 ...
+git checkout develop
+git merge --squash feature/bump-reminder-mention-role
+git commit -m "feat(bump-reminder): メンションロール設定機能を追加"
 ```
 
-### 4. Pull Request の作成
+### 2. リモートへのpush
 
-GitHub上で **`develop` をベースブランチ** として PR を作成する。
+```bash
+# develop へ直接push（CI が自動で走る）
+git push origin develop
+```
 
-- PRテンプレートに従って概要・変更内容・動作確認を記載
-- CI（型チェック・テスト・commitlint）がすべて通ることを確認
-- マージは **Squash and merge** を推奨（コミット履歴をすっきりさせる）
-
-### 5. developからmainへのリリース
+### 3. developからmainへのリリース
 
 機能がまとまったタイミングで `develop → main` の PR を作成してリリースする。
 
@@ -245,25 +237,30 @@ PR に対して以下の CI が自動で実行される：
 
 ---
 
-## 🏷️ ブランチ保護の設定（GitHub UI）
+## 🏷️ ブランチ保護の設定（GitHub Rulesets）
 
-[Settings > Branches](https://github.com/sonozaki-sz/guild-mng-bot-v2/settings/branches) で以下を設定する。
+[Settings > Rules](https://github.com/sonozaki-sz/guild-mng-bot-v2/rules) で管理。
 
-### `main` ブランチ
-
-| 設定                                                  | 値  |
-| ----------------------------------------------------- | --- |
-| Require a pull request before merging                 | ✅  |
-| Require status checks: `Test`, `Lint Commit Messages` | ✅  |
-| Do not allow bypassing the above settings             | ✅  |
-
-### `develop` ブランチ
+### `main` ブランチ（`protect-main` ruleset）
 
 | 設定                                                  | 値  |
 | ----------------------------------------------------- | --- |
 | Require a pull request before merging                 | ✅  |
 | Require status checks: `Test`, `Lint Commit Messages` | ✅  |
 | Do not allow bypassing the above settings             | ✅  |
+| Restrict deletions                                    | ✅  |
+| Block force pushes                                    | ✅  |
+
+### `develop` ブランチ（`protect-develop` ruleset）
+
+1人開発のため直接pushを許可。CI は push 時も自動実行される（マージブロックなし）。
+
+| 設定                    | 値  |
+| ----------------------- | --- |
+| Restrict deletions      | ✅  |
+| Block force pushes      | ✅  |
+| Require pull request    | ❌  |
+| Require status checks   | ❌  |
 
 ---
 
