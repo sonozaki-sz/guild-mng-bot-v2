@@ -53,11 +53,10 @@ jobs:
     name: Deploy to XServer VPS
     needs: test
     runs-on: ubuntu-latest
-    # デプロイ準備完了後に有効化する（VPS契約・Secrets設定後に `false &&` を削除）
-    if: false && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
-      - name: SSH 経由でデプロイ
+      - name: SSH 経由でマイグレーションを実行
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -72,13 +71,19 @@ jobs:
             git pull origin main
 
             echo "==> DBマイグレーションを実行"
-            docker compose -f docker-compose.prod.yml run --rm bot \
+            docker compose -f docker-compose.prod.yml run --rm \
+              -e DATABASE_URL="file:./storage/db.sqlite" bot \
               pnpm prisma migrate deploy
 
-            echo "==> イメージを再ビルドして再起動"
-            docker compose -f docker-compose.prod.yml up -d --build
+            echo "==> マイグレーション完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
 
-            echo "==> 古いイメージを削除"
-            docker image prune -f
-
-            echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+      - name: Portainer Webhook でコンテナを再デプロイ
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}")
+          if [ "$HTTP_CODE" != "204" ]; then
+            echo "Webhook failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "==> Portainer webhook triggered (HTTP $HTTP_CODE)"
+          echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"

@@ -1,4 +1,4 @@
-import { handleBumpReminderConfigShow } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.show";
+import { handleBumpReminderConfigView } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view";
 
 const ensureManageGuildPermissionMock = vi.fn();
 const getBumpReminderConfigMock = vi.fn();
@@ -30,7 +30,7 @@ vi.mock(
   }),
 );
 
-describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.show", () => {
+describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.view", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
@@ -40,7 +40,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.show", (
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
     const interaction = { reply: vi.fn().mockResolvedValue(undefined) };
 
-    await handleBumpReminderConfigShow(interaction as never, "guild-1");
+    await handleBumpReminderConfigView(interaction as never, "guild-1");
 
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [{ description: "translated", kind: "info" }],
@@ -56,7 +56,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.show", (
     });
     const interaction = { reply: vi.fn().mockResolvedValue(undefined) };
 
-    await handleBumpReminderConfigShow(interaction as never, "guild-1");
+    await handleBumpReminderConfigView(interaction as never, "guild-1");
 
     expect(createInfoEmbedMock).toHaveBeenCalled();
     expect(interaction.reply).toHaveBeenCalledWith({

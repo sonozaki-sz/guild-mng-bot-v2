@@ -1,11 +1,11 @@
-// src/bot/features/vac/commands/presenters/vacConfigShowPresenter.ts
-// vac-config show 用の表示整形
+// src/bot/features/vac/commands/presenters/vacConfigViewPresenter.ts
+// vac-config view 用の表示整形
 
 import { ChannelType, type Guild } from "discord.js";
 import type { VacConfig } from "../../../../../shared/database/types";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 
-export interface VacConfigShowPresentation {
+export interface VacConfigViewPresentation {
   title: string;
   fieldTrigger: string;
   triggerChannels: string;
@@ -14,13 +14,13 @@ export interface VacConfigShowPresentation {
 }
 
 /**
- * vac-config show の表示内容を整形する
+ * vac-config view の表示内容を整形する
  */
-export async function presentVacConfigShow(
+export async function presentVacConfigView(
   guild: Guild,
   guildId: string,
   config: VacConfig,
-): Promise<VacConfigShowPresentation> {
+): Promise<VacConfigViewPresentation> {
   const topLabel = await tGuild(guildId, "commands:vac-config.embed.top");
 
   const triggerChannels =

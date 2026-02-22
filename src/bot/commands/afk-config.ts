@@ -17,7 +17,7 @@ const AFK_CONFIG_COMMAND = {
   NAME: "afk-config",
   SUBCOMMAND: {
     SET_CHANNEL: "set-ch",
-    SHOW: "show",
+    VIEW: "view",
   },
   OPTION: {
     CHANNEL: "channel",
@@ -35,7 +35,7 @@ export const afkConfigCommand: Command = {
     const channelDesc = getCommandLocalizations(
       "afk-config.set-ch.channel.description",
     );
-    const showDesc = getCommandLocalizations("afk-config.show.description");
+    const viewDesc = getCommandLocalizations("afk-config.view.description");
 
     return (
       new SlashCommandBuilder()
@@ -62,9 +62,9 @@ export const afkConfigCommand: Command = {
         .addSubcommand((subcommand) =>
           // 現在設定の表示
           subcommand
-            .setName(AFK_CONFIG_COMMAND.SUBCOMMAND.SHOW)
-            .setDescription(showDesc.ja)
-            .setDescriptionLocalizations(showDesc.localizations),
+            .setName(AFK_CONFIG_COMMAND.SUBCOMMAND.VIEW)
+            .setDescription(viewDesc.ja)
+            .setDescriptionLocalizations(viewDesc.localizations),
         )
     );
   })(),

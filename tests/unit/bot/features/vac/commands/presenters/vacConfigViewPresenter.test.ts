@@ -1,4 +1,4 @@
-import { presentVacConfigShow } from "@/bot/features/vac/commands/presenters/vacConfigShowPresenter";
+import { presentVacConfigView } from "@/bot/features/vac/commands/presenters/vacConfigViewPresenter";
 import type { VacConfig } from "@/shared/database/types";
 import { ChannelType } from "discord.js";
 
@@ -16,8 +16,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   }),
 }));
 
-describe("bot/features/vac/commands/presenters/vacConfigShowPresenter", () => {
-  // show 表示用の文言整形と空状態フォールバックを検証する
+describe("bot/features/vac/commands/presenters/vacConfigViewPresenter", () => {
+  // view 表示用の文言整形と空状態フォールバックを検証する
   it("formats trigger channels and created vc details", async () => {
     const guild = {
       channels: {
@@ -46,7 +46,7 @@ describe("bot/features/vac/commands/presenters/vacConfigShowPresenter", () => {
       ],
     };
 
-    const result = await presentVacConfigShow(
+    const result = await presentVacConfigView(
       guild as never,
       "guild-1",
       config,
@@ -73,7 +73,7 @@ describe("bot/features/vac/commands/presenters/vacConfigShowPresenter", () => {
       createdChannels: [],
     };
 
-    const result = await presentVacConfigShow(
+    const result = await presentVacConfigView(
       guild as never,
       "guild-1",
       config,

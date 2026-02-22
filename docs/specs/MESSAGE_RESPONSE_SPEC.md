@@ -253,10 +253,10 @@ await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   - `disable` → Success
   - `set-mention` → Success
   - `remove-mention` → Success
-  - `show` → Info
+  - `view` → Info
 - [x] `/afk-config` の各サブコマンド
   - `set-ch` → Success
-  - `show` → Info
+  - `view` → Info
 - [x] `/afk` コマンド
   - AFK設定 → Success
   - AFK解除 → Success
@@ -432,9 +432,9 @@ export default {
 - [ ] `/bump-reminder-config disable`
 - [ ] `/bump-reminder-config set-mention`
 - [ ] `/bump-reminder-config remove-mention`
-- [ ] `/bump-reminder-config show`
+- [ ] `/bump-reminder-config view`
 - [ ] `/afk-config set-ch`
-- [ ] `/afk-config show`
+- [ ] `/afk-config view`
 - [ ] `/afk` コマンド
 - [ ] `/ping` コマンド
 

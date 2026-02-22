@@ -1,26 +1,20 @@
 import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 import { handleVacConfigCreateTrigger } from "@/bot/features/vac/commands/usecases/vacConfigCreateTrigger";
 import { handleVacConfigRemoveTrigger } from "@/bot/features/vac/commands/usecases/vacConfigRemoveTrigger";
-import { handleVacConfigShow } from "@/bot/features/vac/commands/usecases/vacConfigShow";
+import { handleVacConfigView } from "@/bot/features/vac/commands/usecases/vacConfigView";
 import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand.constants";
 import { executeVacConfigCommand } from "@/bot/features/vac/commands/vacConfigCommand.execute";
 
-vi.mock(
-  "@/bot/features/vac/commands/usecases/vacConfigCreateTrigger",
-  () => ({
-    handleVacConfigCreateTrigger: vi.fn(),
-  }),
-);
+vi.mock("@/bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => ({
+  handleVacConfigCreateTrigger: vi.fn(),
+}));
 
-vi.mock(
-  "@/bot/features/vac/commands/usecases/vacConfigRemoveTrigger",
-  () => ({
-    handleVacConfigRemoveTrigger: vi.fn(),
-  }),
-);
+vi.mock("@/bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => ({
+  handleVacConfigRemoveTrigger: vi.fn(),
+}));
 
-vi.mock("@/bot/features/vac/commands/usecases/vacConfigShow", () => ({
-  handleVacConfigShow: vi.fn(),
+vi.mock("@/bot/features/vac/commands/usecases/vacConfigView", () => ({
+  handleVacConfigView: vi.fn(),
 }));
 
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({
@@ -48,7 +42,7 @@ function createInteraction(overrides?: {
     },
     options: {
       getSubcommand: vi.fn(
-        () => overrides?.subcommand ?? VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW,
+        () => overrides?.subcommand ?? VAC_CONFIG_COMMAND.SUBCOMMAND.VIEW,
       ),
     },
   };
@@ -65,7 +59,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     await executeVacConfigCommand(interaction as never);
 
     expect(handleCommandError).toHaveBeenCalledTimes(1);
-    expect(handleVacConfigShow).not.toHaveBeenCalled();
+    expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
   it("delegates permission validation error to handleCommandError", async () => {
@@ -76,7 +70,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
     expect(handleVacConfigCreateTrigger).not.toHaveBeenCalled();
     expect(handleVacConfigRemoveTrigger).not.toHaveBeenCalled();
-    expect(handleVacConfigShow).not.toHaveBeenCalled();
+    expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
   it("delegates create-trigger-vc subcommand to usecase", async () => {
@@ -91,7 +85,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
       "guild-1",
     );
     expect(handleVacConfigRemoveTrigger).not.toHaveBeenCalled();
-    expect(handleVacConfigShow).not.toHaveBeenCalled();
+    expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
   it("delegates remove-trigger-vc subcommand to usecase", async () => {
@@ -106,17 +100,17 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
       "guild-1",
     );
     expect(handleVacConfigCreateTrigger).not.toHaveBeenCalled();
-    expect(handleVacConfigShow).not.toHaveBeenCalled();
+    expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
-  it("delegates show subcommand to usecase", async () => {
+  it("delegates view subcommand to usecase", async () => {
     const interaction = createInteraction({
-      subcommand: VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW,
+      subcommand: VAC_CONFIG_COMMAND.SUBCOMMAND.VIEW,
     });
 
     await executeVacConfigCommand(interaction as never);
 
-    expect(handleVacConfigShow).toHaveBeenCalledWith(interaction, "guild-1");
+    expect(handleVacConfigView).toHaveBeenCalledWith(interaction, "guild-1");
     expect(handleVacConfigCreateTrigger).not.toHaveBeenCalled();
     expect(handleVacConfigRemoveTrigger).not.toHaveBeenCalled();
   });
@@ -129,6 +123,6 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
     expect(handleVacConfigCreateTrigger).not.toHaveBeenCalled();
     expect(handleVacConfigRemoveTrigger).not.toHaveBeenCalled();
-    expect(handleVacConfigShow).not.toHaveBeenCalled();
+    expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 });

@@ -9,6 +9,10 @@ import { pingCommand } from "./ping";
 import { vacCommand } from "./vac";
 import { vacConfigCommand } from "./vac-config";
 
+/**
+ * Bot が登録するスラッシュコマンド一覧
+ * ここへ追加したコマンドだけが Discord API に登録される
+ */
 export const commands: Command[] = [
   afkCommand,
   afkConfigCommand,

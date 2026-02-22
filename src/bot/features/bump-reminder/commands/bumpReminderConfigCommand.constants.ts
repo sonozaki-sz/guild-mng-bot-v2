@@ -1,7 +1,9 @@
 // src/bot/features/bump-reminder/commands/bumpReminderConfigCommand.constants.ts
 // bump-reminder-config コマンドの定数定義
 
-// bump-reminder-config で共用するコマンド名/サブコマンド名/オプション名/選択値/CustomId接頭辞
+/**
+ * bump-reminder-config コマンドで共用するコマンド名・サブコマンド名・オプション名・選択値・CustomId 接頭辞定数
+ */
 export const BUMP_REMINDER_CONFIG_COMMAND = {
   NAME: "bump-reminder-config",
   SUBCOMMAND: {
@@ -9,7 +11,7 @@ export const BUMP_REMINDER_CONFIG_COMMAND = {
     DISABLE: "disable",
     SET_MENTION: "set-mention",
     REMOVE_MENTION: "remove-mention",
-    SHOW: "show",
+    VIEW: "view",
   },
   OPTION: {
     ROLE: "role",

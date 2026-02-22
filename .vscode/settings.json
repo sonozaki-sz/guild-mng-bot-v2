@@ -12,7 +12,12 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.suggest.autoImports": true,
   // 開いていないファイルを含むプロジェクト全体を常時チェック（乖離防止の核心）
+  // ※ node_modules の診断はスキップ（skipLibCheck で制御）
   "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  // tsconfig/jsconfig のないファイルが implicit project に入ったとき .d.ts エラーを抑制
+  "typescript.implicitProjectConfig.skipLibCheck": true,
+  // JS ファイル（eslint.config.js 等）の TypeScript 診断をオフ
+  "javascript.validate.enable": false,
   // メモリ不足によるTSサーバー再起動を防ぐ（再起動が乖離の原因になることがある）
   "typescript.tsserver.maxTsServerMemory": 4096,
   // Linuxのinotifyで即時検知（ポーリング待機をなくす）

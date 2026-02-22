@@ -1,5 +1,5 @@
-// src/bot/features/bump-reminder/commands/bumpReminderConfigCommand.show.ts
-// bump-reminder-config show 実行処理
+// src/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view.ts
+// bump-reminder-config view 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tGuild } from "../../../../shared/locale/localeManager";
@@ -13,7 +13,7 @@ import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
  * @param guildId 設定参照対象のギルドID
  * @returns 実行完了を示す Promise
  */
-export async function handleBumpReminderConfigShow(
+export async function handleBumpReminderConfigView(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
@@ -43,7 +43,7 @@ export async function handleBumpReminderConfigShow(
   }
 
   // 表示用のローカライズ文字列を解決
-  const showTitle = await tGuild(
+  const viewTitle = await tGuild(
     guildId,
     "commands:bump-reminder-config.embed.title",
   );
@@ -65,7 +65,7 @@ export async function handleBumpReminderConfigShow(
 
   // status / mention role / mention users を固定構成で表示
   const embed = createInfoEmbed("", {
-    title: showTitle,
+    title: viewTitle,
     fields: [
       {
         name: fieldStatus,

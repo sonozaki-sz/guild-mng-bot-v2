@@ -22,7 +22,7 @@ export const commands = {
   "afk-config.description": "Configure AFK feature (administrators only)",
   "afk-config.set-ch.description": "Configure AFK channel",
   "afk-config.set-ch.channel.description": "AFK channel (voice channel)",
-  "afk-config.show.description": "Show current settings",
+  "afk-config.view.description": "Show current settings",
   "afk-config.embed.title": "AFK",
   "afk-config.embed.set_ch_success": "AFK channel configured: {{channel}}",
   "afk-config.embed.not_configured": "AFK channel is not configured",
@@ -45,7 +45,7 @@ export const commands = {
   "bump-reminder-config.remove-mention.target.user": "User (with selection UI)",
   "bump-reminder-config.remove-mention.target.users": "All users",
   "bump-reminder-config.remove-mention.target.all": "Role + All users",
-  "bump-reminder-config.show.description": "Show current settings",
+  "bump-reminder-config.view.description": "Show current settings",
 
   // Bump Reminder config command responses
   // Generic status messages
@@ -80,7 +80,7 @@ export const commands = {
   "bump-reminder-config.embed.remove_mention_error_title": "Deletion Error",
   "bump-reminder-config.embed.remove_mention_error_no_users":
     "No users are registered to remove",
-  // show subcommand display fields
+  // view subcommand display fields
   "bump-reminder-config.embed.title": "Bump Reminder Feature",
   "bump-reminder-config.embed.status": "Current settings status",
   "bump-reminder-config.embed.field.status": "Status",
@@ -99,8 +99,8 @@ export const commands = {
   "vac-config.remove-trigger-vc.category.description":
     "Target category (TOP or category; defaults to current category)",
   "vac-config.remove-trigger-vc.category.top": "TOP (no category)",
-  "vac-config.show.description": "Show current settings",
-  // show subcommand display fields
+  "vac-config.view.description": "Show current settings",
+  // view subcommand display fields
   "vac-config.embed.title": "Voice Auto-Create",
   "vac-config.embed.not_configured": "Not configured",
   "vac-config.embed.no_created_vcs": "None",

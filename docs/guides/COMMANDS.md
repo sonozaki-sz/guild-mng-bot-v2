@@ -134,12 +134,12 @@ AFKチャンネルを設定します。
 
 ---
 
-#### `show`
+#### `view`
 
 現在のAFK設定を表示します。
 
 ```
-/afk-config show
+/afk-config view
 ```
 
 **権限:** サーバー管理（`MANAGE_GUILD`）
@@ -241,12 +241,12 @@ Bumpリマインダー時にメンションするロールまたはユーザー�
 
 ---
 
-#### `show`
+#### `view`
 
 現在のBumpリマインダー設定を表示します。
 
 ```
-/bump-reminder-config show
+/bump-reminder-config view
 ```
 
 **権限:** サーバー管理（`MANAGE_GUILD`）
@@ -325,12 +325,12 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 
 ---
 
-#### `show`
+#### `view`
 
 現在のVC自動作成機能の設定（有効化状態・トリガーチャンネル一覧）を表示します。
 
 ```
-/vac-config show
+/vac-config view
 ```
 
 **権限:** サーバー管理（`MANAGE_GUILD`）
@@ -530,12 +530,12 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 
 ---
 
-#### `show`
+#### `view`
 
 現在の設定を表示します。
 
 ```
-/member-log-config show
+/member-log-config view
 ```
 
 **権限:** サーバー管理（`MANAGE_GUILD`）

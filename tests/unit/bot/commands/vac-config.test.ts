@@ -1,9 +1,9 @@
-import type { Mock } from "vitest";
 import type {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
 } from "discord.js";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
+import type { Mock } from "vitest";
 
 const addTriggerChannelMock = vi.fn();
 const getVacConfigOrDefaultMock = vi.fn();
@@ -13,12 +13,10 @@ const tGuildMock = vi.hoisted(() => vi.fn());
 const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
-const createInfoEmbedMock = vi.fn(
-  (description: string, options?: unknown) => ({
-    description,
-    options,
-  }),
-);
+const createInfoEmbedMock = vi.fn((description: string, options?: unknown) => ({
+  description,
+  options,
+}));
 
 // VAC設定関数の依存を置き換え、コマンド分岐を実コードで検証する
 vi.mock("@/bot/services/botVacDependencyResolver", () => ({
@@ -903,7 +901,7 @@ describe("bot/commands/vac-config", () => {
     };
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getString: vi.fn(() => null),
       },
       guild: createGuildWithChannels({
@@ -946,7 +944,7 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getString: vi.fn(() => null),
       },
       guild: createGuildWithChannels({ byId: {} }),
@@ -979,7 +977,7 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getString: vi.fn(() => null),
       },
     });
@@ -998,11 +996,11 @@ describe("bot/commands/vac-config", () => {
     expect(options.fields.length).toBe(2);
   });
 
-  it("delegates show error when guild is unexpectedly missing", async () => {
+  it("delegates view error when guild is unexpectedly missing", async () => {
     const interaction = createCommandInteraction({
       guild: null,
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getString: vi.fn(() => null),
       },
     });
@@ -1044,7 +1042,7 @@ describe("bot/commands/vac-config", () => {
   it("responds empty choices when subcommand is unsupported", async () => {
     const interaction = createAutocompleteInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getFocused: vi.fn(() => "a"),
       },
     });

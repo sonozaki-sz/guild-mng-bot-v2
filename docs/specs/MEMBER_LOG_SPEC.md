@@ -148,10 +148,10 @@
 /member-log-config set-leave-message message:{user}さんが退出しました
 ```
 
-**6. `show` - 現在の設定表示**
+**6. `view` - 現在の設定表示**
 
 ```
-/member-log-config show
+/member-log-config view
 ```
 
 **表示内容:**

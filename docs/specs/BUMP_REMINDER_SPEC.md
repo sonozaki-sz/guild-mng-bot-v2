@@ -216,10 +216,10 @@ await bumpReminderManager.setReminder(
 - **users**: 全ユーザー登録を一括削除
 - **all**: ロールと全ユーザーを完全削除
 
-**5. `show` - 設定状態表示**
+**5. `view` - 設定状態表示**
 
 ```
-/bump-reminder-config show
+/bump-reminder-config view
 ```
 
 **表示内容:**

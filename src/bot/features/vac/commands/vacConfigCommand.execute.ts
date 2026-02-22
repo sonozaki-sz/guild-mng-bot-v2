@@ -7,7 +7,7 @@ import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { handleVacConfigCreateTrigger } from "./usecases/vacConfigCreateTrigger";
 import { handleVacConfigRemoveTrigger } from "./usecases/vacConfigRemoveTrigger";
-import { handleVacConfigShow } from "./usecases/vacConfigShow";
+import { handleVacConfigView } from "./usecases/vacConfigView";
 import { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
 
 /**
@@ -37,8 +37,8 @@ export async function executeVacConfigCommand(
       case VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER:
         await handleVacConfigRemoveTrigger(interaction, guildId);
         break;
-      case VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW:
-        await handleVacConfigShow(interaction, guildId);
+      case VAC_CONFIG_COMMAND.SUBCOMMAND.VIEW:
+        await handleVacConfigView(interaction, guildId);
         break;
       default:
         throw new ValidationError(

@@ -13,6 +13,10 @@ import { VAC_CONFIG_COMMAND } from "../features/vac/commands/vacConfigCommand.co
 import { executeVacConfigCommand } from "../features/vac/commands/vacConfigCommand.execute";
 import type { Command } from "../types/discord";
 
+/**
+ * VAC（自動作成VC）設定コマンド（サーバー管理権限専用）
+ * トリガーVCの追加・削除・設定確認を提供する
+ */
 export const vacConfigCommand: Command = {
   data: (() => {
     const cmdDesc = getCommandLocalizations("vac-config.description");
@@ -28,7 +32,7 @@ export const vacConfigCommand: Command = {
     const removeCategoryDesc = getCommandLocalizations(
       "vac-config.remove-trigger-vc.category.description",
     );
-    const showDesc = getCommandLocalizations("vac-config.show.description");
+    const viewDesc = getCommandLocalizations("vac-config.view.description");
 
     return new SlashCommandBuilder()
       .setName(VAC_CONFIG_COMMAND.NAME)
@@ -65,9 +69,9 @@ export const vacConfigCommand: Command = {
       )
       .addSubcommand((subcommand) =>
         subcommand
-          .setName(VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW)
-          .setDescription(showDesc.ja)
-          .setDescriptionLocalizations(showDesc.localizations),
+          .setName(VAC_CONFIG_COMMAND.SUBCOMMAND.VIEW)
+          .setDescription(viewDesc.ja)
+          .setDescriptionLocalizations(viewDesc.localizations),
       );
   })(),
 

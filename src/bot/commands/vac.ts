@@ -10,6 +10,10 @@ import { VAC_COMMAND } from "../features/vac/commands/vacCommand.constants";
 import { executeVacCommand } from "../features/vac/commands/vacCommand.execute";
 import type { Command } from "../types/discord";
 
+/**
+ * VAC（自動作成VC）操作コマンド
+ * 所有VCのリネーム・人数制限変更を提供する
+ */
 export const vacCommand: Command = {
   data: (() => {
     const cmdDesc = getCommandLocalizations("vac.description");

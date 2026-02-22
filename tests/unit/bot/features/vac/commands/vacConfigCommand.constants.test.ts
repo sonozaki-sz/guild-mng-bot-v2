@@ -10,7 +10,7 @@ describe("bot/features/vac/commands/vacConfigCommand.constants", () => {
     expect(VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER).toBe(
       "remove-trigger-vc",
     );
-    expect(VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW).toBe("show");
+    expect(VAC_CONFIG_COMMAND.SUBCOMMAND.VIEW).toBe("view");
     expect(VAC_CONFIG_COMMAND.OPTION.CATEGORY).toBe("category");
     expect(VAC_CONFIG_COMMAND.TARGET.TOP).toBe("TOP");
   });
