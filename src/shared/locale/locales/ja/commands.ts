@@ -20,7 +20,7 @@ export const commands = {
   "afk-config.description": "AFK機能の設定（管理者専用）",
   "afk-config.set-ch.description": "AFKチャンネルを設定。",
   "afk-config.set-ch.channel.description": "AFKチャンネル（ボイスチャンネル）",
-  "afk-config.show.description": "現在の設定を表示。",
+  "afk-config.view.description": "現在の設定を表示。",
   "afk-config.embed.title": "AFK機能",
   "afk-config.embed.set_ch_success":
     "AFKチャンネルを {{channel}} に設定しました",
@@ -44,7 +44,7 @@ export const commands = {
   "bump-reminder-config.remove-mention.target.user": "ユーザー（選択UI）",
   "bump-reminder-config.remove-mention.target.users": "全ユーザー",
   "bump-reminder-config.remove-mention.target.all": "ロール＋全ユーザー",
-  "bump-reminder-config.show.description": "現在の設定を表示",
+  "bump-reminder-config.view.description": "現在の設定を表示",
 
   // Bumpリマインダー設定コマンド レスポンス
   // 共通状態メッセージ
@@ -79,7 +79,7 @@ export const commands = {
   "bump-reminder-config.embed.remove_mention_error_title": "削除エラー",
   "bump-reminder-config.embed.remove_mention_error_no_users":
     "削除するユーザーが登録されていません",
-  // show サブコマンド表示用
+  // view サブコマンド表示用
   "bump-reminder-config.embed.title": "Bumpリマインダー機能",
   "bump-reminder-config.embed.status": "現在の設定状態",
   "bump-reminder-config.embed.field.status": "状態",
@@ -96,8 +96,8 @@ export const commands = {
   "vac-config.remove-trigger-vc.category.description":
     "削除対象（TOP またはカテゴリ。未指定時は実行カテゴリ）",
   "vac-config.remove-trigger-vc.category.top": "TOP（カテゴリなし）",
-  "vac-config.show.description": "現在の設定を表示",
-  // show サブコマンド表示用
+  "vac-config.view.description": "現在の設定を表示",
+  // view サブコマンド表示用
   "vac-config.embed.title": "VC自動作成機能",
   "vac-config.embed.not_configured": "未設定",
   "vac-config.embed.no_created_vcs": "なし",

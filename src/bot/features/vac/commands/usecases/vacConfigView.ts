@@ -1,20 +1,20 @@
-// src/bot/features/vac/commands/usecases/vacConfigShow.ts
-// vac-config show のユースケース処理
+// src/bot/features/vac/commands/usecases/vacConfigView.ts
+// vac-config view のユースケース処理
 
 import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
-import { presentVacConfigShow } from "../presenters/vacConfigShowPresenter";
+import { presentVacConfigView } from "../presenters/vacConfigViewPresenter";
 
 /**
- * vac-config show を実行する
+ * vac-config view を実行する
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
  */
-export async function handleVacConfigShow(
+export async function handleVacConfigView(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
@@ -25,7 +25,7 @@ export async function handleVacConfigShow(
   }
 
   const config = await getBotVacRepository().getVacConfigOrDefault(guildId);
-  const presentation = await presentVacConfigShow(guild, guildId, config);
+  const presentation = await presentVacConfigView(guild, guildId, config);
 
   // トリガー一覧と作成済みVC一覧を Embed で返す
   const embed = createInfoEmbed("", {

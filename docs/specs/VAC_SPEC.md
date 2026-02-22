@@ -292,7 +292,7 @@ Discord標準UIからの操作権限は以下の通りです：
 ✅ トリガーチャンネル #CreateVC を削除しました
 ```
 
-#### サブコマンド: `show`
+#### サブコマンド: `view`
 
 現在のVC自動作成機能の設定を表示します。
 
@@ -306,7 +306,7 @@ Discord標準UIからの操作権限は以下の通りです：
 **実行例:**
 
 ```
-/vac-config show
+/vac-config view
 ```
 
 **応答例:**
@@ -519,7 +519,7 @@ async function handleChannelDelete(channel: GuildChannel): Promise<void> {
 
 **サブコマンド処理:**
 
-各サブコマンド（create-trigger-vc, remove-trigger-vc, show）の実装詳細は主要機能セクションを参照。
+各サブコマンド（create-trigger-vc, remove-trigger-vc, view）の実装詳細は主要機能セクションを参照。
 
 ### `/vac` コマンド
 
@@ -681,7 +681,7 @@ async function handleVacRename(interaction: ButtonInteraction) {
         "top": "TOP（カテゴリなし）"
       }
     },
-    "show": {
+    "view": {
       "description": "現在のVC自動作成機能の設定を表示"
     }
   }
@@ -905,7 +905,7 @@ for (const [, guild] of client.guilds.cache) {
 - [ ] **サーバー管理権限なし**: 権限不足で実行した場合、エラーメッセージが表示される
 - [ ] **対象不在**: 指定カテゴリ（またはTOP）にトリガーチャンネルがない場合、適切に処理される
 
-### `/vac-config show` コマンド
+### `/vac-config view` コマンド
 
 #### 正常系
 

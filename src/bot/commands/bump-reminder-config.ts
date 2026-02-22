@@ -44,8 +44,8 @@ export const bumpReminderConfigCommand: Command = {
     const targetAllDesc = getCommandLocalizations(
       "bump-reminder-config.remove-mention.target.all",
     );
-    const showDesc = getCommandLocalizations(
-      "bump-reminder-config.show.description",
+    const viewDesc = getCommandLocalizations(
+      "bump-reminder-config.view.description",
     );
 
     // コマンド定義は commands 層に残し、業務処理は features 側へ委譲する
@@ -130,9 +130,9 @@ export const bumpReminderConfigCommand: Command = {
         .addSubcommand((subcommand) =>
           // 現在設定表示
           subcommand
-            .setName(BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.SHOW)
-            .setDescription(showDesc.ja)
-            .setDescriptionLocalizations(showDesc.localizations),
+            .setName(BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.VIEW)
+            .setDescription(viewDesc.ja)
+            .setDescriptionLocalizations(viewDesc.localizations),
         )
     );
   })(),

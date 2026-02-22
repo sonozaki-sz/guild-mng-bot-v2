@@ -6,7 +6,7 @@ export const VAC_CONFIG_COMMAND = {
   SUBCOMMAND: {
     CREATE_TRIGGER: "create-trigger-vc",
     REMOVE_TRIGGER: "remove-trigger-vc",
-    SHOW: "show",
+    VIEW: "view",
   },
   OPTION: {
     CATEGORY: "category",

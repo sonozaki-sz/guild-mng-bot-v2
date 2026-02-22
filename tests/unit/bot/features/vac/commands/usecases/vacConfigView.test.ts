@@ -1,10 +1,10 @@
-import type { Mock } from "vitest";
-import { presentVacConfigShow } from "@/bot/features/vac/commands/presenters/vacConfigShowPresenter";
-import { handleVacConfigShow } from "@/bot/features/vac/commands/usecases/vacConfigShow";
+import { presentVacConfigView } from "@/bot/features/vac/commands/presenters/vacConfigViewPresenter";
+import { handleVacConfigView } from "@/bot/features/vac/commands/usecases/vacConfigView";
 import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
 import { createInfoEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { MessageFlags } from "discord.js";
+import type { Mock } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
@@ -15,9 +15,9 @@ vi.mock("@/bot/services/botVacDependencyResolver", () => ({
 }));
 
 vi.mock(
-  "@/bot/features/vac/commands/presenters/vacConfigShowPresenter",
+  "@/bot/features/vac/commands/presenters/vacConfigViewPresenter",
   () => ({
-    presentVacConfigShow: vi.fn(),
+    presentVacConfigView: vi.fn(),
   }),
 );
 
@@ -28,8 +28,8 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   })),
 }));
 
-describe("bot/features/vac/commands/usecases/vacConfigShow", () => {
-  // show ユースケースの前提チェックと返信ペイロードを検証
+describe("bot/features/vac/commands/usecases/vacConfigView", () => {
+  // view ユースケースの前提チェックと返信ペイロードを検証
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -41,7 +41,7 @@ describe("bot/features/vac/commands/usecases/vacConfigShow", () => {
     };
 
     await expect(
-      handleVacConfigShow(interaction as never, "guild-1"),
+      handleVacConfigView(interaction as never, "guild-1"),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
@@ -55,7 +55,7 @@ describe("bot/features/vac/commands/usecases/vacConfigShow", () => {
       getVacConfigOrDefault,
     });
 
-    (presentVacConfigShow as Mock).mockResolvedValue({
+    (presentVacConfigView as Mock).mockResolvedValue({
       title: "VAC設定",
       fieldTrigger: "トリガー",
       triggerChannels: "<#trigger-1> (TOP)",
@@ -69,10 +69,10 @@ describe("bot/features/vac/commands/usecases/vacConfigShow", () => {
       reply,
     };
 
-    await handleVacConfigShow(interaction as never, "guild-1");
+    await handleVacConfigView(interaction as never, "guild-1");
 
     expect(getVacConfigOrDefault).toHaveBeenCalledWith("guild-1");
-    expect(presentVacConfigShow).toHaveBeenCalledWith(
+    expect(presentVacConfigView).toHaveBeenCalledWith(
       interaction.guild,
       "guild-1",
       {

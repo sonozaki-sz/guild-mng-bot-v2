@@ -57,9 +57,9 @@ vi.mock(
 );
 
 vi.mock(
-  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.show",
+  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view",
   () => ({
-    handleBumpReminderConfigShow: (...args: unknown[]) => showMock(...args),
+    handleBumpReminderConfigView: (...args: unknown[]) => showMock(...args),
   }),
 );
 
@@ -88,9 +88,9 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute"
     expect(enableMock).toHaveBeenCalledWith(interaction, "guild-1");
   });
 
-  it("routes show subcommand", async () => {
+  it("routes view subcommand", async () => {
     const interaction = createInteraction(
-      BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.SHOW,
+      BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.VIEW,
     );
 
     await executeBumpReminderConfigCommand(interaction as never);

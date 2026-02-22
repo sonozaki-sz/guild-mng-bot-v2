@@ -523,7 +523,7 @@ model BumpReminder {
 - `voiceStateUpdate` でトリガー参加時に専用VCを自動作成
 - 作成済みVCの空室検知による自動削除
 - `channelDelete`/`clientReady` で設定と実体の同期クリーンアップ
-- `/vac-config`（`create-trigger-vc` / `remove-trigger-vc` / `show`）
+- `/vac-config`（`create-trigger-vc` / `remove-trigger-vc` / `view`）
 - `/vac`（`vc-rename` / `vc-limit`）
 - 操作パネル（button/modal/user select）
 - パネルUIを縦一列化し、全ボタン `ButtonStyle.Primary` に統一

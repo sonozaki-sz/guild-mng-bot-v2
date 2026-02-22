@@ -21,7 +21,7 @@ import {
 
 const AFK_CONFIG_SUBCOMMAND = {
   SET_CHANNEL: "set-ch",
-  SHOW: "show",
+  VIEW: "view",
 } as const;
 
 /**
@@ -47,8 +47,8 @@ export async function executeAfkConfigCommand(
     case AFK_CONFIG_SUBCOMMAND.SET_CHANNEL:
       await handleSetChannel(interaction, guildId);
       break;
-    case AFK_CONFIG_SUBCOMMAND.SHOW:
-      await handleShowSetting(interaction, guildId);
+    case AFK_CONFIG_SUBCOMMAND.VIEW:
+      await handleViewSetting(interaction, guildId);
       break;
     default:
       throw new ValidationError(
@@ -99,12 +99,12 @@ async function handleSetChannel(
 }
 
 /**
- * afk-config show の現在設定表示を返す
+ * afk-config view の現在設定表示を返す
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
  */
-async function handleShowSetting(
+async function handleViewSetting(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {

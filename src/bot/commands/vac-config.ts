@@ -28,7 +28,7 @@ export const vacConfigCommand: Command = {
     const removeCategoryDesc = getCommandLocalizations(
       "vac-config.remove-trigger-vc.category.description",
     );
-    const showDesc = getCommandLocalizations("vac-config.show.description");
+    const viewDesc = getCommandLocalizations("vac-config.view.description");
 
     return new SlashCommandBuilder()
       .setName(VAC_CONFIG_COMMAND.NAME)
@@ -65,9 +65,9 @@ export const vacConfigCommand: Command = {
       )
       .addSubcommand((subcommand) =>
         subcommand
-          .setName(VAC_CONFIG_COMMAND.SUBCOMMAND.SHOW)
-          .setDescription(showDesc.ja)
-          .setDescriptionLocalizations(showDesc.localizations),
+          .setName(VAC_CONFIG_COMMAND.SUBCOMMAND.VIEW)
+          .setDescription(viewDesc.ja)
+          .setDescriptionLocalizations(viewDesc.localizations),
       );
   })(),
 

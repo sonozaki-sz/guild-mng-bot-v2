@@ -11,7 +11,7 @@ import { handleBumpReminderConfigEnable } from "./bumpReminderConfigCommand.enab
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 import { handleBumpReminderConfigRemoveMention } from "./bumpReminderConfigCommand.removeMention";
 import { handleBumpReminderConfigSetMention } from "./bumpReminderConfigCommand.setMention";
-import { handleBumpReminderConfigShow } from "./bumpReminderConfigCommand.show";
+import { handleBumpReminderConfigView } from "./bumpReminderConfigCommand.view";
 
 /**
  * bump-reminder-config の実行入口
@@ -52,8 +52,8 @@ export async function executeBumpReminderConfigCommand(
         await handleBumpReminderConfigRemoveMention(interaction, guildId);
         break;
 
-      case BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.SHOW:
-        await handleBumpReminderConfigShow(interaction, guildId);
+      case BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.VIEW:
+        await handleBumpReminderConfigView(interaction, guildId);
         break;
 
       default:

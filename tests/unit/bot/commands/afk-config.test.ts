@@ -1,6 +1,6 @@
-import type { Mock } from "vitest";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
+import type { Mock } from "vitest";
 
 const setAfkChannelMock = vi.fn();
 const getAfkConfigMock = vi.fn();
@@ -20,15 +20,12 @@ const createInfoEmbedMock = vi.fn(
 );
 
 // AFK設定永続化の呼び出しだけをモックし、コマンド分岐を直接検証する
-vi.mock(
-  "@/bot/services/botGuildConfigRepositoryResolver",
-  () => ({
-    getBotGuildConfigRepository: () => ({
-      setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
-      getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
-    }),
+vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
+  getBotGuildConfigRepository: () => ({
+    setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
+    getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
   }),
-);
+}));
 
 vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({
@@ -206,12 +203,12 @@ describe("bot/commands/afk-config", () => {
     expect(setAfkChannelMock).not.toHaveBeenCalled();
   });
 
-  // show 未設定時は情報 Embed を返すことを検証
-  it("shows not-configured state on show subcommand", async () => {
+  // view 未設定時は情報 Embed を返すことを検証
+  it("shows not-configured state on view subcommand", async () => {
     getAfkConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getChannel: vi.fn(),
       },
     });
@@ -228,7 +225,7 @@ describe("bot/commands/afk-config", () => {
     });
   });
 
-  // show で未設定判定の分岐（enabled=false / channelId=null）を網羅する
+  // view で未設定判定の分岐（enabled=false / channelId=null）を網羅する
   it.each([
     { enabled: false, channelId: "afk-channel" },
     { enabled: true, channelId: null },
@@ -236,7 +233,7 @@ describe("bot/commands/afk-config", () => {
     getAfkConfigMock.mockResolvedValueOnce(config);
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getChannel: vi.fn(),
       },
     });
@@ -250,15 +247,15 @@ describe("bot/commands/afk-config", () => {
     });
   });
 
-  // show で設定済みの場合にチャンネル情報を返すことを検証
-  it("shows configured AFK channel on show subcommand", async () => {
+  // view で設定済みの場合にチャンネル情報を返すことを検証
+  it("shows configured AFK channel on view subcommand", async () => {
     getAfkConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "afk-channel",
     });
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getChannel: vi.fn(),
       },
     });
@@ -277,12 +274,12 @@ describe("bot/commands/afk-config", () => {
     });
   });
 
-  // show で権限不足の場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates permission error on show", async () => {
+  // view で権限不足の場合は共通エラーハンドラへ委譲されることを検証
+  it("delegates permission error on view", async () => {
     const interaction = createInteraction({
       memberPermissions: { has: vi.fn(() => false) },
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getChannel: vi.fn(),
       },
     });

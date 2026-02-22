@@ -1,6 +1,6 @@
-import type { Mock } from "vitest";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { DiscordAPIError, MessageFlags, PermissionFlagsBits } from "discord.js";
+import type { Mock } from "vitest";
 
 const setBumpReminderEnabledMock = vi.fn();
 const getBumpReminderConfigMock = vi.fn();
@@ -268,7 +268,7 @@ describe("bot/commands/bump-reminder-config", () => {
   });
 
   // 各サブコマンドの権限不足時にエラーハンドラへ委譲されることを検証
-  it.each(["enable", "disable", "set-mention", "remove-mention", "show"])(
+  it.each(["enable", "disable", "set-mention", "remove-mention", "view"])(
     "delegates permission error when subcommand is %s",
     async (subcommand) => {
       const interaction = createInteraction({
@@ -528,12 +528,12 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // show で設定未登録時に info 応答することを検証
-  it("replies not-configured info on show when config is absent", async () => {
+  // view で設定未登録時に info 応答することを検証
+  it("replies not-configured info on view when config is absent", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getRole: vi.fn(() => null),
         getUser: vi.fn(() => null),
         getString: vi.fn(() => null),
@@ -550,8 +550,8 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // show で設定内容（enabled/role/users）を表示することを検証
-  it("replies configured info on show with role and users", async () => {
+  // view で設定内容（enabled/role/users）を表示することを検証
+  it("replies configured info on view with role and users", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: false,
       channelId: "channel-1",
@@ -560,7 +560,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getRole: vi.fn(() => null),
         getUser: vi.fn(() => null),
         getString: vi.fn(() => null),
@@ -581,8 +581,8 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // show で role/users未設定かつ enabled=true の表示分岐を検証
-  it("replies configured info on show with no role and no users", async () => {
+  // view で role/users未設定かつ enabled=true の表示分岐を検証
+  it("replies configured info on view with no role and no users", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "channel-1",
@@ -591,7 +591,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "show"),
+        getSubcommand: vi.fn(() => "view"),
         getRole: vi.fn(() => null),
         getUser: vi.fn(() => null),
         getString: vi.fn(() => null),

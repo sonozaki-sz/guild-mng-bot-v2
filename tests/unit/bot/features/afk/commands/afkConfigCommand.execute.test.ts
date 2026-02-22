@@ -89,8 +89,8 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
     });
   });
 
-  it("shows current config on show", async () => {
-    const interaction = createInteraction("show");
+  it("shows current config on view", async () => {
+    const interaction = createInteraction("view");
 
     await executeAfkConfigCommand(interaction as never);
 
