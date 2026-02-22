@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       target: runner
     container_name: guild-mng-bot
-    command: node dist/bot/main.js
+    command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
     # プロセスがクラッシュしたとき自動再起動（手動停止時は再起動しない）
     restart: unless-stopped
     environment:
