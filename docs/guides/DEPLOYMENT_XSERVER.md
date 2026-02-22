@@ -2,7 +2,7 @@
 
 > XServer VPS へ guild-mng-bot-v2 を Docker Compose でデプロイする手順
 
-最終更新: 2026年2月22日（GitHub Actions 自動デプロイを追加）
+最終更新: 2026年2月23日
 
 ---
 
@@ -201,17 +201,22 @@ openssl rand -hex 32
 
 ---
 
-## 🐋 4. Dockerfile の作成
+## 🐋 4. Dockerfile の確認
 
-プロジェクトルートに以下の `Dockerfile` を作成する。
+`Dockerfile` はリポジトリルートに含まれている。主な構成：
 
 ```dockerfile
 # syntax=docker/dockerfile:1
+
+# ─── ベースイメージ ───
 FROM node:24-slim AS base
 WORKDIR /app
 
-# pnpm のインストール
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# OS パッケージを最新化してセキュリティ脆弱性を修正
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+# pnpm のインストール（package.json の packageManager に合わせてバージョン固定）
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 # ─── 依存関係インストール ───
 FROM base AS deps
@@ -222,30 +227,33 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm run build
-# Prisma クライアントを生成
+# prisma generate は tsc --build より前に実行すること（@prisma/client の型が必要なため）
 RUN pnpm prisma generate
+RUN pnpm run build
 
 # ─── 本番イメージ ───
 FROM node:24-slim AS runner
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+
+# corepack キャッシュを /app 以下に設定（非root の app ユーザーが書き込み可能にするため）
+ENV COREPACK_HOME=/app/.cache/corepack
 
 # 本番依存のみインストール
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 
-# ビルド成果物と設定ファイルをコピー
+# ビルド成果物・Prisma クライアントをコピー
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.pnpm ./node_modules/.pnpm
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
-# ストレージディレクトリを作成
-RUN mkdir -p /app/storage
+# ストレージ・ログ・corepack キャッシュディレクトリを作成
+RUN mkdir -p /app/storage /app/logs /app/.cache/corepack
 
 # セキュリティ: root 以外のユーザーで実行
 RUN groupadd --system app && useradd --system --gid app app
@@ -255,11 +263,13 @@ USER app
 EXPOSE 3000
 ```
 
+> **Note**: pnpm のバージョンは `package.json` の `packageManager` フィールドと一致させること。`pnpm@latest` と指定すると実行時バージョン不一致で `EACCES` エラーが発生する。
+
 ---
 
-## 🐋 5. Docker Compose ファイルの作成
+## 🐋 5. Docker Compose ファイルの確認
 
-プロジェクトルートに `docker-compose.prod.yml` を作成する。
+`docker-compose.prod.yml` はリポジトリルートに含まれている。
 
 ```yaml
 services:
@@ -268,13 +278,29 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner
-    command: node dist/bot/main.js
+    container_name: guild-mng-bot
+    # 起動時に自動でDBマイグレーションを実行してからbotを起動する
+    command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
     restart: unless-stopped
-    env_file: .env
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DISCORD_APP_ID: ${DISCORD_APP_ID}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      LOCALE: ${LOCALE:-ja}
+      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
       - sqlite_data:/app/storage
+      - ./logs:/app/logs
     networks:
       - internal
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     logging:
       driver: "json-file"
       options:
@@ -286,13 +312,22 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner
+    container_name: guild-mng-web
     command: node dist/web/server.js
     restart: unless-stopped
-    env_file: .env
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
+      WEB_PORT: ${WEB_PORT:-3000}
+      WEB_HOST: ${WEB_HOST:-0.0.0.0}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
       - sqlite_data:/app/storage
+      - ./logs:/app/logs
     ports:
-      - "127.0.0.1:3000:3000" # ループバックにバインド（外部直接アクセス不可）
+      - "127.0.0.1:3000:3000"
     networks:
       - internal
     logging:
@@ -301,8 +336,23 @@ services:
         max-size: "10m"
         max-file: "5"
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - internal
+
 volumes:
   sqlite_data:
+    driver: local
+  portainer_data:
     driver: local
 
 networks:
@@ -310,30 +360,31 @@ networks:
     driver: bridge
 ```
 
-> **Note**: `bot` と `web` は同じ SQLite ファイルを `sqlite_data` ボリューム経由で共有する。両コンテナを同時に書き込みが発生する場合は Turso Cloud への移行を検討すること（後述）。
+> **Note**: `bot` の `command` に `prisma migrate deploy` が含まれているため、コンテナ起動のたびにマイグレーションが自動実行される。GitHub Actions 側で別途マイグレーションを実行する必要はない。
 
 ---
 
 ## 🚀 6. 初回起動
 
-### 6-1. DBマイグレーションを実行
+### 6-1. Portainer の起動（初回のみ）
 
 ```bash
 cd /opt/guild-mng-bot
+docker compose -f docker-compose.prod.yml up portainer -d
 
-# マイグレーション用に一時的にコンテナを立ち上げる
-docker compose -f docker-compose.prod.yml run --rm bot \
-  pnpm prisma migrate deploy
+# 起動確認
+docker compose -f docker-compose.prod.yml ps portainer
 ```
 
-### 6-2. コンテナを起動（初回: Portainer Stack から）
+ブラウザで `http://<サーバーのIPアドレス>:9000` にアクセスし、Portainer の初期設定を行う。
+詳細な手順は **[PORTAINER_SETUP.md](PORTAINER_SETUP.md)** を参照。
 
-初回起動は **[PORTAINER_SETUP.md セクション 5](PORTAINER_SETUP.md#%EF%B8%8F-5-stack-の作成と環境変数管理)** の手順で Portainer Stack を作成して行う。
-Portainer が `docker-compose.prod.yml` を Git から取得し、Env タブの環境変数を注入した上でコンテナを起動する。
+### 6-2. Portainer Stack の作成
 
-確認は Portainer 左メニュー → **Containers** でステータスを見る。
+Portainer の初期設定後、**Stacks** から `docker-compose.prod.yml` を使って Stack を作成する。
+環境変数（`DISCORD_TOKEN` 等）は Stack の **Env タブ** で設定する。
 
-> **自動起動の確認**: Portainer 自体が `portainer_data` ボリュームに Stack 情報を保存するため、サーバー再起動後も Stack は自動復元される。
+詳細は **[PORTAINER_SETUP.md セクション 3〜5](PORTAINER_SETUP.md#️-3-stack-の作成と環境変数管理)** を参照。
 
 ### 6-3. ログ確認
 
@@ -343,18 +394,15 @@ docker compose -f docker-compose.prod.yml logs -f
 
 # Bot のみ
 docker compose -f docker-compose.prod.yml logs -f bot
-
-# Web のみ
-docker compose -f docker-compose.prod.yml logs -f web
 ```
+
+または Portainer の **Containers → guild-mng-bot → Logs** タブで確認できる。
 
 ---
 
-## 🔄 7. アップデート手順
+## 🔄 7. アップデート手順（手動）
 
-> **Note**: `main` への push で GitHub Actions が自動でコード取得・マイグレーション・デプロイを実行する。緊急時およびデバッグ用に手動手順を示す。
-
-コードを更新してデプロイする際の手順。
+> **Note**: `main` への push で GitHub Actions が自動でコード取得・イメージビルド・デプロイを実行する。緊急時およびデバッグ用に手動手順を示す。
 
 ```bash
 cd /opt/guild-mng-bot
@@ -362,12 +410,13 @@ cd /opt/guild-mng-bot
 # 最新コードを取得
 git pull origin main
 
-# マイグレーションがある場合
-docker compose -f docker-compose.prod.yml run --rm bot \
-  pnpm prisma migrate deploy
+# イメージを再ビルド
+docker compose -f docker-compose.prod.yml build bot
 
-# Portainer の Stacks 画面から 「Update the stack」 を実行する（または Docker 直指定して再起動）
-docker compose -f docker-compose.prod.yml up -d --build
+# コンテナを再起動（起動時に migrate が自動実行される）
+docker compose -f docker-compose.prod.yml up -d bot
+
+# 古いイメージを削除
 docker image prune -f
 ```
 
@@ -385,11 +434,11 @@ push to main
   └── CI: 型チェック・テスト（pnpm typecheck && pnpm test）
         └── CD:
               ├── SSH でVPSに接続
-              │     ├── git pull origin main        ← 最新コードを取得
-              │     └── prisma migrate deploy       ← DB マイグレーション
+              │     ├── git pull origin main            ← 最新コードを取得
+              │     └── docker compose build bot        ← イメージを再ビルド
               └── Portainer Webhook を POST
-                    └── Portainer が docker compose up -d --build を実行
-                          └── Env タブの環境変数がコンテナへ注入される
+                    └── Portainer が docker compose up -d を実行
+                          └── bot 起動時に prisma migrate deploy が自動実行
 ```
 
 PR へのpushは CI のみ実行し、デプロイは行わない。
