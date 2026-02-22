@@ -22,7 +22,7 @@ guild-mng-bot-v2で使用可能なすべてのスラッシュコマンドの詳�
 | `/bump-reminder-config` | Bumpリマインダー機能の設定管理   | サーバー管理   | ✅ 実装済み |
 | `/vac-config`           | VC自動作成機能の設定管理         | サーバー管理   | ✅ 実装済み |
 | `/vac`                  | 作成済みVCの名前・人数制限を変更 | なし           | ✅ 実装済み |
-| `/sticky-message`       | メッセージ固定機能の管理         | チャンネル管理 | 📋 未実装   |
+| `/sticky-message`       | メッセージ固定機能の管理         | チャンネル管理 | ✅ 実装済み |
 | `/member-log-config`    | メンバーログ設定                 | サーバー管理   | 📋 未実装   |
 | `/message-delete`       | メッセージ一括削除               | メッセージ管理 | 📋 未実装   |
 
@@ -401,11 +401,9 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 
 ## 📌 メッセージ固定機能
 
-> ⚠️ **このコマンドは未実装です。** 仕様書のみ作成済みで、実装待ちの機能です。
-
 ### `/sticky-message`
 
-チャンネル最下部に常に表示されるメッセージを設定します。
+チャンネル最下部に常に表示されるメッセージを設定・削除・更新・確認するコマンドです。プレーンテキスト・ Embed 両形式対応。
 
 **構文:**
 
@@ -420,27 +418,37 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 スティッキーメッセージを設定します。
 
 ```
-/sticky-message set channel:<チャンネル> message:<メッセージ>
+/sticky-message set channel:<チャンネル> [message:<メッセージ>] [use-embed:<true/false>] ...
 ```
 
-**オプション:**
+**主なオプション:**
 
-- `channel` (必須): メッセージを固定するテキストチャンネル
-- `message` (必須): 固定するメッセージ内容
+- `channel` (必須): スティッキーメッセージを設定するテキストチャンネル
+- `message` (任意): メッセージ内容（プレーンテキスト）
+- `use-embed` (任意): Embed 形式で表示する場合 true
+- `embed-title` (任意): Embed タイトル
+- `embed-description` (任意): Embed 説明文
+- `embed-color` (任意): Embed カラーコード（例: `#008969`）
 
-**権限:** チャンネル管理
+> `message` / `embed-description` / `embed-title` のいずれか1つ以上の指定が必要。
+
+**権限:** チャンネル管理（`MANAGE_CHANNELS`）
 
 **使用例:**
 
 ```
+# プレーンテキスト
 /sticky-message set channel:#rules message:サーバールールを守ってください
+
+# Embed形式
+/sticky-message set channel:#rules use-embed:true embed-title:サーバールール embed-description:ルールを守ってください embed-color:#008969
 ```
 
 ---
 
 #### `remove`
 
-スティッキーメッセージを削除します。
+スティッキーメッセージを削除します。Discord 上のメッセージも同時に削除されます。
 
 ```
 /sticky-message remove channel:<チャンネル>
@@ -450,19 +458,41 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 
 - `channel` (必須): メッセージ固定を解除するチャンネル
 
-**権限:** チャンネル管理
+**権限:** チャンネル管理（`MANAGE_CHANNELS`）
 
 ---
 
-#### `list`
+#### `update`
 
-設定されているスティッキーメッセージの一覧を表示します。
+既存のスティッキーメッセージの内容を上書き更新します。旧メッセージを削除し新しい内容で即時再送信します。
 
 ```
-/sticky-message list
+/sticky-message update channel:<チャンネル> [各オプション]
 ```
 
-**権限:** チャンネル管理
+**権限:** チャンネル管理（`MANAGE_CHANNELS`）
+
+**使用例:**
+
+```
+# テキスト内容だけ変更
+/sticky-message update channel:#rules message:新しいルールになりました
+
+# Embedタイトルだけ変更
+/sticky-message update channel:#rules embed-title:【重要】サーバールール
+```
+
+---
+
+#### `view`
+
+このサーバーで設定中のスティッキーメッセージを確認します。セレクトメニューでチャンネルを選ぶとその設定詳細が Embed で表示されます。
+
+```
+/sticky-message view
+```
+
+**権限:** チャンネル管理（`MANAGE_CHANNELS`）
 
 **関連ドキュメント:** [STICKY_MESSAGE_SPEC.md](../specs/STICKY_MESSAGE_SPEC.md)
 

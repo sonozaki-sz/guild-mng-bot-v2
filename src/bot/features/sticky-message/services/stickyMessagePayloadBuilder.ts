@@ -39,7 +39,7 @@ function parseEmbedData(
 ): EmbedBuilder {
   try {
     const data = JSON.parse(embedDataJson) as StickyEmbedData;
-    const embed = new EmbedBuilder().setColor(data.color ?? 0x5865f2);
+    const embed = new EmbedBuilder().setColor(data.color ?? 0x008969);
 
     if (data.title) embed.setTitle(data.title);
     embed.setDescription(data.description ?? fallbackContent);
@@ -48,7 +48,7 @@ function parseEmbedData(
   } catch {
     // JSON パース失敗時はプレーンテキストで代用
     return new EmbedBuilder()
-      .setColor(0x5865f2)
+      .setColor(0x008969)
       .setDescription(fallbackContent);
   }
 }

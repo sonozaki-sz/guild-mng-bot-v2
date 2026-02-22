@@ -131,7 +131,7 @@ export async function handleStickyMessageUpdate(
         embedDescription ?? messageText ?? prev.description ?? content,
       color: embedColorStr
         ? parseColor(embedColorStr)
-        : (prev.color ?? 0x5865f2),
+        : (prev.color ?? 0x008969),
     };
     embedData = JSON.stringify(updated);
   } else if (messageText && !useEmbed && !existing.embedData) {
@@ -200,7 +200,7 @@ export async function handleStickyMessageUpdate(
 }
 
 /**
- * カラーコード文字列を数値に変換する（失敗時は Discord Blurple）
+ * カラーコード文字列を数値に変換する（失敗時はスティッキーメッセージデフォルトカラー）
  * @param colorStr カラーコード文字列（`#RRGGBB` / `0xRRGGBB` / `RRGGBB` 形式）
  * @returns 数値カラーコード
  */
@@ -211,5 +211,5 @@ function parseColor(colorStr: string): number {
       ? colorStr.slice(2)
       : colorStr;
   const parsed = parseInt(normalized, 16);
-  return isNaN(parsed) ? 0x5865f2 : parsed;
+  return isNaN(parsed) ? 0x008969 : parsed;
 }

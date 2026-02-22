@@ -61,7 +61,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
     }
 
     const embed = new EmbedBuilder()
-      .setColor(0x5865f2)
+      .setColor(0x008969)
       .setTitle(
         `📌 ${await tGuild(guildId, "commands:sticky-message.view.title")}`,
       )

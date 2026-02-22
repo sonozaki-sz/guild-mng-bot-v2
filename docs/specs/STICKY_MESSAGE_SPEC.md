@@ -99,7 +99,7 @@
 | `use-embed`         | Boolean        | ❌   | Embed形式で設定する場合は true（デフォルト: false）   |
 | `embed-title`       | String         | ❌   | Embed タイトル（最大256文字）                         |
 | `embed-description` | String         | ❌   | Embed 説明文（最大4096文字）                          |
-| `embed-color`       | String         | ❌   | Embed カラーコード（例: `#5865F2` または `0x5865F2`） |
+| `embed-color`       | String         | ❌   | Embed カラーコード（例: `#008969` または `0x008969`） |
 
 > `message` か `embed-description` か `embed-title` のいずれか1つ以上の指定が必要。
 
@@ -112,7 +112,7 @@
 /sticky-message set channel:#rules message:このチャンネルではルールを守ってください
 
 # Embed形式
-/sticky-message set channel:#rules use-embed:true embed-title:サーバールール embed-description:ルールを守ってください embed-color:#5865F2
+/sticky-message set channel:#rules use-embed:true embed-title:サーバールール embed-description:ルールを守ってください embed-color:#008969
 ```
 
 **処理:**
@@ -274,7 +274,7 @@
 ───────────────────────────
 
 Embedタイトル: サーバールール
-Embedカラー  : #5865F2
+Embedカラー  : #008969
 ```
 
 **処理:**
@@ -442,7 +442,7 @@ model StickyMessage {
 
 **カラー:**
 
-- デフォルト: `0x5865F2` (Discord Blurple)
+- デフォルト: `0x008969`
 - カスタム: ユーザーが指定可能（`#RRGGBB` または `0xRRGGBB` 形式）
 
 ---
@@ -489,7 +489,7 @@ function hasPermission(member: GuildMember): boolean {
 "sticky-message.set.use-embed.description": "Embed形式で表示する"
 "sticky-message.set.embed-title.description": "Embedタイトル"
 "sticky-message.set.embed-description.description": "Embed説明文"
-"sticky-message.set.embed-color.description": "Embedカラーコード（例: #5865F2 または 0x5865F2）"
+"sticky-message.set.embed-color.description": "Embedカラーコード（例: #008969 または 0x008969）"
 "sticky-message.set.success.title": "設定完了"
 "sticky-message.set.success.description": "スティッキーメッセージを設定しました。"
 "sticky-message.set.alreadyExists.title": "警告"
