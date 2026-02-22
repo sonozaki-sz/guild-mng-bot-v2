@@ -28,7 +28,7 @@ export const errors = {
 
   // AFK errors
   "afk.not_configured":
-    "AFK channel is not configured.\nPlease configure a channel with `/afk-config set-ch` (administrator only).",
+    "AFK channel is not configured.\nPlease configure a channel with `/afk-config set-channel` (administrator only).",
   "afk.member_not_found": "User not found.",
   "afk.user_not_in_voice": "The specified user is not in a voice channel.",
   "afk.channel_not_found":

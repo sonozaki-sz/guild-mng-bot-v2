@@ -91,7 +91,7 @@ function createInteraction(
       has: vi.fn(() => true),
     },
     options: {
-      getSubcommand: vi.fn(() => "set-ch"),
+      getSubcommand: vi.fn(() => "set-channel"),
       getChannel: vi.fn(() => ({
         id: "afk-channel",
         type: ChannelType.GuildVoice,
@@ -121,11 +121,11 @@ describe("bot/commands/afk-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // set-ch 正常系として保存と Ephemeral 返信を検証
-  it("sets AFK channel on set-ch subcommand", async () => {
+  // set-channel 正常系として保存と Ephemeral 返信を検証
+  it("sets AFK channel on set-channel subcommand", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "set-ch"),
+        getSubcommand: vi.fn(() => "set-channel"),
         getChannel: vi.fn(() => ({
           id: "afk-channel",
           type: ChannelType.GuildVoice,
@@ -163,12 +163,12 @@ describe("bot/commands/afk-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // set-ch で権限不足の場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates permission error on set-ch", async () => {
+  // set-channel で権限不足の場合は共通エラーハンドラへ委譲されることを検証
+  it("delegates permission error on set-channel", async () => {
     const interaction = createInteraction({
       memberPermissions: { has: vi.fn(() => false) },
       options: {
-        getSubcommand: vi.fn(() => "set-ch"),
+        getSubcommand: vi.fn(() => "set-channel"),
         getChannel: vi.fn(() => ({
           id: "afk-channel",
           type: ChannelType.GuildVoice,
@@ -183,11 +183,11 @@ describe("bot/commands/afk-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // set-ch でVC以外を指定した場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates invalid channel type error on set-ch", async () => {
+  // set-channel でVC以外を指定した場合は共通エラーハンドラへ委譲されることを検証
+  it("delegates invalid channel type error on set-channel", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: vi.fn(() => "set-ch"),
+        getSubcommand: vi.fn(() => "set-channel"),
         getChannel: vi.fn(() => ({
           id: "text-1",
           type: ChannelType.GuildText,
