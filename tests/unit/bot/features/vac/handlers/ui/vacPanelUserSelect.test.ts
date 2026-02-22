@@ -1,11 +1,11 @@
 import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
 import { safeReply } from "@/bot/utils/interaction";
 
-const isManagedVacChannelMock = jest.fn();
-const getAfkConfigMock = jest.fn();
+const isManagedVacChannelMock = vi.fn();
+const getAfkConfigMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(
     async (_guildId: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.members_moved") {
         return `moved:${String(params?.count)}`;
@@ -15,32 +15,30 @@ jest.mock("@/shared/locale/localeManager", () => ({
   ),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(() => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(() => ({
     isManagedVacChannel: isManagedVacChannelMock,
   })),
 }));
 
-jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: jest.fn(() => ({
-    getAfkConfig: getAfkConfigMock,
-  })),
+vi.mock("@/shared/features/afk/afkConfigService", () => ({
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
-jest.mock("@/bot/utils/interaction", () => ({
-  safeReply: jest.fn(),
+vi.mock("@/bot/utils/interaction", () => ({
+  safeReply: vi.fn(),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: jest.fn((message: string) => ({ message })),
-  createSuccessEmbed: jest.fn((message: string) => ({ message })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: vi.fn((message: string) => ({ message })),
+  createSuccessEmbed: vi.fn((message: string) => ({ message })),
 }));
 
-jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
   VAC_PANEL_CUSTOM_ID: {
     AFK_SELECT_PREFIX: "vac:afk-select:",
   },
-  getVacPanelChannelId: jest.fn((customId: string, prefix: string) =>
+  getVacPanelChannelId: vi.fn((customId: string, prefix: string) =>
     customId.startsWith(prefix) ? customId.slice(prefix.length) : "",
   ),
 }));
@@ -54,10 +52,10 @@ function createInteraction(options?: {
     options?.channel ??
     ({ id: "voice-1", type: 2, members: { size: 3 } } as const);
 
-  const user1SetChannel = jest.fn().mockResolvedValue(undefined);
-  const user2SetChannel = jest.fn().mockResolvedValue(undefined);
+  const user1SetChannel = vi.fn().mockResolvedValue(undefined);
+  const user2SetChannel = vi.fn().mockResolvedValue(undefined);
 
-  const membersFetch = jest.fn(async (userId: string) => {
+  const membersFetch = vi.fn(async (userId: string) => {
     if (userId === "user-1") {
       return {
         voice: { channelId: options?.operatorChannelId ?? "voice-1" },
@@ -83,7 +81,7 @@ function createInteraction(options?: {
   });
 
   const afkChannel = { id: "afk-1", type: 2 };
-  const channelsFetch = jest.fn(async (channelId: string) => {
+  const channelsFetch = vi.fn(async (channelId: string) => {
     if (channelId === "voice-1") {
       return targetChannel;
     }
@@ -111,7 +109,7 @@ function createInteraction(options?: {
 
 describe("bot/features/vac/handlers/ui/vacPanelUserSelect", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     isManagedVacChannelMock.mockResolvedValue(true);
     getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: "afk-1" });
   });

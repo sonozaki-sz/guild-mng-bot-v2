@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import {
   handleCommandError,
   handleInteractionError,
@@ -8,52 +9,52 @@ import { logger } from "@/shared/utils/logger";
 import { Events, MessageFlags } from "discord.js";
 
 // ErrorHandler は呼び出し有無の検証に限定する
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
-  handleInteractionError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
+  handleInteractionError: vi.fn(),
 }));
 
 // ローカライズは固定文字列化してアサーションを簡潔にする
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
-  tGuild: jest.fn(async (_guildId: string, key: string) => `guild:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
+  tGuild: vi.fn(async (_guildId: string, key: string) => `guild:${key}`),
 }));
 
 // ログ出力は副作用回避のためダミー化する
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // レジストリハンドラはテストごとに挙動を制御できるようダミーを公開する
-jest.mock("@/bot/handlers/interactionCreate/ui/buttons", () => {
+vi.mock("@/bot/handlers/interactionCreate/ui/buttons", () => {
   const mockButtonHandler = {
-    matches: jest.fn(() => false),
-    execute: jest.fn().mockResolvedValue(undefined),
+    matches: vi.fn(() => false),
+    execute: vi.fn().mockResolvedValue(undefined),
   };
   return {
     buttonHandlers: [mockButtonHandler],
     __mockButtonHandler: mockButtonHandler,
   };
 });
-jest.mock("@/bot/handlers/interactionCreate/ui/modals", () => {
+vi.mock("@/bot/handlers/interactionCreate/ui/modals", () => {
   const mockModalHandler = {
-    matches: jest.fn(() => false),
-    execute: jest.fn().mockResolvedValue(undefined),
+    matches: vi.fn(() => false),
+    execute: vi.fn().mockResolvedValue(undefined),
   };
   return {
     modalHandlers: [mockModalHandler],
     __mockModalHandler: mockModalHandler,
   };
 });
-jest.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => {
+vi.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => {
   const mockUserSelectHandler = {
-    matches: jest.fn(() => false),
-    execute: jest.fn().mockResolvedValue(undefined),
+    matches: vi.fn(() => false),
+    execute: vi.fn().mockResolvedValue(undefined),
   };
   return {
     userSelectHandlers: [mockUserSelectHandler],
@@ -64,19 +65,19 @@ jest.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => {
 type BaseInteraction = {
   client: {
     commands: Map<string, unknown>;
-    cooldownManager: { check: jest.Mock };
-    modals: Map<string, { execute: jest.Mock<Promise<void>, [unknown]> }>;
+    cooldownManager: { check: Mock };
+    modals: Map<string, { execute: Mock<(arg: unknown) => Promise<void>> }>;
   };
   commandName: string;
   customId: string;
   guildId: string;
   user: { id: string; tag: string };
-  reply: jest.Mock<Promise<void>, [unknown]>;
-  isChatInputCommand: jest.Mock<boolean, []>;
-  isAutocomplete: jest.Mock<boolean, []>;
-  isModalSubmit: jest.Mock<boolean, []>;
-  isButton: jest.Mock<boolean, []>;
-  isUserSelectMenu: jest.Mock<boolean, []>;
+  reply: Mock<(arg: unknown) => Promise<void>>;
+  isChatInputCommand: Mock<() => boolean>;
+  isAutocomplete: Mock<() => boolean>;
+  isModalSubmit: Mock<() => boolean>;
+  isButton: Mock<() => boolean>;
+  isUserSelectMenu: Mock<() => boolean>;
 };
 
 // interactionCreate 用の最小 interaction を共通化して分岐設定を容易にする
@@ -86,19 +87,19 @@ function createInteraction(
   return {
     client: {
       commands: new Map(),
-      cooldownManager: { check: jest.fn(() => 0) },
+      cooldownManager: { check: vi.fn(() => 0) },
       modals: new Map(),
     },
     commandName: "ping",
     customId: "custom-id",
     guildId: "guild-1",
     user: { id: "user-1", tag: "user#0001" },
-    reply: jest.fn().mockResolvedValue(undefined),
-    isChatInputCommand: jest.fn(() => false),
-    isAutocomplete: jest.fn(() => false),
-    isModalSubmit: jest.fn(() => false),
-    isButton: jest.fn(() => false),
-    isUserSelectMenu: jest.fn(() => false),
+    reply: vi.fn().mockResolvedValue(undefined),
+    isChatInputCommand: vi.fn(() => false),
+    isAutocomplete: vi.fn(() => false),
+    isModalSubmit: vi.fn(() => false),
+    isButton: vi.fn(() => false),
+    isUserSelectMenu: vi.fn(() => false),
     ...overrides,
   };
 }
@@ -106,7 +107,7 @@ function createInteraction(
 describe("bot/events/interactionCreate", () => {
   // テスト前にモック状態を初期化し、分岐ごとの副作用検証を安定化する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // イベントメタ情報が正しいことをまず担保する
@@ -120,10 +121,10 @@ describe("bot/events/interactionCreate", () => {
     const command = {
       data: { name: "ping" },
       cooldown: 5,
-      execute: jest.fn(),
+      execute: vi.fn(),
     };
     const interaction = createInteraction({
-      isChatInputCommand: jest.fn(() => true),
+      isChatInputCommand: vi.fn(() => true),
     });
     interaction.client.commands.set("ping", command);
     interaction.client.cooldownManager.check.mockReturnValue(2);
@@ -142,12 +143,12 @@ describe("bot/events/interactionCreate", () => {
 
   // モーダルは registry の prefix match を優先して実行されることを確認する
   it("routes modal submit to registry handler first", async () => {
-    const mockedModalModule = jest.requireMock(
+    const mockedModalModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: jest.Mock<boolean, [string]>;
-        execute: jest.Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -155,7 +156,7 @@ describe("bot/events/interactionCreate", () => {
 
     const interaction = createInteraction({
       customId: "vac:rename:123",
-      isModalSubmit: jest.fn(() => true),
+      isModalSubmit: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);
@@ -167,12 +168,12 @@ describe("bot/events/interactionCreate", () => {
 
   // modal registry 実行失敗時は interaction error ハンドラへ委譲されることを検証
   it("delegates modal registry handler error to interaction error handler", async () => {
-    const mockedModalModule = jest.requireMock(
+    const mockedModalModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: jest.Mock<boolean, [string]>;
-        execute: jest.Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -182,7 +183,7 @@ describe("bot/events/interactionCreate", () => {
 
     const interaction = createInteraction({
       customId: "vac:rename:error",
-      isModalSubmit: jest.fn(() => true),
+      isModalSubmit: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);
@@ -195,12 +196,12 @@ describe("bot/events/interactionCreate", () => {
 
   // ボタン実行失敗時は handleInteractionError にフォールバックすることを検証する
   it("delegates button handler error to interaction error handler", async () => {
-    const mockedButtonModule = jest.requireMock(
+    const mockedButtonModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __mockButtonHandler: {
-        matches: jest.Mock<boolean, [string]>;
-        execute: jest.Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
 
@@ -210,7 +211,7 @@ describe("bot/events/interactionCreate", () => {
 
     const interaction = createInteraction({
       customId: "button:1",
-      isButton: jest.fn(() => true),
+      isButton: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);
@@ -224,11 +225,11 @@ describe("bot/events/interactionCreate", () => {
     const command = {
       data: { name: "ping" },
       cooldown: 3,
-      execute: jest.fn().mockRejectedValue(error),
+      execute: vi.fn().mockRejectedValue(error),
     };
 
     const interaction = createInteraction({
-      isChatInputCommand: jest.fn(() => true),
+      isChatInputCommand: vi.fn(() => true),
     });
     interaction.client.commands.set("ping", command);
 
@@ -240,7 +241,7 @@ describe("bot/events/interactionCreate", () => {
   // 未登録コマンド名は警告ログのみで終了することを検証
   it("warns and returns when command is not found", async () => {
     const interaction = createInteraction({
-      isChatInputCommand: jest.fn(() => true),
+      isChatInputCommand: vi.fn(() => true),
       commandName: "unknown",
     });
 
@@ -257,10 +258,10 @@ describe("bot/events/interactionCreate", () => {
     const command = {
       data: { name: "ping" },
       cooldown: undefined,
-      execute: jest.fn(),
+      execute: vi.fn(),
     };
     const interaction = createInteraction({
-      isChatInputCommand: jest.fn(() => true),
+      isChatInputCommand: vi.fn(() => true),
       guildId: "",
     });
     interaction.client.commands.set("ping", command);
@@ -280,10 +281,10 @@ describe("bot/events/interactionCreate", () => {
     const command = {
       data: { name: "ping" },
       cooldown: 3,
-      execute: jest.fn().mockResolvedValue(undefined),
+      execute: vi.fn().mockResolvedValue(undefined),
     };
     const interaction = createInteraction({
-      isChatInputCommand: jest.fn(() => true),
+      isChatInputCommand: vi.fn(() => true),
     });
     interaction.client.commands.set("ping", command);
     interaction.client.cooldownManager.check.mockReturnValue(0);
@@ -298,14 +299,14 @@ describe("bot/events/interactionCreate", () => {
 
   // autocomplete 対応コマンドがある場合に実行されることを検証
   it("executes autocomplete handler when available", async () => {
-    const autocomplete = jest.fn().mockResolvedValue(undefined);
+    const autocomplete = vi.fn().mockResolvedValue(undefined);
     const command = {
       data: { name: "ping" },
-      execute: jest.fn(),
+      execute: vi.fn(),
       autocomplete,
     };
     const interaction = createInteraction({
-      isAutocomplete: jest.fn(() => true),
+      isAutocomplete: vi.fn(() => true),
     });
     interaction.client.commands.set("ping", command);
 
@@ -317,14 +318,14 @@ describe("bot/events/interactionCreate", () => {
   // autocomplete 非対応または未登録は何もせず終了することを検証
   it("returns on autocomplete when command is missing or no autocomplete", async () => {
     const interaction = createInteraction({
-      isAutocomplete: jest.fn(() => true),
+      isAutocomplete: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);
 
     const commandWithoutAutocomplete = {
       data: { name: "ping" },
-      execute: jest.fn(),
+      execute: vi.fn(),
     };
     interaction.client.commands.set("ping", commandWithoutAutocomplete);
     await interactionCreateEvent.execute(interaction as never);
@@ -340,11 +341,11 @@ describe("bot/events/interactionCreate", () => {
     const autocompleteError = new Error("autocomplete failed");
     const command = {
       data: { name: "ping" },
-      execute: jest.fn(),
-      autocomplete: jest.fn().mockRejectedValue(autocompleteError),
+      execute: vi.fn(),
+      autocomplete: vi.fn().mockRejectedValue(autocompleteError),
     };
     const interaction = createInteraction({
-      isAutocomplete: jest.fn(() => true),
+      isAutocomplete: vi.fn(() => true),
     });
     interaction.client.commands.set("ping", command);
 
@@ -358,18 +359,18 @@ describe("bot/events/interactionCreate", () => {
 
   // modal registry 非一致時は client.modals を使わず警告して終了することを検証
   it("does not use client modal collection when registry has no match", async () => {
-    const mockedModalModule = jest.requireMock(
+    const mockedModalModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: jest.Mock<boolean, [string]>;
+        matches: Mock<(s: string) => boolean>;
       };
     };
     mockedModalModule.__mockModalHandler.matches.mockReturnValue(false);
 
-    const modalExecute = jest.fn().mockResolvedValue(undefined);
+    const modalExecute = vi.fn().mockResolvedValue(undefined);
     const interaction = createInteraction({
-      isModalSubmit: jest.fn(() => true),
+      isModalSubmit: vi.fn(() => true),
       customId: "modal:exact",
     });
     interaction.client.modals.set("modal:exact", { execute: modalExecute });
@@ -384,17 +385,17 @@ describe("bot/events/interactionCreate", () => {
 
   // modal fallback でも見つからない場合は警告して終了することを検証
   it("warns when modal is unknown in both registry and collection", async () => {
-    const mockedModalModule = jest.requireMock(
+    const mockedModalModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: jest.Mock<boolean, [string]>;
+        matches: Mock<(s: string) => boolean>;
       };
     };
     mockedModalModule.__mockModalHandler.matches.mockReturnValue(false);
 
     const interaction = createInteraction({
-      isModalSubmit: jest.fn(() => true),
+      isModalSubmit: vi.fn(() => true),
       customId: "modal:missing",
     });
 
@@ -407,19 +408,19 @@ describe("bot/events/interactionCreate", () => {
 
   // registry 非一致時は fallback モーダルの失敗も発生せず interaction error へ委譲しない
   it("does not delegate modal collection errors when registry has no match", async () => {
-    const mockedModalModule = jest.requireMock(
+    const mockedModalModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __mockModalHandler: {
-        matches: jest.Mock<boolean, [string]>;
+        matches: Mock<(s: string) => boolean>;
       };
     };
     mockedModalModule.__mockModalHandler.matches.mockReturnValue(false);
 
     const modalError = new Error("modal failed");
-    const modalExecute = jest.fn().mockRejectedValue(modalError);
+    const modalExecute = vi.fn().mockRejectedValue(modalError);
     const interaction = createInteraction({
-      isModalSubmit: jest.fn(() => true),
+      isModalSubmit: vi.fn(() => true),
       customId: "modal:error",
     });
     interaction.client.modals.set("modal:error", { execute: modalExecute });
@@ -432,19 +433,19 @@ describe("bot/events/interactionCreate", () => {
 
   // user select ハンドラ成功時に execute が呼ばれることを検証
   it("routes user select menu to handler", async () => {
-    const mockedSelectModule = jest.requireMock(
+    const mockedSelectModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
-        matches: jest.Mock<boolean, [string]>;
-        execute: jest.Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     mockedSelectModule.__mockUserSelectHandler.matches.mockReturnValue(true);
 
     const interaction = createInteraction({
       customId: "user-select:1",
-      isUserSelectMenu: jest.fn(() => true),
+      isUserSelectMenu: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);
@@ -456,12 +457,12 @@ describe("bot/events/interactionCreate", () => {
 
   // user select ハンドラ失敗時は interaction error ハンドラへ委譲することを検証
   it("delegates user select handler error to interaction error handler", async () => {
-    const mockedSelectModule = jest.requireMock(
+    const mockedSelectModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
-        matches: jest.Mock<boolean, [string]>;
-        execute: jest.Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     const selectError = new Error("select failed");
@@ -472,7 +473,7 @@ describe("bot/events/interactionCreate", () => {
 
     const interaction = createInteraction({
       customId: "user-select:error",
-      isUserSelectMenu: jest.fn(() => true),
+      isUserSelectMenu: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);
@@ -485,19 +486,19 @@ describe("bot/events/interactionCreate", () => {
 
   // ボタンハンドラ未一致時は何も実行しないことを検証
   it("does nothing when no button handler matches", async () => {
-    const mockedButtonModule = jest.requireMock(
+    const mockedButtonModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __mockButtonHandler: {
-        matches: jest.Mock<boolean, [string]>;
-        execute: jest.Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     mockedButtonModule.__mockButtonHandler.matches.mockReturnValue(false);
 
     const interaction = createInteraction({
       customId: "button:none",
-      isButton: jest.fn(() => true),
+      isButton: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);
@@ -510,19 +511,19 @@ describe("bot/events/interactionCreate", () => {
 
   // ユーザーセレクトハンドラ未一致時は何も実行しないことを検証
   it("does nothing when no user select handler matches", async () => {
-    const mockedSelectModule = jest.requireMock(
+    const mockedSelectModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __mockUserSelectHandler: {
-        matches: jest.Mock<boolean, [string]>;
-        execute: jest.Mock<Promise<void>, [unknown]>;
+        matches: Mock<(s: string) => boolean>;
+        execute: Mock<(arg: unknown) => Promise<void>>;
       };
     };
     mockedSelectModule.__mockUserSelectHandler.matches.mockReturnValue(false);
 
     const interaction = createInteraction({
       customId: "user-select:none",
-      isUserSelectMenu: jest.fn(() => true),
+      isUserSelectMenu: vi.fn(() => true),
     });
 
     await interactionCreateEvent.execute(interaction as never);

@@ -1,22 +1,23 @@
+import type { Mock } from "vitest";
 import { ensureManageGuildPermission } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { PermissionFlagsBits } from "discord.js";
 
-const tGuildMock: jest.Mock = jest.fn(async () => "permission required");
+const tGuildMock: Mock = vi.fn(async () => "permission required");
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
 }));
 
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("passes when interaction has manage-guild permission", async () => {
     const interaction = {
       memberPermissions: {
-        has: jest.fn(() => true),
+        has: vi.fn(() => true),
       },
     };
 
@@ -31,7 +32,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
   it("throws ValidationError when permission is missing", async () => {
     const interaction = {
       memberPermissions: {
-        has: jest.fn(() => false),
+        has: vi.fn(() => false),
       },
     };
 

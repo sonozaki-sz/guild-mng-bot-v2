@@ -1,3 +1,4 @@
+import type { Mock, MockInstance } from "vitest";
 // bot/main の起動フロー（コマンド登録・イベント登録・エラー終了）を副作用隔離で検証
 type BootOptions = {
   guildId?: string;
@@ -7,33 +8,33 @@ type BootOptions = {
 
 type BootResult = {
   logger: {
-    info: jest.Mock;
-    debug: jest.Mock;
-    error: jest.Mock;
+    info: Mock;
+    debug: Mock;
+    error: Mock;
   };
   client: {
     rest: {
-      setToken: jest.Mock;
-      put: jest.Mock;
+      setToken: Mock;
+      put: Mock;
     };
     commands: {
-      set: jest.Mock;
+      set: Mock;
     };
-    login: jest.Mock;
-    shutdown: jest.Mock;
+    login: Mock;
+    shutdown: Mock;
   };
   prisma: {
-    $connect: jest.Mock;
-    $disconnect: jest.Mock;
+    $connect: Mock;
+    $disconnect: Mock;
   };
-  setupGlobalErrorHandlers: jest.Mock;
-  setupGracefulShutdown: jest.Mock;
-  registerBotEvents: jest.Mock;
+  setupGlobalErrorHandlers: Mock;
+  setupGracefulShutdown: Mock;
+  registerBotEvents: Mock;
   routes: {
-    applicationGuildCommands: jest.Mock;
-    applicationCommands: jest.Mock;
+    applicationGuildCommands: Mock;
+    applicationCommands: Mock;
   };
-  processExitSpy: jest.SpyInstance;
+  processExitSpy: MockInstance;
 };
 
 const flushMicrotasks = async () => {
@@ -42,125 +43,181 @@ const flushMicrotasks = async () => {
   await Promise.resolve();
 };
 
+// vi.hoisted で各モジュールの可変参照を作成する
+// bootMain が呼ばれるたびに実装を差し替えるためのコンテナ
+const mutableMocks = vi.hoisted(() => ({
+  prisma: null as null | {
+    $connect: Mock;
+    $disconnect: Mock;
+  },
+  client: null as null | {
+    rest: { setToken: Mock; put: Mock };
+    commands: { set: Mock };
+    login: Mock;
+    shutdown: Mock;
+  },
+  logger: null as null | { info: Mock; debug: Mock; error: Mock },
+  setupGlobalErrorHandlers: null as null | Mock,
+  setupGracefulShutdown: null as null | Mock,
+  registerBotEvents: null as null | Mock,
+  routes: null as null | {
+    applicationGuildCommands: Mock;
+    applicationCommands: Mock;
+  },
+  guildId: undefined as string | undefined,
+}));
+
+// vi.resetModules()後もコンストラクタとして動作するよう、
+// アロー関数でなくfunction式を使ってvi.fn()に渡す
+vi.mock("@prisma/adapter-libsql", () => ({
+  PrismaLibSql: vi.fn(function (this: unknown) {
+    return {};
+  }),
+}));
+
+vi.mock("@prisma/client", () => ({
+  PrismaClient: vi.fn(function (this: unknown) {
+    return mutableMocks.prisma;
+  }),
+}));
+
+vi.mock("discord.js", () => ({
+  Routes: {
+    applicationGuildCommands: vi.fn((...args: unknown[]) =>
+      mutableMocks.routes?.applicationGuildCommands(...args),
+    ),
+    applicationCommands: vi.fn((...args: unknown[]) =>
+      mutableMocks.routes?.applicationCommands(...args),
+    ),
+  },
+}));
+
+vi.mock("@/shared/config/env", () => ({
+  get env() {
+    return {
+      DATABASE_URL: "file::memory:?cache=shared",
+      DISCORD_TOKEN: "test-token",
+      DISCORD_APP_ID: "123456",
+      DISCORD_GUILD_ID: mutableMocks.guildId,
+    };
+  },
+}));
+
+vi.mock("@/shared/errors/errorHandler", () => ({
+  get setupGlobalErrorHandlers() {
+    return mutableMocks.setupGlobalErrorHandlers;
+  },
+  get setupGracefulShutdown() {
+    return mutableMocks.setupGracefulShutdown;
+  },
+}));
+
+vi.mock("@/shared/locale/localeManager", () => ({
+  localeManager: {
+    initialize: vi.fn().mockResolvedValue(undefined),
+    setRepository: vi.fn(),
+  },
+  tDefault: vi.fn((key: string) => key),
+}));
+
+vi.mock("@/shared/utils/logger", () => ({
+  get logger() {
+    return mutableMocks.logger;
+  },
+}));
+
+vi.mock("@/shared/utils/prisma", () => ({
+  setPrismaClient: vi.fn(),
+}));
+
+vi.mock("@/bot/services/botEventRegistration", () => ({
+  get registerBotEvents() {
+    return mutableMocks.registerBotEvents;
+  },
+}));
+
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  initializeBotCompositionRoot: vi.fn(),
+}));
+
+vi.mock("@/bot/client", () => ({
+  createBotClient: vi.fn(() => mutableMocks.client),
+}));
+
+vi.mock("@/bot/commands/commands", () => ({
+  commands: [
+    {
+      data: {
+        name: "ping",
+        toJSON: vi.fn(() => ({ name: "ping" })),
+      },
+    },
+  ],
+}));
+
+vi.mock("@/bot/events/events", () => ({
+  events: [
+    {
+      name: "ready",
+      once: true,
+      execute: vi.fn(),
+    },
+  ],
+}));
+
 // import 時に起動される main.ts を安全に検証するため、依存を全面モックしてブートする
 async function bootMain(options: BootOptions = {}): Promise<BootResult> {
-  jest.resetModules();
+  const routes = {
+    applicationGuildCommands: vi.fn(() => "guild-route"),
+    applicationCommands: vi.fn(() => "global-route"),
+  };
 
   const prisma = {
     $connect: options.connectReject
-      ? jest.fn().mockRejectedValue(new Error("connect failed"))
-      : jest.fn().mockResolvedValue(undefined),
-    $disconnect: jest.fn().mockResolvedValue(undefined),
+      ? vi.fn().mockRejectedValue(new Error("connect failed"))
+      : vi.fn().mockResolvedValue(undefined),
+    $disconnect: vi.fn().mockResolvedValue(undefined),
   };
 
   const client = {
     rest: {
-      setToken: jest.fn(),
+      setToken: vi.fn(),
       put: options.restPutReject
-        ? jest.fn().mockRejectedValue(new Error("put failed"))
-        : jest.fn().mockResolvedValue(undefined),
+        ? vi.fn().mockRejectedValue(new Error("put failed"))
+        : vi.fn().mockResolvedValue(undefined),
     },
     commands: {
-      set: jest.fn(),
+      set: vi.fn(),
     },
-    login: jest.fn().mockResolvedValue(undefined),
-    shutdown: jest.fn().mockResolvedValue(undefined),
+    login: vi.fn().mockResolvedValue(undefined),
+    shutdown: vi.fn().mockResolvedValue(undefined),
   };
 
-  const setupGlobalErrorHandlers = jest.fn();
-  const setupGracefulShutdown = jest.fn();
-  const registerBotEvents = jest.fn();
+  const setupGlobalErrorHandlers = vi.fn();
+  const setupGracefulShutdown = vi.fn();
+  const registerBotEvents = vi.fn();
 
   const logger = {
-    info: jest.fn(),
-    debug: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    error: vi.fn(),
   };
 
-  const routes = {
-    applicationGuildCommands: jest.fn(() => "guild-route"),
-    applicationCommands: jest.fn(() => "global-route"),
-  };
+  // mutableMocks に値をセット（モック内の getter/forwarder が参照する）
+  mutableMocks.prisma = prisma;
+  mutableMocks.client = client;
+  mutableMocks.logger = logger;
+  mutableMocks.setupGlobalErrorHandlers = setupGlobalErrorHandlers;
+  mutableMocks.setupGracefulShutdown = setupGracefulShutdown;
+  mutableMocks.registerBotEvents = registerBotEvents;
+  mutableMocks.routes = routes;
+  mutableMocks.guildId = options.guildId;
 
-  const processExitSpy = jest
+  const processExitSpy = vi
     .spyOn(process, "exit")
     .mockImplementation((() => undefined) as never);
 
-  const command = {
-    data: {
-      name: "ping",
-      toJSON: jest.fn(() => ({ name: "ping" })),
-    },
-  };
-
-  const event = {
-    name: "ready",
-    once: true,
-    execute: jest.fn(),
-  };
-
-  jest.doMock("@prisma/adapter-libsql", () => ({
-    PrismaLibSql: jest.fn().mockImplementation(() => ({})),
-  }));
-
-  jest.doMock("@prisma/client", () => ({
-    PrismaClient: jest.fn().mockImplementation(() => prisma),
-  }));
-
-  jest.doMock("discord.js", () => ({
-    Routes: routes,
-  }));
-
-  jest.doMock("@/shared/config/env", () => ({
-    env: {
-      DATABASE_URL: "file::memory:?cache=shared",
-      DISCORD_TOKEN: "test-token",
-      DISCORD_APP_ID: "123456",
-      DISCORD_GUILD_ID: options.guildId,
-    },
-  }));
-
-  jest.doMock("@/shared/errors/errorHandler", () => ({
-    setupGlobalErrorHandlers,
-    setupGracefulShutdown,
-  }));
-
-  jest.doMock("@/shared/locale/localeManager", () => ({
-    localeManager: {
-      initialize: jest.fn().mockResolvedValue(undefined),
-      setRepository: jest.fn(),
-    },
-    tDefault: jest.fn((key: string) => key),
-  }));
-
-  jest.doMock("@/shared/utils/logger", () => ({
-    logger,
-  }));
-
-  jest.doMock("@/shared/utils/prisma", () => ({
-    setPrismaClient: jest.fn(),
-  }));
-
-  jest.doMock("@/bot/services/botEventRegistration", () => ({
-    registerBotEvents,
-  }));
-
-  jest.doMock("@/bot/services/botCompositionRoot", () => ({
-    initializeBotCompositionRoot: jest.fn(),
-  }));
-
-  jest.doMock("@/bot/client", () => ({
-    createBotClient: jest.fn(() => client),
-  }));
-
-  jest.doMock("@/bot/commands/commands", () => ({
-    commands: [command],
-  }));
-
-  jest.doMock("@/bot/events/events", () => ({
-    events: [event],
-  }));
-
+  vi.resetModules();
   await import("@/bot/main");
   await flushMicrotasks();
 
@@ -179,7 +236,7 @@ async function bootMain(options: BootOptions = {}): Promise<BootResult> {
 describe("bot/main", () => {
   // process.exit スパイを含むグローバルモックをケースごとに復元する
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   // ギルドコマンド登録とイベント登録、ログイン、graceful shutdown の主経路を検証

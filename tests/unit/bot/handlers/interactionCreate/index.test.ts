@@ -1,20 +1,22 @@
-const handleAutocompleteMock = jest.fn();
-const handleButtonMock = jest.fn();
-const handleChatInputCommandMock = jest.fn();
-const handleModalSubmitMock = jest.fn();
-const handleUserSelectMenuMock = jest.fn();
+import type { Mock } from "vitest";
 
-jest.mock("@/bot/handlers/interactionCreate/flow/command", () => ({
+const handleAutocompleteMock: Mock = vi.fn();
+const handleButtonMock: Mock = vi.fn();
+const handleChatInputCommandMock: Mock = vi.fn();
+const handleModalSubmitMock: Mock = vi.fn();
+const handleUserSelectMenuMock: Mock = vi.fn();
+
+vi.mock("@/bot/handlers/interactionCreate/flow/command", () => ({
   handleAutocomplete: (...args: unknown[]) => handleAutocompleteMock(...args),
   handleChatInputCommand: (...args: unknown[]) =>
     handleChatInputCommandMock(...args),
 }));
 
-jest.mock("@/bot/handlers/interactionCreate/flow/modal", () => ({
+vi.mock("@/bot/handlers/interactionCreate/flow/modal", () => ({
   handleModalSubmit: (...args: unknown[]) => handleModalSubmitMock(...args),
 }));
 
-jest.mock("@/bot/handlers/interactionCreate/flow/components", () => ({
+vi.mock("@/bot/handlers/interactionCreate/flow/components", () => ({
   handleButton: (...args: unknown[]) => handleButtonMock(...args),
   handleUserSelectMenu: (...args: unknown[]) =>
     handleUserSelectMenuMock(...args),
@@ -22,7 +24,7 @@ jest.mock("@/bot/handlers/interactionCreate/flow/components", () => ({
 
 describe("bot/handlers/interactionCreate/index", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("routes chat input command to chat handler", async () => {

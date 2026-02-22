@@ -2,22 +2,22 @@ import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.constants";
 import { executeBumpReminderConfigCommand } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute";
 
-const ensureManageGuildPermissionMock = jest.fn();
-const enableMock = jest.fn();
-const disableMock = jest.fn();
-const setMentionMock = jest.fn();
-const removeMentionMock = jest.fn();
-const showMock = jest.fn();
+const ensureManageGuildPermissionMock = vi.fn();
+const enableMock = vi.fn();
+const disableMock = vi.fn();
+const setMentionMock = vi.fn();
+const removeMentionMock = vi.fn();
+const showMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
   () => ({
     ensureManageGuildPermission: (...args: unknown[]) =>
@@ -25,14 +25,14 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable",
   () => ({
     handleBumpReminderConfigEnable: (...args: unknown[]) => enableMock(...args),
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable",
   () => ({
     handleBumpReminderConfigDisable: (...args: unknown[]) =>
@@ -40,7 +40,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMention",
   () => ({
     handleBumpReminderConfigSetMention: (...args: unknown[]) =>
@@ -48,7 +48,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMention",
   () => ({
     handleBumpReminderConfigRemoveMention: (...args: unknown[]) =>
@@ -56,7 +56,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.show",
   () => ({
     handleBumpReminderConfigShow: (...args: unknown[]) => showMock(...args),
@@ -67,14 +67,14 @@ function createInteraction(subcommand: string) {
   return {
     guildId: "guild-1",
     options: {
-      getSubcommand: jest.fn(() => subcommand),
+      getSubcommand: vi.fn(() => subcommand),
     },
   };
 }
 
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
   });
 

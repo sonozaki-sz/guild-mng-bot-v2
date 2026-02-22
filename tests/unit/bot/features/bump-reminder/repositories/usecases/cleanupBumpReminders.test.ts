@@ -3,7 +3,7 @@ import { cleanupOldBumpRemindersUseCase } from "@/bot/features/bump-reminder/rep
 
 describe("bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders", () => {
   it("deletes old sent/cancelled reminders and returns count", async () => {
-    const deleteMany = jest.fn().mockResolvedValue({ count: 2 });
+    const deleteMany = vi.fn().mockResolvedValue({ count: 2 });
     const prisma = { bumpReminder: { deleteMany } };
 
     const result = await cleanupOldBumpRemindersUseCase(prisma as never, 7);

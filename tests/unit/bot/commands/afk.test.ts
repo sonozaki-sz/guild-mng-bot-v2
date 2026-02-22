@@ -1,14 +1,15 @@
+import type { Mock } from "vitest";
 import type { ChatInputCommandInteraction } from "discord.js";
 
-const getAfkConfigMock = jest.fn();
-const tGuildMock = jest.fn();
-const tDefaultMock = jest.fn((key: string) => `default:${key}`);
-const createSuccessEmbedMock = jest.fn((description: string) => ({
+const getAfkConfigMock = vi.fn();
+const tGuildMock = vi.hoisted(() => vi.fn());
+const tDefaultMock = vi.hoisted(() => vi.fn((key: string) => `default:${key}`));
+const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
 
 // DB依存は AFK 設定取得のみをモックし、コマンド本体ロジックを直接検証する
-jest.mock(
+vi.mock(
   "@/bot/services/botGuildConfigRepositoryResolver",
   () => ({
     getBotGuildConfigRepository: () => ({
@@ -17,39 +18,39 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
+vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
   }),
 }));
 
 // 共通エラーハンドラの委譲を検証する
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
 }));
 
 // i18n を固定文字列化してアサーションを単純化する
-jest.mock("@/shared/locale/commandLocalizations", () => ({
+vi.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
 }));
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));
 
 // Embed 生成は引数検証に集中する
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
 }));
 
 // ログ出力の副作用を抑止する
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    info: jest.fn(),
+    info: vi.fn(),
   },
 }));
 
@@ -60,13 +61,13 @@ type AfkInteraction = {
   guildId: string | null;
   user: { id: string };
   options: {
-    getUser: jest.Mock;
+    getUser: Mock;
   };
   guild: {
-    members: { fetch: jest.Mock };
-    channels: { fetch: jest.Mock };
+    members: { fetch: Mock };
+    channels: { fetch: Mock };
   };
-  reply: jest.Mock;
+  reply: Mock;
 };
 
 // AFKコマンド検証用の最小 interaction モック
@@ -77,25 +78,25 @@ function createInteraction(
     guildId: "guild-1",
     user: { id: "user-1" },
     options: {
-      getUser: jest.fn(() => null),
+      getUser: vi.fn(() => null),
     },
     guild: {
       members: {
-        fetch: jest.fn().mockResolvedValue({
+        fetch: vi.fn().mockResolvedValue({
           voice: {
             channel: { id: "voice-1" },
-            setChannel: jest.fn().mockResolvedValue(undefined),
+            setChannel: vi.fn().mockResolvedValue(undefined),
           },
         }),
       },
       channels: {
-        fetch: jest.fn().mockResolvedValue({
+        fetch: vi.fn().mockResolvedValue({
           id: "afk-channel",
           type: 2,
         }),
       },
     },
-    reply: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -103,7 +104,7 @@ function createInteraction(
 describe("bot/commands/afk", () => {
   // 各ケースでモックを初期化し、相互影響を防ぐ
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     tGuildMock.mockResolvedValue("translated");
     getAfkConfigMock.mockResolvedValue({
       enabled: true,
@@ -154,10 +155,10 @@ describe("bot/commands/afk", () => {
     const interaction = createInteraction({
       guild: {
         members: {
-          fetch: jest.fn().mockRejectedValue(new Error("fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("fetch failed")),
         },
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "afk-channel",
             type: 2,
           }),
@@ -177,15 +178,15 @@ describe("bot/commands/afk", () => {
     const interaction = createInteraction({
       guild: {
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: {
               channel: null,
-              setChannel: jest.fn().mockResolvedValue(undefined),
+              setChannel: vi.fn().mockResolvedValue(undefined),
             },
           }),
         },
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "afk-channel",
             type: 2,
           }),
@@ -205,15 +206,15 @@ describe("bot/commands/afk", () => {
     const interaction = createInteraction({
       guild: {
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: {
               channel: { id: "voice-1" },
-              setChannel: jest.fn().mockResolvedValue(undefined),
+              setChannel: vi.fn().mockResolvedValue(undefined),
             },
           }),
         },
         channels: {
-          fetch: jest.fn().mockRejectedValue(new Error("channel fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("channel fetch failed")),
         },
       },
     });
@@ -227,15 +228,15 @@ describe("bot/commands/afk", () => {
 
   // user オプション指定時は指定ユーザーを優先して移動することを検証
   it("moves explicitly selected user when option user is provided", async () => {
-    const setChannelMock = jest.fn().mockResolvedValue(undefined);
+    const setChannelMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createInteraction({
       user: { id: "executor-1" },
       options: {
-        getUser: jest.fn(() => ({ id: "target-1" })),
+        getUser: vi.fn(() => ({ id: "target-1" })),
       },
       guild: {
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: {
               channel: { id: "voice-1" },
               setChannel: setChannelMock,
@@ -243,7 +244,7 @@ describe("bot/commands/afk", () => {
           }),
         },
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "afk-channel",
             type: 2,
           }),
@@ -264,11 +265,11 @@ describe("bot/commands/afk", () => {
 
   // 正常系としてユーザー移動と成功応答を返すことを検証
   it("moves target user and replies success embed", async () => {
-    const setChannelMock = jest.fn().mockResolvedValue(undefined);
+    const setChannelMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createInteraction({
       guild: {
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: {
               channel: { id: "voice-1" },
               setChannel: setChannelMock,
@@ -276,7 +277,7 @@ describe("bot/commands/afk", () => {
           }),
         },
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "afk-channel",
             type: 2,
           }),

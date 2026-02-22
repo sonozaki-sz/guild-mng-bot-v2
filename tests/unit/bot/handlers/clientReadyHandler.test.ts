@@ -1,7 +1,7 @@
 import { handleClientReady } from "@/bot/handlers/clientReadyHandler";
 import { ActivityType, PresenceUpdateStatus } from "discord.js";
 
-const tDefaultMock = jest.fn(
+const tDefaultMock = vi.fn(
   (key: string, params?: Record<string, unknown>) => {
     if (key === "system:bot.presence_activity") {
       return `presence:${String(params?.count)}`;
@@ -9,39 +9,39 @@ const tDefaultMock = jest.fn(
     return `default:${key}`;
   },
 );
-const loggerInfoMock = jest.fn();
-const restoreBumpRemindersOnStartupMock = jest.fn();
-const cleanupVacOnStartupMock = jest.fn();
+const loggerInfoMock = vi.fn();
+const restoreBumpRemindersOnStartupMock = vi.fn();
+const cleanupVacOnStartupMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     tDefaultMock(key, params),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
-jest.mock("@/bot/features/bump-reminder/handlers/bumpReminderStartup", () => ({
+vi.mock("@/bot/features/bump-reminder/handlers/bumpReminderStartup", () => ({
   restoreBumpRemindersOnStartup: (...args: unknown[]) =>
     restoreBumpRemindersOnStartupMock(...args),
 }));
 
-jest.mock("@/bot/features/vac/handlers/vacStartupCleanup", () => ({
+vi.mock("@/bot/features/vac/handlers/vacStartupCleanup", () => ({
   cleanupVacOnStartup: (...args: unknown[]) => cleanupVacOnStartupMock(...args),
 }));
 
 describe("bot/handlers/clientReadyHandler", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     restoreBumpRemindersOnStartupMock.mockResolvedValue(undefined);
     cleanupVacOnStartupMock.mockResolvedValue(undefined);
   });
 
   it("logs startup metrics, updates presence, and runs startup tasks", async () => {
-    const setPresenceMock = jest.fn();
+    const setPresenceMock = vi.fn();
     const client = {
       user: { tag: "bot#0001", setPresence: setPresenceMock },
       guilds: { cache: { size: 3 } },
@@ -70,7 +70,7 @@ describe("bot/handlers/clientReadyHandler", () => {
       new Error("restore failed"),
     );
     const client = {
-      user: { tag: "bot#0001", setPresence: jest.fn() },
+      user: { tag: "bot#0001", setPresence: vi.fn() },
       guilds: { cache: { size: 1 } },
       users: { cache: { size: 1 } },
       commands: { size: 1 },

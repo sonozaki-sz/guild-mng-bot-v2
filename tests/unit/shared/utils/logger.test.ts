@@ -3,31 +3,31 @@ describe("Logger", () => {
     nodeEnv: "development" | "production" | "test",
     logLevel?: string,
   ) => {
-    jest.resetModules();
+    vi.resetModules();
 
-    const consoleTransportMock = jest.fn();
-    const dailyRotateMock = jest.fn();
-    const createLoggerMock = jest.fn((options) => ({ ...options }));
+    const consoleTransportMock = vi.fn();
+    const dailyRotateMock = vi.fn();
+    const createLoggerMock = vi.fn((options) => ({ ...options }));
 
     const winstonMock = {
       createLogger: createLoggerMock,
       format: {
-        combine: jest.fn((...parts) => ({ type: "combine", parts })),
-        timestamp: jest.fn((opts) => ({ type: "timestamp", opts })),
-        printf: jest.fn((fn) => ({ type: "printf", fn })),
-        colorize: jest.fn(() => ({ type: "colorize" })),
+        combine: vi.fn((...parts) => ({ type: "combine", parts })),
+        timestamp: vi.fn((opts) => ({ type: "timestamp", opts })),
+        printf: vi.fn((fn) => ({ type: "printf", fn })),
+        colorize: vi.fn(() => ({ type: "colorize" })),
       },
       transports: {
         Console: consoleTransportMock,
       },
     };
 
-    jest.doMock("winston", () => ({ __esModule: true, default: winstonMock }));
-    jest.doMock("winston-daily-rotate-file", () => ({
+    vi.doMock("winston", () => ({ __esModule: true, default: winstonMock }));
+    vi.doMock("winston-daily-rotate-file", () => ({
       __esModule: true,
       default: dailyRotateMock,
     }));
-    jest.doMock("@/shared/config/env", () => ({
+    vi.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",

@@ -1,25 +1,25 @@
 import { BUMP_SERVICES } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { sendBumpReminder } from "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder";
 
-const getGuildTranslatorMock = jest.fn();
-const tDefaultMock = jest.fn(
+const getGuildTranslatorMock = vi.fn();
+const tDefaultMock = vi.fn(
   (key: string, _options?: Record<string, unknown>) => key,
 );
 
-const loggerInfoMock = jest.fn();
-const loggerDebugMock = jest.fn();
-const loggerWarnMock = jest.fn();
+const loggerInfoMock = vi.fn();
+const loggerDebugMock = vi.fn();
+const loggerWarnMock = vi.fn();
 
-jest.mock("@/shared/locale/helpers", () => ({
+vi.mock("@/shared/locale/helpers", () => ({
   getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, options?: Record<string, unknown>) =>
     tDefaultMock(key, options),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     debug: (...args: unknown[]) => loggerDebugMock(...args),
@@ -29,17 +29,17 @@ jest.mock("@/shared/utils/logger", () => ({
 
 describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getGuildTranslatorMock.mockResolvedValue((key: string) => key);
   });
 
   it("warns and returns when channel is not text-based", async () => {
     const client = {
       channels: {
-        fetch: jest.fn().mockResolvedValue({ isTextBased: () => false }),
+        fetch: vi.fn().mockResolvedValue({ isTextBased: () => false }),
       },
     };
-    const configService = { getBumpReminderConfig: jest.fn() };
+    const configService = { getBumpReminderConfig: vi.fn() };
 
     await sendBumpReminder(
       client as never,
@@ -54,10 +54,10 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
   });
 
   it("returns when reminder is disabled", async () => {
-    const send = jest.fn();
+    const send = vi.fn();
     const client = {
       channels: {
-        fetch: jest.fn().mockResolvedValue({
+        fetch: vi.fn().mockResolvedValue({
           isTextBased: () => true,
           isSendable: () => true,
           send,
@@ -65,7 +65,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       },
     };
     const configService = {
-      getBumpReminderConfig: jest.fn().mockResolvedValue({ enabled: false }),
+      getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: false }),
     };
 
     await sendBumpReminder(
@@ -82,21 +82,21 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
   });
 
   it("sends reply and deletes panel in finally", async () => {
-    const panelDelete = jest.fn().mockResolvedValue(undefined);
-    const fetchMessage = jest.fn().mockResolvedValue({ delete: panelDelete });
+    const panelDelete = vi.fn().mockResolvedValue(undefined);
+    const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });
     const channel = {
       isTextBased: () => true,
       isSendable: () => true,
-      send: jest.fn().mockResolvedValue(undefined),
+      send: vi.fn().mockResolvedValue(undefined),
       messages: { fetch: fetchMessage },
     };
     const client = {
       channels: {
-        fetch: jest.fn().mockResolvedValue(channel),
+        fetch: vi.fn().mockResolvedValue(channel),
       },
     };
     const configService = {
-      getBumpReminderConfig: jest.fn().mockResolvedValue({
+      getBumpReminderConfig: vi.fn().mockResolvedValue({
         enabled: true,
         mentionRoleId: "role-1",
         mentionUserIds: ["user-1"],

@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
     types:
       - opened
       - synchronize
@@ -45,14 +46,14 @@ jobs:
         run: pnpm test
 
   # ─────────────────────────────────────────────
-  # CD: デプロイ（mainへの直接push、またはmain向けPRのマージ完了時）
+  # CD: デプロイ（mainへの直接push、またはmain向けPRのマージ完了時のみ）
   # ─────────────────────────────────────────────
   deploy:
     name: Deploy to XServer VPS
     needs: test
     runs-on: ubuntu-latest
-    # デプロイ準備完了後に有効化する（VPS契約・Secrets設定後に if: false を削除）
-    if: false
+    # デプロイ準備完了後に有効化する（VPS契約・Secrets設定後に `false &&` を削除）
+    if: false && github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: SSH 経由でデプロイ

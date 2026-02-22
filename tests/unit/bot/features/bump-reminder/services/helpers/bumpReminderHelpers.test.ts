@@ -12,23 +12,23 @@ import {
 import { createTrackedReminderTask } from "@/bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask";
 import { logger } from "@/shared/utils/logger";
 
-const addOneTimeJobMock = jest.fn();
-const removeJobMock = jest.fn();
+const addOneTimeJobMock = vi.fn();
+const removeJobMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    info: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
-jest.mock("@/shared/scheduler/jobScheduler", () => ({
+vi.mock("@/shared/scheduler/jobScheduler", () => ({
   jobScheduler: {
     addOneTimeJob: (...args: unknown[]) => addOneTimeJobMock(...args),
     removeJob: (...args: unknown[]) => removeJobMock(...args),
@@ -38,7 +38,7 @@ jest.mock("@/shared/scheduler/jobScheduler", () => ({
 describe("bot/features/bump-reminder/helpers", () => {
   // 各ヘルパーの状態遷移を独立に検証できるようモック履歴を初期化
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // guild ごとの pending 正規化で最新1件を選別できることを検証
@@ -92,7 +92,7 @@ describe("bot/features/bump-reminder/helpers", () => {
   describe("schedule helper", () => {
     it("schedules one-time task and clears reminder map after task execution", async () => {
       const reminders = new Map<string, ScheduledReminderRef>();
-      const task = jest.fn().mockResolvedValue(undefined);
+      const task = vi.fn().mockResolvedValue(undefined);
 
       let capturedTask: (() => Promise<void>) | undefined;
       addOneTimeJobMock.mockImplementationOnce(
@@ -139,9 +139,9 @@ describe("bot/features/bump-reminder/helpers", () => {
   describe("createTrackedReminderTask", () => {
     it("updates status to sent when task succeeds", async () => {
       const repository = {
-        updateStatus: jest.fn().mockResolvedValue(undefined),
+        updateStatus: vi.fn().mockResolvedValue(undefined),
       };
-      const task = jest.fn().mockResolvedValue(undefined);
+      const task = vi.fn().mockResolvedValue(undefined);
 
       const trackedTask = createTrackedReminderTask(
         repository as never,
@@ -162,9 +162,9 @@ describe("bot/features/bump-reminder/helpers", () => {
 
     it("updates status to cancelled when task fails", async () => {
       const repository = {
-        updateStatus: jest.fn().mockResolvedValue(undefined),
+        updateStatus: vi.fn().mockResolvedValue(undefined),
       };
-      const task = jest.fn().mockRejectedValue(new Error("task failed"));
+      const task = vi.fn().mockRejectedValue(new Error("task failed"));
 
       const trackedTask = createTrackedReminderTask(
         repository as never,
@@ -184,9 +184,9 @@ describe("bot/features/bump-reminder/helpers", () => {
 
     it("logs twice when both task and status update fail", async () => {
       const repository = {
-        updateStatus: jest.fn().mockRejectedValue(new Error("db failed")),
+        updateStatus: vi.fn().mockRejectedValue(new Error("db failed")),
       };
-      const task = jest.fn().mockRejectedValue(new Error("task failed"));
+      const task = vi.fn().mockRejectedValue(new Error("task failed"));
 
       const trackedTask = createTrackedReminderTask(
         repository as never,

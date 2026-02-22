@@ -7,36 +7,36 @@ import { modalHandlers } from "@/bot/handlers/interactionCreate/ui/modals";
 import { userSelectHandlers } from "@/bot/handlers/interactionCreate/ui/selectMenus";
 
 // 重い依存を避けるため、各ハンドラ本体は最小スタブを注入する
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler",
   () => ({
     bumpPanelButtonHandler: {
-      matches: jest.fn(() => false),
-      execute: jest.fn(),
+      matches: vi.fn(() => false),
+      execute: vi.fn(),
     },
   }),
 );
-jest.mock(
+vi.mock(
   "@/bot/features/vac/handlers/ui/vacPanelButton",
   () => ({
     vacPanelButtonHandler: {
-      matches: jest.fn(() => true),
-      execute: jest.fn(),
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
     },
   }),
 );
-jest.mock("@/bot/features/vac/handlers/ui/vacPanelModal", () => ({
+vi.mock("@/bot/features/vac/handlers/ui/vacPanelModal", () => ({
   vacPanelModalHandler: {
-    matches: jest.fn(() => true),
-    execute: jest.fn(),
+    matches: vi.fn(() => true),
+    execute: vi.fn(),
   },
 }));
-jest.mock(
+vi.mock(
   "@/bot/features/vac/handlers/ui/vacPanelUserSelect",
   () => ({
     vacPanelUserSelectHandler: {
-      matches: jest.fn(() => true),
-      execute: jest.fn(),
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
     },
   }),
 );

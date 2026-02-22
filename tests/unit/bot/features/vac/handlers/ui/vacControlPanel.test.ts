@@ -6,12 +6,12 @@ import {
 import { createInfoEmbed } from "@/bot/utils/messageResponse";
 import { tGuild } from "@/shared/locale/localeManager";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async (_guildId: string, key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createInfoEmbed: jest.fn(
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createInfoEmbed: vi.fn(
     (description: string, options?: { title?: string }) => ({
       description,
       title: options?.title,
@@ -21,7 +21,7 @@ jest.mock("@/bot/utils/messageResponse", () => ({
 
 describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("extracts channel id from custom id with expected prefix", () => {
@@ -43,12 +43,12 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
   });
 
   it("returns early when voice channel is not text based", async () => {
-    const send = jest.fn();
+    const send = vi.fn();
     const voiceChannel = {
       id: "voice-1",
       guild: { id: "guild-1" },
-      isTextBased: jest.fn(() => false),
-      isSendable: jest.fn(() => true),
+      isTextBased: vi.fn(() => false),
+      isSendable: vi.fn(() => true),
       send,
     };
 
@@ -59,12 +59,12 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
   });
 
   it("returns early when voice channel is not sendable", async () => {
-    const send = jest.fn();
+    const send = vi.fn();
     const voiceChannel = {
       id: "voice-1",
       guild: { id: "guild-1" },
-      isTextBased: jest.fn(() => true),
-      isSendable: jest.fn(() => false),
+      isTextBased: vi.fn(() => true),
+      isSendable: vi.fn(() => false),
       send,
     };
 
@@ -74,12 +74,12 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
   });
 
   it("sends VAC control panel with four button rows", async () => {
-    const send = jest.fn().mockResolvedValue(undefined);
+    const send = vi.fn().mockResolvedValue(undefined);
     const voiceChannel = {
       id: "voice-1",
       guild: { id: "guild-1" },
-      isTextBased: jest.fn(() => true),
-      isSendable: jest.fn(() => true),
+      isTextBased: vi.fn(() => true),
+      isSendable: vi.fn(() => true),
       send,
     };
 

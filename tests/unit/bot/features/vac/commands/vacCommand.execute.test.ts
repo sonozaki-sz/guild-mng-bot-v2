@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 import { executeVacLimit } from "@/bot/features/vac/commands/usecases/vacLimit";
 import { executeVacRename } from "@/bot/features/vac/commands/usecases/vacRename";
@@ -5,24 +6,24 @@ import { getManagedVacVoiceChannel } from "@/bot/features/vac/commands/usecases/
 import { VAC_COMMAND } from "@/bot/features/vac/commands/vacCommand.constants";
 import { executeVacCommand } from "@/bot/features/vac/commands/vacCommand.execute";
 
-jest.mock("@/bot/features/vac/commands/usecases/vacLimit", () => ({
-  executeVacLimit: jest.fn(),
+vi.mock("@/bot/features/vac/commands/usecases/vacLimit", () => ({
+  executeVacLimit: vi.fn(),
 }));
 
-jest.mock("@/bot/features/vac/commands/usecases/vacRename", () => ({
-  executeVacRename: jest.fn(),
+vi.mock("@/bot/features/vac/commands/usecases/vacRename", () => ({
+  executeVacRename: vi.fn(),
 }));
 
-jest.mock("@/bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => ({
-  getManagedVacVoiceChannel: jest.fn(),
+vi.mock("@/bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => ({
+  getManagedVacVoiceChannel: vi.fn(),
 }));
 
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
 function createInteraction(overrides?: {
@@ -33,7 +34,7 @@ function createInteraction(overrides?: {
     guildId:
       overrides && "guildId" in overrides ? overrides.guildId : "guild-1",
     options: {
-      getSubcommand: jest.fn(
+      getSubcommand: vi.fn(
         () => overrides?.subcommand ?? VAC_COMMAND.SUBCOMMAND.VC_RENAME,
       ),
     },
@@ -42,8 +43,8 @@ function createInteraction(overrides?: {
 
 describe("bot/features/vac/commands/vacCommand.execute", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (getManagedVacVoiceChannel as jest.Mock).mockResolvedValue({
+    vi.clearAllMocks();
+    (getManagedVacVoiceChannel as Mock).mockResolvedValue({
       id: "voice-1",
     });
   });
@@ -106,7 +107,7 @@ describe("bot/features/vac/commands/vacCommand.execute", () => {
   });
 
   it("delegates guard failure to handleCommandError", async () => {
-    (getManagedVacVoiceChannel as jest.Mock).mockRejectedValueOnce(
+    (getManagedVacVoiceChannel as Mock).mockRejectedValueOnce(
       new Error("not managed"),
     );
     const interaction = createInteraction();

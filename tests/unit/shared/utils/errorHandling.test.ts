@@ -4,24 +4,25 @@ import {
   executeWithLoggedError,
 } from "@/shared/utils/errorHandling";
 import { logger } from "@/shared/utils/logger";
+import type { MockedFunction } from "vitest";
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    error: jest.fn(),
+    error: vi.fn(),
   },
 }));
 
 describe("shared/utils/errorHandling", () => {
-  const loggerErrorMock = logger.error as jest.MockedFunction<
+  const loggerErrorMock = logger.error as unknown as MockedFunction<
     typeof logger.error
   >;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("executeWithDatabaseError returns operation result when successful", async () => {
-    const operation = jest.fn().mockResolvedValue("ok");
+    const operation = vi.fn().mockResolvedValue("ok");
 
     await expect(
       executeWithDatabaseError(operation, "db failed"),
@@ -32,7 +33,7 @@ describe("shared/utils/errorHandling", () => {
 
   it("executeWithDatabaseError logs and throws DatabaseError on failure", async () => {
     const cause = new Error("boom");
-    const operation = jest.fn().mockRejectedValue(cause);
+    const operation = vi.fn().mockRejectedValue(cause);
 
     await expect(
       executeWithDatabaseError(operation, "query failed"),
@@ -47,7 +48,7 @@ describe("shared/utils/errorHandling", () => {
   });
 
   it("executeWithLoggedError resolves when operation succeeds", async () => {
-    const operation = jest.fn().mockResolvedValue(undefined);
+    const operation = vi.fn().mockResolvedValue(undefined);
 
     await expect(
       executeWithLoggedError(operation, "ignored"),
@@ -57,7 +58,7 @@ describe("shared/utils/errorHandling", () => {
 
   it("executeWithLoggedError logs and swallows operation error", async () => {
     const cause = new Error("non-fatal");
-    const operation = jest.fn().mockRejectedValue(cause);
+    const operation = vi.fn().mockRejectedValue(cause);
 
     await expect(
       executeWithLoggedError(operation, "warn message"),

@@ -1,8 +1,8 @@
 import { channelDeleteEvent } from "@/bot/events/channelDelete";
 import { ChannelType, Events } from "discord.js";
-const handleVacChannelDeleteMock = jest.fn();
+const handleVacChannelDeleteMock = vi.fn();
 
-jest.mock("@/bot/features/vac/handlers/vacChannelDelete", () => ({
+vi.mock("@/bot/features/vac/handlers/vacChannelDelete", () => ({
   handleVacChannelDelete: (...args: unknown[]) =>
     handleVacChannelDeleteMock(...args),
 }));
@@ -28,7 +28,7 @@ function createChannel(overrides?: Partial<ChannelLike>): ChannelLike {
 describe("bot/events/channelDelete", () => {
   // 各ケース前にモック履歴を初期化する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("has expected event metadata", () => {

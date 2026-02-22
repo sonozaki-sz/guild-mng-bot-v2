@@ -2,8 +2,8 @@ import { autocompleteVacConfigCommand } from "@/bot/features/vac/commands/vacCon
 import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand.constants";
 import { ChannelType } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async (_guildId: string, _key: string) => "TOP"),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, _key: string) => "TOP"),
 }));
 
 type CategoryLike = { id: string; name: string; type: ChannelType };
@@ -20,12 +20,12 @@ function createCache(items: CategoryLike[]) {
 describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
   // サブコマンド判定・入力絞り込み・件数制限の分岐を検証する
   it("responds empty for non-vac-config command", async () => {
-    const respond = jest.fn();
+    const respond = vi.fn();
     const interaction = {
       commandName: "other-command",
       options: {
-        getSubcommand: jest.fn(() => "any"),
-        getFocused: jest.fn(() => ""),
+        getSubcommand: vi.fn(() => "any"),
+        getFocused: vi.fn(() => ""),
       },
       guild: null,
       respond,
@@ -37,14 +37,14 @@ describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
   });
 
   it("responds empty when guild context is missing", async () => {
-    const respond = jest.fn();
+    const respond = vi.fn();
     const interaction = {
       commandName: VAC_CONFIG_COMMAND.NAME,
       options: {
-        getSubcommand: jest.fn(
+        getSubcommand: vi.fn(
           () => VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER,
         ),
-        getFocused: jest.fn(() => ""),
+        getFocused: vi.fn(() => ""),
       },
       guild: null,
       respond,
@@ -56,14 +56,14 @@ describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
   });
 
   it("returns TOP and matching categories with case-insensitive filtering", async () => {
-    const respond = jest.fn();
+    const respond = vi.fn();
     const interaction = {
       commandName: VAC_CONFIG_COMMAND.NAME,
       options: {
-        getSubcommand: jest.fn(
+        getSubcommand: vi.fn(
           () => VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER,
         ),
-        getFocused: jest.fn(() => "ga"),
+        getFocused: vi.fn(() => "ga"),
       },
       guild: {
         id: "guild-1",
@@ -92,7 +92,7 @@ describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
   });
 
   it("limits autocomplete choices to 25", async () => {
-    const respond = jest.fn();
+    const respond = vi.fn();
     const categories = Array.from({ length: 30 }, (_, index) => ({
       id: `cat-${index}`,
       name: `Category-${index}`,
@@ -102,10 +102,10 @@ describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
     const interaction = {
       commandName: VAC_CONFIG_COMMAND.NAME,
       options: {
-        getSubcommand: jest.fn(
+        getSubcommand: vi.fn(
           () => VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER,
         ),
-        getFocused: jest.fn(() => ""),
+        getFocused: vi.fn(() => ""),
       },
       guild: {
         id: "guild-1",
