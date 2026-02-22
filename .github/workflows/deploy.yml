@@ -1,10 +1,11 @@
 name: CI / Deploy
 
-# mainブランチへのpush、またはmain向けPRの作成/更新/再オープン/クローズで実行
+# main/developへの直接push、またはmain/develop向けPRで実行
 on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     branches:
       - main
@@ -17,7 +18,7 @@ on:
 
 jobs:
   # ─────────────────────────────────────────────
-  # CI: 型チェック・テスト（PR・mainどちらでも実行）
+  # CI: 型チェック・テスト（push/PRどちらでも実行）
   # ─────────────────────────────────────────────
   test:
     name: Test
