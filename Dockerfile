@@ -4,6 +4,9 @@
 FROM node:24-slim AS base
 WORKDIR /app
 
+# OS パッケージを最新化してセキュリティ脆弱性を修正
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
 # pnpm のインストール
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -16,12 +19,15 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm run build
 RUN pnpm prisma generate
+RUN pnpm run build
 
 # ─── 本番イメージ ───
 FROM node:24-slim AS runner
 WORKDIR /app
+
+# OS パッケージを最新化してセキュリティ脆弱性を修正
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -33,7 +39,6 @@ RUN pnpm install --frozen-lockfile --prod
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.pnpm ./node_modules/.pnpm
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
