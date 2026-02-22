@@ -2,7 +2,7 @@
 
 > Git Workflow & Commit Convention Guide
 
-最終更新: 2026年2月22日
+最終更新: 2026年2月22日（ブランチ保護ルール追加）
 
 ---
 
@@ -33,7 +33,7 @@ refactor/xxx  ← リファクタリング
 | ブランチ     | 説明                                            | 直接push | マージ先           |
 | ------------ | ----------------------------------------------- | -------- | ------------------ |
 | `main`       | 本番デプロイ済みコード。CI/CDが自動デプロイする | ❌       | -                  |
-| `develop`    | 開発中の統合ブランチ                            | ❌       | `main`             |
+| `develop`    | 開発中の統合ブランチ                            | ✅       | `main`             |
 | `feature/*`  | 新機能の開発                                    | ✅       | `develop`          |
 | `fix/*`      | バグ修正                                        | ✅       | `develop`          |
 | `hotfix/*`   | 本番障害の緊急修正                              | ✅       | `main` + `develop` |
@@ -44,46 +44,38 @@ refactor/xxx  ← リファクタリング
 
 ## 🔄 通常の開発フロー
 
-### 1. 作業ブランチの作成
+### 1. 開発・コミット
 
-**常に `develop` から分岐すること。**
+小規模変更は `develop` に直接コミットして構わない。
 
 ```bash
 # developを最新化
 git checkout develop
 git pull origin develop
 
-# 作業ブランチを作成
-git checkout -b feature/bump-reminder-mention-role
-# または
-git checkout -b fix/afk-status-not-cleared
-```
-
-### 2. 開発・コミット
-
-```bash
-# 変更をステージング
+# 変更をステージング・コミット
 git add src/bot/features/bump-reminder/
-
-# コミット（後述のConventional Commits形式で）
 git commit -m "feat(bump-reminder): メンションロール設定機能を追加"
 ```
 
-### 3. リモートへのpush
+大きめの変更・実験的な変更はフィーチャーブランチを使う（任意）。
 
 ```bash
-git push origin feature/bump-reminder-mention-role
+git checkout -b feature/bump-reminder-mention-role
+# ... 開発 ...
+git checkout develop
+git merge --squash feature/bump-reminder-mention-role
+git commit -m "feat(bump-reminder): メンションロール設定機能を追加"
 ```
 
-### 4. Pull Request の作成
+### 2. リモートへのpush
 
-GitHub上で **`develop` をベースブランチ** として PR を作成する。
+```bash
+# develop へ直接push（CI が自動で走る）
+git push origin develop
+```
 
-- PRテンプレートに従って概要・変更内容・動作確認を記載
-- CI（型チェック・テスト・commitlint）がすべて通ることを確認
-- マージは **Squash and merge** を推奨（コミット履歴をすっきりさせる）
-
-### 5. developからmainへのリリース
+### 3. developからmainへのリリース
 
 機能がまとまったタイミングで `develop → main` の PR を作成してリリースする。
 
@@ -234,7 +226,7 @@ PR に対して以下の CI が自動で実行される：
 | **Test**                 | `deploy.yml`     | 型チェック + 全テスト実行    |
 | **Lint Commit Messages** | `commitlint.yml` | コミットメッセージ形式の検証 |
 
-すべて ✅ でないとマージできない（ブランチ保護設定による）。
+`develop` / `main` へのPRは、すべて ✅ でないとマージできない（ブランチ保護設定による）。
 
 ### マージ戦略
 
@@ -245,25 +237,32 @@ PR に対して以下の CI が自動で実行される：
 
 ---
 
-## 🏷️ ブランチ保護の設定（GitHub UI）
+## 🏷️ ブランチ保護の設定（Branch Protection Rules）
 
-[Settings > Branches](https://github.com/sonozaki-sz/guild-mng-bot-v2/settings/branches) で以下を設定する。
+[Settings > Branches](https://github.com/sonozaki-sz/guild-mng-bot-v2/settings/branches) で管理。
 
 ### `main` ブランチ
 
-| 設定                                                  | 値  |
-| ----------------------------------------------------- | --- |
-| Require a pull request before merging                 | ✅  |
-| Require status checks: `Test`, `Lint Commit Messages` | ✅  |
-| Do not allow bypassing the above settings             | ✅  |
+直接pushは禁止。PR経由でのみ変更可能で、CIが通らないとマージできない。
+
+| 設定                                  | 値                               |
+| ------------------------------------- | -------------------------------- |
+| Require a pull request before merging | ✅（レビュー承認は不要）         |
+| Require status checks to pass: `Test` | ✅（strict: ベース最新化が必要） |
+| Block force pushes                    | ✅                               |
 
 ### `develop` ブランチ
 
-| 設定                                                  | 値  |
-| ----------------------------------------------------- | --- |
-| Require a pull request before merging                 | ✅  |
-| Require status checks: `Test`, `Lint Commit Messages` | ✅  |
-| Do not allow bypassing the above settings             | ✅  |
+直接pushは**許可**。ただしPR経由でマージする場合はCIが通る必要がある。
+
+| 設定                                        | 値               |
+| ------------------------------------------- | ---------------- |
+| Require a pull request before merging       | ❌（直接push可） |
+| Require status checks to pass: `Test`（PR） | ✅               |
+| Block force pushes                          | ✅               |
+
+> **注意**: `develop` への直接pushはCIが後から走るためpush後にCIが失敗しても遡ってブロックはされない。
+> 確実にCIで守りたい変更はPRを経由すること。
 
 ---
 
