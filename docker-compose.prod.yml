@@ -1,9 +1,6 @@
 services:
   bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner
+    image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
     container_name: guild-mng-bot
     command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
     # プロセスがクラッシュしたとき自動再起動（手動停止時は再起動しない）
@@ -34,10 +31,7 @@ services:
         max-file: "5"
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner
+    image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
     container_name: guild-mng-web
     command: node dist/web/server.js
     restart: unless-stopped
