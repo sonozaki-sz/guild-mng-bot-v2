@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # pnpm のインストール
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 # ─── 依存関係インストール ───
 FROM base AS deps
@@ -29,7 +29,10 @@ WORKDIR /app
 # OS パッケージを最新化してセキュリティ脆弱性を修正
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+
+# corepack キャッシュを /app 以下に設定（app ユーザーが書き込み可能にするため）
+ENV COREPACK_HOME=/app/.cache/corepack
 
 # 本番依存のみインストール
 COPY package.json pnpm-lock.yaml ./
@@ -42,8 +45,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
-# ストレージ・ログディレクトリを作成
-RUN mkdir -p /app/storage /app/logs
+# ストレージ・ログ・corepack キャッシュディレクトリを作成
+RUN mkdir -p /app/storage /app/logs /app/.cache/corepack
 
 # セキュリティ: root 以外のユーザーで実行
 RUN groupadd --system app && useradd --system --gid app app
