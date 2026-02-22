@@ -79,6 +79,9 @@ export async function handleVacConfigCreateTrigger(
     await tGuild(guildId, "commands:vac-config.embed.trigger_created", {
       channel: `<#${triggerChannel.id}>`,
     }),
+    {
+      title: await tGuild(guildId, "commands:vac-config.embed.success_title"),
+    },
   );
   // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える
   await interaction.reply({
