@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "skipLibCheck": true,
+    "checkJs": false,
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["*.js", "*.mjs", "*.cjs"],
+  "exclude": ["node_modules", "dist", ".build", "coverage"]
+}
