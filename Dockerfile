@@ -16,8 +16,8 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm run build
 RUN pnpm prisma generate
+RUN pnpm run build
 
 # ─── 本番イメージ ───
 FROM node:24-slim AS runner
