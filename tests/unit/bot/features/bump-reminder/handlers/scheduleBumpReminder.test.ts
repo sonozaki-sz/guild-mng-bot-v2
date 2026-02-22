@@ -2,34 +2,34 @@ import { scheduleBumpReminder } from "@/bot/features/bump-reminder/handlers/usec
 
 const SERVICE_NAME = "Disboard" as const;
 
-const getReminderDelayMinutesMock = jest.fn();
-const getBotBumpReminderManagerMock = jest.fn();
-const setReminderMock = jest.fn();
-const sendBumpReminderMock = jest.fn();
-const loggerDebugMock = jest.fn();
+const getReminderDelayMinutesMock = vi.fn();
+const getBotBumpReminderManagerMock = vi.fn();
+const setReminderMock = vi.fn();
+const sendBumpReminderMock = vi.fn();
+const loggerDebugMock = vi.fn();
 
-jest.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
+vi.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
   getReminderDelayMinutes: (...args: unknown[]) =>
     getReminderDelayMinutesMock(...args),
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   getBotBumpReminderManager: (...args: unknown[]) =>
     getBotBumpReminderManagerMock(...args),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder",
   () => ({
     sendBumpReminder: (...args: unknown[]) => sendBumpReminderMock(...args),
   }),
 );
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: (...args: unknown[]) => loggerDebugMock(...args),
   },
@@ -37,7 +37,7 @@ jest.mock("@/shared/utils/logger", () => ({
 
 describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getReminderDelayMinutesMock.mockReturnValue(120);
     getBotBumpReminderManagerMock.mockReturnValue({
       setReminder: (...args: unknown[]) => setReminderMock(...args),
@@ -45,8 +45,8 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
   });
 
   it("registers reminder with delay and service", async () => {
-    const client = { channels: { fetch: jest.fn() } };
-    const configService = { getBumpReminderConfig: jest.fn() };
+    const client = { channels: { fetch: vi.fn() } };
+    const configService = { getBumpReminderConfig: vi.fn() };
 
     await scheduleBumpReminder(
       client as never,
@@ -65,15 +65,15 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
   });
 
   it("deletes orphan panel and rethrows on registration error", async () => {
-    const panelDelete = jest.fn().mockResolvedValue(undefined);
-    const fetchMessage = jest.fn().mockResolvedValue({ delete: panelDelete });
-    const fetchChannel = jest.fn().mockResolvedValue({
+    const panelDelete = vi.fn().mockResolvedValue(undefined);
+    const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });
+    const fetchChannel = vi.fn().mockResolvedValue({
       isTextBased: () => true,
       messages: { fetch: fetchMessage },
     });
 
     const client = { channels: { fetch: fetchChannel } };
-    const configService = { getBumpReminderConfig: jest.fn() };
+    const configService = { getBumpReminderConfig: vi.fn() };
 
     setReminderMock.mockRejectedValueOnce(new Error("set failed"));
 
@@ -95,8 +95,8 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
   });
 
   it("executes registered task with sendBumpReminder", async () => {
-    const client = { channels: { fetch: jest.fn() } };
-    const configService = { getBumpReminderConfig: jest.fn() };
+    const client = { channels: { fetch: vi.fn() } };
+    const configService = { getBumpReminderConfig: vi.fn() };
 
     await scheduleBumpReminder(
       client as never,
@@ -123,14 +123,14 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
   });
 
   it("logs debug when orphan panel deletion fails", async () => {
-    const fetchMessage = jest.fn().mockRejectedValue(new Error("fetch failed"));
-    const fetchChannel = jest.fn().mockResolvedValue({
+    const fetchMessage = vi.fn().mockRejectedValue(new Error("fetch failed"));
+    const fetchChannel = vi.fn().mockResolvedValue({
       isTextBased: () => true,
       messages: { fetch: fetchMessage },
     });
 
     const client = { channels: { fetch: fetchChannel } };
-    const configService = { getBumpReminderConfig: jest.fn() };
+    const configService = { getBumpReminderConfig: vi.fn() };
     setReminderMock.mockRejectedValueOnce(new Error("set failed"));
 
     await expect(
@@ -152,9 +152,9 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
   });
 
   it("rethrows without orphan cleanup when panelMessageId is undefined", async () => {
-    const fetchChannel = jest.fn();
+    const fetchChannel = vi.fn();
     const client = { channels: { fetch: fetchChannel } };
-    const configService = { getBumpReminderConfig: jest.fn() };
+    const configService = { getBumpReminderConfig: vi.fn() };
     setReminderMock.mockRejectedValueOnce(new Error("set failed"));
 
     await expect(
@@ -173,12 +173,12 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
   });
 
   it("skips panel deletion when fetched channel is not text based", async () => {
-    const fetchChannel = jest.fn().mockResolvedValue({
+    const fetchChannel = vi.fn().mockResolvedValue({
       isTextBased: () => false,
-      messages: { fetch: jest.fn() },
+      messages: { fetch: vi.fn() },
     });
     const client = { channels: { fetch: fetchChannel } };
-    const configService = { getBumpReminderConfig: jest.fn() };
+    const configService = { getBumpReminderConfig: vi.fn() };
     setReminderMock.mockRejectedValueOnce(new Error("set failed"));
 
     await expect(

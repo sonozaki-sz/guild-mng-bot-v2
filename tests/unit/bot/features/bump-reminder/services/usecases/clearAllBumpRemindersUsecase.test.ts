@@ -1,12 +1,12 @@
 import { clearAllBumpRemindersUsecase } from "@/bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsecase";
 
-const loggerErrorMock = jest.fn();
+const loggerErrorMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },
@@ -14,11 +14,11 @@ jest.mock("@/shared/utils/logger", () => ({
 
 describe("bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsecase", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("calls cancelReminder for all tracked guild ids", async () => {
-    const cancelReminder = jest.fn().mockResolvedValue(true);
+    const cancelReminder = vi.fn().mockResolvedValue(true);
     const reminders = new Map([
       ["g1", { jobId: "job-1", reminderId: "r1" }],
       ["g2", { jobId: "job-2", reminderId: "r2" }],
@@ -31,7 +31,7 @@ describe("bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsec
   });
 
   it("logs when one cancellation promise is rejected", async () => {
-    const cancelReminder = jest
+    const cancelReminder = vi
       .fn()
       .mockResolvedValueOnce(true)
       .mockRejectedValueOnce(new Error("failed"));

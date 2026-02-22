@@ -3,6 +3,7 @@
  * エラーハンドリング機能のテスト
  */
 
+import type { Mocked } from "vitest";
 import {
   handleCommandError,
   handleInteractionError,
@@ -18,17 +19,17 @@ import { logger } from "@/shared/utils/logger";
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 
 // Logger のモック
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) => {
     const translations: Record<string, string> = {
       "errors:general.unexpected_production":
@@ -50,7 +51,7 @@ describe("ErrorHandler", () => {
   // ログ出力・ユーザー向けメッセージ変換・Interaction応答分岐を検証
   // 各テスト実行前にモックの呼び出し履歴を初期化
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("logError()", () => {
@@ -153,16 +154,16 @@ describe("ErrorHandler", () => {
   });
 
   describe("handleCommandError()", () => {
-    let mockInteraction: jest.Mocked<ChatInputCommandInteraction>;
+    let mockInteraction: Mocked<ChatInputCommandInteraction>;
 
     // Interaction の最小モックを毎回組み立てる
     beforeEach(() => {
       mockInteraction = {
         replied: false,
         deferred: false,
-        reply: jest.fn().mockResolvedValue(undefined),
-        editReply: jest.fn().mockResolvedValue(undefined),
-      } as unknown as jest.Mocked<ChatInputCommandInteraction>;
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      } as unknown as Mocked<ChatInputCommandInteraction>;
     });
 
     it("should reply with error message when not replied", async () => {
@@ -255,8 +256,8 @@ describe("ErrorHandler", () => {
         replied: false,
         deferred: false,
         guildId: "guild-1",
-        reply: jest.fn().mockResolvedValue(undefined),
-        editReply: jest.fn().mockResolvedValue(undefined),
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
       };
 
       await handleInteractionError(interaction, new ValidationError("invalid"));
@@ -274,8 +275,8 @@ describe("ErrorHandler", () => {
         replied: false,
         deferred: false,
         guildId: null,
-        reply: jest.fn().mockResolvedValue(undefined),
-        editReply: jest.fn().mockResolvedValue(undefined),
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
       };
 
       const error = new BaseError(
@@ -303,8 +304,8 @@ describe("ErrorHandler", () => {
         replied: false,
         deferred: false,
         guildId: null,
-        reply: jest.fn().mockResolvedValue(undefined),
-        editReply: jest.fn().mockResolvedValue(undefined),
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
       };
 
       await handleInteractionError(interaction, new Error("unexpected"));
@@ -324,9 +325,9 @@ describe("ErrorHandler", () => {
       const mockInteraction = {
         replied: false,
         deferred: false,
-        reply: jest.fn().mockResolvedValue(undefined),
-        editReply: jest.fn().mockResolvedValue(undefined),
-      } as unknown as jest.Mocked<ChatInputCommandInteraction>;
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      } as unknown as Mocked<ChatInputCommandInteraction>;
 
       const error = new ValidationError("Test");
 

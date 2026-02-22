@@ -1,9 +1,9 @@
 import Fastify from "fastify";
 
 // Prisma クライアント取得処理を差し替えるモック
-const getPrismaClientMock = jest.fn();
+const getPrismaClientMock = vi.fn();
 
-jest.mock("@/shared/utils/prisma", () => ({
+vi.mock("@/shared/utils/prisma", () => ({
   getPrismaClient: () => getPrismaClientMock(),
 }));
 
@@ -13,7 +13,7 @@ describe("web/routes/health", () => {
   // ヘルス/レディネスAPIの成功・失敗分岐を検証
   // 各テストでモック状態をリセット
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("GET /health returns status payload", async () => {
@@ -53,7 +53,7 @@ describe("web/routes/health", () => {
 
   it("GET /ready returns ready true when query succeeds", async () => {
     // 疎通クエリ成功時の分岐
-    const queryRaw = jest.fn().mockResolvedValueOnce([{ value: 1 }]);
+    const queryRaw = vi.fn().mockResolvedValueOnce([{ value: 1 }]);
     getPrismaClientMock.mockReturnValueOnce({
       $queryRaw: queryRaw,
     });
@@ -72,7 +72,7 @@ describe("web/routes/health", () => {
 
   it("GET /ready returns 503 when query fails", async () => {
     // 疎通クエリ失敗時の分岐
-    const queryRaw = jest.fn().mockRejectedValueOnce(new Error("db down"));
+    const queryRaw = vi.fn().mockRejectedValueOnce(new Error("db down"));
     getPrismaClientMock.mockReturnValueOnce({
       $queryRaw: queryRaw,
     });

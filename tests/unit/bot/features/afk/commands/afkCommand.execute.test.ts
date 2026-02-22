@@ -1,48 +1,46 @@
 import { executeAfkCommand } from "@/bot/features/afk/commands/afkCommand.execute";
 import { ValidationError } from "@/shared/errors/customErrors";
 
-const getAfkConfigMock = jest.fn();
-const tGuildMock = jest.fn();
-const tDefaultMock = jest.fn((key: string) => `default:${key}`);
-const createSuccessEmbedMock = jest.fn((description: string) => ({
+const getAfkConfigMock = vi.fn();
+const tGuildMock = vi.fn();
+const tDefaultMock = vi.fn((key: string) => `default:${key}`);
+const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
-const loggerInfoMock = jest.fn();
+const loggerInfoMock = vi.fn();
 
-jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: () => ({
-    getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
-  }),
+vi.mock("@/shared/features/afk/afkConfigService", () => ({
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
 function createInteraction() {
-  const setChannelMock = jest.fn().mockResolvedValue(undefined);
+  const setChannelMock = vi.fn().mockResolvedValue(undefined);
   return {
     guildId: "guild-1",
     user: { id: "user-1" },
     options: {
-      getUser: jest.fn(() => null),
+      getUser: vi.fn(() => null),
     },
     guild: {
       members: {
-        fetch: jest.fn().mockResolvedValue({
+        fetch: vi.fn().mockResolvedValue({
           voice: {
             channel: { id: "voice-1" },
             setChannel: setChannelMock,
@@ -50,20 +48,20 @@ function createInteraction() {
         }),
       },
       channels: {
-        fetch: jest.fn().mockResolvedValue({
+        fetch: vi.fn().mockResolvedValue({
           id: "afk-channel",
           type: 2,
         }),
       },
     },
-    reply: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
     setChannelMock,
   };
 }
 
 describe("bot/features/afk/commands/afkCommand.execute", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getAfkConfigMock.mockResolvedValue({
       enabled: true,
       channelId: "afk-channel",

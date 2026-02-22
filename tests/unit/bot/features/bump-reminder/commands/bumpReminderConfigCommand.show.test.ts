@@ -1,28 +1,28 @@
 import { handleBumpReminderConfigShow } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.show";
 
-const ensureManageGuildPermissionMock = jest.fn();
-const getBumpReminderConfigMock = jest.fn();
-const createInfoEmbedMock = jest.fn((description: string) => ({
+const ensureManageGuildPermissionMock = vi.fn();
+const getBumpReminderConfigMock = vi.fn();
+const createInfoEmbedMock = vi.fn((description: string) => ({
   description,
   kind: "info",
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async () => "translated"),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async () => "translated"),
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   getBotBumpReminderConfigService: () => ({
     getBumpReminderConfig: (...args: unknown[]) =>
       getBumpReminderConfigMock(...args),
   }),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: (description: string) => createInfoEmbedMock(description),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
   () => ({
     ensureManageGuildPermission: (...args: unknown[]) =>
@@ -32,13 +32,13 @@ jest.mock(
 
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.show", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
   });
 
   it("replies not-configured embed when config is null", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
-    const interaction = { reply: jest.fn().mockResolvedValue(undefined) };
+    const interaction = { reply: vi.fn().mockResolvedValue(undefined) };
 
     await handleBumpReminderConfigShow(interaction as never, "guild-1");
 
@@ -54,7 +54,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.show", (
       mentionRoleId: "role-1",
       mentionUserIds: ["user-1"],
     });
-    const interaction = { reply: jest.fn().mockResolvedValue(undefined) };
+    const interaction = { reply: vi.fn().mockResolvedValue(undefined) };
 
     await handleBumpReminderConfigShow(interaction as never, "guild-1");
 

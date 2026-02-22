@@ -7,7 +7,7 @@ import {
 
 describe("bot/features/bump-reminder/repositories/usecases/updateBumpReminderStatus", () => {
   it("updates reminder status by id", async () => {
-    const update = jest.fn().mockResolvedValue(undefined);
+    const update = vi.fn().mockResolvedValue(undefined);
     const prisma = { bumpReminder: { update } };
 
     await updateReminderStatusUseCase(
@@ -23,7 +23,7 @@ describe("bot/features/bump-reminder/repositories/usecases/updateBumpReminderSta
   });
 
   it("cancels pending reminders by guild", async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 2 });
+    const updateMany = vi.fn().mockResolvedValue({ count: 2 });
     const prisma = { bumpReminder: { updateMany } };
 
     await cancelPendingByGuildUseCase(prisma as never, "guild-1");
@@ -35,7 +35,7 @@ describe("bot/features/bump-reminder/repositories/usecases/updateBumpReminderSta
   });
 
   it("cancels pending reminders by guild and channel", async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 });
     const prisma = { bumpReminder: { updateMany } };
 
     await cancelPendingByGuildAndChannelUseCase(

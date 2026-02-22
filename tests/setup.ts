@@ -1,5 +1,5 @@
 /**
- * Jest Setup File
+ * Vitest Setup File
  * テスト実行前のグローバル設定
  */
 
@@ -26,12 +26,11 @@ EventEmitter.defaultMaxListeners = 20;
 // 不要な標準出力ノイズを抑制（error は失敗解析のため維持）
 global.console = {
   ...console,
-  log: jest.fn(),
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
+  log: vi.fn(),
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
   // error は残す（テスト失敗時に確認が必要）
 };
 
-// 重い統合テストに備えてデフォルトタイムアウトを延長
-jest.setTimeout(10000);
+// タイムアウトは vitest.config.ts の testTimeout で設定済み（10000ms）

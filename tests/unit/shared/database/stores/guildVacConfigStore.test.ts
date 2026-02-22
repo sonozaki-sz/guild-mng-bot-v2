@@ -5,8 +5,8 @@ describe("shared/database/stores/guildVacConfigStore", () => {
 
   const createPrismaMock = () => ({
     guildConfig: {
-      findUnique: jest.fn(),
-      upsert: jest.fn(),
+      findUnique: vi.fn(),
+      upsert: vi.fn(),
     },
   });
 
@@ -20,7 +20,7 @@ describe("shared/database/stores/guildVacConfigStore", () => {
     prisma.guildConfig.findUnique.mockResolvedValue({
       vacConfig: JSON.stringify(parsed),
     });
-    const safeJsonParse = jest.fn().mockReturnValue(parsed);
+    const safeJsonParse = vi.fn().mockReturnValue(parsed);
 
     const store = new GuildVacConfigStore(
       prisma as never,
@@ -38,7 +38,7 @@ describe("shared/database/stores/guildVacConfigStore", () => {
 
   it("returns null when config is missing or parse fails", async () => {
     const prisma = createPrismaMock();
-    const safeJsonParse = jest.fn().mockReturnValue(undefined);
+    const safeJsonParse = vi.fn().mockReturnValue(undefined);
     const store = new GuildVacConfigStore(
       prisma as never,
       defaultLocale,
@@ -58,7 +58,7 @@ describe("shared/database/stores/guildVacConfigStore", () => {
 
   it("upserts vac config JSON with default locale on create", async () => {
     const prisma = createPrismaMock();
-    const safeJsonParse = jest.fn();
+    const safeJsonParse = vi.fn();
     const store = new GuildVacConfigStore(
       prisma as never,
       defaultLocale,

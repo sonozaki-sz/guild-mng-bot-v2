@@ -6,7 +6,7 @@ import {
 
 describe("bot/features/bump-reminder/repositories/usecases/findPendingReminders", () => {
   it("finds next pending reminder for guild", async () => {
-    const findFirst = jest.fn().mockResolvedValue({ id: "r1" });
+    const findFirst = vi.fn().mockResolvedValue({ id: "r1" });
     const prisma = { bumpReminder: { findFirst } };
 
     const result = await findPendingByGuildUseCase(prisma as never, "guild-1");
@@ -19,7 +19,7 @@ describe("bot/features/bump-reminder/repositories/usecases/findPendingReminders"
   });
 
   it("finds all pending reminders ordered by schedule", async () => {
-    const findMany = jest.fn().mockResolvedValue([{ id: "r1" }, { id: "r2" }]);
+    const findMany = vi.fn().mockResolvedValue([{ id: "r1" }, { id: "r2" }]);
     const prisma = { bumpReminder: { findMany } };
 
     const result = await findAllPendingUseCase(prisma as never);

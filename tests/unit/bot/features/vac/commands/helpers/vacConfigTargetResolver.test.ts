@@ -15,10 +15,10 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
       };
       const guild = {
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             parent: category,
           }),
-          cache: { find: jest.fn() },
+          cache: { find: vi.fn() },
         },
       };
 
@@ -32,11 +32,11 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
     });
 
     it("returns null when TOP is specified", async () => {
-      const fetch = jest.fn();
+      const fetch = vi.fn();
       const guild = {
         channels: {
           fetch,
-          cache: { find: jest.fn() },
+          cache: { find: vi.fn() },
         },
       };
 
@@ -58,12 +58,12 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
       };
       const guild = {
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: ChannelType.GuildVoice,
           }),
           cache: {
-            find: jest.fn((predicate: (item: unknown) => boolean) => {
+            find: vi.fn((predicate: (item: unknown) => boolean) => {
               const candidates = [categoryByName];
               return candidates.find(predicate);
             }),
@@ -85,7 +85,7 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
     it("returns first voice trigger channel matching category", async () => {
       const guild = {
         channels: {
-          fetch: jest
+          fetch: vi
             .fn()
             .mockResolvedValueOnce({
               id: "text-1",
@@ -116,7 +116,7 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
     it("returns null when no trigger matches category", async () => {
       const guild = {
         channels: {
-          fetch: jest
+          fetch: vi
             .fn()
             .mockResolvedValueOnce(null)
             .mockResolvedValueOnce({

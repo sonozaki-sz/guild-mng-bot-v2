@@ -2,37 +2,37 @@ import { handleBumpReminderConfigRemoveMention } from "@/bot/features/bump-remin
 import { ValidationError } from "@/shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-reminder/bumpReminderConfigService";
 
-const ensureManageGuildPermissionMock = jest.fn();
-const getBumpReminderConfigMock = jest.fn();
-const setMentionRoleMock = jest.fn();
+const ensureManageGuildPermissionMock = vi.fn();
+const getBumpReminderConfigMock = vi.fn();
+const setMentionRoleMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
-  tGuild: jest.fn(async () => "translated"),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
+  tGuild: vi.fn(async () => "translated"),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
-  logger: { info: jest.fn() },
+vi.mock("@/shared/utils/logger", () => ({
+  logger: { info: vi.fn() },
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   getBotBumpReminderConfigService: () => ({
     getBumpReminderConfig: (...args: unknown[]) =>
       getBumpReminderConfigMock(...args),
     setBumpReminderMentionRole: (...args: unknown[]) =>
       setMentionRoleMock(...args),
-    clearBumpReminderMentionUsers: jest.fn(),
-    clearBumpReminderMentions: jest.fn(),
-    removeBumpReminderMentionUser: jest.fn(),
+    clearBumpReminderMentionUsers: vi.fn(),
+    clearBumpReminderMentions: vi.fn(),
+    removeBumpReminderMentionUser: vi.fn(),
   }),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: jest.fn((description: string) => ({ description })),
-  createSuccessEmbed: jest.fn((description: string) => ({ description })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: vi.fn((description: string) => ({ description })),
+  createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
   () => ({
     ensureManageGuildPermission: (...args: unknown[]) =>
@@ -42,7 +42,7 @@ jest.mock(
 
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMention", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
     getBumpReminderConfigMock.mockResolvedValue({
       enabled: true,
@@ -58,9 +58,9 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
 
     const interaction = {
       options: {
-        getString: jest.fn(() => "role"),
+        getString: vi.fn(() => "role"),
       },
-      reply: jest.fn(),
+      reply: vi.fn(),
     };
 
     await expect(
@@ -75,9 +75,9 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
 
     const interaction = {
       options: {
-        getString: jest.fn(() => "role"),
+        getString: vi.fn(() => "role"),
       },
-      reply: jest.fn().mockResolvedValue(undefined),
+      reply: vi.fn().mockResolvedValue(undefined),
     };
 
     await handleBumpReminderConfigRemoveMention(

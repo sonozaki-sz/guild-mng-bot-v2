@@ -1,12 +1,12 @@
 import { setBumpReminderUsecase } from "@/bot/features/bump-reminder/services/usecases/setBumpReminderUsecase";
 
-const toBumpReminderJobIdMock = jest.fn();
-const toScheduledAtMock = jest.fn();
-const scheduleReminderInMemoryMock = jest.fn();
-const createTrackedReminderTaskMock = jest.fn();
-const loggerInfoMock = jest.fn();
+const toBumpReminderJobIdMock = vi.fn();
+const toScheduledAtMock = vi.fn();
+const scheduleReminderInMemoryMock = vi.fn();
+const createTrackedReminderTaskMock = vi.fn();
+const loggerInfoMock = vi.fn();
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/constants/bumpReminderConstants",
   () => ({
     toBumpReminderJobId: (...args: unknown[]) =>
@@ -15,7 +15,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper",
   () => ({
     scheduleReminderInMemory: (...args: unknown[]) =>
@@ -23,7 +23,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask",
   () => ({
     createTrackedReminderTask: (...args: unknown[]) =>
@@ -31,11 +31,11 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
@@ -43,7 +43,7 @@ jest.mock("@/shared/utils/logger", () => ({
 
 describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     toBumpReminderJobIdMock.mockReturnValue("job-g1");
     toScheduledAtMock.mockReturnValue(new Date(Date.now() + 60_000));
     createTrackedReminderTaskMock.mockImplementation(
@@ -58,11 +58,11 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
 
   it("creates and schedules reminder", async () => {
     const repository = {
-      create: jest.fn().mockResolvedValue({ id: "r1" }),
+      create: vi.fn().mockResolvedValue({ id: "r1" }),
     };
     const reminders = new Map<string, { jobId: string; reminderId: string }>();
-    const cancelReminder = jest.fn().mockResolvedValue(true);
-    const task = jest.fn().mockResolvedValue(undefined);
+    const cancelReminder = vi.fn().mockResolvedValue(true);
+    const task = vi.fn().mockResolvedValue(undefined);
 
     await setBumpReminderUsecase({
       repository: repository as never,
@@ -85,12 +85,12 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
 
   it("cancels existing reminder before scheduling replacement", async () => {
     const repository = {
-      create: jest.fn().mockResolvedValue({ id: "r1" }),
+      create: vi.fn().mockResolvedValue({ id: "r1" }),
     };
     const reminders = new Map<string, { jobId: string; reminderId: string }>([
       ["g1", { jobId: "job-old", reminderId: "r-old" }],
     ]);
-    const cancelReminder = jest.fn().mockResolvedValue(true);
+    const cancelReminder = vi.fn().mockResolvedValue(true);
 
     await setBumpReminderUsecase({
       repository: repository as never,
@@ -100,7 +100,7 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
       messageId: undefined,
       panelMessageId: undefined,
       delayMinutes: 1,
-      task: jest.fn().mockResolvedValue(undefined),
+      task: vi.fn().mockResolvedValue(undefined),
       serviceName: undefined,
       cancelReminder,
     });

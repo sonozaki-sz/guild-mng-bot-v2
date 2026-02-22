@@ -1,67 +1,67 @@
 import { initializeBotCompositionRoot } from "@/bot/services/botCompositionRoot";
 
-const getGuildConfigRepositoryMock = jest.fn();
-const getVacConfigServiceMock = jest.fn();
-const getBumpReminderFeatureConfigServiceMock = jest.fn();
-const getBumpReminderRepositoryMock = jest.fn();
-const getBumpReminderManagerMock = jest.fn();
-const createVacRepositoryMock = jest.fn();
-const getVacRepositoryMock = jest.fn();
-const getVacServiceMock = jest.fn();
+const getGuildConfigRepositoryMock = vi.fn();
+const getVacConfigServiceMock = vi.fn();
+const getBumpReminderFeatureConfigServiceMock = vi.fn();
+const getBumpReminderRepositoryMock = vi.fn();
+const getBumpReminderManagerMock = vi.fn();
+const createVacRepositoryMock = vi.fn();
+const getVacRepositoryMock = vi.fn();
+const getVacServiceMock = vi.fn();
 
-const setBotGuildConfigRepositoryMock = jest.fn();
-const setBotBumpReminderConfigServiceMock = jest.fn();
-const setBotBumpReminderRepositoryMock = jest.fn();
-const setBotBumpReminderManagerMock = jest.fn();
-const setBotVacRepositoryMock = jest.fn();
-const setBotVacServiceMock = jest.fn();
-const localeSetRepositoryMock = jest.fn();
+const setBotGuildConfigRepositoryMock = vi.fn();
+const setBotBumpReminderConfigServiceMock = vi.fn();
+const setBotBumpReminderRepositoryMock = vi.fn();
+const setBotBumpReminderManagerMock = vi.fn();
+const setBotVacRepositoryMock = vi.fn();
+const setBotVacServiceMock = vi.fn();
+const localeSetRepositoryMock = vi.fn();
 
-jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
+vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: (...args: unknown[]) =>
     getGuildConfigRepositoryMock(...args),
 }));
 
-jest.mock("@/shared/features/vac/vacConfigService", () => ({
+vi.mock("@/shared/features/vac/vacConfigService", () => ({
   getVacConfigService: (...args: unknown[]) => getVacConfigServiceMock(...args),
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   localeManager: {
     setRepository: (...args: unknown[]) => localeSetRepositoryMock(...args),
   },
 }));
 
-jest.mock("@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver", () => ({
+vi.mock("@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver", () => ({
   getBumpReminderFeatureConfigService: (...args: unknown[]) =>
     getBumpReminderFeatureConfigServiceMock(...args),
 }));
 
-jest.mock("@/bot/features/bump-reminder/repositories/bumpReminderRepository", () => ({
+vi.mock("@/bot/features/bump-reminder/repositories/bumpReminderRepository", () => ({
   getBumpReminderRepository: (...args: unknown[]) =>
     getBumpReminderRepositoryMock(...args),
 }));
 
-jest.mock("@/bot/features/bump-reminder/services/bumpReminderService", () => ({
+vi.mock("@/bot/features/bump-reminder/services/bumpReminderService", () => ({
   getBumpReminderManager: (...args: unknown[]) =>
     getBumpReminderManagerMock(...args),
 }));
 
-jest.mock("@/bot/features/vac/repositories/vacRepository", () => ({
+vi.mock("@/bot/features/vac/repositories/vacRepository", () => ({
   createVacRepository: (...args: unknown[]) => createVacRepositoryMock(...args),
   getVacRepository: (...args: unknown[]) => getVacRepositoryMock(...args),
 }));
 
-jest.mock("@/bot/features/vac/services/vacService", () => ({
+vi.mock("@/bot/features/vac/services/vacService", () => ({
   getVacService: (...args: unknown[]) => getVacServiceMock(...args),
 }));
 
-jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
+vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
   setBotGuildConfigRepository: (...args: unknown[]) =>
     setBotGuildConfigRepositoryMock(...args),
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   setBotBumpReminderConfigService: (...args: unknown[]) =>
     setBotBumpReminderConfigServiceMock(...args),
   setBotBumpReminderRepository: (...args: unknown[]) =>
@@ -70,14 +70,14 @@ jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
     setBotBumpReminderManagerMock(...args),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
   setBotVacRepository: (...args: unknown[]) => setBotVacRepositoryMock(...args),
   setBotVacService: (...args: unknown[]) => setBotVacServiceMock(...args),
 }));
 
 describe("bot/services/botCompositionRoot", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("wires all bot dependencies from prisma root", () => {

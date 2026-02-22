@@ -3,11 +3,11 @@ import { createBumpReminderUseCase } from "@/bot/features/bump-reminder/reposito
 
 describe("bot/features/bump-reminder/repositories/usecases/createBumpReminder", () => {
   it("cancels existing pending and creates new reminder in transaction", async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 1 });
-    const create = jest.fn().mockResolvedValue({ id: "r1" });
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 });
+    const create = vi.fn().mockResolvedValue({ id: "r1" });
     const tx = { bumpReminder: { updateMany, create } };
     const prisma = {
-      $transaction: jest
+      $transaction: vi
         .fn()
         .mockImplementation(async (fn: (txArg: unknown) => unknown) => fn(tx)),
     };

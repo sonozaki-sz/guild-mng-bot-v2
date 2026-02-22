@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import { presentVacConfigShow } from "@/bot/features/vac/commands/presenters/vacConfigShowPresenter";
 import { handleVacConfigShow } from "@/bot/features/vac/commands/usecases/vacConfigShow";
 import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
@@ -5,23 +6,23 @@ import { createInfoEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(),
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/vac/commands/presenters/vacConfigShowPresenter",
   () => ({
-    presentVacConfigShow: jest.fn(),
+    presentVacConfigShow: vi.fn(),
   }),
 );
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createInfoEmbed: jest.fn((description: string, options?: object) => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createInfoEmbed: vi.fn((description: string, options?: object) => ({
     description,
     options,
   })),
@@ -30,13 +31,13 @@ jest.mock("@/bot/utils/messageResponse", () => ({
 describe("bot/features/vac/commands/usecases/vacConfigShow", () => {
   // show ユースケースの前提チェックと返信ペイロードを検証
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("throws ValidationError when guild context is missing", async () => {
     const interaction = {
       guild: null,
-      reply: jest.fn(),
+      reply: vi.fn(),
     };
 
     await expect(
@@ -45,16 +46,16 @@ describe("bot/features/vac/commands/usecases/vacConfigShow", () => {
   });
 
   it("builds info embed and replies ephemeral when guild exists", async () => {
-    const getVacConfigOrDefault = jest.fn().mockResolvedValue({
+    const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["trigger-1"],
       createdChannels: [],
     });
-    (getBotVacRepository as jest.Mock).mockReturnValue({
+    (getBotVacRepository as Mock).mockReturnValue({
       getVacConfigOrDefault,
     });
 
-    (presentVacConfigShow as jest.Mock).mockResolvedValue({
+    (presentVacConfigShow as Mock).mockResolvedValue({
       title: "VAC設定",
       fieldTrigger: "トリガー",
       triggerChannels: "<#trigger-1> (TOP)",
@@ -62,7 +63,7 @@ describe("bot/features/vac/commands/usecases/vacConfigShow", () => {
       createdVcDetails: "作成済みVCなし",
     });
 
-    const reply = jest.fn().mockResolvedValue(undefined);
+    const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guild: { id: "guild-1" },
       reply,

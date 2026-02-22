@@ -1,11 +1,11 @@
 import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { cancelBumpReminderUsecase } from "@/bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase";
 
-const cancelScheduledReminderMock = jest.fn();
-const loggerInfoMock = jest.fn();
-const loggerErrorMock = jest.fn();
+const cancelScheduledReminderMock = vi.fn();
+const loggerInfoMock = vi.fn();
+const loggerErrorMock = vi.fn();
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper",
   () => ({
     cancelScheduledReminder: (...args: unknown[]) =>
@@ -13,11 +13,11 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     error: (...args: unknown[]) => loggerErrorMock(...args),
@@ -26,12 +26,12 @@ jest.mock("@/shared/utils/logger", () => ({
 
 describe("bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("returns false when no scheduled reminder exists", async () => {
     cancelScheduledReminderMock.mockReturnValue(undefined);
-    const repository = { updateStatus: jest.fn() };
+    const repository = { updateStatus: vi.fn() };
 
     const result = await cancelBumpReminderUsecase({
       repository: repository as never,
@@ -48,7 +48,7 @@ describe("bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase
       jobId: "job-1",
       reminderId: "r1",
     });
-    const repository = { updateStatus: jest.fn().mockResolvedValue(undefined) };
+    const repository = { updateStatus: vi.fn().mockResolvedValue(undefined) };
 
     const result = await cancelBumpReminderUsecase({
       repository: repository as never,

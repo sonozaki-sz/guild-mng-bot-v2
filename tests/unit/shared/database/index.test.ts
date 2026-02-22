@@ -1,11 +1,11 @@
 describe("shared/database/guildConfigRepositoryProvider", () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it("throws when repository is not initialized and no prisma is provided", async () => {
-    const createGuildConfigRepositoryMock = jest.fn();
-    jest.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
+    const createGuildConfigRepositoryMock = vi.fn();
+    vi.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
@@ -20,11 +20,11 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     const repoB = { id: "repoB" };
     const prismaA = { id: "prismaA" };
     const prismaB = { id: "prismaB" };
-    const createGuildConfigRepositoryMock = jest.fn((prisma: unknown) =>
+    const createGuildConfigRepositoryMock = vi.fn((prisma: unknown) =>
       prisma === prismaA ? repoA : repoB,
     );
 
-    jest.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
+    vi.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
@@ -46,9 +46,9 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     const repoFromPrisma = { id: "repoFromPrisma" };
     const explicitDefault = { id: "explicitDefault" };
     const prisma = { id: "prisma" };
-    const createGuildConfigRepositoryMock = jest.fn(() => repoFromPrisma);
+    const createGuildConfigRepositoryMock = vi.fn(() => repoFromPrisma);
 
-    jest.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
+    vi.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
@@ -64,9 +64,9 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
   it("clears cached and default repositories on reset", async () => {
     const repoFromPrisma = { id: "repoFromPrisma" };
     const prisma = { id: "prisma" };
-    const createGuildConfigRepositoryMock = jest.fn(() => repoFromPrisma);
+    const createGuildConfigRepositoryMock = vi.fn(() => repoFromPrisma);
 
-    jest.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
+    vi.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 

@@ -2,7 +2,7 @@ import { findBumpReminderByIdUseCase } from "@/bot/features/bump-reminder/reposi
 
 describe("bot/features/bump-reminder/repositories/usecases/findBumpReminderById", () => {
   it("finds reminder by id", async () => {
-    const findUnique = jest.fn().mockResolvedValue({ id: "r1" });
+    const findUnique = vi.fn().mockResolvedValue({ id: "r1" });
     const prisma = { bumpReminder: { findUnique } };
 
     const result = await findBumpReminderByIdUseCase(prisma as never, "r1");

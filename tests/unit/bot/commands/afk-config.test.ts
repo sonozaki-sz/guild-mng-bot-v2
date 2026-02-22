@@ -1,17 +1,18 @@
+import type { Mock } from "vitest";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 
-const setAfkChannelMock = jest.fn();
-const getAfkConfigMock = jest.fn();
-const tGuildMock = jest.fn();
-const tDefaultMock = jest.fn((key: string) => `default:${key}`);
-const createSuccessEmbedMock = jest.fn(
+const setAfkChannelMock = vi.fn();
+const getAfkConfigMock = vi.fn();
+const tGuildMock = vi.hoisted(() => vi.fn());
+const tDefaultMock = vi.hoisted(() => vi.fn((key: string) => `default:${key}`));
+const createSuccessEmbedMock = vi.fn(
   (description: string, _options?: unknown) => ({
     kind: "success",
     description,
   }),
 );
-const createInfoEmbedMock = jest.fn(
+const createInfoEmbedMock = vi.fn(
   (description: string, _options?: unknown) => ({
     kind: "info",
     description,
@@ -19,7 +20,7 @@ const createInfoEmbedMock = jest.fn(
 );
 
 // AFK設定永続化の呼び出しだけをモックし、コマンド分岐を直接検証する
-jest.mock(
+vi.mock(
   "@/bot/services/botGuildConfigRepositoryResolver",
   () => ({
     getBotGuildConfigRepository: () => ({
@@ -29,7 +30,7 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
+vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({
     setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
@@ -37,24 +38,24 @@ jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
 }));
 
 // 共通エラーハンドラへの委譲可否を確認する
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
 }));
 
 // i18n を固定値化して期待値を安定させる
-jest.mock("@/shared/locale/commandLocalizations", () => ({
+vi.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
 }));
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));
 
 // メッセージ生成ユーティリティは生成結果を簡易オブジェクトに置換する
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string, options?: unknown) =>
     createSuccessEmbedMock(description, options),
   createInfoEmbed: (description: string, options?: unknown) =>
@@ -62,9 +63,9 @@ jest.mock("@/bot/utils/messageResponse", () => ({
 }));
 
 // ログ出力の副作用を抑止
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    info: jest.fn(),
+    info: vi.fn(),
   },
 }));
 
@@ -74,12 +75,12 @@ import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 type AfkConfigInteraction = {
   guildId: string | null;
   channelId: string;
-  memberPermissions: { has: jest.Mock };
+  memberPermissions: { has: Mock };
   options: {
-    getSubcommand: jest.Mock<string, []>;
-    getChannel: jest.Mock;
+    getSubcommand: Mock<() => string>;
+    getChannel: Mock;
   };
-  reply: jest.Mock;
+  reply: Mock;
 };
 
 // afk-config 検証用の最小 interaction モック
@@ -90,16 +91,16 @@ function createInteraction(
     guildId: "guild-1",
     channelId: "channel-1",
     memberPermissions: {
-      has: jest.fn(() => true),
+      has: vi.fn(() => true),
     },
     options: {
-      getSubcommand: jest.fn(() => "set-ch"),
-      getChannel: jest.fn(() => ({
+      getSubcommand: vi.fn(() => "set-ch"),
+      getChannel: vi.fn(() => ({
         id: "afk-channel",
         type: ChannelType.GuildVoice,
       })),
     },
-    reply: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -107,7 +108,7 @@ function createInteraction(
 describe("bot/commands/afk-config", () => {
   // ケースごとにモック状態を初期化する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     tGuildMock.mockResolvedValue("translated");
     getAfkConfigMock.mockResolvedValue({ enabled: false, channelId: null });
   });
@@ -127,8 +128,8 @@ describe("bot/commands/afk-config", () => {
   it("sets AFK channel on set-ch subcommand", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-ch"),
-        getChannel: jest.fn(() => ({
+        getSubcommand: vi.fn(() => "set-ch"),
+        getChannel: vi.fn(() => ({
           id: "afk-channel",
           type: ChannelType.GuildVoice,
         })),
@@ -153,8 +154,8 @@ describe("bot/commands/afk-config", () => {
   it("delegates invalid subcommand error", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "unknown"),
-        getChannel: jest.fn(),
+        getSubcommand: vi.fn(() => "unknown"),
+        getChannel: vi.fn(),
       },
     });
 
@@ -168,10 +169,10 @@ describe("bot/commands/afk-config", () => {
   // set-ch で権限不足の場合は共通エラーハンドラへ委譲されることを検証
   it("delegates permission error on set-ch", async () => {
     const interaction = createInteraction({
-      memberPermissions: { has: jest.fn(() => false) },
+      memberPermissions: { has: vi.fn(() => false) },
       options: {
-        getSubcommand: jest.fn(() => "set-ch"),
-        getChannel: jest.fn(() => ({
+        getSubcommand: vi.fn(() => "set-ch"),
+        getChannel: vi.fn(() => ({
           id: "afk-channel",
           type: ChannelType.GuildVoice,
         })),
@@ -189,8 +190,8 @@ describe("bot/commands/afk-config", () => {
   it("delegates invalid channel type error on set-ch", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-ch"),
-        getChannel: jest.fn(() => ({
+        getSubcommand: vi.fn(() => "set-ch"),
+        getChannel: vi.fn(() => ({
           id: "text-1",
           type: ChannelType.GuildText,
         })),
@@ -210,8 +211,8 @@ describe("bot/commands/afk-config", () => {
     getAfkConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getChannel: jest.fn(),
+        getSubcommand: vi.fn(() => "show"),
+        getChannel: vi.fn(),
       },
     });
 
@@ -235,8 +236,8 @@ describe("bot/commands/afk-config", () => {
     getAfkConfigMock.mockResolvedValueOnce(config);
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getChannel: jest.fn(),
+        getSubcommand: vi.fn(() => "show"),
+        getChannel: vi.fn(),
       },
     });
 
@@ -257,8 +258,8 @@ describe("bot/commands/afk-config", () => {
     });
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getChannel: jest.fn(),
+        getSubcommand: vi.fn(() => "show"),
+        getChannel: vi.fn(),
       },
     });
 
@@ -279,10 +280,10 @@ describe("bot/commands/afk-config", () => {
   // show で権限不足の場合は共通エラーハンドラへ委譲されることを検証
   it("delegates permission error on show", async () => {
     const interaction = createInteraction({
-      memberPermissions: { has: jest.fn(() => false) },
+      memberPermissions: { has: vi.fn(() => false) },
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getChannel: jest.fn(),
+        getSubcommand: vi.fn(() => "show"),
+        getChannel: vi.fn(),
       },
     });
 
