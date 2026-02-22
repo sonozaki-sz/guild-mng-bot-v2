@@ -9,10 +9,8 @@ const createSuccessEmbedMock = vi.fn((description: string) => ({
 }));
 const loggerInfoMock = vi.fn();
 
-vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: () => ({
-    getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
-  }),
+vi.mock("@/shared/features/afk/afkConfigService", () => ({
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({

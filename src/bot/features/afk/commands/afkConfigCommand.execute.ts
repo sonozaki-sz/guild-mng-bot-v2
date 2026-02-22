@@ -8,9 +8,12 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
+import {
+  getAfkConfig,
+  setAfkChannel,
+} from "../../../../shared/features/afk/afkConfigService";
 import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotGuildConfigRepository } from "../../../services/botGuildConfigRepositoryResolver";
 import {
   createInfoEmbed,
   createSuccessEmbed,
@@ -73,7 +76,7 @@ async function handleSetChannel(
     );
   }
 
-  await getBotGuildConfigRepository().setAfkChannel(guildId, channel.id);
+  await setAfkChannel(guildId, channel.id);
 
   const description = await tGuild(
     guildId,
@@ -105,7 +108,7 @@ async function handleShowSetting(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  const config = await getBotGuildConfigRepository().getAfkConfig(guildId);
+  const config = await getAfkConfig(guildId);
 
   const title = await tGuild(guildId, "commands:afk-config.embed.title");
 

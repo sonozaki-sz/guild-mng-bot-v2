@@ -15,11 +15,9 @@ const createInfoEmbedMock = vi.fn((description: string) => ({
   kind: "info",
 }));
 
-vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: () => ({
-    setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
-    getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
-  }),
+vi.mock("@/shared/features/afk/afkConfigService", () => ({
+  setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
