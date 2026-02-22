@@ -84,17 +84,13 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          script_stop: true
-          envs: IMAGE_TAG,GHCR_TOKEN,GHCR_USER
+          envs: IMAGE_TAG
           script: |
-            # GHCR にログインして最新イメージを取得
-            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            set -e
+            # 最新イメージを取得（GHCR パブリックのため認証不要）
             docker pull "$IMAGE_TAG"
-            docker logout ghcr.io
             # コンテナを再起動して新イメージを適用
             docker restart guild-mng-bot-v2
             echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
         env:
           IMAGE_TAG: ghcr.io/${{ github.repository }}:latest
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-          GHCR_USER: ${{ github.actor }}
