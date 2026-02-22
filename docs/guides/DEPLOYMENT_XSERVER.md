@@ -32,10 +32,10 @@ XServer VPS (2GB RAM / 3vCPU / NVMe SSD 50GB)
 
 XServer VPS コントロールパネル（https://secure.xserver.ne.jp/xapanel/login/xvps/）にログインし、以下の設定でサーバーを申し込む。
 
-| 項目 | 推奨設定 |
-|---|---|
-| プラン | 2GB（月額 990円） |
-| OS | Ubuntu 24.04 LTS |
+| 項目           | 推奨設定                                                            |
+| -------------- | ------------------------------------------------------------------- |
+| プラン         | 2GB（月額 990円）                                                   |
+| OS             | Ubuntu 24.04 LTS                                                    |
 | アプリイメージ | **Docker**（専用イメージを選択するとDocker/Compose が初めから入る） |
 
 > **Tip**: アプリイメージで「Docker」を選択すると、Docker と Docker Compose が初期インストール済みの状態で起動する。
@@ -150,12 +150,17 @@ git clone https://github.com/<あなたのユーザー名>/guild-mng-bot-v2.git 
 
 ### 3-2. 環境変数ファイルの作成
 
+> **Note**: [セクション 8](#-8-github-actions-による自動デプロイcd) の GitHub Actions 自動デプロイ + Portainer 構成では、環境変数は **Portainer Stacks の Env タブ** で管理する。`.env` ファイルをサーバーに置く必要はない。
+> 配置が必要なキーの一覧は [PORTAINER_SETUP.md セクション 5-2](PORTAINER_SETUP.md#5-2-環境変数を-env-タブで設定する) を参照すること。
+
+**手動起動やローカルテスト用に .env が必要な場合:**
+
 ```bash
 cp .env.example .env
 nano .env
 ```
 
-本番環境での `.env` の設定例:
+本番環境での `.env` の設定例（Portainer Env タブに入力する値と同じ）:
 
 ```dotenv
 # 実行環境
@@ -287,7 +292,7 @@ services:
     volumes:
       - sqlite_data:/app/storage
     ports:
-      - "127.0.0.1:3000:3000"   # ループバックにバインド（外部直接アクセス不可）
+      - "127.0.0.1:3000:3000" # ループバックにバインド（外部直接アクセス不可）
     networks:
       - internal
     logging:
@@ -321,15 +326,14 @@ docker compose -f docker-compose.prod.yml run --rm bot \
   pnpm prisma migrate deploy
 ```
 
-### 6-2. コンテナを起動
+### 6-2. コンテナを起動（初回: Portainer Stack から）
 
-```bash
-# イメージをビルドして起動（バックグラウンド）
-docker compose -f docker-compose.prod.yml up -d --build
+初回起動は **[PORTAINER_SETUP.md セクション 5](PORTAINER_SETUP.md#%EF%B8%8F-5-stack-の作成と環境変数管理)** の手順で Portainer Stack を作成して行う。
+Portainer が `docker-compose.prod.yml` を Git から取得し、Env タブの環境変数を注入した上でコンテナを起動する。
 
-# 起動確認
-docker compose -f docker-compose.prod.yml ps
-```
+確認は Portainer 左メニュー → **Containers** でステータスを見る。
+
+> **自動起動の確認**: Portainer 自体が `portainer_data` ボリュームに Stack 情報を保存するため、サーバー再起動後も Stack は自動復元される。
 
 ### 6-3. ログ確認
 
@@ -348,6 +352,8 @@ docker compose -f docker-compose.prod.yml logs -f web
 
 ## 🔄 7. アップデート手順
 
+> **Note**: `main` への push で GitHub Actions が自動でコード取得・マイグレーション・デプロイを実行する。緊急時およびデバッグ用に手動手順を示す。
+
 コードを更新してデプロイする際の手順。
 
 ```bash
@@ -356,14 +362,12 @@ cd /opt/guild-mng-bot
 # 最新コードを取得
 git pull origin main
 
-# イメージを再ビルドして再起動（ダウンタイム最小化）
-docker compose -f docker-compose.prod.yml up -d --build
-
 # マイグレーションがある場合
 docker compose -f docker-compose.prod.yml run --rm bot \
   pnpm prisma migrate deploy
 
-# 古いイメージを削除（ストレージ節約）
+# Portainer の Stacks 画面から 「Update the stack」 を実行する（または Docker 直指定して再起動）
+docker compose -f docker-compose.prod.yml up -d --build
 docker image prune -f
 ```
 
@@ -379,7 +383,13 @@ docker image prune -f
 ```
 push to main
   └── CI: 型チェック・テスト（pnpm typecheck && pnpm test）
-        └── CD: SSH でVPSに接続 → git pull → migrate → docker compose up --build
+        └── CD:
+              ├── SSH でVPSに接続
+              │     ├── git pull origin main        ← 最新コードを取得
+              │     └── prisma migrate deploy       ← DB マイグレーション
+              └── Portainer Webhook を POST
+                    └── Portainer が docker compose up -d --build を実行
+                          └── Env タブの環境変数がコンテナへ注入される
 ```
 
 PR へのpushは CI のみ実行し、デプロイは行わない。
@@ -388,12 +398,13 @@ PR へのpushは CI のみ実行し、デプロイは行わない。
 
 GitHub リポジトリ → **Settings → Secrets and variables → Actions** を開き、以下の **Repository Secrets** を登録する。
 
-| Secret 名     | 内容                             | 例                          |
-|---------------|----------------------------------|-----------------------------|
-| `VPS_HOST`    | サーバーの IP アドレス           | `203.0.113.10`              |
-| `VPS_USER`    | SSH ユーザー名                   | `deploy`                    |
-| `VPS_SSH_KEY` | SSH 秘密鍵（ed25519 の全文）     | `-----BEGIN OPENSSH...`     |
-| `VPS_PORT`    | SSH ポート番号                   | `22`                        |
+| Secret 名               | 内容                         | 例                                                           |
+| ----------------------- | ---------------------------- | ------------------------------------------------------------ |
+| `VPS_HOST`              | サーバーの IP アドレス       | `203.0.113.10`                                               |
+| `VPS_USER`              | SSH ユーザー名               | `deploy`                                                     |
+| `VPS_SSH_KEY`           | SSH 秘密鍵（ed25519 の全文） | `-----BEGIN OPENSSH...`                                      |
+| `VPS_PORT`              | SSH ポート番号               | `22`                                                         |
+| `PORTAINER_WEBHOOK_URL` | Portainer Stack Webhook URL  | `https://portainer.your-domain.com/api/stacks/webhooks/xxxx` |
 
 **SSH 秘密鍵の確認方法（ローカルPCで実行）:**
 
@@ -405,6 +416,12 @@ cat ~/.ssh/id_ed25519
 
 > **Note**: 秘密鍵はローカルPCからサーバーに接続できているキー（[1-3](#1-3-一般ユーザーの作成と-ssh-キー設定) で生成したもの）を使用する。
 
+**PORTAINER_WEBHOOK_URL の取得方法:**
+
+[PORTAINER_SETUP.md](PORTAINER_SETUP.md) のセクション **5-4. Webhook を取得して GitHub Secrets に登録する** の手順を参照する。
+
+> **初回デプロイの順序**: Portainer Stack の作成（[PORTAINER_SETUP.md セクション 5](PORTAINER_SETUP.md#%EF%B8%8F-5-stack-の作成と環境変数管理)）→ Webhook URLを取得して `PORTAINER_WEBHOOK_URL` を登録 → `VPS_HOST`/`VPS_USER`/`VPS_SSH_KEY`/`VPS_PORT` を登録。この順序で設定すること。
+
 ### 8-3. デプロイ対象ブランチの確認
 
 `.github/workflows/deploy.yml` のデフォルト設定：
@@ -413,10 +430,10 @@ cat ~/.ssh/id_ed25519
 on:
   push:
     branches:
-      - main        # main への push で CI + CD を実行
+      - main # main への push で CI + CD を実行
   pull_request:
     branches:
-      - main        # main への PR で CI のみ実行
+      - main # main への PR で CI のみ実行
 ```
 
 デプロイブランチを変更したい場合はこの部分を編集する。
@@ -439,6 +456,7 @@ docker compose -f docker-compose.prod.yml logs --tail=50 web
 GitHub Actions のログは **Actions タブ → 対象の実行 → 各ステップを展開** で確認できる。
 
 > **Tips**:
+>
 > - テストが失敗すると Deploy ジョブは自動的にスキップされる。安全なデプロイのためテストを常にグリーンに保つこと。
 > - SSH 接続エラーは VPS の UFW 設定（ポート 22 の許可）と `VPS_SSH_KEY` の内容を確認する。
 > - `git pull` の際に認証が必要な場合はリポジトリを **Public** にするか、Deploy Key を追加する（後述）。
@@ -675,4 +693,5 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 - [DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md) — ローカル開発環境のセットアップ
 - [ARCHITECTURE.md](ARCHITECTURE.md) — システム構成・アーキテクチャ解説
+- [PORTAINER_SETUP.md](PORTAINER_SETUP.md) — Portainer で Docker コンテナを Web UI 管理する手順
 - [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) — CI/CD ワークフロー定義
