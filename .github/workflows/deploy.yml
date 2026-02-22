@@ -61,6 +61,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Docker Buildx セットアップ
+        uses: docker/setup-buildx-action@v3
+
       - name: GHCR にログイン
         uses: docker/login-action@v3
         with:
@@ -77,29 +80,50 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: SSH で VPS にデプロイ（イメージ更新 + コンテナ再作成）
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          envs: IMAGE_TAG
-          script: |
-            set -e
-            # 最新イメージを取得（GHCR パブリックのため認証不要）
-            docker pull "$IMAGE_TAG"
-            # 旧コンテナを停止・削除して新イメージで再作成
-            docker stop guild-mng-bot-v2 || true
-            docker rm guild-mng-bot-v2 || true
-            docker run -d \
-              --name guild-mng-bot-v2 \
-              --restart unless-stopped \
-              --env-file /opt/guild-mng-bot/.env \
-              -v guild-mng_sqlite_data:/app/storage \
-              -v /opt/guild-mng-bot/logs:/app/logs \
-              "$IMAGE_TAG" \
-              sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
-            echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+      - name: Portainer API でスタックを再デプロイ（最新イメージをプル）
+        run: |
+          python3 << 'EOF'
+          import os, json, urllib.request, ssl, sys
+
+          host        = os.environ["PORTAINER_HOST"]
+          token       = os.environ["PORTAINER_TOKEN"]
+          stack_id    = os.environ["PORTAINER_STACK_ID"]
+          endpoint_id = os.environ["PORTAINER_ENDPOINT_ID"]
+
+          # 自己署名証明書を許容
+          ctx = ssl.create_default_context()
+          ctx.check_hostname = False
+          ctx.verify_mode = ssl.CERT_NONE
+          headers = {"X-API-Key": token}
+
+          def api(method, path, body=None):
+              h = {**headers, "Content-Type": "application/json"} if body else headers
+              req = urllib.request.Request(
+                  f"https://{host}:9443{path}", data=body, method=method, headers=h
+              )
+              with urllib.request.urlopen(req, context=ctx) as r:
+                  return json.loads(r.read())
+
+          # 現在のスタックファイルと環境変数を取得
+          stack_file = api("GET", f"/api/stacks/{stack_id}/file")["StackFileContent"]
+          stack_info = api("GET", f"/api/stacks/{stack_id}")
+          env_vars   = stack_info.get("Env", [])
+
+          # pullImage=true でスタックを更新（最新イメージをプルして再デプロイ）
+          payload = json.dumps({
+              "pullImage": True,
+              "prune": False,
+              "stackFileContent": stack_file,
+              "env": env_vars,
+          }).encode()
+          api("PUT", f"/api/stacks/{stack_id}?endpointId={endpoint_id}", payload)
+          print(f"==> デプロイ完了")
+          EOF
         env:
-          IMAGE_TAG: ghcr.io/${{ github.repository }}:latest
+          PORTAINER_HOST: ${{ secrets.PORTAINER_HOST }}
+          PORTAINER_TOKEN: ${{ secrets.PORTAINER_TOKEN }}
+          PORTAINER_STACK_ID: ${{ secrets.PORTAINER_STACK_ID }}
+          PORTAINER_ENDPOINT_ID: ${{ secrets.PORTAINER_ENDPOINT_ID }}
