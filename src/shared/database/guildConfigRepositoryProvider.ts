@@ -1,3 +1,6 @@
+// src/shared/database/guildConfigRepositoryProvider.ts
+// GuildConfigRepository プロバイダー（シングルトン・キャッシュ付き）
+
 import type { PrismaClient } from "@prisma/client";
 import { createGuildConfigRepository } from "./repositories/guildConfigRepository";
 import type { IGuildConfigRepository } from "./types";

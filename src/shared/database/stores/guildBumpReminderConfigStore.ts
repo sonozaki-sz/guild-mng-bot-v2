@@ -41,12 +41,24 @@ export class GuildBumpReminderConfigStore {
     };
   }
 
+  /**
+   * BumpReminder設定を取得する
+   * @param guildId 対象ギルドID
+   * @returns BumpReminder設定（未設定時はnull）
+   */
   async getBumpReminderConfig(
     guildId: string,
   ): Promise<BumpReminderConfig | null> {
     return getBumpReminderConfigUseCase(this.getContext(), guildId);
   }
 
+  /**
+   * BumpReminderの有効/無効状態を更新する
+   * @param guildId 対象ギルドID
+   * @param enabled 有効状態
+   * @param channelId 有効化時に設定するチャンネルID
+   * @returns 実行完了
+   */
   async setBumpReminderEnabled(
     guildId: string,
     enabled: boolean,
@@ -60,6 +72,12 @@ export class GuildBumpReminderConfigStore {
     );
   }
 
+  /**
+   * BumpReminder設定全体を更新する
+   * @param guildId 対象ギルドID
+   * @param bumpReminderConfig 保存する設定
+   * @returns 実行完了
+   */
   async updateBumpReminderConfig(
     guildId: string,
     bumpReminderConfig: BumpReminderConfig,
@@ -71,6 +89,12 @@ export class GuildBumpReminderConfigStore {
     );
   }
 
+  /**
+   * メンション対象ロールを設定/解除する
+   * @param guildId 対象ギルドID
+   * @param roleId 設定するロールID（undefined で解除）
+   * @returns 更新結果
+   */
   async setBumpReminderMentionRole(
     guildId: string,
     roleId: string | undefined,
@@ -95,6 +119,12 @@ export class GuildBumpReminderConfigStore {
     );
   }
 
+  /**
+   * メンション対象ユーザーを追加する
+   * @param guildId 対象ギルドID
+   * @param userId 追加するユーザーID
+   * @returns 追加結果
+   */
   async addBumpReminderMentionUser(
     guildId: string,
     userId: string,
@@ -107,6 +137,12 @@ export class GuildBumpReminderConfigStore {
     ) as Promise<BumpReminderMentionUserAddResult>;
   }
 
+  /**
+   * メンション対象ユーザーを削除する
+   * @param guildId 対象ギルドID
+   * @param userId 削除するユーザーID
+   * @returns 削除結果
+   */
   async removeBumpReminderMentionUser(
     guildId: string,
     userId: string,
@@ -119,6 +155,11 @@ export class GuildBumpReminderConfigStore {
     ) as Promise<BumpReminderMentionUserRemoveResult>;
   }
 
+  /**
+   * メンション対象ユーザー一覧をすべてクリアする
+   * @param guildId 対象ギルドID
+   * @returns クリア結果
+   */
   async clearBumpReminderMentionUsers(
     guildId: string,
   ): Promise<BumpReminderMentionUsersClearResult> {
@@ -153,6 +194,11 @@ export class GuildBumpReminderConfigStore {
     );
   }
 
+  /**
+   * メンション対象ロール・ユーザーをすべてクリアする
+   * @param guildId 対象ギルドID
+   * @returns クリア結果
+   */
   async clearBumpReminderMentions(
     guildId: string,
   ): Promise<BumpReminderMentionClearResult> {

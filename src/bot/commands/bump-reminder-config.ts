@@ -7,6 +7,10 @@ import { BUMP_REMINDER_CONFIG_COMMAND } from "../features/bump-reminder/commands
 import { executeBumpReminderConfigCommand } from "../features/bump-reminder/commands/bumpReminderConfigCommand.execute";
 import type { Command } from "../types/discord";
 
+/**
+ * Bumpリマインダー設定コマンド（サーバー管理権限専用）
+ * 機能の有効化/無効化・メンション対象の設定・確認を提供する
+ */
 export const bumpReminderConfigCommand: Command = {
   data: (() => {
     // 各ロケール文言を先に解決して SlashCommandBuilder へ流し込む
