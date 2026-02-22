@@ -29,6 +29,8 @@
     "TextChannel",
     "SlashCommandBuilder",
     "GatewayIntentBits",
+    "subcommand",
+    "subcommands",
     // Prisma関連
     "prisma",
     "datasource",
@@ -37,6 +39,8 @@
     "updatedAt",
     "libsql",
     "PrismaLibSql",
+    "upsert",
+    "upserts",
     // プロジェクト固有
     "keyvs",
     "cnfAfk",
@@ -49,6 +53,8 @@
     "mng",
     "bot",
     "guild",
+    "usecase",
+    "usecases",
     "LocaleManager",
     "GuildConfigRepository",
     "CooldownManager",
@@ -96,15 +102,17 @@
     "TFunction",
     // Web/API関連
     "fastify",
+    "zod",
+    // ロギング関連（Winston）
     "winston",
+    "colorize",
+    "DailyRotateFile",
+    // スケジューラー関連
+    "cron",
+    // デプロイ関連
+    "portainer",
     // 一般的な技術用語
-    "readonly",
-    "async",
-    "await",
-    "enum",
     "args",
-    "env",
-    "config",
     "utils",
     "middleware",
     "healthcheck",
@@ -113,14 +121,12 @@
     "deferred",
     "cooldown",
     "cooldowns",
-    "typeof",
-    "instanceof",
     "filename",
     "filepath",
     "dirname",
-    "concat",
     "catchable",
-    // Jest関連
+    // Vitest関連
+    "vitest",
     "beforeEach",
     "afterEach",
     "beforeAll",
