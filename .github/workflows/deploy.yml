@@ -78,7 +78,7 @@ jobs:
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
 
-      - name: SSH で VPS にデプロイ（イメージ更新 + コンテナ再起動）
+      - name: SSH で VPS にデプロイ（イメージ更新 + コンテナ再作成）
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -89,8 +89,17 @@ jobs:
             set -e
             # 最新イメージを取得（GHCR パブリックのため認証不要）
             docker pull "$IMAGE_TAG"
-            # コンテナを再起動して新イメージを適用
-            docker restart guild-mng-bot-v2
+            # 旧コンテナを停止・削除して新イメージで再作成
+            docker stop guild-mng-bot-v2 || true
+            docker rm guild-mng-bot-v2 || true
+            docker run -d \
+              --name guild-mng-bot-v2 \
+              --restart unless-stopped \
+              --env-file /opt/guild-mng-bot/.env \
+              -v guild-mng_sqlite_data:/app/storage \
+              -v /opt/guild-mng-bot/logs:/app/logs \
+              "$IMAGE_TAG" \
+              sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
             echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
         env:
           IMAGE_TAG: ghcr.io/${{ github.repository }}:latest
