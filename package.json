@@ -8,8 +8,8 @@
     "dev:bot": "tsx watch src/bot/main.ts",
     "dev:web": "tsx watch src/web/server.ts",
     "dev": "concurrently \"pnpm dev:bot\" \"pnpm dev:web\"",
-    "build": "tsc --build",
-    "tsc-watch": "tsc --build --watch",
+    "build": "tsup",
+    "tsc-watch": "tsc --noEmit --watch",
     "start:bot": "node dist/bot/main.js",
     "start:web": "node dist/web/server.js",
     "start": "concurrently \"pnpm start:bot\" \"pnpm start:web\"",
@@ -67,6 +67,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
+    "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
