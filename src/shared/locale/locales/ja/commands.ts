@@ -18,8 +18,9 @@ export const commands = {
 
   // AFK設定コマンド
   "afk-config.description": "AFK機能の設定（管理者専用）",
-  "afk-config.set-ch.description": "AFKチャンネルを設定。",
-  "afk-config.set-ch.channel.description": "AFKチャンネル（ボイスチャンネル）",
+  "afk-config.set-channel.description": "AFKチャンネルを設定。",
+  "afk-config.set-channel.channel.description":
+    "AFKチャンネル（ボイスチャンネル）",
   "afk-config.view.description": "現在の設定を表示。",
   "afk-config.embed.title": "AFK機能",
   "afk-config.embed.success_title": "設定完了",
