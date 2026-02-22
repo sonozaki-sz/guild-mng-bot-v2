@@ -2,8 +2,11 @@
 // スティッキーメッセージ用リポジトリ
 
 import type { PrismaClient } from "@prisma/client";
+import type {
+  IStickyMessageRepository,
+  StickyMessage,
+} from "../../../../shared/database/types";
 import { executeWithDatabaseError } from "../../../../shared/utils/errorHandling";
-import type { IStickyMessageRepository, StickyMessage } from "./types";
 
 /**
  * Prisma 実装

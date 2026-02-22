@@ -10,7 +10,7 @@ import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
 import {
   createSuccessEmbed,
   createWarningEmbed,
@@ -67,10 +67,10 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       return;
     }
 
-    const repository = getBotStickyMessageRepository();
+    const service = getBotStickyMessageConfigService();
 
     // モーダル表示から送信までの間に他のユーザーが設定した可能性があるため再確認する
-    const existing = await repository.findByChannel(channelId);
+    const existing = await service.findByChannel(channelId);
     if (existing) {
       await interaction.reply({
         embeds: [
@@ -107,7 +107,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
 
     try {
       // DB に保存（プレーンテキストなので embedData は undefined）
-      const stickyRecord = await repository.create(
+      const stickyRecord = await service.create(
         guildId,
         channelId,
         content,
@@ -120,7 +120,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       const sent = await textChannel.send(sendPayload);
 
       // lastMessageId を更新
-      await repository.updateLastMessageId(stickyRecord.id, sent.id);
+      await service.updateLastMessageId(stickyRecord.id, sent.id);
 
       await interaction.reply({
         embeds: [

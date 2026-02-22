@@ -11,7 +11,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
 import {
   createInfoEmbed,
   createWarningEmbed,
@@ -52,8 +52,8 @@ export async function handleStickyMessageUpdate(
     return;
   }
 
-  const repository = getBotStickyMessageRepository();
-  const existing = await repository.findByChannel(targetChannel.id);
+  const service = getBotStickyMessageConfigService();
+  const existing = await service.findByChannel(targetChannel.id);
 
   if (!existing) {
     await interaction.reply({

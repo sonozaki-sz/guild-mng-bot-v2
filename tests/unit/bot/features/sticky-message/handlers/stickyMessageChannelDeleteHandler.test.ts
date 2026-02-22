@@ -10,7 +10,7 @@ vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
   getBotStickyMessageResendService: vi.fn(() => ({
     cancelTimer: cancelTimerMock,
   })),
-  getBotStickyMessageRepository: vi.fn(() => ({
+  getBotStickyMessageConfigService: vi.fn(() => ({
     deleteByChannel: deleteByChannelMock,
   })),
 }));

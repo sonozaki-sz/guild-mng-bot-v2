@@ -4,7 +4,7 @@
 import { ChannelType, type Channel } from "discord.js";
 import { logger } from "../../../../shared/utils/logger";
 import {
-  getBotStickyMessageRepository,
+  getBotStickyMessageConfigService,
   getBotStickyMessageResendService,
 } from "../../../services/botStickyMessageDependencyResolver";
 
@@ -26,7 +26,7 @@ export async function handleStickyMessageChannelDelete(
 
   // DB にレコードがあれば削除する
   try {
-    await getBotStickyMessageRepository().deleteByChannel(channelId);
+    await getBotStickyMessageConfigService().deleteByChannel(channelId);
     logger.debug("StickyMessage: cleaned up on channel delete", { channelId });
   } catch (err) {
     logger.error("StickyMessage: failed to delete record on channel delete", {

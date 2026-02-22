@@ -9,7 +9,7 @@ import {
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
 import {
   createInfoEmbed,
   createSuccessEmbed,
@@ -84,10 +84,10 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
 
     const content = embedDescription ?? embedTitle ?? "";
 
-    const repository = getBotStickyMessageRepository();
+    const service = getBotStickyMessageConfigService();
 
     // モーダル表示から送信までの間に削除された可能性があるため再確認する
-    const existing = await repository.findByChannel(channelId);
+    const existing = await service.findByChannel(channelId);
     if (!existing) {
       await interaction.reply({
         embeds: [
@@ -117,7 +117,7 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
     const embedData = JSON.stringify(embedPayload);
 
     try {
-      const updated = await repository.updateContent(
+      const updated = await service.updateContent(
         existing.id,
         content,
         embedData,
@@ -140,7 +140,7 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
         try {
           const payload = buildStickyMessagePayload(updated);
           const sent = await textChannel.send(payload);
-          await repository.updateLastMessageId(updated.id, sent.id);
+          await service.updateLastMessageId(updated.id, sent.id);
         } catch (err) {
           logger.error("Failed to resend sticky message after embed update", {
             channelId,

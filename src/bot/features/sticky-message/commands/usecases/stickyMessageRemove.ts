@@ -8,7 +8,7 @@ import {
   type TextChannel,
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
 import {
   createInfoEmbed,
   createSuccessEmbed,
@@ -47,10 +47,10 @@ export async function handleStickyMessageRemove(
     return;
   }
 
-  const repository = getBotStickyMessageRepository();
+  const service = getBotStickyMessageConfigService();
 
   // 既存設定の有無を確認する
-  const existing = await repository.findByChannel(channelOption.id);
+  const existing = await service.findByChannel(channelOption.id);
 
   if (!existing) {
     await interaction.reply({
@@ -89,7 +89,7 @@ export async function handleStickyMessageRemove(
   }
 
   // DB から削除
-  await repository.delete(existing.id);
+  await service.delete(existing.id);
 
   await interaction.reply({
     embeds: [

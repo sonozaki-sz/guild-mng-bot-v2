@@ -9,7 +9,7 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 
@@ -29,8 +29,8 @@ export async function handleStickyMessageView(
   guildId: string,
 ): Promise<void> {
   // ギルド内の全スティッキーメッセージ設定を取得する
-  const repository = getBotStickyMessageRepository();
-  const stickies = await repository.findAllByGuild(guildId);
+  const service = getBotStickyMessageConfigService();
+  const stickies = await service.findAllByGuild(guildId);
 
   if (stickies.length === 0) {
     await interaction.reply({

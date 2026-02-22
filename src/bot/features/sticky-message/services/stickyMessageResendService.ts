@@ -2,8 +2,8 @@
 // スティッキーメッセージ再送信サービス（レート制限付き）
 
 import type { TextChannel } from "discord.js";
+import type { IStickyMessageRepository } from "../../../../shared/database/types";
 import { logger } from "../../../../shared/utils/logger";
-import type { IStickyMessageRepository } from "../repositories/types";
 import { buildStickyMessagePayload } from "./stickyMessagePayloadBuilder";
 
 /** チャンネルごとの再送信タイマー管理 */

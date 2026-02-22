@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
 import { localeManager } from "../../shared/locale/localeManager";
 import { getBumpReminderRepository } from "../features/bump-reminder/repositories/bumpReminderRepository";
@@ -22,6 +23,7 @@ import {
 } from "./botBumpReminderDependencyResolver";
 import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
 import {
+  setBotStickyMessageConfigService,
   setBotStickyMessageRepository,
   setBotStickyMessageResendService,
 } from "./botStickyMessageDependencyResolver";
@@ -58,11 +60,15 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
   setBotVacRepository(vacRepository);
   setBotVacService(vacService);
 
-  // StickyMessage のリポジトリ/サービスを初期化
+  // StickyMessage のリポジトリ/設定サービス/再送信サービスを初期化
   const stickyMessageRepository = getStickyMessageRepository(prisma);
+  const stickyMessageConfigService = createStickyMessageConfigService(
+    stickyMessageRepository,
+  );
   const stickyMessageResendService = getStickyMessageResendService(
     stickyMessageRepository,
   );
   setBotStickyMessageRepository(stickyMessageRepository);
+  setBotStickyMessageConfigService(stickyMessageConfigService);
   setBotStickyMessageResendService(stickyMessageResendService);
 }
