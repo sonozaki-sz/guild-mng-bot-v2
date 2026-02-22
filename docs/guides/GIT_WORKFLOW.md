@@ -2,7 +2,7 @@
 
 > Git Workflow & Commit Convention Guide
 
-最終更新: 2026年2月22日
+最終更新: 2026年2月22日（ブランチ保護ルール追加）
 
 ---
 
@@ -226,7 +226,7 @@ PR に対して以下の CI が自動で実行される：
 | **Test**                 | `deploy.yml`     | 型チェック + 全テスト実行    |
 | **Lint Commit Messages** | `commitlint.yml` | コミットメッセージ形式の検証 |
 
-すべて ✅ でないとマージできない（ブランチ保護設定による）。
+`develop` / `main` へのPRは、すべて ✅ でないとマージできない（ブランチ保護設定による）。
 
 ### マージ戦略
 
@@ -237,30 +237,32 @@ PR に対して以下の CI が自動で実行される：
 
 ---
 
-## 🏷️ ブランチ保護の設定（GitHub Rulesets）
+## 🏷️ ブランチ保護の設定（Branch Protection Rules）
 
-[Settings > Rules](https://github.com/sonozaki-sz/guild-mng-bot-v2/rules) で管理。
+[Settings > Branches](https://github.com/sonozaki-sz/guild-mng-bot-v2/settings/branches) で管理。
 
-### `main` ブランチ（`protect-main` ruleset）
+### `main` ブランチ
 
-| 設定                                                  | 値  |
-| ----------------------------------------------------- | --- |
-| Require a pull request before merging                 | ✅  |
-| Require status checks: `Test`, `Lint Commit Messages` | ✅  |
-| Do not allow bypassing the above settings             | ✅  |
-| Restrict deletions                                    | ✅  |
-| Block force pushes                                    | ✅  |
+直接pushは禁止。PR経由でのみ変更可能で、CIが通らないとマージできない。
 
-### `develop` ブランチ（`protect-develop` ruleset）
+| 設定                                  | 値                               |
+| ------------------------------------- | -------------------------------- |
+| Require a pull request before merging | ✅（レビュー承認は不要）         |
+| Require status checks to pass: `Test` | ✅（strict: ベース最新化が必要） |
+| Block force pushes                    | ✅                               |
 
-1人開発のため直接pushを許可。CI は push 時も自動実行される（マージブロックなし）。
+### `develop` ブランチ
 
-| 設定                    | 値  |
-| ----------------------- | --- |
-| Restrict deletions      | ✅  |
-| Block force pushes      | ✅  |
-| Require pull request    | ❌  |
-| Require status checks   | ❌  |
+直接pushは**許可**。ただしPR経由でマージする場合はCIが通る必要がある。
+
+| 設定                                        | 値               |
+| ------------------------------------------- | ---------------- |
+| Require a pull request before merging       | ❌（直接push可） |
+| Require status checks to pass: `Test`（PR） | ✅               |
+| Block force pushes                          | ✅               |
+
+> **注意**: `develop` への直接pushはCIが後から走るためpush後にCIが失敗しても遡ってブロックはされない。
+> 確実にCIで守りたい変更はPRを経由すること。
 
 ---
 
