@@ -1,32 +1,32 @@
 import { handleBumpReminderConfigEnable } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable";
 
-const ensureManageGuildPermissionMock = jest.fn();
-const setEnabledMock = jest.fn();
-const createSuccessEmbedMock = jest.fn((description: string) => ({
+const ensureManageGuildPermissionMock = vi.fn();
+const setEnabledMock = vi.fn();
+const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
-  tGuild: jest.fn(async () => "translated"),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
+  tGuild: vi.fn(async () => "translated"),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
-  logger: { info: jest.fn() },
+vi.mock("@/shared/utils/logger", () => ({
+  logger: { info: vi.fn() },
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   getBotBumpReminderConfigService: () => ({
     setBumpReminderEnabled: (...args: unknown[]) => setEnabledMock(...args),
   }),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
   () => ({
     ensureManageGuildPermission: (...args: unknown[]) =>
@@ -36,7 +36,7 @@ jest.mock(
 
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
     setEnabledMock.mockResolvedValue(undefined);
   });
@@ -44,7 +44,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable",
   it("enables bump reminder in current channel and replies success", async () => {
     const interaction = {
       channelId: "channel-1",
-      reply: jest.fn().mockResolvedValue(undefined),
+      reply: vi.fn().mockResolvedValue(undefined),
     };
 
     await handleBumpReminderConfigEnable(interaction as never, "guild-1");

@@ -1,34 +1,34 @@
 import { registerBotEvents } from "@/bot/services/botEventRegistration";
 
-const loggerInfoMock = jest.fn();
-const loggerDebugMock = jest.fn();
-const registerBotEventMock = jest.fn();
+const loggerInfoMock = vi.fn();
+const loggerDebugMock = vi.fn();
+const registerBotEventMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
     debug: (...args: unknown[]) => loggerDebugMock(...args),
   },
 }));
 
-jest.mock("@/bot/types/discord", () => ({
+vi.mock("@/bot/types/discord", () => ({
   registerBotEvent: (...args: unknown[]) => registerBotEventMock(...args),
 }));
 
 describe("bot/services/botEventRegistration", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("registers all events and logs progress", () => {
     const client = {};
     const events = [
-      { name: "ready", execute: jest.fn() },
-      { name: "interactionCreate", execute: jest.fn() },
+      { name: "ready", execute: vi.fn() },
+      { name: "interactionCreate", execute: vi.fn() },
     ];
 
     registerBotEvents(client as never, events as never);

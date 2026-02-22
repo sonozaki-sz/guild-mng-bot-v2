@@ -2,15 +2,16 @@ import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelBu
 import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
 import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
 import { safeReply } from "@/bot/utils/interaction";
+import type { Mock } from "vitest";
 
-const isManagedVacChannelMock = jest.fn().mockResolvedValue(true);
-const getAfkConfigMock = jest.fn();
-const getGuildConfigRepositoryMock = jest.fn(() => ({
+const isManagedVacChannelMock = vi.fn().mockResolvedValue(true);
+const getAfkConfigMock = vi.fn();
+const getGuildConfigRepositoryMock = vi.fn(() => ({
   getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
 // VAC パネル customId 定数を固定化して matches 判定を検証しやすくする
-jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
   VAC_PANEL_CUSTOM_ID: {
     RENAME_BUTTON_PREFIX: "vac:rename-btn:",
     LIMIT_BUTTON_PREFIX: "vac:limit-btn:",
@@ -22,40 +23,43 @@ jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
     RENAME_INPUT: "rename-input",
     LIMIT_INPUT: "limit-input",
   },
-  getVacPanelChannelId: jest.fn(() => "voice-1"),
-  sendVacControlPanel: jest.fn(),
+  getVacPanelChannelId: vi.fn(() => "voice-1"),
+  sendVacControlPanel: vi.fn(),
 }));
 
 // 外部依存の副作用を抑えるため、呼び出し不要なモジュールはダミー化
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(() => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(() => ({
     isManagedVacChannel: isManagedVacChannelMock,
   })),
 }));
-jest.mock("@/shared/features/vac/vacConfigService", () => ({
+vi.mock("@/shared/features/vac/vacConfigService", () => ({
   isManagedVacChannel: isManagedVacChannelMock,
 }));
-jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: jest.fn(() => getGuildConfigRepositoryMock()),
+vi.mock("@/shared/features/afk/afkConfigService", () => ({
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
-jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
+vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
+  getBotGuildConfigRepository: vi.fn(() => getGuildConfigRepositoryMock()),
+}));
+vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: getGuildConfigRepositoryMock,
 }));
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async (_guildId: string, key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
-jest.mock("@/bot/utils/interaction", () => ({
-  safeReply: jest.fn(),
+vi.mock("@/bot/utils/interaction", () => ({
+  safeReply: vi.fn(),
 }));
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: jest.fn((message: string) => ({ message })),
-  createSuccessEmbed: jest.fn((message: string) => ({ message })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: vi.fn((message: string) => ({ message })),
+  createSuccessEmbed: vi.fn((message: string) => ({ message })),
 }));
 
 describe("bot/features/vac/ui handlers", () => {
   // 各ケース前にモックを初期化する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: "afk-1" });
   });
 
@@ -98,13 +102,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(null),
+          fetch: vi.fn().mockResolvedValue(null),
         },
       },
       customId: "vac:rename-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -120,13 +124,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn(),
+          fetch: vi.fn(),
         },
       },
       customId: "unknown:custom-id",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -140,13 +144,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockRejectedValue(new Error("fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("fetch failed")),
         },
       },
       customId: "vac:rename-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -162,19 +166,19 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
       },
       customId: "vac:rename-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(false);
 
@@ -191,24 +195,24 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "other-voice" },
           }),
         },
       },
       customId: "vac:rename-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -225,22 +229,22 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn().mockRejectedValue(new Error("fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("fetch failed")),
         },
       },
       customId: "vac:rename-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -257,24 +261,24 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
       },
       customId: "vac:rename-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn().mockResolvedValue(undefined),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn().mockResolvedValue(undefined),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -288,24 +292,24 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
       },
       customId: "vac:limit-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn().mockResolvedValue(undefined),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn().mockResolvedValue(undefined),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -319,28 +323,28 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
             members: { size: 0 },
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
       },
       customId: "vac:afk-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -356,19 +360,19 @@ describe("bot/features/vac/ui handlers", () => {
   });
 
   it("refreshes panel and replies success when refresh button pressed", async () => {
-    const deleteMock = jest.fn().mockResolvedValue(undefined);
+    const deleteMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
             members: { size: 3 },
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -376,20 +380,20 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:refresh-btn:voice-1",
       user: { id: "user-1" },
       message: { deletable: true, delete: deleteMock },
-      showModal: jest.fn(),
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const panelModule = jest.requireMock(
+    const panelModule = (await vi.importMock(
       "@/bot/features/vac/handlers/ui/vacControlPanel",
-    ) as {
-      sendVacControlPanel: jest.Mock;
+    )) as {
+      sendVacControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -407,19 +411,19 @@ describe("bot/features/vac/ui handlers", () => {
   });
 
   it("refreshes panel when refresh message is not deletable", async () => {
-    const deleteMock = jest.fn();
+    const deleteMock = vi.fn();
     const interaction = {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
             members: { size: 1 },
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -427,20 +431,20 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:refresh-btn:voice-1",
       user: { id: "user-1" },
       message: { deletable: false, delete: deleteMock },
-      showModal: jest.fn(),
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const panelModule = jest.requireMock(
+    const panelModule = (await vi.importMock(
       "@/bot/features/vac/handlers/ui/vacControlPanel",
-    ) as {
-      sendVacControlPanel: jest.Mock;
+    )) as {
+      sendVacControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -454,19 +458,19 @@ describe("bot/features/vac/ui handlers", () => {
   });
 
   it("continues refresh flow when delete fails", async () => {
-    const deleteMock = jest.fn().mockRejectedValue(new Error("delete failed"));
+    const deleteMock = vi.fn().mockRejectedValue(new Error("delete failed"));
     const interaction = {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
             members: { size: 1 },
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -474,20 +478,20 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:refresh-btn:voice-1",
       user: { id: "user-1" },
       message: { deletable: true, delete: deleteMock },
-      showModal: jest.fn(),
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const panelModule = jest.requireMock(
+    const panelModule = (await vi.importMock(
       "@/bot/features/vac/handlers/ui/vacControlPanel",
-    ) as {
-      sendVacControlPanel: jest.Mock;
+    )) as {
+      sendVacControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -501,7 +505,7 @@ describe("bot/features/vac/ui handlers", () => {
   });
 
   it("falls through when no button action matches after channel resolution", async () => {
-    const startsWithMock = jest
+    const startsWithMock = vi
       .fn()
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
@@ -520,35 +524,35 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
             members: { size: 1 },
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
       },
       customId,
       user: { id: "user-1" },
-      message: { deletable: true, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: true, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const panelModule = jest.requireMock(
+    const panelModule = (await vi.importMock(
       "@/bot/features/vac/handlers/ui/vacControlPanel",
-    ) as {
-      sendVacControlPanel: jest.Mock;
+    )) as {
+      sendVacControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -569,14 +573,14 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
-            edit: jest.fn(),
+            edit: vi.fn(),
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -584,14 +588,14 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:limit-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "120"),
+        getTextInputValue: vi.fn(() => "120"),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -608,13 +612,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(null),
+          fetch: vi.fn().mockResolvedValue(null),
         },
       },
       customId: "vac:rename-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "new-name"),
+        getTextInputValue: vi.fn(() => "new-name"),
       },
     };
 
@@ -631,13 +635,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockRejectedValue(new Error("fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("fetch failed")),
         },
       },
       customId: "vac:rename-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "new-name"),
+        getTextInputValue: vi.fn(() => "new-name"),
       },
     };
 
@@ -654,14 +658,14 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
-            edit: jest.fn(),
+            edit: vi.fn(),
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -669,14 +673,14 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:rename-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "new-name"),
+        getTextInputValue: vi.fn(() => "new-name"),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(false);
 
@@ -693,14 +697,14 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
-            edit: jest.fn(),
+            edit: vi.fn(),
           }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "other-voice" },
           }),
         },
@@ -708,14 +712,14 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:rename-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "new-name"),
+        getTextInputValue: vi.fn(() => "new-name"),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -732,27 +736,27 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
-            edit: jest.fn(),
+            edit: vi.fn(),
           }),
         },
         members: {
-          fetch: jest.fn().mockRejectedValue(new Error("fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("fetch failed")),
         },
       },
       customId: "vac:rename-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "new-name"),
+        getTextInputValue: vi.fn(() => "new-name"),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -768,17 +772,17 @@ describe("bot/features/vac/ui handlers", () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
-      edit: jest.fn(),
+      edit: vi.fn(),
     };
 
     const interaction = {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(voiceChannel),
+          fetch: vi.fn().mockResolvedValue(voiceChannel),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -786,14 +790,14 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:rename-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "   "),
+        getTextInputValue: vi.fn(() => "   "),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -810,17 +814,17 @@ describe("bot/features/vac/ui handlers", () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
-      edit: jest.fn().mockResolvedValue(undefined),
+      edit: vi.fn().mockResolvedValue(undefined),
     };
 
     const interaction = {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(voiceChannel),
+          fetch: vi.fn().mockResolvedValue(voiceChannel),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -828,14 +832,14 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:rename-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "my-vc"),
+        getTextInputValue: vi.fn(() => "my-vc"),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -852,17 +856,17 @@ describe("bot/features/vac/ui handlers", () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
-      edit: jest.fn().mockResolvedValue(undefined),
+      edit: vi.fn().mockResolvedValue(undefined),
     };
 
     const interaction = {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(voiceChannel),
+          fetch: vi.fn().mockResolvedValue(voiceChannel),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -870,14 +874,14 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:limit-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "5"),
+        getTextInputValue: vi.fn(() => "5"),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -894,17 +898,17 @@ describe("bot/features/vac/ui handlers", () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
-      edit: jest.fn().mockResolvedValue(undefined),
+      edit: vi.fn().mockResolvedValue(undefined),
     };
 
     const interaction = {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(voiceChannel),
+          fetch: vi.fn().mockResolvedValue(voiceChannel),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -912,14 +916,14 @@ describe("bot/features/vac/ui handlers", () => {
       customId: "vac:limit-modal:voice-1",
       user: { id: "user-1" },
       fields: {
-        getTextInputValue: jest.fn(() => "0"),
+        getTextInputValue: vi.fn(() => "0"),
       },
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -937,13 +941,13 @@ describe("bot/features/vac/ui handlers", () => {
     const movedMember = {
       voice: {
         channelId: "voice-1",
-        setChannel: jest.fn().mockResolvedValue(undefined),
+        setChannel: vi.fn().mockResolvedValue(undefined),
       },
     };
     const skippedMember = {
       voice: {
         channelId: "other-voice",
-        setChannel: jest.fn(),
+        setChannel: vi.fn(),
       },
     };
 
@@ -951,7 +955,7 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest
+          fetch: vi
             .fn()
             .mockResolvedValueOnce({
               id: "voice-1",
@@ -961,7 +965,7 @@ describe("bot/features/vac/ui handlers", () => {
             .mockResolvedValueOnce({ id: "afk-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn((userId: string) => {
+          fetch: vi.fn((userId: string) => {
             if (userId === "operator") {
               return Promise.resolve({ voice: { channelId: "voice-1" } });
             }
@@ -980,20 +984,20 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["move-user", "skip-user"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const databaseModule = jest.requireMock(
+    const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
-    ) as {
-      getGuildConfigRepository: jest.Mock;
+    )) as {
+      getGuildConfigRepository: Mock;
     };
     databaseModule.getGuildConfigRepository.mockReturnValue({
-      getAfkConfig: jest.fn().mockResolvedValue({
+      getAfkConfig: vi.fn().mockResolvedValue({
         enabled: true,
         channelId: "afk-1",
       }),
@@ -1016,7 +1020,7 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(null),
+          fetch: vi.fn().mockResolvedValue(null),
         },
       },
       customId: "vac:afk-select:voice-1",
@@ -1037,7 +1041,7 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockRejectedValue(new Error("fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("fetch failed")),
         },
       },
       customId: "vac:afk-select:voice-1",
@@ -1058,7 +1062,7 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
       },
       customId: "vac:afk-select:voice-1",
@@ -1066,10 +1070,10 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(false);
 
@@ -1086,10 +1090,10 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "other-voice" },
           }),
         },
@@ -1099,10 +1103,10 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -1119,12 +1123,10 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest
-            .fn()
-            .mockRejectedValue(new Error("operator fetch failed")),
+          fetch: vi.fn().mockRejectedValue(new Error("operator fetch failed")),
         },
       },
       customId: "vac:afk-select:voice-1",
@@ -1132,10 +1134,10 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
@@ -1152,10 +1154,10 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -1165,21 +1167,14 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const databaseModule = jest.requireMock(
-      "@/shared/database/guildConfigRepositoryProvider",
-    ) as {
-      getGuildConfigRepository: jest.Mock;
-    };
-    databaseModule.getGuildConfigRepository.mockReturnValue({
-      getAfkConfig: jest.fn().mockResolvedValue(null),
-    });
+    getAfkConfigMock.mockResolvedValueOnce(null);
 
     await vacPanelUserSelectHandler.execute(interaction as never);
 
@@ -1194,13 +1189,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest
+          fetch: vi
             .fn()
             .mockResolvedValueOnce({ id: "voice-1", type: 2 })
             .mockResolvedValueOnce(null),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -1210,20 +1205,20 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const databaseModule = jest.requireMock(
+    const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
-    ) as {
-      getGuildConfigRepository: jest.Mock;
+    )) as {
+      getGuildConfigRepository: Mock;
     };
     databaseModule.getGuildConfigRepository.mockReturnValue({
-      getAfkConfig: jest.fn().mockResolvedValue({
+      getAfkConfig: vi.fn().mockResolvedValue({
         enabled: true,
         channelId: "afk-1",
       }),
@@ -1242,13 +1237,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest
+          fetch: vi
             .fn()
             .mockResolvedValueOnce({ id: "voice-1", type: 2 })
             .mockRejectedValueOnce(new Error("afk fetch failed")),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -1258,20 +1253,20 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const databaseModule = jest.requireMock(
+    const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
-    ) as {
-      getGuildConfigRepository: jest.Mock;
+    )) as {
+      getGuildConfigRepository: Mock;
     };
     databaseModule.getGuildConfigRepository.mockReturnValue({
-      getAfkConfig: jest.fn().mockResolvedValue({
+      getAfkConfig: vi.fn().mockResolvedValue({
         enabled: true,
         channelId: "afk-1",
       }),
@@ -1289,7 +1284,7 @@ describe("bot/features/vac/ui handlers", () => {
     const failingMoveMember = {
       voice: {
         channelId: "voice-1",
-        setChannel: jest.fn().mockRejectedValue(new Error("move failed")),
+        setChannel: vi.fn().mockRejectedValue(new Error("move failed")),
       },
     };
 
@@ -1297,13 +1292,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest
+          fetch: vi
             .fn()
             .mockResolvedValueOnce({ id: "voice-1", type: 2 })
             .mockResolvedValueOnce({ id: "afk-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn((userId: string) => {
+          fetch: vi.fn((userId: string) => {
             if (userId === "operator") {
               return Promise.resolve({ voice: { channelId: "voice-1" } });
             }
@@ -1319,20 +1314,20 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["move-user"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const databaseModule = jest.requireMock(
+    const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
-    ) as {
-      getGuildConfigRepository: jest.Mock;
+    )) as {
+      getGuildConfigRepository: Mock;
     };
     databaseModule.getGuildConfigRepository.mockReturnValue({
-      getAfkConfig: jest.fn().mockResolvedValue({
+      getAfkConfig: vi.fn().mockResolvedValue({
         enabled: true,
         channelId: "afk-1",
       }),
@@ -1354,7 +1349,7 @@ describe("bot/features/vac/ui handlers", () => {
     const movableMember = {
       voice: {
         channelId: "voice-1",
-        setChannel: jest.fn().mockResolvedValue(undefined),
+        setChannel: vi.fn().mockResolvedValue(undefined),
       },
     };
 
@@ -1362,13 +1357,13 @@ describe("bot/features/vac/ui handlers", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest
+          fetch: vi
             .fn()
             .mockResolvedValueOnce({ id: "voice-1", type: 2 })
             .mockResolvedValueOnce({ id: "afk-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn((userId: string) => {
+          fetch: vi.fn((userId: string) => {
             if (userId === "operator") {
               return Promise.resolve({ voice: { channelId: "voice-1" } });
             }
@@ -1387,20 +1382,20 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["broken-user", "move-user"],
     };
 
-    const featureModule = jest.requireMock(
+    const featureModule = (await vi.importMock(
       "@/shared/features/vac/vacConfigService",
-    ) as {
-      isManagedVacChannel: jest.Mock;
+    )) as {
+      isManagedVacChannel: Mock;
     };
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
-    const databaseModule = jest.requireMock(
+    const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
-    ) as {
-      getGuildConfigRepository: jest.Mock;
+    )) as {
+      getGuildConfigRepository: Mock;
     };
     databaseModule.getGuildConfigRepository.mockReturnValue({
-      getAfkConfig: jest.fn().mockResolvedValue({
+      getAfkConfig: vi.fn().mockResolvedValue({
         enabled: true,
         channelId: "afk-1",
       }),

@@ -1,33 +1,33 @@
 import { restoreBumpRemindersOnStartup } from "@/bot/features/bump-reminder/handlers/bumpReminderStartup";
 
-const getBotBumpReminderConfigServiceMock = jest.fn();
-const getBotBumpReminderManagerMock = jest.fn();
-const restorePendingRemindersMock = jest.fn();
-const loggerErrorMock = jest.fn();
-const sendBumpReminderMock = jest.fn();
+const getBotBumpReminderConfigServiceMock = vi.fn();
+const getBotBumpReminderManagerMock = vi.fn();
+const restorePendingRemindersMock = vi.fn();
+const loggerErrorMock = vi.fn();
+const sendBumpReminderMock = vi.fn();
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   getBotBumpReminderConfigService: (...args: unknown[]) =>
     getBotBumpReminderConfigServiceMock(...args),
   getBotBumpReminderManager: (...args: unknown[]) =>
     getBotBumpReminderManagerMock(...args),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },
 }));
 
-jest.mock("@/bot/features/bump-reminder/handlers/bumpReminderHandler", () => ({
+vi.mock("@/bot/features/bump-reminder/handlers/bumpReminderHandler", () => ({
   sendBumpReminder: (...args: unknown[]) => sendBumpReminderMock(...args),
 }));
 
 describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getBotBumpReminderConfigServiceMock.mockReturnValue({
-      getBumpReminderConfig: jest.fn(),
+      getBumpReminderConfig: vi.fn(),
     });
     getBotBumpReminderManagerMock.mockReturnValue({
       restorePendingReminders: (...args: unknown[]) =>

@@ -1,11 +1,12 @@
+import type { Mock } from "vitest";
 import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
 import { executeVacLimit } from "@/bot/features/vac/commands/usecases/vacLimit";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(
     async (_guildId: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.unlimited") {
         return "unlimited";
@@ -18,27 +19,27 @@ jest.mock("@/shared/locale/localeManager", () => ({
   ),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver",
   () => ({
-    resolveVacVoiceChannelForEdit: jest.fn(),
+    resolveVacVoiceChannelForEdit: vi.fn(),
   }),
 );
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: jest.fn((description: string) => ({ description })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
 describe("bot/features/vac/commands/usecases/vacLimit", () => {
   // VC上限変更の範囲検証と通知内容を検証する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("throws ValidationError when limit is out of allowed range", async () => {
     const interaction = {
-      options: { getInteger: jest.fn(() => 100) },
-      reply: jest.fn(),
+      options: { getInteger: vi.fn(() => 100) },
+      reply: vi.fn(),
     };
 
     await expect(
@@ -47,12 +48,12 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
   });
 
   it("updates channel limit and replies with unlimited label when limit is 0", async () => {
-    const edit = jest.fn().mockResolvedValue(undefined);
-    (resolveVacVoiceChannelForEdit as jest.Mock).mockResolvedValue({ edit });
+    const edit = vi.fn().mockResolvedValue(undefined);
+    (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
-    const reply = jest.fn().mockResolvedValue(undefined);
+    const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
-      options: { getInteger: jest.fn(() => 0) },
+      options: { getInteger: vi.fn(() => 0) },
       reply,
     };
 
@@ -67,12 +68,12 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
   });
 
   it("updates channel limit and replies with numeric label", async () => {
-    const edit = jest.fn().mockResolvedValue(undefined);
-    (resolveVacVoiceChannelForEdit as jest.Mock).mockResolvedValue({ edit });
+    const edit = vi.fn().mockResolvedValue(undefined);
+    (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
-    const reply = jest.fn().mockResolvedValue(undefined);
+    const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
-      options: { getInteger: jest.fn(() => 8) },
+      options: { getInteger: vi.fn(() => 8) },
       reply,
     };
 

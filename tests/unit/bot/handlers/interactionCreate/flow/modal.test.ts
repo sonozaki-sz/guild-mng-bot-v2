@@ -1,15 +1,16 @@
+import type { Mock } from "vitest";
 import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
 import { handleModalSubmit } from "@/bot/handlers/interactionCreate/flow/modal";
 
-const loggerWarnMock = jest.fn();
-const loggerDebugMock = jest.fn();
-const loggerErrorMock = jest.fn();
+const loggerWarnMock = vi.fn();
+const loggerDebugMock = vi.fn();
+const loggerErrorMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     warn: (...args: unknown[]) => loggerWarnMock(...args),
     debug: (...args: unknown[]) => loggerDebugMock(...args),
@@ -17,30 +18,30 @@ jest.mock("@/shared/utils/logger", () => ({
   },
 }));
 
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleInteractionError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleInteractionError: vi.fn(),
 }));
 
-jest.mock("@/bot/handlers/interactionCreate/ui/modals", () => ({
+vi.mock("@/bot/handlers/interactionCreate/ui/modals", () => ({
   modalHandlers: [
     {
-      matches: jest.fn((id: string) => id.startsWith("vac:")),
-      execute: jest.fn().mockResolvedValue(undefined),
+      matches: vi.fn((id: string) => id.startsWith("vac:")),
+      execute: vi.fn().mockResolvedValue(undefined),
     },
   ],
 }));
 
 describe("bot/handlers/interactionCreate/flow/modal", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("warns and returns when no modal handler matches", async () => {
     const interaction = { customId: "unknown", user: { tag: "user#0001" } };
-    const uiModule = jest.requireMock(
+    const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
-      modalHandlers: Array<{ execute: jest.Mock }>;
+      modalHandlers: Array<{ execute: Mock }>;
     };
 
     await handleModalSubmit(interaction as never);
@@ -51,10 +52,10 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
 
   it("executes matching modal handler", async () => {
     const interaction = { customId: "vac:rename", user: { tag: "user#0001" } };
-    const uiModule = jest.requireMock(
+    const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
-      modalHandlers: Array<{ execute: jest.Mock }>;
+      modalHandlers: Array<{ execute: Mock }>;
     };
 
     await handleModalSubmit(interaction as never);
@@ -65,10 +66,10 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
 
   it("delegates modal handler errors", async () => {
     const error = new Error("modal failed");
-    const uiModule = jest.requireMock(
+    const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
-      modalHandlers: Array<{ execute: jest.Mock }>;
+      modalHandlers: Array<{ execute: Mock }>;
     };
     uiModule.modalHandlers[0].execute.mockRejectedValueOnce(error);
     const interaction = { customId: "vac:rename", user: { tag: "user#0001" } };

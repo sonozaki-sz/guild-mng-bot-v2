@@ -2,39 +2,37 @@ import { executeAfkConfigCommand } from "@/bot/features/afk/commands/afkConfigCo
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 
-const setAfkChannelMock = jest.fn();
-const getAfkConfigMock = jest.fn();
-const tGuildMock = jest.fn();
-const tDefaultMock = jest.fn((key: string) => `default:${key}`);
-const createSuccessEmbedMock = jest.fn((description: string) => ({
+const setAfkChannelMock = vi.fn();
+const getAfkConfigMock = vi.fn();
+const tGuildMock = vi.fn();
+const tDefaultMock = vi.fn((key: string) => `default:${key}`);
+const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
   kind: "success",
 }));
-const createInfoEmbedMock = jest.fn((description: string) => ({
+const createInfoEmbedMock = vi.fn((description: string) => ({
   description,
   kind: "info",
 }));
 
-jest.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: () => ({
-    setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
-    getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
-  }),
+vi.mock("@/shared/features/afk/afkConfigService", () => ({
+  setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    info: jest.fn(),
+    info: vi.fn(),
   },
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
   createInfoEmbed: (description: string) => createInfoEmbedMock(description),
@@ -44,22 +42,22 @@ function createInteraction(subcommand: string) {
   return {
     guildId: "guild-1",
     memberPermissions: {
-      has: jest.fn(() => true),
+      has: vi.fn(() => true),
     },
     options: {
-      getSubcommand: jest.fn(() => subcommand),
-      getChannel: jest.fn(() => ({
+      getSubcommand: vi.fn(() => subcommand),
+      getChannel: vi.fn(() => ({
         id: "afk-channel",
         type: ChannelType.GuildVoice,
       })),
     },
-    reply: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
   };
 }
 
 describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     tGuildMock.mockResolvedValue("translated");
     getAfkConfigMock.mockResolvedValue({
       enabled: true,

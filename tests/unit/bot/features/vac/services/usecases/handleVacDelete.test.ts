@@ -1,34 +1,35 @@
+import type { Mocked } from "vitest";
 import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
 import { ChannelType } from "discord.js";
 
-const loggerInfoMock = jest.fn();
+const loggerInfoMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
-function createRepositoryMock(): jest.Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<IVacRepository> {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
 describe("bot/features/vac/services/usecases/handleVacDelete", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("returns when oldState has no channel", async () => {
@@ -56,7 +57,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
       triggerChannelIds: [],
       createdChannels: [],
     });
-    const deleteMock = jest.fn().mockResolvedValue(undefined);
+    const deleteMock = vi.fn().mockResolvedValue(undefined);
 
     await handleVacDeleteUseCase(repository, {
       channel: {
@@ -86,7 +87,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
         },
       ],
     });
-    const deleteMock = jest.fn().mockResolvedValue(undefined);
+    const deleteMock = vi.fn().mockResolvedValue(undefined);
 
     await handleVacDeleteUseCase(repository, {
       channel: {
@@ -116,7 +117,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
         },
       ],
     });
-    const deleteMock = jest.fn().mockResolvedValue(undefined);
+    const deleteMock = vi.fn().mockResolvedValue(undefined);
 
     await handleVacDeleteUseCase(repository, {
       channel: {
@@ -149,7 +150,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
         },
       ],
     });
-    const deleteMock = jest.fn().mockRejectedValue(new Error("delete failed"));
+    const deleteMock = vi.fn().mockRejectedValue(new Error("delete failed"));
 
     await handleVacDeleteUseCase(repository, {
       channel: {

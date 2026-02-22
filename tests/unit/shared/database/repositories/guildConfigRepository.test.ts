@@ -1,69 +1,80 @@
+import type { Mock } from "vitest";
 describe("shared/database/repositories/guildConfigRepository", () => {
   const loadModule = async () => {
-    jest.resetModules();
+    vi.resetModules();
 
     const coreUsecases = {
-      getGuildConfigUsecase: jest.fn(),
-      saveGuildConfigUsecase: jest.fn(),
-      updateGuildConfigUsecase: jest.fn(),
-      deleteGuildConfigUsecase: jest.fn(),
-      existsGuildConfigUsecase: jest.fn(),
-      getGuildLocaleUsecase: jest.fn(),
-      updateGuildLocaleUsecase: jest.fn(),
+      getGuildConfigUsecase: vi.fn(),
+      saveGuildConfigUsecase: vi.fn(),
+      updateGuildConfigUsecase: vi.fn(),
+      deleteGuildConfigUsecase: vi.fn(),
+      existsGuildConfigUsecase: vi.fn(),
+      getGuildLocaleUsecase: vi.fn(),
+      updateGuildLocaleUsecase: vi.fn(),
     };
 
     const afkStore = {
-      getAfkConfig: jest.fn(),
-      setAfkChannel: jest.fn(),
-      updateAfkConfig: jest.fn(),
+      getAfkConfig: vi.fn(),
+      setAfkChannel: vi.fn(),
+      updateAfkConfig: vi.fn(),
     };
     const bumpStore = {
-      getBumpReminderConfig: jest.fn(),
-      setBumpReminderEnabled: jest.fn(),
-      updateBumpReminderConfig: jest.fn(),
-      setBumpReminderMentionRole: jest.fn(),
-      addBumpReminderMentionUser: jest.fn(),
-      removeBumpReminderMentionUser: jest.fn(),
-      clearBumpReminderMentionUsers: jest.fn(),
-      clearBumpReminderMentions: jest.fn(),
+      getBumpReminderConfig: vi.fn(),
+      setBumpReminderEnabled: vi.fn(),
+      updateBumpReminderConfig: vi.fn(),
+      setBumpReminderMentionRole: vi.fn(),
+      addBumpReminderMentionUser: vi.fn(),
+      removeBumpReminderMentionUser: vi.fn(),
+      clearBumpReminderMentionUsers: vi.fn(),
+      clearBumpReminderMentions: vi.fn(),
     };
     const vacStore = {
-      getVacConfig: jest.fn(),
-      updateVacConfig: jest.fn(),
+      getVacConfig: vi.fn(),
+      updateVacConfig: vi.fn(),
     };
     const stickStore = {
-      getStickMessages: jest.fn(),
-      updateStickMessages: jest.fn(),
+      getStickMessages: vi.fn(),
+      updateStickMessages: vi.fn(),
     };
     const memberStore = {
-      getMemberLogConfig: jest.fn(),
-      updateMemberLogConfig: jest.fn(),
+      getMemberLogConfig: vi.fn(),
+      updateMemberLogConfig: vi.fn(),
     };
 
-    const GuildAfkConfigStore = jest.fn(() => afkStore);
-    const GuildBumpReminderConfigStore = jest.fn(() => bumpStore);
-    const GuildVacConfigStore = jest.fn(() => vacStore);
-    const GuildStickMessageStore = jest.fn(() => stickStore);
-    const GuildMemberLogConfigStore = jest.fn(() => memberStore);
+    // function式を使うことでvi.resetModules()後もnewで呼び出せるコンストラクタとして機能する
+    const GuildAfkConfigStore = vi.fn(function (this: unknown) {
+      return afkStore;
+    });
+    const GuildBumpReminderConfigStore = vi.fn(function (this: unknown) {
+      return bumpStore;
+    });
+    const GuildVacConfigStore = vi.fn(function (this: unknown) {
+      return vacStore;
+    });
+    const GuildStickMessageStore = vi.fn(function (this: unknown) {
+      return stickStore;
+    });
+    const GuildMemberLogConfigStore = vi.fn(function (this: unknown) {
+      return memberStore;
+    });
 
-    jest.doMock(
+    vi.doMock(
       "@/shared/database/repositories/usecases/guildConfigCoreUsecases",
       () => coreUsecases,
     );
-    jest.doMock("@/shared/database/stores/guildAfkConfigStore", () => ({
+    vi.doMock("@/shared/database/stores/guildAfkConfigStore", () => ({
       GuildAfkConfigStore,
     }));
-    jest.doMock(
-      "@/shared/database/stores/guildBumpReminderConfigStore",
-      () => ({ GuildBumpReminderConfigStore }),
-    );
-    jest.doMock("@/shared/database/stores/guildVacConfigStore", () => ({
+    vi.doMock("@/shared/database/stores/guildBumpReminderConfigStore", () => ({
+      GuildBumpReminderConfigStore,
+    }));
+    vi.doMock("@/shared/database/stores/guildVacConfigStore", () => ({
       GuildVacConfigStore,
     }));
-    jest.doMock("@/shared/database/stores/guildStickMessageStore", () => ({
+    vi.doMock("@/shared/database/stores/guildStickMessageStore", () => ({
       GuildStickMessageStore,
     }));
-    jest.doMock("@/shared/database/stores/guildMemberLogConfigStore", () => ({
+    vi.doMock("@/shared/database/stores/guildMemberLogConfigStore", () => ({
       GuildMemberLogConfigStore,
     }));
 
@@ -186,12 +197,10 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     await repository.getMemberLogConfig("g1");
     await repository.updateMemberLogConfig("g1", { channelId: "x" });
 
-    const stickStoreCtorArgs = (
-      constructors.GuildStickMessageStore as jest.Mock
-    ).mock.calls[0] as unknown[] | undefined;
-    const memberStoreCtorArgs = (
-      constructors.GuildMemberLogConfigStore as jest.Mock
-    ).mock.calls[0] as unknown[] | undefined;
+    const stickStoreCtorArgs = (constructors.GuildStickMessageStore as Mock)
+      .mock.calls[0] as unknown[] | undefined;
+    const memberStoreCtorArgs = (constructors.GuildMemberLogConfigStore as Mock)
+      .mock.calls[0] as unknown[] | undefined;
     expect(stickStoreCtorArgs).toBeDefined();
     expect(memberStoreCtorArgs).toBeDefined();
 

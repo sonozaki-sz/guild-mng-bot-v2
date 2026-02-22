@@ -2,19 +2,19 @@ import { BotClient, createBotClient } from "@/bot/client";
 import { logger } from "@/shared/utils/logger";
 import { Collection, GatewayIntentBits } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    info: jest.fn(),
+    info: vi.fn(),
   },
 }));
 
 describe("bot/client", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("creates BotClient with expected collections and intents", () => {
@@ -46,10 +46,10 @@ describe("bot/client", () => {
 
   it("shutdown destroys cooldown manager and client with logs", async () => {
     const client = new BotClient();
-    const destroyCooldownSpy = jest
+    const destroyCooldownSpy = vi
       .spyOn(client.cooldownManager, "destroy")
       .mockImplementation(() => undefined);
-    const destroyClientMock = jest.fn().mockResolvedValue(undefined);
+    const destroyClientMock = vi.fn().mockResolvedValue(undefined);
     (client as unknown as { destroy: () => Promise<void> }).destroy =
       destroyClientMock;
 

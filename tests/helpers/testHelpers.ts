@@ -10,6 +10,7 @@ import type {
   TextChannel,
   User,
 } from "discord.js";
+import type { Mocked } from "vitest";
 
 // ============================================================
 // Discord.js モック生成ヘルパー
@@ -18,7 +19,7 @@ import type {
 /**
  * モックユーザーの作成
  */
-export const createMockUser = (overrides?: Partial<User>): jest.Mocked<User> =>
+export const createMockUser = (overrides?: Partial<User>): Mocked<User> =>
   ({
     id: "123456789",
     username: "testuser",
@@ -26,62 +27,60 @@ export const createMockUser = (overrides?: Partial<User>): jest.Mocked<User> =>
     bot: false,
     tag: "testuser#0001",
     ...overrides,
-  }) as jest.Mocked<User>;
+  }) as Mocked<User>;
 
 /**
  * モックギルドの作成
  */
-export const createMockGuild = (
-  overrides?: Partial<Guild>,
-): jest.Mocked<Guild> =>
+export const createMockGuild = (overrides?: Partial<Guild>): Mocked<Guild> =>
   ({
     id: "987654321",
     name: "Test Guild",
     ownerId: "123456789",
     ...overrides,
-  }) as jest.Mocked<Guild>;
+  }) as Mocked<Guild>;
 
 /**
  * モックメンバーの作成
  */
 export const createMockMember = (
   overrides?: Partial<GuildMember>,
-): jest.Mocked<GuildMember> =>
+): Mocked<GuildMember> =>
   ({
     id: "123456789",
     user: createMockUser(),
     guild: createMockGuild(),
     roles: {
       cache: new Map(),
-      add: jest.fn(),
-      remove: jest.fn(),
+      add: vi.fn(),
+      remove: vi.fn(),
     },
     permissions: {
-      has: jest.fn().mockReturnValue(true),
+      has: vi.fn().mockReturnValue(true),
     },
     ...overrides,
-  }) as unknown as jest.Mocked<GuildMember>;
+  }) as unknown as Mocked<GuildMember>;
 
 /**
  * モックテキストチャンネルの作成
  */
 export const createMockTextChannel = (
   overrides?: Partial<TextChannel>,
-): jest.Mocked<TextChannel> =>
+): Mocked<TextChannel> =>
   ({
     id: "111222333",
     name: "test-channel",
     type: 0, // GUILD_TEXT
-    send: jest.fn().mockResolvedValue(undefined),
+    send: vi.fn().mockResolvedValue(undefined),
     ...overrides,
-  }) as unknown as jest.Mocked<TextChannel>;
+  }) as unknown as Mocked<TextChannel>;
 
 /**
  * モックインタラクションの作成
  */
 export const createMockInteraction = (
   overrides?: Partial<ChatInputCommandInteraction>,
-): jest.Mocked<ChatInputCommandInteraction> =>
+): Mocked<ChatInputCommandInteraction> =>
   ({
     id: "interaction-123",
     commandName: "test",
@@ -92,23 +91,23 @@ export const createMockInteraction = (
     replied: false,
     deferred: false,
     ephemeral: false,
-    reply: jest.fn().mockResolvedValue(undefined),
-    editReply: jest.fn().mockResolvedValue(undefined),
-    deferReply: jest.fn().mockResolvedValue(undefined),
-    followUp: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
+    editReply: vi.fn().mockResolvedValue(undefined),
+    deferReply: vi.fn().mockResolvedValue(undefined),
+    followUp: vi.fn().mockResolvedValue(undefined),
     options: {
-      getString: jest.fn(),
-      getInteger: jest.fn(),
-      getBoolean: jest.fn(),
-      getUser: jest.fn(),
-      getChannel: jest.fn(),
-      getRole: jest.fn(),
-      getMember: jest.fn(),
-      getSubcommand: jest.fn(),
-      getSubcommandGroup: jest.fn(),
+      getString: vi.fn(),
+      getInteger: vi.fn(),
+      getBoolean: vi.fn(),
+      getUser: vi.fn(),
+      getChannel: vi.fn(),
+      getRole: vi.fn(),
+      getMember: vi.fn(),
+      getSubcommand: vi.fn(),
+      getSubcommandGroup: vi.fn(),
     },
     ...overrides,
-  }) as unknown as jest.Mocked<ChatInputCommandInteraction>;
+  }) as unknown as Mocked<ChatInputCommandInteraction>;
 
 // ============================================================
 // 汎用ユーティリティ

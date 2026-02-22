@@ -22,7 +22,7 @@ describe("Environment Configuration", () => {
 
   // 各テスト前にモジュールキャッシュを破棄し、環境変数を初期状態へ戻す
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     restoreEnv();
   });
 
@@ -32,20 +32,20 @@ describe("Environment Configuration", () => {
   });
 
   describe("Required Fields", () => {
-    it("should parse valid environment variables", () => {
+    it("should parse valid environment variables", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "production";
       process.env.JWT_SECRET = "super-secret-key-for-production"; // 本番環境では必須
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.DISCORD_TOKEN).toBe("a".repeat(50));
       expect(env.DISCORD_APP_ID).toBe("1234567890");
       expect(env.NODE_ENV).toBe("production");
     });
 
-    it("should use default values for optional fields", () => {
+    it("should use default values for optional fields", async () => {
       // 任意項目を未設定にし、デフォルト値の適用を確認
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
@@ -54,7 +54,7 @@ describe("Environment Configuration", () => {
       delete process.env.WEB_PORT;
       delete process.env.WEB_HOST;
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.NODE_ENV).toBe("test"); // setup.tsで設定済み
       expect(env.LOCALE).toBe("ja");
@@ -66,12 +66,12 @@ describe("Environment Configuration", () => {
   });
 
   describe("Type Coercion", () => {
-    it("should coerce WEB_PORT to number", () => {
+    it("should coerce WEB_PORT to number", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.WEB_PORT = "8080";
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.WEB_PORT).toBe(8080);
       expect(typeof env.WEB_PORT).toBe("number");
@@ -79,12 +79,12 @@ describe("Environment Configuration", () => {
   });
 
   describe("Enum Validation", () => {
-    it("should accept valid NODE_ENV values", () => {
+    it("should accept valid NODE_ENV values", async () => {
       const validEnvs = ["development", "production", "test"];
 
       // 有効な NODE_ENV 値を順番に検証
-      validEnvs.forEach((nodeEnv) => {
-        jest.resetModules();
+      for (const nodeEnv of validEnvs) {
+        vi.resetModules();
         restoreEnv();
         process.env.DISCORD_TOKEN = "a".repeat(50);
         process.env.DISCORD_APP_ID = "1234567890";
@@ -94,81 +94,81 @@ describe("Environment Configuration", () => {
           process.env.JWT_SECRET = "test-jwt-secret-for-production";
         }
 
-        const { env } = require("@/shared/config/env");
+        const { env } = await import("@/shared/config/env");
         expect(env.NODE_ENV).toBe(nodeEnv);
-      });
+      }
     });
 
-    it("should accept valid LOG_LEVEL values", () => {
+    it("should accept valid LOG_LEVEL values", async () => {
       const validLevels = ["trace", "debug", "info", "warn", "error"];
 
       // 有効な LOG_LEVEL 値を順番に検証
-      validLevels.forEach((level) => {
-        jest.resetModules();
+      for (const level of validLevels) {
+        vi.resetModules();
         restoreEnv();
         process.env.DISCORD_TOKEN = "a".repeat(50);
         process.env.DISCORD_APP_ID = "1234567890";
         process.env.LOG_LEVEL = level;
 
-        const { env } = require("@/shared/config/env");
+        const { env } = await import("@/shared/config/env");
         expect(env.LOG_LEVEL).toBe(level);
-      });
+      }
     });
   });
 
   describe("Optional Fields", () => {
-    it("should handle optional DISCORD_GUILD_ID", () => {
+    it("should handle optional DISCORD_GUILD_ID", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.DISCORD_GUILD_ID = "9876543210";
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.DISCORD_GUILD_ID).toBe("9876543210");
     });
 
-    it("should handle optional JWT_SECRET", () => {
+    it("should handle optional JWT_SECRET", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.JWT_SECRET = "my-secret-key";
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.JWT_SECRET).toBe("my-secret-key");
     });
   });
 
   describe("Database Configuration", () => {
-    it("should use DATABASE_URL from setup", () => {
+    it("should use DATABASE_URL from setup", async () => {
       // setup.ts で注入されるテスト用 DATABASE_URL を利用すること
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       // DATABASE_URLはsetup.tsで設定済み
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.DATABASE_URL).toBe("file::memory:?cache=shared");
     });
 
-    it("should accept custom DATABASE_URL", () => {
+    it("should accept custom DATABASE_URL", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.DATABASE_URL = "file:./custom/path/db.sqlite";
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.DATABASE_URL).toBe("file:./custom/path/db.sqlite");
     });
   });
 
   describe("Web Server Configuration", () => {
-    it("should handle custom WEB_PORT and WEB_HOST", () => {
+    it("should handle custom WEB_PORT and WEB_HOST", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.WEB_PORT = "5000";
       process.env.WEB_HOST = "127.0.0.1";
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.WEB_PORT).toBe(5000);
       expect(env.WEB_HOST).toBe("127.0.0.1");
@@ -176,27 +176,27 @@ describe("Environment Configuration", () => {
   });
 
   describe("Locale Configuration", () => {
-    it("should accept custom locale", () => {
+    it("should accept custom locale", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.LOCALE = "en";
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.LOCALE).toBe("en");
     });
   });
 
   describe("Warning and Failure Paths", () => {
-    it("should warn when JWT_SECRET is missing in non-production", () => {
+    it("should warn when JWT_SECRET is missing in non-production", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "test";
       delete process.env.JWT_SECRET;
 
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation(jest.fn());
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
-      const { env } = require("@/shared/config/env");
+      const { env } = await import("@/shared/config/env");
 
       expect(env.NODE_ENV).toBe("test");
       expect(warnSpy).toHaveBeenCalledWith(
@@ -204,20 +204,18 @@ describe("Environment Configuration", () => {
       );
     });
 
-    it("should log validation errors and exit when production JWT_SECRET is missing", () => {
+    it("should log validation errors and exit when production JWT_SECRET is missing", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "production";
       delete process.env.JWT_SECRET;
 
-      const errorSpy = jest
-        .spyOn(console, "error")
-        .mockImplementation(jest.fn());
-      const exitSpy = jest.spyOn(process, "exit").mockImplementation((() => {
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(vi.fn());
+      const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
         throw new Error("EXIT");
       }) as never);
 
-      expect(() => require("@/shared/config/env")).toThrow("EXIT");
+      await expect(import("@/shared/config/env")).rejects.toThrow("EXIT");
       expect(errorSpy).toHaveBeenCalledWith(
         "❌ Environment variable validation failed:",
       );
@@ -228,23 +226,21 @@ describe("Environment Configuration", () => {
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    it("should exit on non-Zod error during env parsing", () => {
+    it("should exit on non-Zod error during env parsing", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "test";
       delete process.env.JWT_SECRET;
 
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {
         throw new Error("warn-failed");
       });
-      const errorSpy = jest
-        .spyOn(console, "error")
-        .mockImplementation(jest.fn());
-      const exitSpy = jest.spyOn(process, "exit").mockImplementation((() => {
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(vi.fn());
+      const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
         throw new Error("EXIT");
       }) as never);
 
-      expect(() => require("@/shared/config/env")).toThrow("EXIT");
+      await expect(import("@/shared/config/env")).rejects.toThrow("EXIT");
       expect(warnSpy).toHaveBeenCalled();
       expect(errorSpy).not.toHaveBeenCalledWith(
         "❌ Environment variable validation failed:",

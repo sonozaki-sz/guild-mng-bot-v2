@@ -1,7 +1,7 @@
-const addOneTimeJobMock = jest.fn();
-const removeJobMock = jest.fn();
+const addOneTimeJobMock = vi.fn();
+const removeJobMock = vi.fn();
 
-jest.mock("@/shared/scheduler/jobScheduler", () => ({
+vi.mock("@/shared/scheduler/jobScheduler", () => ({
   jobScheduler: {
     addOneTimeJob: (...args: unknown[]) => addOneTimeJobMock(...args),
     removeJob: (...args: unknown[]) => removeJobMock(...args),
@@ -15,12 +15,12 @@ import {
 
 describe("bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("schedules one-time job and tracks reminder in map", async () => {
     const reminders = new Map<string, { jobId: string; reminderId: string }>();
-    const task = jest.fn().mockResolvedValue(undefined);
+    const task = vi.fn().mockResolvedValue(undefined);
 
     let scheduledTask: (() => Promise<void>) | undefined;
     addOneTimeJobMock.mockImplementationOnce(

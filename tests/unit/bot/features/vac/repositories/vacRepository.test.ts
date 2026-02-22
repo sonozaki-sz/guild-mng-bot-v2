@@ -1,38 +1,56 @@
-const getVacConfigServiceMock = jest.fn();
+import type { Mock } from "vitest";
 
-jest.mock("@/shared/features/vac/vacConfigService", () => ({
+const getVacConfigServiceMock: Mock = vi.fn();
+
+vi.mock("@/shared/features/vac/vacConfigService", () => ({
   getVacConfigService: (repository?: unknown) =>
     getVacConfigServiceMock(repository),
 }));
 
-function createVacConfigServicePortMock() {
+function createVacConfigServicePortMock(): {
+  getVacConfigOrDefault: Mock;
+  saveVacConfig: Mock;
+  addTriggerChannel: Mock;
+  removeTriggerChannel: Mock;
+  addCreatedVacChannel: Mock;
+  removeCreatedVacChannel: Mock;
+  isManagedVacChannel: Mock;
+} {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
-function createRepositoryMock() {
+function createRepositoryMock(): {
+  getVacConfigOrDefault: Mock;
+  saveVacConfig: Mock;
+  addTriggerChannel: Mock;
+  removeTriggerChannel: Mock;
+  addCreatedVacChannel: Mock;
+  removeCreatedVacChannel: Mock;
+  isManagedVacChannel: Mock;
+} {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
 describe("bot/features/vac/repositories/vacRepository", () => {
   beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
   });
 
   it("delegates all repository operations to injected vac config service", async () => {

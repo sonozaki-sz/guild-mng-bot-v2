@@ -6,29 +6,29 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
   const USERS_CLEAR = "USERS_CLEAR";
 
   const createRepositoryMock = () => ({
-    getBumpReminderConfig: jest.fn(),
-    updateBumpReminderConfig: jest.fn(),
-    setBumpReminderEnabled: jest.fn(),
-    setBumpReminderMentionRole: jest.fn(),
-    addBumpReminderMentionUser: jest.fn(),
-    removeBumpReminderMentionUser: jest.fn(),
-    clearBumpReminderMentionUsers: jest.fn(),
-    clearBumpReminderMentions: jest.fn(),
+    getBumpReminderConfig: vi.fn(),
+    updateBumpReminderConfig: vi.fn(),
+    setBumpReminderEnabled: vi.fn(),
+    setBumpReminderMentionRole: vi.fn(),
+    addBumpReminderMentionUser: vi.fn(),
+    removeBumpReminderMentionUser: vi.fn(),
+    clearBumpReminderMentionUsers: vi.fn(),
+    clearBumpReminderMentions: vi.fn(),
   });
 
   const loadModule = async () => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
 
-    const getGuildConfigRepositoryMock = jest.fn();
-    jest.doMock("@/shared/database/types", () => ({
+    const getGuildConfigRepositoryMock = vi.fn();
+    vi.doMock("@/shared/database/types", () => ({
       BUMP_REMINDER_MENTION_CLEAR_RESULT: CLEAR,
       BUMP_REMINDER_MENTION_ROLE_RESULT: ROLE,
       BUMP_REMINDER_MENTION_USER_ADD_RESULT: ADD,
       BUMP_REMINDER_MENTION_USER_REMOVE_RESULT: REMOVE,
       BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT: USERS_CLEAR,
     }));
-    jest.doMock("@/shared/database/guildConfigRepositoryProvider", () => ({
+    vi.doMock("@/shared/database/guildConfigRepositoryProvider", () => ({
       getGuildConfigRepository: getGuildConfigRepositoryMock,
     }));
 

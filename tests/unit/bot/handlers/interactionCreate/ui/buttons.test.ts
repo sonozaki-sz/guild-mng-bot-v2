@@ -1,11 +1,11 @@
 const bumpPanelButtonHandlerMock = { name: "bump" };
 const vacPanelButtonHandlerMock = { name: "vac" };
 
-jest.mock("@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler", () => ({
+vi.mock("@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler", () => ({
   bumpPanelButtonHandler: bumpPanelButtonHandlerMock,
 }));
 
-jest.mock("@/bot/features/vac/handlers/ui/vacPanelButton", () => ({
+vi.mock("@/bot/features/vac/handlers/ui/vacPanelButton", () => ({
   vacPanelButtonHandler: vacPanelButtonHandlerMock,
 }));
 

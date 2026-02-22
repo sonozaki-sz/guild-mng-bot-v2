@@ -18,6 +18,7 @@ export default {
         'ci',       // CI設定の変更
         'build',    // ビルドシステムや外部依存の変更
         'revert',   // コミットの revert
+        'merge',    // マージコミット
       ],
     ],
     // subject は小文字で始めることを強制しない（日本語対応）

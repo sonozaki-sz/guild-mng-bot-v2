@@ -1,15 +1,13 @@
-import type {
-  VacChannelPair,
-  VacConfig,
-} from "@/shared/database/types";
+import type { VacChannelPair, VacConfig } from "@/shared/database/types";
 
 // GuildConfigRepository の VAC 関連メソッドをテスト用にモック
 const mockRepo = {
-  getVacConfig: jest.fn<Promise<VacConfig | null>, [string]>(),
-  updateVacConfig: jest.fn<Promise<void>, [string, VacConfig]>(),
+  getVacConfig: vi.fn<(guildId: string) => Promise<VacConfig | null>>(),
+  updateVacConfig:
+    vi.fn<(guildId: string, config: VacConfig) => Promise<void>>(),
 };
 
-jest.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
+vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => mockRepo,
 }));
 
@@ -33,11 +31,12 @@ describe("shared/features/vac/config", () => {
 
   // テスト間でモック状態が汚染されないように毎回リセット
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("re-exports all service values", async () => {
-    const serviceModule = await import("@/shared/features/vac/vacConfigService");
+    const serviceModule =
+      await import("@/shared/features/vac/vacConfigService");
 
     expect(DEFAULT_VAC_CONFIG).toBe(serviceModule.DEFAULT_VAC_CONFIG);
     expect(VacConfigService).toBe(serviceModule.VacConfigService);
@@ -142,7 +141,7 @@ describe("shared/features/vac/config", () => {
     expect(mockRepo.updateVacConfig).toHaveBeenCalledTimes(1);
 
     // 削除対象が存在しないケース（保存は発生しない）
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRepo.getVacConfig.mockResolvedValueOnce({
       enabled: true,
       triggerChannelIds: ["keep"],
@@ -173,7 +172,7 @@ describe("shared/features/vac/config", () => {
     expect(mockRepo.updateVacConfig).toHaveBeenCalledTimes(1);
 
     // 既存チャンネル再登録時は保存が走らないことを確認
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRepo.getVacConfig.mockResolvedValueOnce({
       enabled: true,
       triggerChannelIds: ["t1"],
@@ -204,7 +203,7 @@ describe("shared/features/vac/config", () => {
     expect(mockRepo.updateVacConfig).toHaveBeenCalledTimes(1);
 
     // 存在しないIDを削除しても保存は発生しない
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRepo.getVacConfig.mockResolvedValueOnce({
       enabled: true,
       triggerChannelIds: ["t1"],

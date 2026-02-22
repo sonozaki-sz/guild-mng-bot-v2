@@ -3,37 +3,37 @@ describe("web/webAppBuilder", () => {
     nodeEnv: "development" | "production";
     corsOrigin?: string;
   }) => {
-    jest.resetModules();
+    vi.resetModules();
 
     const fastifyInstance = {
-      register: jest.fn().mockResolvedValue(undefined),
-      setErrorHandler: jest.fn(),
+      register: vi.fn().mockResolvedValue(undefined),
+      setErrorHandler: vi.fn(),
     };
-    const fastifyFactory = jest.fn(() => fastifyInstance);
-    const corsPlugin = jest.fn();
-    const staticPlugin = jest.fn();
-    const apiRoutes = jest.fn();
-    const healthRoute = jest.fn();
-    const logger = { error: jest.fn() };
-    const tDefault = jest.fn((key: string) => `tr:${key}`);
+    const fastifyFactory = vi.fn(() => fastifyInstance);
+    const corsPlugin = vi.fn();
+    const staticPlugin = vi.fn();
+    const apiRoutes = vi.fn();
+    const healthRoute = vi.fn();
+    const logger = { error: vi.fn() };
+    const tDefault = vi.fn((key: string) => `tr:${key}`);
 
-    jest.doMock("fastify", () => ({
+    vi.doMock("fastify", () => ({
       __esModule: true,
       default: fastifyFactory,
     }));
-    jest.doMock("@fastify/cors", () => ({
+    vi.doMock("@fastify/cors", () => ({
       __esModule: true,
       default: corsPlugin,
     }));
-    jest.doMock("@fastify/static", () => ({
+    vi.doMock("@fastify/static", () => ({
       __esModule: true,
       default: staticPlugin,
     }));
-    jest.doMock("@/web/routes/api/apiRoutes", () => ({ apiRoutes }));
-    jest.doMock("@/web/routes/health", () => ({ healthRoute }));
-    jest.doMock("@/shared/locale/localeManager", () => ({ tDefault }));
-    jest.doMock("@/shared/utils/logger", () => ({ logger }));
-    jest.doMock("@/shared/config/env", () => ({
+    vi.doMock("@/web/routes/api/apiRoutes", () => ({ apiRoutes }));
+    vi.doMock("@/web/routes/health", () => ({ healthRoute }));
+    vi.doMock("@/shared/locale/localeManager", () => ({ tDefault }));
+    vi.doMock("@/shared/utils/logger", () => ({ logger }));
+    vi.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",
@@ -113,8 +113,8 @@ describe("web/webAppBuilder", () => {
       },
     ) => void;
 
-    const send = jest.fn();
-    const status = jest.fn(() => ({ send }));
+    const send = vi.fn();
+    const status = vi.fn(() => ({ send }));
     handler(
       Object.assign(new Error("internal details"), { statusCode: 418 }),
       { url: "/api/test", method: "GET" },
@@ -147,8 +147,8 @@ describe("web/webAppBuilder", () => {
       },
     ) => void;
 
-    const send = jest.fn();
-    const status = jest.fn(() => ({ send }));
+    const send = vi.fn();
+    const status = vi.fn(() => ({ send }));
     handler(
       new Error("debug-visible"),
       { url: "/x", method: "POST" },

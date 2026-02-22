@@ -8,30 +8,30 @@ import type { GuildConfig } from "@/shared/database/types";
 import { DatabaseError } from "@/shared/errors/customErrors";
 
 // Logger のモック
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // i18n のモック
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 
 // Prismaクライアントのモック
 const mockPrismaClient = {
   guildConfig: {
-    findUnique: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    updateMany: jest.fn(),
-    upsert: jest.fn(),
-    delete: jest.fn(),
-    count: jest.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    updateMany: vi.fn(),
+    upsert: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
   },
 };
 
@@ -48,7 +48,7 @@ describe("PrismaGuildConfigRepository", () => {
   beforeEach(() => {
     // @ts-expect-error - モックのため型エラーは無視
     repository = new PrismaGuildConfigRepository(mockPrismaClient);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("getConfig()", () => {

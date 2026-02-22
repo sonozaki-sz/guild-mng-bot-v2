@@ -1,13 +1,14 @@
+import type { Mock } from "vitest";
 import { executePingCommand } from "@/bot/features/ping/commands/pingCommand.execute";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { tGuild } from "@/shared/locale/localeManager";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: jest.fn((description: string) => ({ description })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
 function createInteraction() {
@@ -15,21 +16,21 @@ function createInteraction() {
     guildId: "guild-1",
     createdTimestamp: 1_000,
     client: { ws: { ping: 42 } },
-    reply: jest.fn().mockResolvedValue(undefined),
-    fetchReply: jest.fn().mockResolvedValue({ createdTimestamp: 1_130 }),
-    editReply: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
+    fetchReply: vi.fn().mockResolvedValue({ createdTimestamp: 1_130 }),
+    editReply: vi.fn().mockResolvedValue(undefined),
   };
 }
 
 describe("bot/features/ping/commands/pingCommand.execute", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("replies measuring then edits with latency embed", async () => {
     const interaction = createInteraction();
 
-    (tGuild as jest.Mock)
+    (tGuild as Mock)
       .mockResolvedValueOnce("計測中...")
       .mockResolvedValueOnce("API: 130ms / WS: 42ms");
 
@@ -47,7 +48,7 @@ describe("bot/features/ping/commands/pingCommand.execute", () => {
     const interaction = createInteraction();
     interaction.guildId = null as never;
 
-    (tGuild as jest.Mock)
+    (tGuild as Mock)
       .mockResolvedValueOnce("計測中...")
       .mockResolvedValueOnce("API: 130ms / WS: 42ms");
 

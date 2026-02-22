@@ -7,9 +7,9 @@ import {
   type GuildMember,
   type UserSelectMenuInteraction,
 } from "discord.js";
+import { getAfkConfig } from "../../../../../shared/features/afk/afkConfigService";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotGuildConfigRepository } from "../../../../services/botGuildConfigRepositoryResolver";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {
@@ -98,9 +98,7 @@ export const vacPanelUserSelectHandler: UserSelectHandler = {
     }
 
     // AFK 機能が有効かつチャンネル指定済みであることを確認
-    const afkConfig = await getBotGuildConfigRepository().getAfkConfig(
-      guild.id,
-    );
+    const afkConfig = await getAfkConfig(guild.id);
     if (!afkConfig || !afkConfig.enabled || !afkConfig.channelId) {
       // AFK 機能未設定時は選択操作を受け付けない
       // パネル側で設定変更は行わず、専用設定コマンドへ責務を分離する

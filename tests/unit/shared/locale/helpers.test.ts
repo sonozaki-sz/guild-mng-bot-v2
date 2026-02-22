@@ -3,10 +3,10 @@ import {
   invalidateGuildLocaleCache,
 } from "@/shared/locale/helpers";
 
-const getGuildTMock = jest.fn();
-const invalidateLocaleCacheMock = jest.fn();
+const getGuildTMock = vi.fn();
+const invalidateLocaleCacheMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   localeManager: {
     getGuildT: (...args: unknown[]) => getGuildTMock(...args),
     invalidateLocaleCache: (...args: unknown[]) =>
@@ -18,12 +18,12 @@ jest.mock("@/shared/locale/localeManager", () => ({
 describe("shared/locale/helpers", () => {
   // 各ケースでモック呼び出し履歴を独立化する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // guild translator 取得時に localeManager.getGuildT を透過利用することを検証
   it("returns guild translator from locale manager", async () => {
-    const fixedT = jest.fn((key: string) => `translated:${key}`);
+    const fixedT = vi.fn((key: string) => `translated:${key}`);
     getGuildTMock.mockResolvedValue(fixedT);
 
     const translator = await getGuildTranslator("guild-1");
@@ -36,7 +36,7 @@ describe("shared/locale/helpers", () => {
 
   // 追加パラメータなしで guild translator を解決できることを検証
   it("resolves translator without repository parameter", async () => {
-    const fixedT = jest.fn((key: string) => key);
+    const fixedT = vi.fn((key: string) => key);
     getGuildTMock.mockResolvedValue(fixedT);
 
     await getGuildTranslator("guild-2");

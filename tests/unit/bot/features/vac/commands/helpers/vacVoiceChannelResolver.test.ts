@@ -3,8 +3,8 @@ import { ValidationError } from "@/shared/errors/customErrors";
 import { tGuild } from "@/shared/locale/localeManager";
 import { ChannelType } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async (_guildId: string, key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
 describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
@@ -17,7 +17,7 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
     const interaction = {
       guild: {
         channels: {
-          fetch: jest.fn().mockResolvedValue(voiceChannel),
+          fetch: vi.fn().mockResolvedValue(voiceChannel),
         },
       },
     };
@@ -35,7 +35,7 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
     const interaction = {
       guild: {
         channels: {
-          fetch: jest.fn().mockResolvedValue(null),
+          fetch: vi.fn().mockResolvedValue(null),
         },
       },
     };
@@ -54,7 +54,7 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
     const interaction = {
       guild: {
         channels: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             id: "text-1",
             type: ChannelType.GuildText,
           }),

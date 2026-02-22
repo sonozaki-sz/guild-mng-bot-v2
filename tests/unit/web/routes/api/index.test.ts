@@ -1,16 +1,16 @@
 import { apiAuthPlugin } from "@/web/middleware/auth";
 import { apiRoutes } from "@/web/routes/api/apiRoutes";
 
-jest.mock("@/web/middleware/auth", () => ({
-  apiAuthPlugin: jest.fn(async () => undefined),
+vi.mock("@/web/middleware/auth", () => ({
+  apiAuthPlugin: vi.fn(async () => undefined),
 }));
 
 describe("web/routes/api/index", () => {
   it("registers auth plugin and API root route", async () => {
     let registeredRootHandler: (() => Promise<unknown>) | undefined;
     const fastifyMock = {
-      register: jest.fn().mockResolvedValue(undefined),
-      get: jest.fn(
+      register: vi.fn().mockResolvedValue(undefined),
+      get: vi.fn(
         (_path: string, handler: () => Promise<unknown> | unknown) => {
           registeredRootHandler = async () => handler();
         },

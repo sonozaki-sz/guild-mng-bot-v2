@@ -19,7 +19,7 @@ describe("bot/features/bump-reminder/repositories/types", () => {
     };
 
     const repository: Pick<IBumpReminderRepository, "findById"> = {
-      findById: jest.fn().mockResolvedValue(reminder),
+      findById: vi.fn().mockResolvedValue(reminder),
     };
 
     expect(reminder.guildId).toBe("g1");

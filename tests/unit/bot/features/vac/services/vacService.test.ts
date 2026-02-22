@@ -1,3 +1,4 @@
+import type { Mocked } from "vitest";
 import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
@@ -9,55 +10,55 @@ import {
 } from "@/bot/features/vac/services/vacService";
 import { ChannelType } from "discord.js";
 
-const executeWithLoggedErrorMock = jest.fn(
+const executeWithLoggedErrorMock = vi.fn(
   async (operation: () => Promise<void>, _message: string) => {
     await operation();
   },
 );
-const loggerInfoMock = jest.fn();
-const getVacRepositoryMock = jest.fn();
+const loggerInfoMock = vi.fn();
+const getVacRepositoryMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
 }));
 
-jest.mock("@/shared/utils/errorHandling", () => ({
+vi.mock("@/shared/utils/errorHandling", () => ({
   executeWithLoggedError: (operation: () => Promise<void>, message: string) =>
     executeWithLoggedErrorMock(operation, message),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
-jest.mock("@/bot/features/vac/repositories/vacRepository", () => ({
+vi.mock("@/bot/features/vac/repositories/vacRepository", () => ({
   getVacRepository: (repository?: IVacRepository) =>
     getVacRepositoryMock(repository),
 }));
 
-jest.mock("@/bot/features/vac/services/usecases/handleVacCreate", () => ({
-  handleVacCreateUseCase: jest.fn(),
+vi.mock("@/bot/features/vac/services/usecases/handleVacCreate", () => ({
+  handleVacCreateUseCase: vi.fn(),
 }));
 
-jest.mock("@/bot/features/vac/services/usecases/handleVacDelete", () => ({
-  handleVacDeleteUseCase: jest.fn(),
+vi.mock("@/bot/features/vac/services/usecases/handleVacDelete", () => ({
+  handleVacDeleteUseCase: vi.fn(),
 }));
 
-jest.mock("@/bot/features/vac/services/usecases/cleanupVacOnStartup", () => ({
-  cleanupVacOnStartupUseCase: jest.fn(),
+vi.mock("@/bot/features/vac/services/usecases/cleanupVacOnStartup", () => ({
+  cleanupVacOnStartupUseCase: vi.fn(),
 }));
 
-function createRepositoryMock(): jest.Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<IVacRepository> {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
@@ -65,7 +66,7 @@ describe("bot/features/vac/services/vacService", () => {
   const defaultRepository = createRepositoryMock();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getVacRepositoryMock.mockImplementation(
       (repository?: IVacRepository) => repository ?? defaultRepository,
     );
@@ -122,7 +123,7 @@ describe("bot/features/vac/services/vacService", () => {
       id: "voice-1",
       guildId: "guild-1",
       type: ChannelType.GuildVoice,
-      isDMBased: jest.fn(() => false),
+      isDMBased: vi.fn(() => false),
     };
 
     await service.handleChannelDelete(channel as never);
@@ -158,7 +159,7 @@ describe("bot/features/vac/services/vacService", () => {
       id: "other-voice",
       guildId: "guild-1",
       type: ChannelType.GuildVoice,
-      isDMBased: jest.fn(() => false),
+      isDMBased: vi.fn(() => false),
     };
 
     await service.handleChannelDelete(channel as never);
@@ -172,11 +173,11 @@ describe("bot/features/vac/services/vacService", () => {
     const service = new VacService(repository);
 
     await service.handleChannelDelete({
-      isDMBased: jest.fn(() => true),
+      isDMBased: vi.fn(() => true),
     } as never);
 
     await service.handleChannelDelete({
-      isDMBased: jest.fn(() => false),
+      isDMBased: vi.fn(() => false),
       type: ChannelType.GuildText,
     } as never);
 

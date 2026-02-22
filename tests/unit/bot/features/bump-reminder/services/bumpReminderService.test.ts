@@ -4,39 +4,39 @@ import {
 } from "@/bot/features/bump-reminder/services/bumpReminderService";
 import { logger } from "@/shared/utils/logger";
 
-const addOneTimeJobMock = jest.fn();
-const removeJobMock = jest.fn();
+const addOneTimeJobMock = vi.fn();
+const removeJobMock = vi.fn();
 const repositoryMock = {
-  create: jest.fn(),
-  findAllPending: jest.fn(),
-  updateStatus: jest.fn(),
+  create: vi.fn(),
+  findAllPending: vi.fn(),
+  updateStatus: vi.fn(),
 };
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    info: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
-jest.mock("@/shared/utils/prisma", () => ({
-  requirePrismaClient: jest.fn(() => ({})),
+vi.mock("@/shared/utils/prisma", () => ({
+  requirePrismaClient: vi.fn(() => ({})),
 }));
 
-jest.mock("@/shared/scheduler/jobScheduler", () => ({
+vi.mock("@/shared/scheduler/jobScheduler", () => ({
   jobScheduler: {
     addOneTimeJob: (...args: unknown[]) => addOneTimeJobMock(...args),
     removeJob: (...args: unknown[]) => removeJobMock(...args),
   },
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/bumpReminderRepository",
   () => ({
     getBumpReminderRepository: () => repositoryMock,
@@ -49,14 +49,14 @@ describe("shared/features/bump-reminder/manager", () => {
 
   // 各ケースで時刻とモック状態を固定化
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2026-02-20T00:00:00.000Z"));
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-02-20T00:00:00.000Z"));
+    vi.clearAllMocks();
     manager = new BumpReminderManager(repositoryMock as never);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // setReminder が one-time 登録し、実行後に sent 更新することを検証
@@ -78,7 +78,7 @@ describe("shared/features/bump-reminder/manager", () => {
       },
     );
 
-    const task = jest.fn().mockResolvedValue(undefined);
+    const task = vi.fn().mockResolvedValue(undefined);
 
     await manager.setReminder("g-1", "ch-1", "m-1", "p-1", 120, task);
 
@@ -111,7 +111,7 @@ describe("shared/features/bump-reminder/manager", () => {
       },
     );
 
-    const task = jest.fn().mockRejectedValue(new Error("task failed"));
+    const task = vi.fn().mockRejectedValue(new Error("task failed"));
     repositoryMock.updateStatus.mockRejectedValueOnce(
       new Error("status update failed"),
     );
@@ -163,7 +163,7 @@ describe("shared/features/bump-reminder/manager", () => {
       undefined,
       undefined,
       120,
-      jest.fn(),
+      vi.fn(),
     );
     await manager.setReminder(
       "g-3",
@@ -171,7 +171,7 @@ describe("shared/features/bump-reminder/manager", () => {
       undefined,
       undefined,
       180,
-      jest.fn(),
+      vi.fn(),
     );
 
     expect(removeJobMock).toHaveBeenCalledTimes(1);
@@ -207,7 +207,7 @@ describe("shared/features/bump-reminder/manager", () => {
       undefined,
       undefined,
       120,
-      jest.fn(),
+      vi.fn(),
     );
 
     const result = await manager.cancelReminder("g-4");
@@ -259,10 +259,10 @@ describe("shared/features/bump-reminder/manager", () => {
       (_jobId, _delayMs, _task) => undefined,
     );
 
-    const futureTask = jest.fn().mockResolvedValue(undefined);
-    const immediateTask = jest.fn().mockResolvedValue(undefined);
+    const futureTask = vi.fn().mockResolvedValue(undefined);
+    const immediateTask = vi.fn().mockResolvedValue(undefined);
 
-    const taskFactory = jest
+    const taskFactory = vi
       .fn()
       .mockReturnValueOnce(futureTask)
       .mockReturnValueOnce(immediateTask);
@@ -320,7 +320,7 @@ describe("shared/features/bump-reminder/manager", () => {
     addOneTimeJobMock.mockImplementation(
       (_jobId, _delayMs, _task) => undefined,
     );
-    const taskFactory = jest.fn(() => jest.fn().mockResolvedValue(undefined));
+    const taskFactory = vi.fn(() => vi.fn().mockResolvedValue(undefined));
 
     await manager.restorePendingReminders(taskFactory);
 
@@ -338,7 +338,7 @@ describe("shared/features/bump-reminder/manager", () => {
       }
     ).reminders.set("g-x", { jobId: "job-x", reminderId: "r-x" });
 
-    const cancelSpy = jest
+    const cancelSpy = vi
       .spyOn(manager, "cancelReminder")
       .mockRejectedValueOnce(new Error("cancel failed"));
 
@@ -368,7 +368,7 @@ describe("shared/features/bump-reminder/manager", () => {
     addOneTimeJobMock.mockImplementation(
       (_jobId, _delayMs, _task) => undefined,
     );
-    const taskFactory = jest.fn(() => jest.fn().mockResolvedValue(undefined));
+    const taskFactory = vi.fn(() => vi.fn().mockResolvedValue(undefined));
 
     const restored = await manager.restorePendingReminders(taskFactory);
 
@@ -393,7 +393,7 @@ describe("shared/features/bump-reminder/manager", () => {
       }
     ).reminders.set("g-ok", { jobId: "job-ok", reminderId: "r-ok" });
 
-    const cancelSpy = jest
+    const cancelSpy = vi
       .spyOn(manager, "cancelReminder")
       .mockResolvedValueOnce(true);
 

@@ -1,22 +1,23 @@
+import type { Mock } from "vitest";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { DiscordAPIError, MessageFlags, PermissionFlagsBits } from "discord.js";
 
-const setBumpReminderEnabledMock = jest.fn();
-const getBumpReminderConfigMock = jest.fn();
-const setBumpReminderMentionRoleMock = jest.fn();
-const addBumpReminderMentionUserMock = jest.fn();
-const clearBumpReminderMentionUsersMock = jest.fn();
-const clearBumpReminderMentionsMock = jest.fn();
-const removeBumpReminderMentionUserMock = jest.fn();
-const cancelReminderMock = jest.fn();
-const tDefaultMock = jest.fn((key: string) => `default:${key}`);
-const tGuildMock = jest.fn();
-const createSuccessEmbedMock = jest.fn((description: string) => ({
+const setBumpReminderEnabledMock = vi.fn();
+const getBumpReminderConfigMock = vi.fn();
+const setBumpReminderMentionRoleMock = vi.fn();
+const addBumpReminderMentionUserMock = vi.fn();
+const clearBumpReminderMentionUsersMock = vi.fn();
+const clearBumpReminderMentionsMock = vi.fn();
+const removeBumpReminderMentionUserMock = vi.fn();
+const cancelReminderMock = vi.fn();
+const tDefaultMock = vi.hoisted(() => vi.fn((key: string) => `default:${key}`));
+const tGuildMock = vi.hoisted(() => vi.fn());
+const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
 
 // Bump設定サービス依存を置き換えてコマンド分岐を直接検証する
-jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
+vi.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   BUMP_REMINDER_MENTION_CLEAR_RESULT: {
     CLEARED: "cleared",
     NOT_CONFIGURED: "not_configured",
@@ -41,7 +42,7 @@ jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
     EMPTY: "empty",
     NOT_CONFIGURED: "not_configured",
   },
-  getBumpReminderConfigService: jest.fn(() => ({
+  getBumpReminderConfigService: vi.fn(() => ({
     setBumpReminderEnabled: (...args: unknown[]) =>
       setBumpReminderEnabledMock(...args),
     getBumpReminderConfig: (...args: unknown[]) =>
@@ -59,8 +60,8 @@ jest.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   })),
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
-  getBotBumpReminderConfigService: jest.fn(() => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+  getBotBumpReminderConfigService: vi.fn(() => ({
     setBumpReminderEnabled: (...args: unknown[]) =>
       setBumpReminderEnabledMock(...args),
     getBumpReminderConfig: (...args: unknown[]) =>
@@ -76,41 +77,41 @@ jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
     removeBumpReminderMentionUser: (...args: unknown[]) =>
       removeBumpReminderMentionUserMock(...args),
   })),
-  getBotBumpReminderManager: jest.fn(() => ({
+  getBotBumpReminderManager: vi.fn(() => ({
     cancelReminder: (...args: unknown[]) => cancelReminderMock(...args),
   })),
 }));
 
 // 共通エラーハンドラの委譲を確認
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
 }));
 
 // i18n を固定値化して期待値を安定させる
-jest.mock("@/shared/locale/commandLocalizations", () => ({
+vi.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
 }));
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));
 
 // メッセージ生成は簡易オブジェクト化
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: jest.fn((message: string) => ({ message })),
-  createInfoEmbed: jest.fn((message: string) => ({ message })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: vi.fn((message: string) => ({ message })),
+  createInfoEmbed: vi.fn((message: string) => ({ message })),
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
 }));
 
 // ログ出力の副作用を抑止
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    info: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -123,18 +124,18 @@ type InteractionLike = {
   user: { id: string };
   guild?: {
     members: {
-      fetch: jest.Mock;
+      fetch: Mock;
     };
   };
-  memberPermissions: { has: jest.Mock };
+  memberPermissions: { has: Mock };
   options: {
-    getSubcommand: jest.Mock;
-    getRole: jest.Mock;
-    getUser: jest.Mock;
-    getString: jest.Mock;
+    getSubcommand: Mock;
+    getRole: Mock;
+    getUser: Mock;
+    getString: Mock;
   };
-  reply: jest.Mock;
-  editReply: jest.Mock;
+  reply: Mock;
+  editReply: Mock;
 };
 
 // bump-reminder-config 検証用 interaction モック
@@ -147,20 +148,20 @@ function createInteraction(
     user: { id: "operator-1" },
     guild: {
       members: {
-        fetch: jest.fn().mockResolvedValue(null),
+        fetch: vi.fn().mockResolvedValue(null),
       },
     },
-    memberPermissions: { has: jest.fn(() => true) },
+    memberPermissions: { has: vi.fn(() => true) },
     options: {
-      getSubcommand: jest.fn(() => "enable"),
-      getRole: jest.fn(() => null),
-      getUser: jest.fn(() => null),
-      getString: jest.fn(() => null),
+      getSubcommand: vi.fn(() => "enable"),
+      getRole: vi.fn(() => null),
+      getUser: vi.fn(() => null),
+      getString: vi.fn(() => null),
     },
-    reply: jest.fn().mockResolvedValue({
-      awaitMessageComponent: jest.fn(),
+    reply: vi.fn().mockResolvedValue({
+      awaitMessageComponent: vi.fn(),
     }),
-    editReply: jest.fn().mockResolvedValue(undefined),
+    editReply: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -168,7 +169,7 @@ function createInteraction(
 describe("bot/commands/bump-reminder-config", () => {
   // ケースごとにモックを初期化する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     tGuildMock.mockResolvedValue("translated");
     cancelReminderMock.mockResolvedValue(undefined);
     setBumpReminderEnabledMock.mockResolvedValue(undefined);
@@ -200,10 +201,10 @@ describe("bot/commands/bump-reminder-config", () => {
   it("enables bump reminder and replies success", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "enable"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "enable"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -229,10 +230,10 @@ describe("bot/commands/bump-reminder-config", () => {
   it("disables bump reminder and cancels active reminder", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "disable"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "disable"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -252,10 +253,10 @@ describe("bot/commands/bump-reminder-config", () => {
   it("delegates invalid subcommand error to handleCommandError", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "unknown-subcommand"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "unknown-subcommand"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -271,12 +272,12 @@ describe("bot/commands/bump-reminder-config", () => {
     "delegates permission error when subcommand is %s",
     async (subcommand) => {
       const interaction = createInteraction({
-        memberPermissions: { has: jest.fn(() => false) },
+        memberPermissions: { has: vi.fn(() => false) },
         options: {
-          getSubcommand: jest.fn(() => subcommand),
-          getRole: jest.fn(() => null),
-          getUser: jest.fn(() => null),
-          getString: jest.fn(() => "role"),
+          getSubcommand: vi.fn(() => subcommand),
+          getRole: vi.fn(() => null),
+          getUser: vi.fn(() => null),
+          getString: vi.fn(() => "role"),
         },
       });
 
@@ -292,10 +293,10 @@ describe("bot/commands/bump-reminder-config", () => {
   it("delegates validation error when set-mention has no role and user", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -320,10 +321,10 @@ describe("bot/commands/bump-reminder-config", () => {
 
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => ({ id: "user-9" })),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => ({ id: "user-9" })),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -360,10 +361,10 @@ describe("bot/commands/bump-reminder-config", () => {
 
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => ({ id: "role-7" })),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => ({ id: "role-7" })),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -397,10 +398,10 @@ describe("bot/commands/bump-reminder-config", () => {
 
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => ({ id: "user-9" })),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => ({ id: "user-9" })),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -423,10 +424,10 @@ describe("bot/commands/bump-reminder-config", () => {
     addBumpReminderMentionUserMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => ({ id: "user-9" })),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => ({ id: "user-9" })),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -443,10 +444,10 @@ describe("bot/commands/bump-reminder-config", () => {
     removeBumpReminderMentionUserMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => ({ id: "user-9" })),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => ({ id: "user-9" })),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -462,10 +463,10 @@ describe("bot/commands/bump-reminder-config", () => {
     setBumpReminderMentionRoleMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => ({ id: "role-7" })),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => ({ id: "role-7" })),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -502,10 +503,10 @@ describe("bot/commands/bump-reminder-config", () => {
 
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "set-mention"),
-        getRole: jest.fn(() => ({ id: "role-7" })),
-        getUser: jest.fn(() => ({ id: "user-9" })),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "set-mention"),
+        getRole: vi.fn(() => ({ id: "role-7" })),
+        getUser: vi.fn(() => ({ id: "user-9" })),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -532,10 +533,10 @@ describe("bot/commands/bump-reminder-config", () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "show"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -559,10 +560,10 @@ describe("bot/commands/bump-reminder-config", () => {
     });
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "show"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -590,10 +591,10 @@ describe("bot/commands/bump-reminder-config", () => {
     });
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "show"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -615,10 +616,10 @@ describe("bot/commands/bump-reminder-config", () => {
   it("removes role mention on remove-mention target=role", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "role"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "role"),
       },
     });
 
@@ -641,10 +642,10 @@ describe("bot/commands/bump-reminder-config", () => {
     setBumpReminderMentionRoleMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "role"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "role"),
       },
     });
 
@@ -663,10 +664,10 @@ describe("bot/commands/bump-reminder-config", () => {
   it("clears all user mentions on remove-mention target=users", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "users"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "users"),
       },
     });
 
@@ -686,10 +687,10 @@ describe("bot/commands/bump-reminder-config", () => {
     clearBumpReminderMentionUsersMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "users"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "users"),
       },
     });
 
@@ -705,10 +706,10 @@ describe("bot/commands/bump-reminder-config", () => {
   it("clears all mentions on remove-mention target=all", async () => {
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "all"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "all"),
       },
     });
 
@@ -728,10 +729,10 @@ describe("bot/commands/bump-reminder-config", () => {
     clearBumpReminderMentionsMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "all"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "all"),
       },
     });
 
@@ -753,10 +754,10 @@ describe("bot/commands/bump-reminder-config", () => {
     });
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "user"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "user"),
       },
     });
 
@@ -775,10 +776,10 @@ describe("bot/commands/bump-reminder-config", () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "user"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "user"),
       },
     });
 
@@ -801,17 +802,17 @@ describe("bot/commands/bump-reminder-config", () => {
       mentionUserIds: ["user-a"],
     });
 
-    const awaitMessageComponent = jest
+    const awaitMessageComponent = vi
       .fn()
       .mockRejectedValue(new Error("collector ended with reason: time"));
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "user"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "user"),
       },
-      reply: jest.fn().mockResolvedValue({
+      reply: vi.fn().mockResolvedValue({
         awaitMessageComponent,
       }),
     });
@@ -839,8 +840,8 @@ describe("bot/commands/bump-reminder-config", () => {
       .mockResolvedValueOnce("removed")
       .mockResolvedValueOnce("not_found");
 
-    const updateMock = jest.fn().mockResolvedValue(undefined);
-    const awaitMessageComponent = jest
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    const awaitMessageComponent = vi
       .fn()
       .mockImplementation(async (options: { filter: (i: any) => boolean }) => {
         expect(
@@ -866,14 +867,14 @@ describe("bot/commands/bump-reminder-config", () => {
 
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "user"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "user"),
       },
       guild: {
         members: {
-          fetch: jest.fn((id: string) => {
+          fetch: vi.fn((id: string) => {
             if (id === "user-b") {
               return Promise.reject(new Error("member fetch failed"));
             }
@@ -884,7 +885,7 @@ describe("bot/commands/bump-reminder-config", () => {
           }),
         },
       },
-      reply: jest.fn().mockResolvedValue({
+      reply: vi.fn().mockResolvedValue({
         awaitMessageComponent,
       }),
     });
@@ -921,15 +922,15 @@ describe("bot/commands/bump-reminder-config", () => {
     const apiError = Object.create(
       DiscordAPIError.prototype,
     ) as DiscordAPIError;
-    const awaitMessageComponent = jest.fn().mockRejectedValue(apiError);
+    const awaitMessageComponent = vi.fn().mockRejectedValue(apiError);
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "user"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "user"),
       },
-      reply: jest.fn().mockResolvedValue({
+      reply: vi.fn().mockResolvedValue({
         awaitMessageComponent,
       }),
     });
@@ -950,17 +951,17 @@ describe("bot/commands/bump-reminder-config", () => {
       mentionUserIds: ["user-a"],
     });
 
-    const awaitMessageComponent = jest
+    const awaitMessageComponent = vi
       .fn()
       .mockRejectedValue(new Error("collector crashed"));
     const interaction = createInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-mention"),
-        getRole: jest.fn(() => null),
-        getUser: jest.fn(() => null),
-        getString: jest.fn(() => "user"),
+        getSubcommand: vi.fn(() => "remove-mention"),
+        getRole: vi.fn(() => null),
+        getUser: vi.fn(() => null),
+        getString: vi.fn(() => "user"),
       },
-      reply: jest.fn().mockResolvedValue({
+      reply: vi.fn().mockResolvedValue({
         awaitMessageComponent,
       }),
     });

@@ -1,16 +1,17 @@
+import type { Mocked } from "vitest";
 import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
 import { ChannelType } from "discord.js";
 
-function createRepositoryMock(): jest.Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<IVacRepository> {
   return {
-    getVacConfigOrDefault: jest.fn(),
-    saveVacConfig: jest.fn(),
-    addTriggerChannel: jest.fn(),
-    removeTriggerChannel: jest.fn(),
-    addCreatedVacChannel: jest.fn(),
-    removeCreatedVacChannel: jest.fn(),
-    isManagedVacChannel: jest.fn(),
+    getVacConfigOrDefault: vi.fn(),
+    saveVacConfig: vi.fn(),
+    addTriggerChannel: vi.fn(),
+    removeTriggerChannel: vi.fn(),
+    addCreatedVacChannel: vi.fn(),
+    removeCreatedVacChannel: vi.fn(),
+    isManagedVacChannel: vi.fn(),
   };
 }
 
@@ -18,7 +19,7 @@ function createGuild(params: {
   guildId: string;
   fetchedChannels: Record<string, unknown | Error>;
 }) {
-  const fetchMock = jest.fn(async (channelId: string) => {
+  const fetchMock = vi.fn(async (channelId: string) => {
     const value = params.fetchedChannels[channelId];
     if (value instanceof Error) {
       throw value;
@@ -36,7 +37,7 @@ function createGuild(params: {
 
 describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("keeps valid trigger and non-empty managed voice channel", async () => {
@@ -65,7 +66,7 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
           type: ChannelType.GuildVoice,
           isDMBased: () => false,
           members: { size: 2 },
-          delete: jest.fn(),
+          delete: vi.fn(),
         },
       },
     });
@@ -112,7 +113,7 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
           type: ChannelType.GuildText,
           isDMBased: () => false,
           members: { size: 0 },
-          delete: jest.fn(),
+          delete: vi.fn(),
         },
       },
     });
@@ -162,8 +163,8 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
       ],
     });
 
-    const deleteOk = jest.fn().mockResolvedValue(undefined);
-    const deleteFail = jest.fn().mockRejectedValue(new Error("delete failed"));
+    const deleteOk = vi.fn().mockResolvedValue(undefined);
+    const deleteFail = vi.fn().mockRejectedValue(new Error("delete failed"));
     const guild = createGuild({
       guildId: "guild-1",
       fetchedChannels: {
