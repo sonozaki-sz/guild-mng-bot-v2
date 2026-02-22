@@ -207,6 +207,8 @@ export const commands = {
     "Update the content of an existing sticky message",
   "sticky-message.update.channel.description":
     "Channel whose sticky message to update",
+  "sticky-message.update.message.description":
+    "Updated message content (plain text)",
   "sticky-message.update.success.title": "Updated",
   "sticky-message.update.success.description":
     "Sticky message has been updated.",

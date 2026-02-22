@@ -206,6 +206,8 @@ export const commands = {
   // update サブコマンド
   "sticky-message.update.description": "スティッキーメッセージの内容を更新",
   "sticky-message.update.channel.description": "更新対象のチャンネル",
+  "sticky-message.update.message.description":
+    "更新後のメッセージ内容（プレーンテキスト）",
   "sticky-message.update.success.title": "更新完了",
   "sticky-message.update.success.description":
     "スティッキーメッセージを更新しました。",

@@ -17,15 +17,12 @@ vi.mock(
     },
   }),
 );
-vi.mock(
-  "@/bot/features/vac/handlers/ui/vacPanelButton",
-  () => ({
-    vacPanelButtonHandler: {
-      matches: vi.fn(() => true),
-      execute: vi.fn(),
-    },
-  }),
-);
+vi.mock("@/bot/features/vac/handlers/ui/vacPanelButton", () => ({
+  vacPanelButtonHandler: {
+    matches: vi.fn(() => true),
+    execute: vi.fn(),
+  },
+}));
 vi.mock("@/bot/features/vac/handlers/ui/vacPanelModal", () => ({
   vacPanelModalHandler: {
     matches: vi.fn(() => true),
@@ -41,15 +38,12 @@ vi.mock(
     },
   }),
 );
-vi.mock(
-  "@/bot/features/vac/handlers/ui/vacPanelUserSelect",
-  () => ({
-    vacPanelUserSelectHandler: {
-      matches: vi.fn(() => true),
-      execute: vi.fn(),
-    },
-  }),
-);
+vi.mock("@/bot/features/vac/handlers/ui/vacPanelUserSelect", () => ({
+  vacPanelUserSelectHandler: {
+    matches: vi.fn(() => true),
+    execute: vi.fn(),
+  },
+}));
 
 describe("bot/handlers/interactionCreate/ui", () => {
   // ボタンレジストリに想定ハンドラが登録済みであることを検証する

@@ -55,7 +55,7 @@ export const stickyMessageCommand: Command = {
     );
     // update はプレーンテキスト・Embed 両対応のためオプションを保持する
     const updateMessageDesc = getCommandLocalizations(
-      "sticky-message.set.channel.description",
+      "sticky-message.update.message.description",
     );
     const updateEmbedTitleDesc = getCommandLocalizations(
       "sticky-message.set-embed.embed-title.description",
