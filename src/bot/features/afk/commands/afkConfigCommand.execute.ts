@@ -86,7 +86,11 @@ async function handleSetChannel(
     },
   );
 
-  const embed = createSuccessEmbed(description);
+  const successTitle = await tGuild(
+    guildId,
+    "commands:afk-config.embed.success_title",
+  );
+  const embed = createSuccessEmbed(description, { title: successTitle });
 
   await interaction.reply({
     embeds: [embed],

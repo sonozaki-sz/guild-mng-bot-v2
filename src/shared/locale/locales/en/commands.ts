@@ -24,6 +24,7 @@ export const commands = {
   "afk-config.set-ch.channel.description": "AFK channel (voice channel)",
   "afk-config.view.description": "Show current settings",
   "afk-config.embed.title": "AFK",
+  "afk-config.embed.success_title": "Settings Updated",
   "afk-config.embed.set_ch_success": "AFK channel configured: {{channel}}",
   "afk-config.embed.not_configured": "AFK channel is not configured",
   "afk-config.embed.field.channel": "AFK Channel",
@@ -102,6 +103,7 @@ export const commands = {
   "vac-config.view.description": "Show current settings",
   // view subcommand display fields
   "vac-config.embed.title": "Voice Auto-Create",
+  "vac-config.embed.success_title": "Settings Updated",
   "vac-config.embed.not_configured": "Not configured",
   "vac-config.embed.no_created_vcs": "None",
   "vac-config.embed.top": "TOP",
