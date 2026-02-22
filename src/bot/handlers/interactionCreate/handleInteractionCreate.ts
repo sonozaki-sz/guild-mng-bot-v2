@@ -13,6 +13,11 @@ import {
 } from "./flow/components";
 import { handleModalSubmit } from "./flow/modal";
 
+/**
+ * Discord インタラクションをタイプ別にルーティングして処理する
+ * @param interaction 受信したインタラクション
+ * @returns 実行完了を示す Promise
+ */
 export async function handleInteractionCreate(
   interaction: Interaction,
 ): Promise<void> {

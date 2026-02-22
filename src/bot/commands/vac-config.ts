@@ -13,6 +13,10 @@ import { VAC_CONFIG_COMMAND } from "../features/vac/commands/vacConfigCommand.co
 import { executeVacConfigCommand } from "../features/vac/commands/vacConfigCommand.execute";
 import type { Command } from "../types/discord";
 
+/**
+ * VAC（自動作成VC）設定コマンド（サーバー管理権限専用）
+ * トリガーVCの追加・削除・設定確認を提供する
+ */
 export const vacConfigCommand: Command = {
   data: (() => {
     const cmdDesc = getCommandLocalizations("vac-config.description");
