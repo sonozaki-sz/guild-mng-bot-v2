@@ -3,9 +3,9 @@
 
 import { ChannelType, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
+import { getAfkConfig } from "../../../../shared/features/afk/afkConfigService";
 import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotGuildConfigRepository } from "../../../services/botGuildConfigRepositoryResolver";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 
 const AFK_I18N_KEYS = {
@@ -29,7 +29,7 @@ export async function executeAfkCommand(
     throw new ValidationError(tDefault(AFK_I18N_KEYS.ERROR_GUILD_ONLY));
   }
 
-  const config = await getBotGuildConfigRepository().getAfkConfig(guildId);
+  const config = await getAfkConfig(guildId);
 
   if (!config || !config.enabled || !config.channelId) {
     throw new ValidationError(

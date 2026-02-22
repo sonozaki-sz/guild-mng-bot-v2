@@ -21,10 +21,8 @@ vi.mock("@/bot/services/botVacDependencyResolver", () => ({
   })),
 }));
 
-vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: vi.fn(() => ({
-    getAfkConfig: getAfkConfigMock,
-  })),
+vi.mock("@/shared/features/afk/afkConfigService", () => ({
+  getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
 vi.mock("@/bot/utils/interaction", () => ({
