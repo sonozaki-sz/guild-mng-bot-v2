@@ -71,6 +71,9 @@ export async function handleVacConfigRemoveTrigger(
     await tGuild(guildId, "commands:vac-config.embed.trigger_removed", {
       channel: `#${triggerChannel.name}`,
     }),
+    {
+      title: await tGuild(guildId, "commands:vac-config.embed.success_title"),
+    },
   );
   // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える
   await interaction.reply({

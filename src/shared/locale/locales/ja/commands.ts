@@ -22,6 +22,7 @@ export const commands = {
   "afk-config.set-ch.channel.description": "AFKチャンネル（ボイスチャンネル）",
   "afk-config.view.description": "現在の設定を表示。",
   "afk-config.embed.title": "AFK機能",
+  "afk-config.embed.success_title": "設定完了",
   "afk-config.embed.set_ch_success":
     "AFKチャンネルを {{channel}} に設定しました",
   "afk-config.embed.not_configured": "AFKチャンネルが設定されていません",
@@ -99,6 +100,7 @@ export const commands = {
   "vac-config.view.description": "現在の設定を表示",
   // view サブコマンド表示用
   "vac-config.embed.title": "VC自動作成機能",
+  "vac-config.embed.success_title": "設定完了",
   "vac-config.embed.not_configured": "未設定",
   "vac-config.embed.no_created_vcs": "なし",
   "vac-config.embed.top": "TOP",
