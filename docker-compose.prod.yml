@@ -1,9 +1,12 @@
+# guild-mng Portainer スタック用 compose ファイル
+# このファイルを Portainer の "Add Stack" で登録し、Webhook を有効化して使用する
+# スタック名: guild-mng（ボリューム guild-mng_sqlite_data が自動で割り当てられる）
+
 services:
   bot:
     image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
-    container_name: guild-mng-bot
+    container_name: guild-mng-bot-v2
     command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
-    # プロセスがクラッシュしたとき自動再起動（手動停止時は再起動しない）
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
@@ -15,9 +18,7 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
       - sqlite_data:/app/storage
-      - ./logs:/app/logs
-    networks:
-      - internal
+      - /opt/guild-mng-bot/logs:/app/logs
     healthcheck:
       test: ["CMD", "node", "-e", "process.exit(0)"]
       interval: 30s
@@ -25,61 +26,10 @@ services:
       retries: 3
       start_period: 15s
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
         max-size: "10m"
         max-file: "5"
-
-  web:
-    image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
-    container_name: guild-mng-web
-    command: node dist/web/server.js
-    restart: unless-stopped
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
-      WEB_PORT: ${WEB_PORT:-3000}
-      WEB_HOST: ${WEB_HOST:-0.0.0.0}
-      JWT_SECRET: ${JWT_SECRET}
-      CORS_ORIGIN: ${CORS_ORIGIN:-}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-    volumes:
-      - sqlite_data:/app/storage
-      - ./logs:/app/logs
-    ports:
-      - "127.0.0.1:3000:3000"
-    networks:
-      - internal
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
-      - "9443:9443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    networks:
-      - internal
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "3"
 
 volumes:
   sqlite_data:
-    driver: local
-  portainer_data:
-    driver: local
-
-networks:
-  internal:
-    driver: bridge
