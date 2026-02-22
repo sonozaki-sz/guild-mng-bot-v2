@@ -112,12 +112,12 @@ AFK機能の設定を管理します。
 
 **サブコマンド:**
 
-#### `set-ch`
+#### `set-channel`
 
 AFKチャンネルを設定します。
 
 ```
-/afk-config set-ch channel:<チャンネル>
+/afk-config set-channel channel:<チャンネル>
 ```
 
 **オプション:**
@@ -129,7 +129,7 @@ AFKチャンネルを設定します。
 **使用例:**
 
 ```
-/afk-config set-ch channel:#AFK
+/afk-config set-channel channel:#AFK
 ```
 
 ---

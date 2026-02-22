@@ -70,7 +70,7 @@
 
 **実行権限**: 管理者のみ
 
-#### サブコマンド: `set-ch`
+#### サブコマンド: `set-channel`
 
 AFKチャンネルを設定します。
 
@@ -89,7 +89,7 @@ AFKチャンネルを設定します。
 **実行例:**
 
 ```
-/afk-config set-ch channel:#AFK
+/afk-config set-channel channel:#AFK
 ```
 
 **成功時の応答:**
@@ -219,7 +219,7 @@ interface AfkConfig {
 - `PermissionFlagsBits.Administrator` を要求
 - SlashCommandBuilderで `setDefaultMemberPermissions()` も設定
 
-**サブコマンド: `set-ch`**
+**サブコマンド: `set-channel`**
 
 ```typescript
 1. サーバー管理権限の確認
@@ -315,7 +315,7 @@ throw new ValidationError(
   },
   "afk-config": {
     "description": "AFK機能の設定",
-    "set-ch": {
+    "set-channel": {
       "description": "AFKチャンネルを設定",
       "channel": {
         "description": "AFKチャンネル"
@@ -383,7 +383,7 @@ throw new ValidationError(
 - [ ] **チャンネル削除済み**: AFKチャンネルが削除されている場合、エラーメッセージが表示される
 - [ ] **権限不足**: Botに移動権限がない場合、適切なエラーが表示される
 
-### `/afk-config set-ch` コマンド
+### `/afk-config set-channel` コマンド
 
 #### 正常系
 

@@ -255,7 +255,7 @@ await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   - `remove-mention` → Success
   - `view` → Info
 - [x] `/afk-config` の各サブコマンド
-  - `set-ch` → Success
+  - `set-channel` → Success
   - `view` → Info
 - [x] `/afk` コマンド
   - AFK設定 → Success
@@ -433,7 +433,7 @@ export default {
 - [ ] `/bump-reminder-config set-mention`
 - [ ] `/bump-reminder-config remove-mention`
 - [ ] `/bump-reminder-config view`
-- [ ] `/afk-config set-ch`
+- [ ] `/afk-config set-channel`
 - [ ] `/afk-config view`
 - [ ] `/afk` コマンド
 - [ ] `/ping` コマンド

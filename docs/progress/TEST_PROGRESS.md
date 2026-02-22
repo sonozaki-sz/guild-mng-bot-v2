@@ -257,7 +257,7 @@
 
 **検証項目**:
 
-- ✅ コマンド構造: `/afk`, `/afk-config` (set-ch, show)
+- ✅ コマンド構造: `/afk`, `/afk-config` (set-channel, show)
 - ✅ データ構造: AfkConfig {enabled, channelId}
 - ✅ 権限管理: ユーザー（全て）、設定（管理者のみ）
 - ✅ エラーハンドリング: ValidationError パターン

@@ -20,7 +20,7 @@ import {
 } from "../../../utils/messageResponse";
 
 const AFK_CONFIG_SUBCOMMAND = {
-  SET_CHANNEL: "set-ch",
+  SET_CHANNEL: "set-channel",
   VIEW: "view",
 } as const;
 
@@ -58,7 +58,7 @@ export async function executeAfkConfigCommand(
 }
 
 /**
- * afk-config set-ch の設定更新を行う
+ * afk-config set-channel の設定更新を行う
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
