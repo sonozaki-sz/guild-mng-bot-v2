@@ -1,6 +1,6 @@
 describe("bot/services/botBumpReminderDependencyResolver", () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it("stores and returns bump reminder dependencies", async () => {

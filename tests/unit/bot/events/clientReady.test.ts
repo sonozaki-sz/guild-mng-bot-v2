@@ -1,15 +1,15 @@
 import { Events } from "discord.js";
 import { clientReadyEvent } from "@/bot/events/clientReady";
 
-const handleClientReadyMock = jest.fn();
+const handleClientReadyMock = vi.fn();
 
-jest.mock("@/bot/handlers/clientReadyHandler", () => ({
+vi.mock("@/bot/handlers/clientReadyHandler", () => ({
   handleClientReady: (...args: unknown[]) => handleClientReadyMock(...args),
 }));
 
 describe("bot/events/clientReady", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("has expected event metadata", () => {

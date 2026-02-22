@@ -1,9 +1,9 @@
 import { handleBumpMessageCreate } from "@/bot/features/bump-reminder/handlers/bumpMessageCreateHandler";
 
-const resolveBumpServiceMock = jest.fn();
-const handleBumpDetectedMock = jest.fn();
+const resolveBumpServiceMock = vi.fn();
+const handleBumpDetectedMock = vi.fn();
 
-jest.mock("@/shared/config/env", () => ({
+vi.mock("@/shared/config/env", () => ({
   NODE_ENV: { PRODUCTION: "production" },
   env: {
     NODE_ENV: "test",
@@ -11,7 +11,7 @@ jest.mock("@/shared/config/env", () => ({
   },
 }));
 
-jest.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
+vi.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
   BUMP_COMMANDS: {
     DISBOARD: "/bump",
     DISSOKU: "/dissoku up",
@@ -23,7 +23,7 @@ jest.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => 
   resolveBumpService: (...args: unknown[]) => resolveBumpServiceMock(...args),
 }));
 
-jest.mock("@/bot/features/bump-reminder/handlers/bumpReminderHandler", () => ({
+vi.mock("@/bot/features/bump-reminder/handlers/bumpReminderHandler", () => ({
   handleBumpDetected: (...args: unknown[]) => handleBumpDetectedMock(...args),
 }));
 
@@ -42,7 +42,7 @@ function createMessage(overrides?: Partial<Record<string, unknown>>) {
 
 describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("ignores messages without guild", async () => {

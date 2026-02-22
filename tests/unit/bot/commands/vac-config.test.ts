@@ -1,18 +1,19 @@
+import type { Mock } from "vitest";
 import type {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
 } from "discord.js";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 
-const addTriggerChannelMock = jest.fn();
-const getVacConfigOrDefaultMock = jest.fn();
-const removeTriggerChannelMock = jest.fn();
-const tDefaultMock = jest.fn((key: string) => `default:${key}`);
-const tGuildMock = jest.fn();
-const createSuccessEmbedMock = jest.fn((description: string) => ({
+const addTriggerChannelMock = vi.fn();
+const getVacConfigOrDefaultMock = vi.fn();
+const removeTriggerChannelMock = vi.fn();
+const tDefaultMock = vi.hoisted(() => vi.fn((key: string) => `default:${key}`));
+const tGuildMock = vi.hoisted(() => vi.fn());
+const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
-const createInfoEmbedMock = jest.fn(
+const createInfoEmbedMock = vi.fn(
   (description: string, options?: unknown) => ({
     description,
     options,
@@ -20,7 +21,7 @@ const createInfoEmbedMock = jest.fn(
 );
 
 // VAC設定関数の依存を置き換え、コマンド分岐を実コードで検証する
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
   getBotVacRepository: () => ({
     addTriggerChannel: (...args: unknown[]) => addTriggerChannelMock(...args),
     getVacConfigOrDefault: (...args: unknown[]) =>
@@ -31,24 +32,24 @@ jest.mock("@/bot/services/botVacDependencyResolver", () => ({
 }));
 
 // 共通エラーハンドラ委譲のみ検証する
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
 }));
 
 // i18n を固定化して期待値を安定させる
-jest.mock("@/shared/locale/commandLocalizations", () => ({
+vi.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
 }));
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
 }));
 
 // Embed 生成は簡易オブジェクトを返す
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
   createInfoEmbed: (description: string, options?: unknown) =>
@@ -62,21 +63,21 @@ type CommandInteractionLike = {
   guildId: string | null;
   guild: {
     channels: {
-      create: jest.Mock;
-      fetch: jest.Mock;
+      create: Mock;
+      fetch: Mock;
       cache: {
-        find: jest.Mock;
-        filter: jest.Mock;
+        find: Mock;
+        filter: Mock;
       };
     };
   } | null;
   channelId: string;
-  memberPermissions: { has: jest.Mock };
+  memberPermissions: { has: Mock };
   options: {
-    getSubcommand: jest.Mock;
-    getString: jest.Mock;
+    getSubcommand: Mock;
+    getString: Mock;
   };
-  reply: jest.Mock;
+  reply: Mock;
 };
 
 type FakeChannel = {
@@ -85,17 +86,17 @@ type FakeChannel = {
   name?: string;
   parent?: { id: string; name?: string; type: ChannelType } | null;
   children?: { cache: { size: number } };
-  delete?: jest.Mock;
+  delete?: Mock;
 };
 
 type AutocompleteInteractionLike = {
   commandName: string;
-  guild: { id: string; channels: { cache: { filter: jest.Mock } } } | null;
+  guild: { id: string; channels: { cache: { filter: Mock } } } | null;
   options: {
-    getSubcommand: jest.Mock;
-    getFocused: jest.Mock;
+    getSubcommand: Mock;
+    getFocused: Mock;
   };
-  respond: jest.Mock;
+  respond: Mock;
 };
 
 // vac-config 実行用 interaction モック
@@ -106,21 +107,21 @@ function createCommandInteraction(
     guildId: "guild-1",
     guild: {
       channels: {
-        create: jest.fn().mockResolvedValue({ id: "trigger-1" }),
-        fetch: jest.fn().mockResolvedValue({ id: "text-1", parent: null }),
+        create: vi.fn().mockResolvedValue({ id: "trigger-1" }),
+        fetch: vi.fn().mockResolvedValue({ id: "text-1", parent: null }),
         cache: {
-          find: jest.fn(() => null),
-          filter: jest.fn(() => []),
+          find: vi.fn(() => null),
+          filter: vi.fn(() => []),
         },
       },
     },
     channelId: "text-1",
-    memberPermissions: { has: jest.fn(() => true) },
+    memberPermissions: { has: vi.fn(() => true) },
     options: {
-      getSubcommand: jest.fn(() => "create-trigger-vc"),
-      getString: jest.fn(() => null),
+      getSubcommand: vi.fn(() => "create-trigger-vc"),
+      getString: vi.fn(() => null),
     },
-    reply: jest.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -136,18 +137,18 @@ function createGuildWithChannels(options?: {
 
   return {
     channels: {
-      create: jest.fn().mockResolvedValue(createdChannel),
-      fetch: jest.fn(async (id: string) => {
+      create: vi.fn().mockResolvedValue(createdChannel),
+      fetch: vi.fn(async (id: string) => {
         if (Object.prototype.hasOwnProperty.call(byId, id)) {
           return byId[id] ?? null;
         }
         return null;
       }),
       cache: {
-        find: jest.fn((predicate: (channel: FakeChannel) => boolean) =>
+        find: vi.fn((predicate: (channel: FakeChannel) => boolean) =>
           cacheList.find(predicate),
         ),
-        filter: jest.fn((predicate: (channel: FakeChannel) => boolean) =>
+        filter: vi.fn((predicate: (channel: FakeChannel) => boolean) =>
           cacheList.filter(predicate),
         ),
       },
@@ -177,17 +178,17 @@ function createAutocompleteInteraction(
       id: "guild-1",
       channels: {
         cache: {
-          filter: jest.fn((predicate: (channel: unknown) => boolean) =>
+          filter: vi.fn((predicate: (channel: unknown) => boolean) =>
             channels.filter(predicate),
           ),
         },
       },
     },
     options: {
-      getSubcommand: jest.fn(() => "create-trigger-vc"),
-      getFocused: jest.fn(() => "a"),
+      getSubcommand: vi.fn(() => "create-trigger-vc"),
+      getFocused: vi.fn(() => "a"),
     },
-    respond: jest.fn().mockResolvedValue(undefined),
+    respond: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -195,7 +196,7 @@ function createAutocompleteInteraction(
 describe("bot/commands/vac-config", () => {
   // ケース間でモック状態を初期化する
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     tGuildMock.mockResolvedValue("translated");
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
@@ -217,7 +218,7 @@ describe("bot/commands/vac-config", () => {
 
   it("delegates permission error when ManageGuild is missing", async () => {
     const interaction = createCommandInteraction({
-      memberPermissions: { has: jest.fn(() => false) },
+      memberPermissions: { has: vi.fn(() => false) },
     });
 
     await vacConfigCommand.execute(
@@ -232,7 +233,7 @@ describe("bot/commands/vac-config", () => {
 
   it("delegates permission error when memberPermissions is undefined", async () => {
     const interaction = createCommandInteraction({
-      memberPermissions: undefined as unknown as { has: jest.Mock },
+      memberPermissions: undefined as unknown as { has: Mock },
     });
 
     await vacConfigCommand.execute(
@@ -245,8 +246,8 @@ describe("bot/commands/vac-config", () => {
   it("delegates invalid subcommand error", async () => {
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "unknown"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "unknown"),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -335,8 +336,8 @@ describe("bot/commands/vac-config", () => {
   it("creates trigger when category option is TOP", async () => {
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "TOP"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "TOP"),
       },
     });
 
@@ -360,8 +361,8 @@ describe("bot/commands/vac-config", () => {
     };
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "cat-by-id"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "cat-by-id"),
       },
       guild: createGuildWithChannels({ byId: { "cat-by-id": category } }),
     });
@@ -386,8 +387,8 @@ describe("bot/commands/vac-config", () => {
     };
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "targetcategory"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "targetcategory"),
       },
       guild: createGuildWithChannels({
         byId: { targetcategory: null },
@@ -409,8 +410,8 @@ describe("bot/commands/vac-config", () => {
   it("creates trigger at top when category option does not resolve", async () => {
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "unknown-category"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "unknown-category"),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -437,8 +438,8 @@ describe("bot/commands/vac-config", () => {
   it("creates trigger when category fetch throws and name fallback misses", async () => {
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "cat-error"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "cat-error"),
       },
       guild: createGuildWithChannels({ byId: {}, cacheList: [] }),
     });
@@ -477,8 +478,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "cat-1"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "cat-1"),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -510,8 +511,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "TOP"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "TOP"),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -542,8 +543,8 @@ describe("bot/commands/vac-config", () => {
     };
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => "cat-full"),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => "cat-full"),
       },
       guild: createGuildWithChannels({ byId: { "cat-full": category } }),
     });
@@ -560,8 +561,8 @@ describe("bot/commands/vac-config", () => {
     const interaction = createCommandInteraction({
       guild: null,
       options: {
-        getSubcommand: jest.fn(() => "create-trigger-vc"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "create-trigger-vc"),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -585,11 +586,11 @@ describe("bot/commands/vac-config", () => {
       type: ChannelType.GuildCategory,
       children: { cache: { size: 1 } },
     };
-    const deleteMock = jest.fn().mockResolvedValue(undefined);
+    const deleteMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => "cat-1"),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => "cat-1"),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -632,8 +633,8 @@ describe("bot/commands/vac-config", () => {
     };
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => "cat-1"),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => "cat-1"),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -690,8 +691,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -711,8 +712,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => null),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -753,8 +754,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => "cat-target"),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => "cat-target"),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -786,8 +787,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => null),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -828,8 +829,8 @@ describe("bot/commands/vac-config", () => {
     };
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => "cat-err"),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => "cat-err"),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -876,8 +877,8 @@ describe("bot/commands/vac-config", () => {
     const interaction = createCommandInteraction({
       guild: null,
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -902,8 +903,8 @@ describe("bot/commands/vac-config", () => {
     };
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "show"),
+        getString: vi.fn(() => null),
       },
       guild: createGuildWithChannels({
         byId: {
@@ -945,8 +946,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "show"),
+        getString: vi.fn(() => null),
       },
       guild: createGuildWithChannels({ byId: {} }),
     });
@@ -978,8 +979,8 @@ describe("bot/commands/vac-config", () => {
 
     const interaction = createCommandInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "show"),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -1001,8 +1002,8 @@ describe("bot/commands/vac-config", () => {
     const interaction = createCommandInteraction({
       guild: null,
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getString: jest.fn(() => null),
+        getSubcommand: vi.fn(() => "show"),
+        getString: vi.fn(() => null),
       },
     });
 
@@ -1043,8 +1044,8 @@ describe("bot/commands/vac-config", () => {
   it("responds empty choices when subcommand is unsupported", async () => {
     const interaction = createAutocompleteInteraction({
       options: {
-        getSubcommand: jest.fn(() => "show"),
-        getFocused: jest.fn(() => "a"),
+        getSubcommand: vi.fn(() => "show"),
+        getFocused: vi.fn(() => "a"),
       },
     });
 
@@ -1068,8 +1069,8 @@ describe("bot/commands/vac-config", () => {
   it("supports remove-trigger-vc autocomplete as valid path", async () => {
     const interaction = createAutocompleteInteraction({
       options: {
-        getSubcommand: jest.fn(() => "remove-trigger-vc"),
-        getFocused: jest.fn(() => "be"),
+        getSubcommand: vi.fn(() => "remove-trigger-vc"),
+        getFocused: vi.fn(() => "be"),
       },
     });
 

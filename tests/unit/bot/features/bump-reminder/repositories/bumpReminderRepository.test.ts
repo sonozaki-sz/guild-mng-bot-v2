@@ -1,51 +1,53 @@
-const executeWithDatabaseErrorMock = jest.fn(
+import type { Mock } from "vitest";
+
+const executeWithDatabaseErrorMock = vi.fn(
   async (fn: () => Promise<unknown>, _message?: string) => fn(),
 );
 
-const loggerDebugMock = jest.fn();
-const loggerInfoMock = jest.fn();
+const loggerDebugMock: Mock = vi.fn();
+const loggerInfoMock: Mock = vi.fn();
 
-const createBumpReminderUseCaseMock = jest.fn();
-const findBumpReminderByIdUseCaseMock = jest.fn();
-const findPendingByGuildUseCaseMock = jest.fn();
-const findAllPendingUseCaseMock = jest.fn();
-const updateReminderStatusUseCaseMock = jest.fn();
-const deleteBumpReminderUseCaseMock = jest.fn();
-const cancelPendingByGuildUseCaseMock = jest.fn();
-const cancelPendingByGuildAndChannelUseCaseMock = jest.fn();
-const cleanupOldBumpRemindersUseCaseMock = jest.fn();
+const createBumpReminderUseCaseMock: Mock = vi.fn();
+const findBumpReminderByIdUseCaseMock: Mock = vi.fn();
+const findPendingByGuildUseCaseMock: Mock = vi.fn();
+const findAllPendingUseCaseMock: Mock = vi.fn();
+const updateReminderStatusUseCaseMock: Mock = vi.fn();
+const deleteBumpReminderUseCaseMock: Mock = vi.fn();
+const cancelPendingByGuildUseCaseMock: Mock = vi.fn();
+const cancelPendingByGuildAndChannelUseCaseMock: Mock = vi.fn();
+const cleanupOldBumpRemindersUseCaseMock: Mock = vi.fn();
 
-jest.mock("@/shared/utils/errorHandling", () => ({
+vi.mock("@/shared/utils/errorHandling", () => ({
   executeWithDatabaseError: (fn: () => Promise<unknown>, message: string) =>
     executeWithDatabaseErrorMock(fn, message),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: (...args: unknown[]) => loggerDebugMock(...args),
     info: (...args: unknown[]) => loggerInfoMock(...args),
   },
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/usecases/createBumpReminder",
   () => ({
     createBumpReminderUseCase: (...args: unknown[]) =>
       createBumpReminderUseCaseMock(...args),
   }),
 );
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/usecases/findBumpReminderById",
   () => ({
     findBumpReminderByIdUseCase: (...args: unknown[]) =>
       findBumpReminderByIdUseCaseMock(...args),
   }),
 );
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/usecases/findPendingReminders",
   () => ({
     findPendingByGuildUseCase: (...args: unknown[]) =>
@@ -54,7 +56,7 @@ jest.mock(
       findAllPendingUseCaseMock(...args),
   }),
 );
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/usecases/updateBumpReminderStatus",
   () => ({
     updateReminderStatusUseCase: (...args: unknown[]) =>
@@ -65,14 +67,14 @@ jest.mock(
       cancelPendingByGuildAndChannelUseCaseMock(...args),
   }),
 );
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/usecases/deleteBumpReminder",
   () => ({
     deleteBumpReminderUseCase: (...args: unknown[]) =>
       deleteBumpReminderUseCaseMock(...args),
   }),
 );
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders",
   () => ({
     cleanupOldBumpRemindersUseCase: (...args: unknown[]) =>
@@ -82,7 +84,7 @@ jest.mock(
 
 describe("bot/features/bump-reminder/repositories/bumpReminderRepository", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("delegates CRUD-style operations to usecases", async () => {

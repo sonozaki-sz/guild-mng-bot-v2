@@ -1,13 +1,13 @@
 import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { createTrackedReminderTask } from "@/bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask";
 
-const loggerErrorMock = jest.fn();
+const loggerErrorMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },
@@ -15,12 +15,12 @@ jest.mock("@/shared/utils/logger", () => ({
 
 describe("bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("marks reminder as sent when task succeeds", async () => {
-    const repository = { updateStatus: jest.fn().mockResolvedValue(undefined) };
-    const task = jest.fn().mockResolvedValue(undefined);
+    const repository = { updateStatus: vi.fn().mockResolvedValue(undefined) };
+    const task = vi.fn().mockResolvedValue(undefined);
 
     await createTrackedReminderTask(repository as never, "g1", "r1", task)();
 
@@ -32,8 +32,8 @@ describe("bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask", 
   });
 
   it("marks reminder cancelled when task fails", async () => {
-    const repository = { updateStatus: jest.fn().mockResolvedValue(undefined) };
-    const task = jest.fn().mockRejectedValue(new Error("task failed"));
+    const repository = { updateStatus: vi.fn().mockResolvedValue(undefined) };
+    const task = vi.fn().mockRejectedValue(new Error("task failed"));
 
     await createTrackedReminderTask(repository as never, "g1", "r1", task)();
 

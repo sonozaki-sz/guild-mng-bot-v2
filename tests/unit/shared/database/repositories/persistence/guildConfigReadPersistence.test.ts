@@ -10,12 +10,12 @@ import {
 describe("shared/database/repositories/persistence/guildConfigReadPersistence", () => {
   const createPrisma = () => ({
     guildConfig: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("findGuildConfigRecord returns full record by guildId", async () => {

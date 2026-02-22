@@ -1,6 +1,6 @@
 describe("bot/services/botGuildConfigRepositoryResolver", () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it("stores and returns guild config repository", async () => {

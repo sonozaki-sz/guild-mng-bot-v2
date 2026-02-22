@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import {
   findTriggerChannelByCategory,
   resolveTargetCategory,
@@ -8,41 +9,41 @@ import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, MessageFlags } from "discord.js";
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => key),
-  tGuild: jest.fn(async (_guildId: string, key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(),
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: jest.fn((description: string) => ({ description })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/vac/commands/helpers/vacConfigTargetResolver",
   () => ({
-    resolveTargetCategory: jest.fn(),
-    findTriggerChannelByCategory: jest.fn(),
+    resolveTargetCategory: vi.fn(),
+    findTriggerChannelByCategory: vi.fn(),
   }),
 );
 
 describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
   // create-trigger-vc のガード分岐と成功経路を検証する
   beforeEach(() => {
-    jest.clearAllMocks();
-    (findTriggerChannelByCategory as jest.Mock).mockResolvedValue(null);
-    (resolveTargetCategory as jest.Mock).mockResolvedValue(null);
+    vi.clearAllMocks();
+    (findTriggerChannelByCategory as Mock).mockResolvedValue(null);
+    (resolveTargetCategory as Mock).mockResolvedValue(null);
   });
 
   it("throws ValidationError when guild context is missing", async () => {
     const interaction = {
       guild: null,
       channelId: "ch-1",
-      options: { getString: jest.fn() },
-      reply: jest.fn(),
+      options: { getString: vi.fn() },
+      reply: vi.fn(),
     };
 
     await expect(
@@ -51,25 +52,25 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
   });
 
   it("throws ValidationError when trigger already exists in target category", async () => {
-    const getVacConfigOrDefault = jest.fn().mockResolvedValue({
+    const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: ["trigger-1"],
     });
-    (getBotVacRepository as jest.Mock).mockReturnValue({
+    (getBotVacRepository as Mock).mockReturnValue({
       getVacConfigOrDefault,
-      addTriggerChannel: jest.fn(),
+      addTriggerChannel: vi.fn(),
     });
-    (findTriggerChannelByCategory as jest.Mock).mockResolvedValue({
+    (findTriggerChannelByCategory as Mock).mockResolvedValue({
       id: "trigger-1",
       type: ChannelType.GuildVoice,
     });
 
     const interaction = {
       guild: {
-        channels: { create: jest.fn() },
+        channels: { create: vi.fn() },
       },
       channelId: "ch-1",
-      options: { getString: jest.fn(() => "cat-1") },
-      reply: jest.fn(),
+      options: { getString: vi.fn(() => "cat-1") },
+      reply: vi.fn(),
     };
 
     await expect(
@@ -78,25 +79,25 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
   });
 
   it("throws ValidationError when target category is full", async () => {
-    const getVacConfigOrDefault = jest.fn().mockResolvedValue({
+    const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: [],
     });
-    (getBotVacRepository as jest.Mock).mockReturnValue({
+    (getBotVacRepository as Mock).mockReturnValue({
       getVacConfigOrDefault,
-      addTriggerChannel: jest.fn(),
+      addTriggerChannel: vi.fn(),
     });
-    (resolveTargetCategory as jest.Mock).mockResolvedValue({
+    (resolveTargetCategory as Mock).mockResolvedValue({
       id: "cat-1",
       children: { cache: { size: 50 } },
     });
 
     const interaction = {
       guild: {
-        channels: { create: jest.fn() },
+        channels: { create: vi.fn() },
       },
       channelId: "ch-1",
-      options: { getString: jest.fn(() => "cat-1") },
-      reply: jest.fn(),
+      options: { getString: vi.fn(() => "cat-1") },
+      reply: vi.fn(),
     };
 
     await expect(
@@ -105,25 +106,25 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
   });
 
   it("creates trigger channel, persists it, and replies ephemeral", async () => {
-    const addTriggerChannel = jest.fn().mockResolvedValue(undefined);
-    const getVacConfigOrDefault = jest.fn().mockResolvedValue({
+    const addTriggerChannel = vi.fn().mockResolvedValue(undefined);
+    const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: [],
     });
-    (getBotVacRepository as jest.Mock).mockReturnValue({
+    (getBotVacRepository as Mock).mockReturnValue({
       getVacConfigOrDefault,
       addTriggerChannel,
     });
-    (resolveTargetCategory as jest.Mock).mockResolvedValue({
+    (resolveTargetCategory as Mock).mockResolvedValue({
       id: "cat-1",
       children: { cache: { size: 0 } },
     });
 
-    const create = jest.fn().mockResolvedValue({ id: "trigger-new" });
-    const reply = jest.fn().mockResolvedValue(undefined);
+    const create = vi.fn().mockResolvedValue({ id: "trigger-new" });
+    const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guild: { channels: { create } },
       channelId: "ch-1",
-      options: { getString: jest.fn(() => "cat-1") },
+      options: { getString: vi.fn(() => "cat-1") },
       reply,
     };
 

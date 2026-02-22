@@ -1,27 +1,28 @@
+import type { MockedFunction } from "vitest";
 import { findMemberLogConfigJson } from "@/shared/database/repositories/persistence/guildConfigReadPersistence";
 import { GuildMemberLogConfigStore } from "@/shared/database/stores/guildMemberLogConfigStore";
 
-jest.mock(
+vi.mock(
   "@/shared/database/repositories/persistence/guildConfigReadPersistence",
   () => ({
-    findMemberLogConfigJson: jest.fn(),
+    findMemberLogConfigJson: vi.fn(),
   }),
 );
 
 describe("shared/database/stores/guildMemberLogConfigStore", () => {
   const findMemberLogConfigJsonMock =
-    findMemberLogConfigJson as jest.MockedFunction<
+    findMemberLogConfigJson as MockedFunction<
       typeof findMemberLogConfigJson
     >;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("returns parsed member log config", async () => {
-    const safeJsonParse = jest.fn().mockReturnValue({ channelId: "ch-1" });
-    const updateConfig = jest.fn();
-    const prisma = { guildConfig: { findUnique: jest.fn() } };
+    const safeJsonParse = vi.fn().mockReturnValue({ channelId: "ch-1" });
+    const updateConfig = vi.fn();
+    const prisma = { guildConfig: { findUnique: vi.fn() } };
 
     findMemberLogConfigJsonMock.mockResolvedValue('{"channelId":"ch-1"}');
 
@@ -39,9 +40,9 @@ describe("shared/database/stores/guildMemberLogConfigStore", () => {
   });
 
   it("returns null when parser returns undefined", async () => {
-    const safeJsonParse = jest.fn().mockReturnValue(undefined);
-    const updateConfig = jest.fn();
-    const prisma = { guildConfig: { findUnique: jest.fn() } };
+    const safeJsonParse = vi.fn().mockReturnValue(undefined);
+    const updateConfig = vi.fn();
+    const prisma = { guildConfig: { findUnique: vi.fn() } };
 
     findMemberLogConfigJsonMock.mockResolvedValue("broken");
 
@@ -55,9 +56,9 @@ describe("shared/database/stores/guildMemberLogConfigStore", () => {
   });
 
   it("delegates update through shared updateConfig path", async () => {
-    const safeJsonParse = jest.fn();
-    const updateConfig = jest.fn().mockResolvedValue(undefined);
-    const prisma = { guildConfig: { findUnique: jest.fn() } };
+    const safeJsonParse = vi.fn();
+    const updateConfig = vi.fn().mockResolvedValue(undefined);
+    const prisma = { guildConfig: { findUnique: vi.fn() } };
 
     const store = new GuildMemberLogConfigStore(
       prisma as never,

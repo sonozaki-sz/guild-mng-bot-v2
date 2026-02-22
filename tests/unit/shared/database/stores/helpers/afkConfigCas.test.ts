@@ -7,14 +7,14 @@ import {
 describe("shared/database/stores/helpers/afkConfigCas", () => {
   const createPrisma = () => ({
     guildConfig: {
-      findUnique: jest.fn(),
-      updateMany: jest.fn(),
-      upsert: jest.fn(),
+      findUnique: vi.fn(),
+      updateMany: vi.fn(),
+      upsert: vi.fn(),
     },
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("fetchAfkConfigSnapshot returns record existence and raw JSON", async () => {

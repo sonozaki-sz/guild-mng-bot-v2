@@ -1,14 +1,14 @@
 import { sendBumpPanel } from "@/bot/features/bump-reminder/handlers/usecases/sendBumpPanel";
 
-const toScheduledAtMock = jest.fn();
-const getGuildTranslatorMock = jest.fn();
-const tDefaultMock = jest.fn(
+const toScheduledAtMock = vi.fn();
+const getGuildTranslatorMock = vi.fn();
+const tDefaultMock = vi.fn(
   (key: string, _options?: Record<string, unknown>) => key,
 );
-const createInfoEmbedMock = jest.fn();
-const loggerErrorMock = jest.fn();
+const createInfoEmbedMock = vi.fn();
+const loggerErrorMock = vi.fn();
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/constants/bumpReminderConstants",
   () => ({
     BUMP_CONSTANTS: {
@@ -21,20 +21,20 @@ jest.mock(
   }),
 );
 
-jest.mock("@/shared/locale/helpers", () => ({
+vi.mock("@/shared/locale/helpers", () => ({
   getGuildTranslator: (guildId: string) => getGuildTranslatorMock(guildId),
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
+vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, options?: Record<string, unknown>) =>
     tDefaultMock(key, options),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: (...args: unknown[]) => createInfoEmbedMock(...args),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
     error: (...args: unknown[]) => loggerErrorMock(...args),
   },
@@ -42,7 +42,7 @@ jest.mock("@/shared/utils/logger", () => ({
 
 describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     toScheduledAtMock.mockReturnValue(new Date("2026-02-21T00:00:00.000Z"));
     getGuildTranslatorMock.mockResolvedValue(
       (key: string) =>
@@ -62,7 +62,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
   it("returns undefined when target channel is not text-based", async () => {
     const client = {
       channels: {
-        fetch: jest.fn().mockResolvedValue({ isTextBased: () => false }),
+        fetch: vi.fn().mockResolvedValue({ isTextBased: () => false }),
       },
     };
 
@@ -78,10 +78,10 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
   });
 
   it("sends panel and returns message id", async () => {
-    const send = jest.fn().mockResolvedValue({ id: "panel-1" });
+    const send = vi.fn().mockResolvedValue({ id: "panel-1" });
     const client = {
       channels: {
-        fetch: jest.fn().mockResolvedValue({
+        fetch: vi.fn().mockResolvedValue({
           isTextBased: () => true,
           isSendable: () => true,
           send,
@@ -111,7 +111,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     const error = new Error("fetch failed");
     const client = {
       channels: {
-        fetch: jest.fn().mockRejectedValue(error),
+        fetch: vi.fn().mockRejectedValue(error),
       },
     };
 

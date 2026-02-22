@@ -1,16 +1,16 @@
 import { messageCreateEvent } from "@/bot/events/messageCreate";
 import { Events } from "discord.js";
 
-const handleBumpMessageCreateMock = jest.fn();
+const handleBumpMessageCreateMock = vi.fn();
 
-jest.mock("@/bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => ({
+vi.mock("@/bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => ({
   handleBumpMessageCreate: (...args: unknown[]) =>
     handleBumpMessageCreateMock(...args),
 }));
 
 describe("bot/events/messageCreate", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("has expected event metadata", () => {

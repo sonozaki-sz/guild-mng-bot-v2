@@ -1,22 +1,22 @@
 import { handleBumpReminderConfigDisable } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable";
 
-const ensureManageGuildPermissionMock = jest.fn();
-const cancelReminderMock = jest.fn();
-const setEnabledMock = jest.fn();
-const createSuccessEmbedMock = jest.fn((description: string) => ({
+const ensureManageGuildPermissionMock = vi.fn();
+const cancelReminderMock = vi.fn();
+const setEnabledMock = vi.fn();
+const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => `default:${key}`),
-  tGuild: jest.fn(async () => "translated"),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => `default:${key}`),
+  tGuild: vi.fn(async () => "translated"),
 }));
 
-jest.mock("@/shared/utils/logger", () => ({
-  logger: { info: jest.fn() },
+vi.mock("@/shared/utils/logger", () => ({
+  logger: { info: vi.fn() },
 }));
 
-jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   getBotBumpReminderManager: () => ({
     cancelReminder: (...args: unknown[]) => cancelReminderMock(...args),
   }),
@@ -25,12 +25,12 @@ jest.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
   }),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
+vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
 }));
 
-jest.mock(
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
   () => ({
     ensureManageGuildPermission: (...args: unknown[]) =>
@@ -40,7 +40,7 @@ jest.mock(
 
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
     cancelReminderMock.mockResolvedValue(undefined);
     setEnabledMock.mockResolvedValue(undefined);
@@ -48,7 +48,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable"
 
   it("cancels pending reminder, disables config, and replies success", async () => {
     const interaction = {
-      reply: jest.fn().mockResolvedValue(undefined),
+      reply: vi.fn().mockResolvedValue(undefined),
     };
 
     await handleBumpReminderConfigDisable(interaction as never, "guild-1");

@@ -1,3 +1,4 @@
+import type { MockedFunction } from "vitest";
 import { GuildAfkConfigStore } from "@/shared/database/stores/guildAfkConfigStore";
 import {
   casUpdateAfkConfig,
@@ -6,39 +7,39 @@ import {
 } from "@/shared/database/stores/helpers/afkConfigCas";
 import { DatabaseError } from "@/shared/errors/customErrors";
 
-jest.mock("@/shared/database/stores/helpers/afkConfigCas", () => ({
+vi.mock("@/shared/database/stores/helpers/afkConfigCas", () => ({
   AFK_CONFIG_CAS_MAX_RETRIES: 3,
-  fetchAfkConfigSnapshot: jest.fn(),
-  initializeAfkConfigIfMissing: jest.fn(),
-  casUpdateAfkConfig: jest.fn(),
+  fetchAfkConfigSnapshot: vi.fn(),
+  initializeAfkConfigIfMissing: vi.fn(),
+  casUpdateAfkConfig: vi.fn(),
 }));
 
 describe("shared/database/stores/guildAfkConfigStore", () => {
-  const fetchSnapshotMock = fetchAfkConfigSnapshot as jest.MockedFunction<
+  const fetchSnapshotMock = fetchAfkConfigSnapshot as MockedFunction<
     typeof fetchAfkConfigSnapshot
   >;
   const initializeIfMissingMock =
-    initializeAfkConfigIfMissing as jest.MockedFunction<
+    initializeAfkConfigIfMissing as MockedFunction<
       typeof initializeAfkConfigIfMissing
     >;
-  const casUpdateMock = casUpdateAfkConfig as jest.MockedFunction<
+  const casUpdateMock = casUpdateAfkConfig as MockedFunction<
     typeof casUpdateAfkConfig
   >;
 
   const createStore = () => {
     const prisma = {
       guildConfig: {
-        findUnique: jest.fn(),
+        findUnique: vi.fn(),
       },
     };
-    const safeJsonParse = jest.fn();
+    const safeJsonParse = vi.fn();
 
     const store = new GuildAfkConfigStore(prisma as never, "ja", safeJsonParse);
     return { store, prisma, safeJsonParse };
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("getAfkConfig returns parsed config or null", async () => {
@@ -59,7 +60,7 @@ describe("shared/database/stores/guildAfkConfigStore", () => {
 
   it("setAfkChannel delegates to updateAfkConfig with enabled=true", async () => {
     const { store } = createStore();
-    const spy = jest
+    const spy = vi
       .spyOn(store, "updateAfkConfig")
       .mockResolvedValue(undefined);
 

@@ -1,17 +1,18 @@
+import type { Mock } from "vitest";
 import { pingCommand } from "@/bot/commands/ping";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
 import type { ChatInputCommandInteraction } from "discord.js";
 
 // コマンド・イベント結合検証のため、翻訳とEmbed生成のみ固定化する
-jest.mock("@/shared/locale/commandLocalizations", () => ({
+vi.mock("@/shared/locale/commandLocalizations", () => ({
   getCommandLocalizations: () => ({
     ja: "ping description",
     localizations: { "en-US": "ping description" },
   }),
 }));
-jest.mock("@/shared/locale/localeManager", () => ({
-  tDefault: jest.fn((key: string) => key),
-  tGuild: jest.fn(
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
+  tGuild: vi.fn(
     async (
       _guildId: string | undefined,
       key: string,
@@ -27,26 +28,26 @@ jest.mock("@/shared/locale/localeManager", () => ({
     },
   ),
 }));
-jest.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: jest.fn(),
-  handleInteractionError: jest.fn(),
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
+  handleInteractionError: vi.fn(),
 }));
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: jest.fn((description: string) => ({ description })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
-jest.mock("@/shared/utils/logger", () => ({
+vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 type CommandInteraction = {
   client: {
     commands: Map<string, unknown>;
-    cooldownManager: { check: jest.Mock };
+    cooldownManager: { check: Mock };
     modals: Map<string, unknown>;
     ws: { ping: number };
   };
@@ -54,14 +55,14 @@ type CommandInteraction = {
   guildId: string;
   createdTimestamp: number;
   user: { id: string; tag: string };
-  reply: jest.Mock<Promise<void>, [unknown]>;
-  fetchReply: jest.Mock<Promise<{ createdTimestamp: number }>, []>;
-  editReply: jest.Mock<Promise<void>, [unknown]>;
-  isChatInputCommand: jest.Mock<boolean, []>;
-  isAutocomplete: jest.Mock<boolean, []>;
-  isModalSubmit: jest.Mock<boolean, []>;
-  isButton: jest.Mock<boolean, []>;
-  isUserSelectMenu: jest.Mock<boolean, []>;
+  reply: Mock<(arg: unknown) => Promise<void>>;
+  fetchReply: Mock<() => Promise<{ createdTimestamp: number }>>;
+  editReply: Mock<(arg: unknown) => Promise<void>>;
+  isChatInputCommand: Mock<() => boolean>;
+  isAutocomplete: Mock<() => boolean>;
+  isModalSubmit: Mock<() => boolean>;
+  isButton: Mock<() => boolean>;
+  isUserSelectMenu: Mock<() => boolean>;
 };
 
 // ChatInput 経路の統合検証に必要な最小 interaction を組み立てる
@@ -69,7 +70,7 @@ function createInteraction(): CommandInteraction {
   return {
     client: {
       commands: new Map([["ping", pingCommand]]),
-      cooldownManager: { check: jest.fn(() => 0) },
+      cooldownManager: { check: vi.fn(() => 0) },
       modals: new Map(),
       ws: { ping: 42 },
     },
@@ -77,21 +78,21 @@ function createInteraction(): CommandInteraction {
     guildId: "guild-1",
     createdTimestamp: 1_000,
     user: { id: "user-1", tag: "user#0001" },
-    reply: jest.fn().mockResolvedValue(undefined),
-    fetchReply: jest.fn().mockResolvedValue({ createdTimestamp: 1_123 }),
-    editReply: jest.fn().mockResolvedValue(undefined),
-    isChatInputCommand: jest.fn(() => true),
-    isAutocomplete: jest.fn(() => false),
-    isModalSubmit: jest.fn(() => false),
-    isButton: jest.fn(() => false),
-    isUserSelectMenu: jest.fn(() => false),
+    reply: vi.fn().mockResolvedValue(undefined),
+    fetchReply: vi.fn().mockResolvedValue({ createdTimestamp: 1_123 }),
+    editReply: vi.fn().mockResolvedValue(undefined),
+    isChatInputCommand: vi.fn(() => true),
+    isAutocomplete: vi.fn(() => false),
+    isModalSubmit: vi.fn(() => false),
+    isButton: vi.fn(() => false),
+    isUserSelectMenu: vi.fn(() => false),
   };
 }
 
 describe("integration: interactionCreate + pingCommand", () => {
   // 各ケースの検証前にモック履歴をリセットする
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // interactionCreate から pingCommand までの実行経路を統合的に確認する

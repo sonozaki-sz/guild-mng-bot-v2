@@ -1,3 +1,4 @@
+import type { MockedFunction } from "vitest";
 import {
   existsGuildConfigRecord,
   findGuildConfigRecord,
@@ -23,30 +24,30 @@ import {
   updateGuildLocaleUsecase,
 } from "@/shared/database/repositories/usecases/guildConfigCoreUsecases";
 
-jest.mock(
+vi.mock(
   "@/shared/database/repositories/persistence/guildConfigReadPersistence",
   () => ({
-    existsGuildConfigRecord: jest.fn(),
-    findGuildConfigRecord: jest.fn(),
-    findGuildLocale: jest.fn(),
+    existsGuildConfigRecord: vi.fn(),
+    findGuildConfigRecord: vi.fn(),
+    findGuildLocale: vi.fn(),
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/shared/database/repositories/persistence/guildConfigWritePersistence",
   () => ({
-    createGuildConfigRecord: jest.fn(),
-    deleteGuildConfigRecord: jest.fn(),
-    upsertGuildConfigRecord: jest.fn(),
+    createGuildConfigRecord: vi.fn(),
+    deleteGuildConfigRecord: vi.fn(),
+    upsertGuildConfigRecord: vi.fn(),
   }),
 );
 
-jest.mock(
+vi.mock(
   "@/shared/database/repositories/serializers/guildConfigSerializer",
   () => ({
-    toGuildConfig: jest.fn(),
-    toGuildConfigCreateData: jest.fn(),
-    toGuildConfigUpdateData: jest.fn(),
+    toGuildConfig: vi.fn(),
+    toGuildConfigCreateData: vi.fn(),
+    toGuildConfigUpdateData: vi.fn(),
   }),
 );
 
@@ -54,7 +55,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
   const deps = {
     prisma: { guildConfig: {} } as never,
     defaultLocale: "ja",
-    toDatabaseError: jest.fn(
+    toDatabaseError: vi.fn(
       (prefix: string, error: unknown) =>
         new Error(
           `${prefix}:${error instanceof Error ? error.message : String(error)}`,
@@ -63,38 +64,38 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
   };
 
   const findGuildConfigRecordMock =
-    findGuildConfigRecord as jest.MockedFunction<typeof findGuildConfigRecord>;
-  const toGuildConfigMock = toGuildConfig as jest.MockedFunction<
+    findGuildConfigRecord as MockedFunction<typeof findGuildConfigRecord>;
+  const toGuildConfigMock = toGuildConfig as MockedFunction<
     typeof toGuildConfig
   >;
-  const toCreateDataMock = toGuildConfigCreateData as jest.MockedFunction<
+  const toCreateDataMock = toGuildConfigCreateData as MockedFunction<
     typeof toGuildConfigCreateData
   >;
   const createGuildConfigRecordMock =
-    createGuildConfigRecord as jest.MockedFunction<
+    createGuildConfigRecord as MockedFunction<
       typeof createGuildConfigRecord
     >;
-  const toUpdateDataMock = toGuildConfigUpdateData as jest.MockedFunction<
+  const toUpdateDataMock = toGuildConfigUpdateData as MockedFunction<
     typeof toGuildConfigUpdateData
   >;
   const upsertGuildConfigRecordMock =
-    upsertGuildConfigRecord as jest.MockedFunction<
+    upsertGuildConfigRecord as MockedFunction<
       typeof upsertGuildConfigRecord
     >;
   const deleteGuildConfigRecordMock =
-    deleteGuildConfigRecord as jest.MockedFunction<
+    deleteGuildConfigRecord as MockedFunction<
       typeof deleteGuildConfigRecord
     >;
   const existsGuildConfigRecordMock =
-    existsGuildConfigRecord as jest.MockedFunction<
+    existsGuildConfigRecord as MockedFunction<
       typeof existsGuildConfigRecord
     >;
-  const findGuildLocaleMock = findGuildLocale as jest.MockedFunction<
+  const findGuildLocaleMock = findGuildLocale as MockedFunction<
     typeof findGuildLocale
   >;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("getGuildConfigUsecase returns mapped config or null", async () => {

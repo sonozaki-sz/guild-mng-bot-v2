@@ -1,29 +1,29 @@
 import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
 import { safeReply } from "@/bot/utils/interaction";
 
-const isManagedVacChannelMock = jest.fn();
-const sendVacControlPanelMock = jest.fn();
+const isManagedVacChannelMock = vi.fn();
+const sendVacControlPanelMock = vi.fn();
 
-jest.mock("@/shared/locale/localeManager", () => ({
-  tGuild: jest.fn(async (_guildId: string, key: string) => key),
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-jest.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: jest.fn(() => ({
+vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: vi.fn(() => ({
     isManagedVacChannel: isManagedVacChannelMock,
   })),
 }));
 
-jest.mock("@/bot/utils/interaction", () => ({
-  safeReply: jest.fn(),
+vi.mock("@/bot/utils/interaction", () => ({
+  safeReply: vi.fn(),
 }));
 
-jest.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: jest.fn((message: string) => ({ message })),
-  createSuccessEmbed: jest.fn((message: string) => ({ message })),
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: vi.fn((message: string) => ({ message })),
+  createSuccessEmbed: vi.fn((message: string) => ({ message })),
 }));
 
-jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
   VAC_PANEL_CUSTOM_ID: {
     RENAME_BUTTON_PREFIX: "vac:rename-btn:",
     LIMIT_BUTTON_PREFIX: "vac:limit-btn:",
@@ -35,7 +35,7 @@ jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
     RENAME_INPUT: "rename-input",
     LIMIT_INPUT: "limit-input",
   },
-  getVacPanelChannelId: jest.fn((customId: string, prefix: string) =>
+  getVacPanelChannelId: vi.fn((customId: string, prefix: string) =>
     customId.startsWith(prefix) ? customId.slice(prefix.length) : "",
   ),
   sendVacControlPanel: (...args: unknown[]) => sendVacControlPanelMock(...args),
@@ -43,7 +43,7 @@ jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
 
 describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     isManagedVacChannelMock.mockResolvedValue(true);
     sendVacControlPanelMock.mockResolvedValue(undefined);
   });
@@ -63,13 +63,13 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn(),
+          fetch: vi.fn(),
         },
       },
       customId: "other:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -88,10 +88,10 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue(channel),
+          fetch: vi.fn().mockResolvedValue(channel),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "voice-1" },
           }),
         },
@@ -100,9 +100,9 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
       user: { id: "user-1" },
       message: {
         deletable: true,
-        delete: jest.fn().mockRejectedValue(new Error("delete failed")),
+        delete: vi.fn().mockRejectedValue(new Error("delete failed")),
       },
-      showModal: jest.fn(),
+      showModal: vi.fn(),
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
@@ -119,18 +119,18 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
       guild: {
         id: "guild-1",
         channels: {
-          fetch: jest.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
+          fetch: vi.fn().mockResolvedValue({ id: "voice-1", type: 2 }),
         },
         members: {
-          fetch: jest.fn().mockResolvedValue({
+          fetch: vi.fn().mockResolvedValue({
             voice: { channelId: "other-voice" },
           }),
         },
       },
       customId: "vac:rename-btn:voice-1",
       user: { id: "user-1" },
-      message: { deletable: false, delete: jest.fn() },
-      showModal: jest.fn(),
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
