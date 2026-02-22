@@ -85,45 +85,18 @@ jobs:
 
       - name: Portainer API でスタックを再デプロイ（最新イメージをプル）
         run: |
-          python3 << 'EOF'
-          import os, json, urllib.request, ssl, sys
-
-          host        = os.environ["PORTAINER_HOST"]
-          token       = os.environ["PORTAINER_TOKEN"]
-          stack_id    = os.environ["PORTAINER_STACK_ID"]
-          endpoint_id = os.environ["PORTAINER_ENDPOINT_ID"]
-
-          # 自己署名証明書を許容
-          ctx = ssl.create_default_context()
-          ctx.check_hostname = False
-          ctx.verify_mode = ssl.CERT_NONE
-          headers = {"X-API-Key": token}
-
-          def api(method, path, body=None):
-              h = {**headers, "Content-Type": "application/json"} if body else headers
-              req = urllib.request.Request(
-                  f"https://{host}:9443{path}", data=body, method=method, headers=h
-              )
-              with urllib.request.urlopen(req, context=ctx) as r:
-                  return json.loads(r.read())
+          BASE="http://${{ secrets.PORTAINER_HOST }}:9000/api"
+          HEADERS=(-H "X-API-Key: ${{ secrets.PORTAINER_TOKEN }}" -H "Content-Type: application/json")
+          STACK_ID="${{ secrets.PORTAINER_STACK_ID }}"
+          ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
 
           # 現在のスタックファイルと環境変数を取得
-          stack_file = api("GET", f"/api/stacks/{stack_id}/file")["StackFileContent"]
-          stack_info = api("GET", f"/api/stacks/{stack_id}")
-          env_vars   = stack_info.get("Env", [])
+          STACK_FILE=$(curl -fsS "${HEADERS[@]}" "$BASE/stacks/$STACK_ID/file" | jq -r '.StackFileContent')
+          ENV_VARS=$(curl -fsS "${HEADERS[@]}" "$BASE/stacks/$STACK_ID" | jq '.Env // []')
 
           # pullImage=true でスタックを更新（最新イメージをプルして再デプロイ）
-          payload = json.dumps({
-              "pullImage": True,
-              "prune": False,
-              "stackFileContent": stack_file,
-              "env": env_vars,
-          }).encode()
-          api("PUT", f"/api/stacks/{stack_id}?endpointId={endpoint_id}", payload)
-          print(f"==> デプロイ完了")
-          EOF
-        env:
-          PORTAINER_HOST: ${{ secrets.PORTAINER_HOST }}
-          PORTAINER_TOKEN: ${{ secrets.PORTAINER_TOKEN }}
-          PORTAINER_STACK_ID: ${{ secrets.PORTAINER_STACK_ID }}
-          PORTAINER_ENDPOINT_ID: ${{ secrets.PORTAINER_ENDPOINT_ID }}
+          curl -fsS -X PUT "${HEADERS[@]}" \
+            "$BASE/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
+            -d "{\"pullImage\":true,\"prune\":false,\"stackFileContent\":$(echo "$STACK_FILE" | jq -Rs .),\"env\":$ENV_VARS}"
+
+          echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
