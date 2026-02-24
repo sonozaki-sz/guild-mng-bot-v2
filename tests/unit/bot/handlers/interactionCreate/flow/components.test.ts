@@ -108,4 +108,29 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
       interaction,
     );
   });
+
+  it("skips non-matching string-select handler", async () => {
+    const interaction = { customId: "no-match" };
+    const uiModule = (await vi.importMock(
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
+    )) as { stringSelectHandlers: Array<{ execute: Mock }> };
+
+    await handleStringSelectMenu(interaction as never);
+
+    expect(uiModule.stringSelectHandlers[0].execute).not.toHaveBeenCalled();
+  });
+
+  it("delegates string-select handler error to interaction error handler", async () => {
+    const error = new Error("select failed");
+    const uiModule = (await vi.importMock(
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
+    )) as { stringSelectHandlers: Array<{ execute: Mock }> };
+    uiModule.stringSelectHandlers[0].execute.mockRejectedValueOnce(error);
+    const interaction = { customId: "target" };
+
+    await handleStringSelectMenu(interaction as never);
+
+    expect(handleInteractionError).toHaveBeenCalledWith(interaction, error);
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1);
+  });
 });

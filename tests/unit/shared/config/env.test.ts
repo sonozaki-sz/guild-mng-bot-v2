@@ -247,5 +247,24 @@ describe("Environment Configuration", () => {
       );
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
+
+    it("should log validation errors and exit on ZodError during env parsing", async () => {
+      // 必須の DISCORD_TOKEN / DISCORD_APP_ID を削除して ZodError を発生させる
+      delete process.env.DISCORD_TOKEN;
+      delete process.env.DISCORD_APP_ID;
+
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(vi.fn());
+      const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+        throw new Error("EXIT");
+      }) as never);
+      // console.warn は問題なく通すため上書きしない
+      vi.spyOn(console, "warn").mockImplementation(vi.fn());
+
+      await expect(import("@/shared/config/env")).rejects.toThrow("EXIT");
+      expect(errorSpy).toHaveBeenCalledWith(
+        "❌ Environment variable validation failed:",
+      );
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
   });
 });

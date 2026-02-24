@@ -2,13 +2,13 @@
 
 > Testing Guidelines - テスト設計とベストプラクティス
 
-最終更新: 2026年2月22日
+最終更新: 2026年2月25日
 
 ---
 
 ## 📋 概要
 
-このドキュメントは、guild-mng-bot-v2 におけるテスト設計方針・命名規則・実行方法を定義します。Jest + ts-jest を前提に、回帰を素早く検知できるテスト運用を目的とします。
+このドキュメントは、guild-mng-bot-v2 におけるテスト設計方針・命名規則・実行方法を定義します。Vitest を前提に、回帰を素早く検知できるテスト運用を目的とします。
 
 ---
 
@@ -24,27 +24,31 @@
    - 統合テスト 25%
    - E2Eテスト 5%（次フェーズ）
 3. **カバレッジ目標**
-   - 全体 70%以上（Statements / Branches / Functions / Lines）
+   - statements / functions / lines: **100%**
+   - branches: **99%以上**（v8 async内部ブランチのアーティファクトにより 100% 初期は達成不可）
 
-### 現状（2026-02-22）
+### 現状（2026-02-25）
 
-- テストは全件成功（185 suites / 805 tests）
+- 全テスト成功（205 suites / 972 tests）
+- カバレッジ: statements 100% / functions 100% / lines 100% / branches 99.27%
 - `unit` / `integration` の配置を `src` 対称へ再編済み
 - `e2e` は次フェーズで実施
 
 ### import方針とテスト追従
 
 - 実装方針は「`index.ts` を使わず、常に直接 import」
-- そのためテストでは、**対象実装が実際に import しているパス**を `jest.mock()` する
+- そのためテストでは、**対象実装が実際に import しているパス**を `vi.mock()` する
   - 例: 実装が `@/shared/utils/logger` を参照しているなら、テストも同パスをモックする
 - テストコードでも `index.ts` パスは参照せず、実体モジュールへ直接 import する
 - 直接 import 化に追従していないモックは、回帰の主因になるため優先修正対象とする
 - `bot/features` 内部実装のテストでは、featureローカル `..` / `index` を前提にしたモックを置かず、直接モジュールパスへ追従する
 
-### カバレッジ運用メモ（Functions）
+### カバレッジ運用メモ
 
 - `index.ts` を撤廃することで、再エクスポート専用ファイル由来の `Functions` ノイズを削減できる
 - 実体モジュールのテストに集約し、公開面の検証も同じ実体パスで行う
+- **v8 async ブランチのアーティファクトに注意**: async 関数内の `|| null` / `??` 演算子を v8 がgeneratorに変換する際、実際には到達不可能な内部ブランチが生成される。テキストレポートでは "uncovered" と表示されるが LCOV では影響なし（実コードは 100% カバー済み）。vitest.config.ts の `thresholds.branches` は `99` に設定して吸収する
+- **型専用ファイルの除外**: 実行可能なコードを持たない型定義・再エクスポートのみのファイルは `coverage.exclude` に追加する（v8 による誤検知回避）
 
 ---
 
@@ -216,19 +220,24 @@ tests/
 
 ## ⚙️ テスト設定
 
-### `jest.config.ts` の主な設定
+### `vitest.config.ts` の主な設定
 
-- プリセット: `ts-jest`
+- プロバイダ: `v8`（カバレッジ）
 - テスト環境: `node`
+- グローバル API: `globals: true`（`describe` / `it` / `expect` / `vi` が import 不要）
 - セットアップファイル: `tests/setup.ts`
 - タイムアウト: 10秒（デフォルト）
-- `moduleNameMapper` に `@/` エイリアスを設定
+- `@/` エイリアス: `src/` に解決
+- **カバレッジしきい値**: `{ branches: 99, functions: 100, lines: 100, statements: 100 }`
 
 ### モジュール解決エラー時の確認
 
 ```typescript
-moduleNameMapper: {
-  '^@/(.*)$': '<rootDir>/src/$1',
+// vitest.config.ts
+resolve: {
+  alias: {
+    "@": resolve(__dirname, "src"),
+  },
 }
 ```
 
