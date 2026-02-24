@@ -125,7 +125,7 @@ export const commands = {
   "vac.embed.renamed": "VC名を {{name}} に変更しました",
   "vac.embed.limit_changed": "人数制限を {{limit}} に設定しました",
   // パネル内の AFK 一括移動結果メッセージ
-  "vac.embed.members_moved": "{{count}}人を AFK に移動しました",
+  "vac.embed.members_moved": "{{channel}} へ移動しました。",
   // パネル再送時（最下部移動）の成功メッセージ
   "vac.embed.panel_refreshed": "パネルを最下部に移動しました",
   // 0人制限を表示する際の共通ラベル

@@ -5,11 +5,11 @@ import {
   ChannelType,
   MessageFlags,
   type GuildMember,
-  type UserSelectMenuInteraction,
+  type StringSelectMenuInteraction,
 } from "discord.js";
 import { getAfkConfig } from "../../../../../shared/features/afk/afkConfigService";
 import { tGuild } from "../../../../../shared/locale/localeManager";
-import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
+import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {
@@ -18,7 +18,7 @@ import {
 } from "../../../../utils/messageResponse";
 import { getVacPanelChannelId, VAC_PANEL_CUSTOM_ID } from "./vacControlPanel";
 
-export const vacPanelUserSelectHandler: UserSelectHandler = {
+export const vacPanelUserSelectHandler: StringSelectHandler = {
   /**
    * ハンドラー対象の customId かを判定する
    * @param customId 判定対象の customId
@@ -34,7 +34,7 @@ export const vacPanelUserSelectHandler: UserSelectHandler = {
    * @param interaction ユーザーセレクトインタラクション
    * @returns 実行完了を示す Promise
    */
-  async execute(interaction: UserSelectMenuInteraction) {
+  async execute(interaction: StringSelectMenuInteraction) {
     // interaction に guild がないケースは処理対象外
     const guild = interaction.guild;
     if (!guild) {
@@ -140,24 +140,40 @@ export const vacPanelUserSelectHandler: UserSelectHandler = {
         // 操作時点で対象 VC から外れているユーザーは無視
         continue;
       }
-      // 1ユーザーごとの移動失敗は全体失敗にせず継続
-      await member.voice.setChannel(afkChannel).catch(() => null);
-      movedCount += 1;
+      // setChannel は成功時に GuildMember を返すが、テスト/実装上 void 扱いでも動作するよう
+      // 戻り値ではなく例外のみで成功/失敗を判定する
+      const success = await member.voice
+        .setChannel(afkChannel)
+        .then(() => true)
+        .catch(() => false);
+      if (success) {
+        movedCount += 1;
+      }
     }
-    // ベストエフォート実行とし、一部失敗でも成功件数を返す
 
-    // 実際に移動できた人数のみを結果に反映
-    // 選択人数ではなく成功件数を返して実態と表示を一致させる
+    // 1件も移動できなかった場合はエラーで返す
+    if (movedCount === 0) {
+      await safeReply(interaction, {
+        embeds: [
+          createErrorEmbed(
+            await tGuild(guild.id, "errors:vac.afk_move_failed"),
+          ),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    // 移動先チャンネルのメンションリンクを含む成功メッセージを返す
     await safeReply(interaction, {
       embeds: [
         createSuccessEmbed(
           await tGuild(guild.id, "commands:vac.embed.members_moved", {
-            count: String(movedCount),
+            channel: afkChannel.toString(),
           }),
         ),
       ],
       flags: MessageFlags.Ephemeral,
     });
-    // 0件でも成功応答を返し、操作完了を明示する
   },
 };

@@ -6,9 +6,10 @@ import {
   ChannelType,
   MessageFlags,
   ModalBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle,
-  UserSelectMenuBuilder,
   type ButtonInteraction,
   type GuildMember,
 } from "discord.js";
@@ -170,25 +171,44 @@ export const vacPanelButtonHandler: ButtonHandler = {
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.AFK_BUTTON_PREFIX)
     ) {
-      // 実行時点の接続人数に合わせて選択上限を調整
-      const selectMenu = new UserSelectMenuBuilder()
+      // 接続中メンバーのみを選択肢として提示
+      const vcMembers = [...channel.members.values()];
+
+      if (vcMembers.length === 0) {
+        // VC に誰もいない場合は選択メニューを出さずエラー
+        await safeReply(interaction, {
+          embeds: [
+            createErrorEmbed(await tGuild(guild.id, "errors:vac.not_in_vc")),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const options = vcMembers.slice(0, 25).map((m) =>
+        new StringSelectMenuOptionBuilder()
+          // 表示名が長い場合でも label 上限(100)に収める
+          .setLabel(m.displayName.slice(0, 100))
+          .setValue(m.id),
+      );
+
+      const selectMenu = new StringSelectMenuBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.AFK_SELECT_PREFIX}${channel.id}`)
         .setPlaceholder(await tGuild(guild.id, "commands:vac.panel.afk_button"))
         .setMinValues(1)
-        // Discord 上限(25)と現在接続人数から選択可能数を決定
-        .setMaxValues(Math.min(25, Math.max(1, channel.members.size)));
-      // members.size が 0 でも UI 破綻しないよう最小1を保証
+        // Discord StringSelect の上限(25)と接続人数から選択可能数を決定
+        .setMaxValues(Math.min(25, vcMembers.length))
+        .addOptions(options);
 
       await safeReply(interaction, {
         components: [
-          new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
+          new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
             selectMenu,
           ),
         ],
         flags: MessageFlags.Ephemeral,
       });
-      // 選択メニュー送信後の処理は userSelect handler に委譲
-      // セレクトUI返信で処理完了（以降は userSelect ハンドラーへ委譲）
+      // 選択メニュー送信後の処理は stringSelect handler に委譲
       return;
     }
 
