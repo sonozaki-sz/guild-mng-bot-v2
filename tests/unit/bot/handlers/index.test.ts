@@ -8,7 +8,7 @@ import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelMod
 import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
 import { buttonHandlers } from "@/bot/handlers/interactionCreate/ui/buttons";
 import { modalHandlers } from "@/bot/handlers/interactionCreate/ui/modals";
-import { userSelectHandlers } from "@/bot/handlers/interactionCreate/ui/selectMenus";
+import { stringSelectHandlers } from "@/bot/handlers/interactionCreate/ui/selectMenus";
 
 // 重い依存を避けるため、各ハンドラ本体は最小スタブを注入する
 vi.mock(
@@ -95,8 +95,8 @@ describe("bot/handlers/interactionCreate/ui", () => {
     ]);
   });
 
-  // ユーザーセレクトレジストリに VAC ハンドラが登録されることを検証する
-  it("exports user-select handlers", () => {
-    expect(userSelectHandlers).toEqual([vacPanelUserSelectHandler]);
+  // 文字列セレクトレジストリに VAC ハンドラが登録されることを検証する
+  it("exports string-select handlers", () => {
+    expect(stringSelectHandlers).toContainEqual(vacPanelUserSelectHandler);
   });
 });

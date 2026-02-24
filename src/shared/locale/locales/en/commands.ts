@@ -125,7 +125,7 @@ export const commands = {
   "vac.embed.renamed": "VC name has been changed to {{name}}",
   "vac.embed.limit_changed": "User limit has been set to {{limit}}",
   // Result message for AFK bulk-move action on panel
-  "vac.embed.members_moved": "Moved {{count}} member(s) to AFK",
+  "vac.embed.members_moved": "Moved to {{channel}}.",
   // Result message when re-posting panel to the latest position
   "vac.embed.panel_refreshed": "Panel moved to the bottom",
   // Shared label used when 0 (= no cap) is selected

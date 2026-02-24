@@ -5,12 +5,11 @@ import { stickyMessageViewSelectHandler } from "../../../features/sticky-message
 import { vacPanelUserSelectHandler } from "../../../features/vac/handlers/ui/vacPanelUserSelect";
 import type { StringSelectHandler, UserSelectHandler } from "./types";
 
-export const userSelectHandlers: UserSelectHandler[] = [
-  // VAC パネルのユーザー選択入力を処理
-  vacPanelUserSelectHandler,
-];
+export const userSelectHandlers: UserSelectHandler[] = [];
 
 export const stringSelectHandlers: StringSelectHandler[] = [
   // sticky-message view コマンドのチャンネル選択を処理
   stickyMessageViewSelectHandler,
+  // VAC パネルの AFK 移動ユーザー選択を処理
+  vacPanelUserSelectHandler,
 ];

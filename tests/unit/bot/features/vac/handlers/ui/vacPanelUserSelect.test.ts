@@ -8,7 +8,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(
     async (_guildId: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.members_moved") {
-        return `moved:${String(params?.count)}`;
+        return `moved:${String(params?.channel)}`;
       }
       return key;
     },
@@ -142,7 +142,7 @@ describe("bot/features/vac/handlers/ui/vacPanelUserSelect", () => {
     expect(user1SetChannel).toHaveBeenCalledWith({ id: "afk-1", type: 2 });
     expect(user2SetChannel).not.toHaveBeenCalled();
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "moved:1" }],
+      embeds: [{ message: "moved:[object Object]" }],
       flags: 64,
     });
   });

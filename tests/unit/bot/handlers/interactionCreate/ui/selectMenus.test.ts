@@ -17,13 +17,16 @@ describe("bot/handlers/interactionCreate/ui/selectMenus", () => {
     const { userSelectHandlers } =
       await import("@/bot/handlers/interactionCreate/ui/selectMenus");
 
-    expect(userSelectHandlers).toEqual([vacPanelUserSelectHandlerMock]);
+    expect(userSelectHandlers).toEqual([]);
   });
 
   it("exports string-select handlers", async () => {
     const { stringSelectHandlers } =
       await import("@/bot/handlers/interactionCreate/ui/selectMenus");
 
-    expect(stringSelectHandlers).toEqual([stickyMessageViewSelectHandlerMock]);
+    expect(stringSelectHandlers).toEqual([
+      stickyMessageViewSelectHandlerMock,
+      vacPanelUserSelectHandlerMock,
+    ]);
   });
 });
