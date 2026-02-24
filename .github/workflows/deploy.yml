@@ -19,10 +19,14 @@ on:
 jobs:
   # ─────────────────────────────────────────────
   # CI: 型チェック・テスト（push/PRどちらでも実行）
+  #   - PRのcloseはテスト不要なのでスキップ
   # ─────────────────────────────────────────────
   test:
     name: Test
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && github.event.action != 'closed')
 
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +54,7 @@ jobs:
   # CD: デプロイ（mainへの直接push、またはmain向けPRのマージ完了時のみ）
   # ─────────────────────────────────────────────
   deploy:
-    name: Deploy to XServer VPS
+    name: Deploy to Portainer
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -100,3 +104,94 @@ jobs:
             -d "{\"pullImage\":true,\"prune\":false,\"stackFileContent\":$(echo "$STACK_FILE" | jq -Rs .),\"env\":$ENV_VARS}"
 
           echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+
+  # ─────────────────────────────────────────────
+  # Discord 通知（成功）
+  #   - main への push でデプロイが成功した場合のみ
+  # ─────────────────────────────────────────────
+  notify-success:
+    name: Discord通知（成功）
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: |
+      success() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Discord に成功通知を送信
+        run: |
+          curl -fsSL -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [
+                {
+                  "title": "✅ デプロイに成功しました",
+                  "color": 32895,
+                  "fields": [
+                    {
+                      "name": "リポジトリ",
+                      "value": "[guild-mng-bot-v2](https://github.com/${{ github.repository }})",
+                      "inline": false
+                    },
+                    {
+                      "name": "Portainer",
+                      "value": "[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_URL }})",
+                      "inline": false
+                    }
+                  ],
+                  "timestamp": "${{ github.event.head_commit.timestamp }}"
+                }
+              ]
+            }'
+
+  # ─────────────────────────────────────────────
+  # Discord 通知（失敗）
+  #   - main への push で test または deploy が失敗した場合のみ
+  # ─────────────────────────────────────────────
+  notify-failure:
+    name: Discord通知（失敗）
+    needs: [test, deploy]
+    runs-on: ubuntu-latest
+    if: |
+      failure() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 失敗したジョブを特定して Discord に通知
+        run: |
+          if [ "${{ needs.test.result }}" = "failure" ]; then
+            FAILED_JOB="test (Test)"
+          else
+            FAILED_JOB="deploy (Deploy to Portainer)"
+          fi
+
+          curl -fsSL -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [
+                {
+                  \"title\": \"❌ デプロイに失敗しました\",
+                  \"color\": 16711680,
+                  \"fields\": [
+                    {
+                      \"name\": \"理由\",
+                      \"value\": \"ジョブ: \`${FAILED_JOB}\`\n[🔗 失敗したワークフローを確認](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\",
+                      \"inline\": false
+                    },
+                    {
+                      \"name\": \"リポジトリ\",
+                      \"value\": \"[guild-mng-bot-v2](https://github.com/${{ github.repository }})\",
+                      \"inline\": false
+                    },
+                    {
+                      \"name\": \"Portainer\",
+                      \"value\": \"[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_URL }})\",
+                      \"inline\": false
+                    }
+                  ],
+                  \"timestamp\": \"${{ github.event.head_commit.timestamp }}\"
+                }
+              ]
+            }"
