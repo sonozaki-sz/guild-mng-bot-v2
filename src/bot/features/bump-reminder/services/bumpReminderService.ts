@@ -2,7 +2,10 @@
 // Bumpリマインダー用のジョブマネージャー
 // DB永続化対応：Bot再起動時もリマインダーを復元可能
 
-import { type BumpServiceName } from "../constants/bumpReminderConstants";
+import {
+  toBumpReminderKey,
+  type BumpServiceName,
+} from "../constants/bumpReminderConstants";
 import { type IBumpReminderRepository } from "../repositories/types";
 import { type ScheduledReminderRef } from "./helpers/bumpReminderScheduleHelper";
 import { cancelBumpReminderUsecase } from "./usecases/cancelBumpReminderUsecase";
@@ -58,32 +61,40 @@ export class BumpReminderManager {
       delayMinutes,
       task,
       serviceName,
-      cancelReminder: (targetGuildId: string) =>
-        this.cancelReminder(targetGuildId),
+      cancelReminder: (
+        targetGuildId: string,
+        targetServiceName?: BumpServiceName,
+      ) => this.cancelReminder(targetGuildId, targetServiceName),
     });
   }
 
   /**
    * リマインダーをキャンセル
    * @param guildId キャンセル対象のギルドID
+   * @param serviceName キャンセル対象のサービス名（未指定時は guildId のみで照合）
    * @returns キャンセルできた場合は true
    */
-  public async cancelReminder(guildId: string): Promise<boolean> {
+  public async cancelReminder(
+    guildId: string,
+    serviceName?: BumpServiceName,
+  ): Promise<boolean> {
     return cancelBumpReminderUsecase({
       repository: this.repository,
       reminders: this.reminders,
       guildId,
+      serviceName,
     });
   }
 
   /**
    * リマインダーが設定されているか確認
    * @param guildId 確認対象のギルドID
+   * @param serviceName 確認対象のサービス名（未指定時は guildId のみで照合）
    * @returns 予約が存在する場合は true
    */
-  public hasReminder(guildId: string): boolean {
-    // メモリ上の管理マップに予約情報があるかを返す
-    return this.reminders.has(guildId);
+  public hasReminder(guildId: string, serviceName?: BumpServiceName): boolean {
+    // 複合キーでメモリ上の管理マップを照合する
+    return this.reminders.has(toBumpReminderKey(guildId, serviceName));
   }
 
   /**
@@ -110,7 +121,9 @@ export class BumpReminderManager {
   public async clearAll(): Promise<void> {
     await clearAllBumpRemindersUsecase({
       reminders: this.reminders,
-      cancelReminder: (guildId: string) => this.cancelReminder(guildId),
+      // Map のキーは複合キー（"guildId:serviceName"）の場合があるため、
+      // キーをそのまま guildId として渡す（toBumpReminderKey の掂等変換で安全）
+      cancelByKey: (reminderKey: string) => this.cancelReminder(reminderKey),
     });
   }
 }

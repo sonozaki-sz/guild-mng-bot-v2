@@ -17,21 +17,21 @@ describe("bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsec
     vi.clearAllMocks();
   });
 
-  it("calls cancelReminder for all tracked guild ids", async () => {
-    const cancelReminder = vi.fn().mockResolvedValue(true);
+  it("calls cancelByKey for all tracked reminder keys", async () => {
+    const cancelByKey = vi.fn().mockResolvedValue(true);
     const reminders = new Map([
       ["g1", { jobId: "job-1", reminderId: "r1" }],
       ["g2", { jobId: "job-2", reminderId: "r2" }],
     ]);
 
-    await clearAllBumpRemindersUsecase({ reminders, cancelReminder });
+    await clearAllBumpRemindersUsecase({ reminders, cancelByKey });
 
-    expect(cancelReminder).toHaveBeenCalledWith("g1");
-    expect(cancelReminder).toHaveBeenCalledWith("g2");
+    expect(cancelByKey).toHaveBeenCalledWith("g1");
+    expect(cancelByKey).toHaveBeenCalledWith("g2");
   });
 
   it("logs when one cancellation promise is rejected", async () => {
-    const cancelReminder = vi
+    const cancelByKey = vi
       .fn()
       .mockResolvedValueOnce(true)
       .mockRejectedValueOnce(new Error("failed"));
@@ -40,7 +40,7 @@ describe("bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsec
       ["g2", { jobId: "job-2", reminderId: "r2" }],
     ]);
 
-    await clearAllBumpRemindersUsecase({ reminders, cancelReminder });
+    await clearAllBumpRemindersUsecase({ reminders, cancelByKey });
 
     expect(loggerErrorMock).toHaveBeenCalled();
   });
