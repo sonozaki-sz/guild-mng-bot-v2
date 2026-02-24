@@ -3,7 +3,11 @@
 
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
-import { BUMP_REMINDER_STATUS } from "../../constants/bumpReminderConstants";
+import {
+  BUMP_REMINDER_STATUS,
+  toBumpReminderKey,
+  type BumpServiceName,
+} from "../../constants/bumpReminderConstants";
 import { type IBumpReminderRepository } from "../../repositories/types";
 import {
   cancelScheduledReminder,
@@ -14,6 +18,7 @@ type CancelBumpReminderUsecaseInput = {
   repository: IBumpReminderRepository;
   reminders: Map<string, ScheduledReminderRef>;
   guildId: string;
+  serviceName?: BumpServiceName;
 };
 
 /**
@@ -24,9 +29,10 @@ type CancelBumpReminderUsecaseInput = {
 export async function cancelBumpReminderUsecase(
   input: CancelBumpReminderUsecaseInput,
 ): Promise<boolean> {
-  const { repository, reminders, guildId } = input;
+  const { repository, reminders, guildId, serviceName } = input;
 
-  const reminder = cancelScheduledReminder(reminders, guildId);
+  const reminderKey = toBumpReminderKey(guildId, serviceName);
+  const reminder = cancelScheduledReminder(reminders, reminderKey);
   if (!reminder) {
     return false;
   }

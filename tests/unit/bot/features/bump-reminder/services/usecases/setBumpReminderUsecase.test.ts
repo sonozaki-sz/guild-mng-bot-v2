@@ -1,19 +1,17 @@
 import { setBumpReminderUsecase } from "@/bot/features/bump-reminder/services/usecases/setBumpReminderUsecase";
 
 const toBumpReminderJobIdMock = vi.fn();
+const toBumpReminderKeyMock = vi.fn();
 const toScheduledAtMock = vi.fn();
 const scheduleReminderInMemoryMock = vi.fn();
 const createTrackedReminderTaskMock = vi.fn();
 const loggerInfoMock = vi.fn();
 
-vi.mock(
-  "@/bot/features/bump-reminder/constants/bumpReminderConstants",
-  () => ({
-    toBumpReminderJobId: (...args: unknown[]) =>
-      toBumpReminderJobIdMock(...args),
-    toScheduledAt: (...args: unknown[]) => toScheduledAtMock(...args),
-  }),
-);
+vi.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
+  toBumpReminderJobId: (...args: unknown[]) => toBumpReminderJobIdMock(...args),
+  toBumpReminderKey: (...args: unknown[]) => toBumpReminderKeyMock(...args),
+  toScheduledAt: (...args: unknown[]) => toScheduledAtMock(...args),
+}));
 
 vi.mock(
   "@/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper",
@@ -45,6 +43,10 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
   beforeEach(() => {
     vi.clearAllMocks();
     toBumpReminderJobIdMock.mockReturnValue("job-g1");
+    toBumpReminderKeyMock.mockImplementation(
+      (guildId: string, serviceName?: string) =>
+        serviceName ? `${guildId}:${serviceName}` : guildId,
+    );
     toScheduledAtMock.mockReturnValue(new Date(Date.now() + 60_000));
     createTrackedReminderTaskMock.mockImplementation(
       (
@@ -105,7 +107,7 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
       cancelReminder,
     });
 
-    expect(cancelReminder).toHaveBeenCalledWith("g1");
+    expect(cancelReminder).toHaveBeenCalledWith("g1", undefined);
     expect(scheduleReminderInMemoryMock).toHaveBeenCalled();
   });
 });

@@ -232,7 +232,7 @@ describe("shared/features/bump-reminder/manager", () => {
         channelId: "ch-a",
         messageId: null,
         panelMessageId: null,
-        serviceName: "UnknownService",
+        serviceName: "Disboard",
         scheduledAt: new Date("2026-02-20T00:10:00.000Z"),
       },
       {

@@ -5,6 +5,7 @@ import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   toBumpReminderJobId,
+  toBumpReminderKey,
   toScheduledAt,
   type BumpServiceName,
 } from "../../constants/bumpReminderConstants";
@@ -25,7 +26,10 @@ type SetBumpReminderUsecaseInput = {
   delayMinutes: number;
   task: () => Promise<void>;
   serviceName?: BumpServiceName;
-  cancelReminder: (guildId: string) => Promise<boolean>;
+  cancelReminder: (
+    guildId: string,
+    serviceName?: BumpServiceName,
+  ) => Promise<boolean>;
 };
 
 /**
@@ -49,11 +53,12 @@ export async function setBumpReminderUsecase(
     cancelReminder,
   } = input;
 
-  const jobId = toBumpReminderJobId(guildId);
+  const reminderKey = toBumpReminderKey(guildId, serviceName);
+  const jobId = toBumpReminderJobId(guildId, serviceName);
 
-  if (reminders.has(guildId)) {
+  if (reminders.has(reminderKey)) {
     logger.info(tDefault("system:scheduler.cancel_bump_reminder", { guildId }));
-    await cancelReminder(guildId);
+    await cancelReminder(guildId, serviceName);
   }
 
   const scheduledAt = toScheduledAt(delayMinutes);
@@ -69,7 +74,7 @@ export async function setBumpReminderUsecase(
   const delayMs = scheduledAt.getTime() - Date.now();
   scheduleReminderInMemory(
     reminders,
-    guildId,
+    reminderKey,
     jobId,
     reminder.id,
     delayMs,
