@@ -7,7 +7,8 @@ import { type ScheduledReminderRef } from "../helpers/bumpReminderScheduleHelper
 
 type ClearAllBumpRemindersUsecaseInput = {
   reminders: Map<string, ScheduledReminderRef>;
-  cancelReminder: (guildId: string) => Promise<boolean>;
+  /** Map の生のキー（複合キーの可能性あり）を受け取りキャンセル処理を実行する */
+  cancelByKey: (reminderKey: string) => Promise<boolean>;
 };
 
 /**
@@ -18,18 +19,18 @@ type ClearAllBumpRemindersUsecaseInput = {
 export async function clearAllBumpRemindersUsecase(
   input: ClearAllBumpRemindersUsecaseInput,
 ): Promise<void> {
-  const { reminders, cancelReminder } = input;
+  const { reminders, cancelByKey } = input;
 
-  const guildIds = Array.from(reminders.keys());
+  const reminderKeys = Array.from(reminders.keys());
   const results = await Promise.allSettled(
-    guildIds.map((guildId) => cancelReminder(guildId)),
+    reminderKeys.map((key) => cancelByKey(key)),
   );
 
   results.forEach((result, index) => {
     if (result.status === "rejected") {
       logger.error(
         tDefault("system:scheduler.bump_reminder_task_failed", {
-          guildId: guildIds[index],
+          guildId: reminderKeys[index],
         }),
         result.reason,
       );

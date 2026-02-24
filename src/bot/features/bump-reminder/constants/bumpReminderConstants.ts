@@ -125,11 +125,29 @@ export function resolveBumpService(
 }
 
 /**
+ * Bumpリマインダーの管理キーを生成（guildId + serviceName の複合キー）
+ * 同一ギルドで複数サービス（Disboard・Dissoku）が独立して共存できるようにする
+ * @param guildId ギルドID
+ * @param serviceName サービス名（未指定時は guildId のみ）
+ * @returns 管理キー
+ */
+export function toBumpReminderKey(
+  guildId: string,
+  serviceName?: BumpServiceName,
+): string {
+  return serviceName ? `${guildId}:${serviceName}` : guildId;
+}
+
+/**
  * BumpリマインダージョブIDを生成
  * @param guildId ジョブを識別するギルドID
+ * @param serviceName サービス名（未指定時は guildId のみ）
  * @returns スケジューラー管理用のジョブID
  */
-export function toBumpReminderJobId(guildId: string): string {
-  // スケジューラ管理用の一意IDを組み立てる
-  return `${BUMP_CONSTANTS.JOB_ID_PREFIX}${guildId}`;
+export function toBumpReminderJobId(
+  guildId: string,
+  serviceName?: BumpServiceName,
+): string {
+  // サービスごとに一意IDを組み立てる（同一ギルドの複数サービスが競合しない）
+  return `${BUMP_CONSTANTS.JOB_ID_PREFIX}${toBumpReminderKey(guildId, serviceName)}`;
 }
