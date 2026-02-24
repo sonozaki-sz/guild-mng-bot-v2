@@ -52,9 +52,7 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
     expect(vacPanelButtonHandler.matches("vac:rename-btn:voice-1")).toBe(true);
     expect(vacPanelButtonHandler.matches("vac:limit-btn:voice-1")).toBe(true);
     expect(vacPanelButtonHandler.matches("vac:afk-btn:voice-1")).toBe(true);
-    expect(vacPanelButtonHandler.matches("vac:refresh-btn:voice-1")).toBe(
-      true,
-    );
+    expect(vacPanelButtonHandler.matches("vac:refresh-btn:voice-1")).toBe(true);
     expect(vacPanelButtonHandler.matches("other:voice-1")).toBe(false);
   });
 
@@ -128,6 +126,38 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
         },
       },
       customId: "vac:rename-btn:voice-1",
+      user: { id: "user-1" },
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
+    };
+
+    await vacPanelButtonHandler.execute(interaction as never);
+
+    expect(safeReply).toHaveBeenCalledWith(interaction, {
+      embeds: [{ message: "errors:vac.not_in_vc" }],
+      flags: 64,
+    });
+  });
+
+  it("replies not-in-vc error when afk button is pressed but vc is empty", async () => {
+    const channel = {
+      id: "voice-1",
+      type: 2,
+      members: { values: () => [][Symbol.iterator]() },
+    };
+    const interaction = {
+      guild: {
+        id: "guild-1",
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+        members: {
+          fetch: vi.fn().mockResolvedValue({
+            voice: { channelId: "voice-1" },
+          }),
+        },
+      },
+      customId: "vac:afk-btn:voice-1",
       user: { id: "user-1" },
       message: { deletable: false, delete: vi.fn() },
       showModal: vi.fn(),

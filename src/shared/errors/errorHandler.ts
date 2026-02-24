@@ -1,5 +1,6 @@
 // src/shared/errors/errorHandler.ts
 // エラーハンドリング機能の公開エントリーポイント
+/* c8 ignore file */
 
 // Discord非依存のエラーユーティリティ
 export { getUserFriendlyMessage, logError, toError } from "./errorUtils";
