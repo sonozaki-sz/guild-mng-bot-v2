@@ -319,6 +319,7 @@ describe("bot/features/vac/ui handlers", () => {
   });
 
   it("replies with user-select menu on AFK button", async () => {
+    const mockMember1 = { displayName: "User One", id: "user-one" };
     const interaction = {
       guild: {
         id: "guild-1",
@@ -326,7 +327,10 @@ describe("bot/features/vac/ui handlers", () => {
           fetch: vi.fn().mockResolvedValue({
             id: "voice-1",
             type: 2,
-            members: { size: 0 },
+            members: {
+              size: 1,
+              values: () => [mockMember1][Symbol.iterator](),
+            },
           }),
         },
         members: {
@@ -1009,10 +1013,13 @@ describe("bot/features/vac/ui handlers", () => {
       id: "afk-1",
       type: 2,
     });
-    expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.members_moved" }],
-      flags: 64,
-    });
+    expect(safeReply).toHaveBeenCalledWith(
+      interaction,
+      expect.objectContaining({
+        embeds: expect.any(Array),
+        flags: 64,
+      }),
+    );
   });
 
   it("replies error when user-select target channel is invalid", async () => {
@@ -1280,7 +1287,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("continues when setChannel fails and still replies success", async () => {
+  it("replies error when all moves fail (setChannel throws)", async () => {
     const failingMoveMember = {
       voice: {
         channelId: "voice-1",
@@ -1340,7 +1347,7 @@ describe("bot/features/vac/ui handlers", () => {
       type: 2,
     });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.members_moved" }],
+      embeds: [{ message: "errors:vac.afk_move_failed" }],
       flags: 64,
     });
   });

@@ -46,6 +46,8 @@ export const errors = {
   "vac.not_in_any_vc": "This command can only be used while in a VC.",
   "vac.not_vac_channel": "This VC is not managed by auto-create feature.",
   "vac.limit_out_of_range": "User limit must be between 0 and 99.",
+  "vac.afk_move_failed":
+    "Failed to move to AFK channel. The target user(s) may have left the VC.",
 
   // General errors
   // Final fallback for unexpected exceptions

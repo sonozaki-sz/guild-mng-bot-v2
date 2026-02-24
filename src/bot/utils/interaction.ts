@@ -6,6 +6,7 @@ import type {
   ChatInputCommandInteraction,
   InteractionReplyOptions,
   ModalSubmitInteraction,
+  StringSelectMenuInteraction,
   UserSelectMenuInteraction,
 } from "discord.js";
 import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
@@ -14,7 +15,8 @@ type AnyInteraction =
   | ChatInputCommandInteraction
   | ButtonInteraction
   | ModalSubmitInteraction
-  | UserSelectMenuInteraction;
+  | UserSelectMenuInteraction
+  | StringSelectMenuInteraction;
 
 /**
  * 返信済み状態を考慮して reply / followUp を安全に切り替える
