@@ -198,6 +198,76 @@ describe("shared/errors/processErrorHandler", () => {
     expect(loggerMock.warn).not.toHaveBeenCalled();
   });
 
+  it("logs DeprecationWarning when code is not in the ignore list", async () => {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    vi.spyOn(process, "on").mockImplementation(((
+      event: string,
+      listener: (...args: unknown[]) => void,
+    ) => {
+      handlers.set(event, listener);
+      return process;
+    }) as typeof process.on);
+
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGlobalErrorHandlers();
+
+    const warningHandler = handlers.get("warning");
+    expect(warningHandler).toBeDefined();
+
+    const unknownDeprecation = Object.assign(
+      new Error("Some unknown deprecation"),
+      {
+        name: "DeprecationWarning",
+        code: "DEP9999",
+      },
+    );
+    warningHandler?.(unknownDeprecation);
+
+    // DEP9999 は無視リストにないため warn が呼ばれること
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        name: "DeprecationWarning",
+        message: "Some unknown deprecation",
+      }),
+    );
+  });
+
+  it("logs DeprecationWarning when code is undefined (null-coalescing fallback)", async () => {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    vi.spyOn(process, "on").mockImplementation(((
+      event: string,
+      listener: (...args: unknown[]) => void,
+    ) => {
+      handlers.set(event, listener);
+      return process;
+    }) as typeof process.on);
+
+    const { setupGlobalErrorHandlers } =
+      await import("@/shared/errors/processErrorHandler");
+    setupGlobalErrorHandlers();
+
+    const warningHandler = handlers.get("warning");
+    expect(warningHandler).toBeDefined();
+
+    // code プロパティが未定義の場合 warning.code ?? "" → "" → not in ignore list
+    const deprecationNoCode = Object.assign(
+      new Error("Some deprecation without code"),
+      { name: "DeprecationWarning" },
+      // code is intentionally absent (undefined)
+    );
+    warningHandler?.(deprecationNoCode);
+
+    // code が undefined のため無視リストに含まれず warn が呼ばれること
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        name: "DeprecationWarning",
+      }),
+    );
+  });
+
   it("registers graceful shutdown once and handles cleanup outcomes", async () => {
     const onceHandlers = new Map<string, () => void>();
     vi.spyOn(process, "once").mockImplementation(((
