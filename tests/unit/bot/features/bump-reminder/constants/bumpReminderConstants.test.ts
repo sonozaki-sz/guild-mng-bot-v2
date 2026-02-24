@@ -132,4 +132,13 @@ describe("shared/features/bump-reminder/constants", () => {
       "bump-reminder-guild-123",
     );
   });
+
+  // serviceName 付きでジョブID を組み立てられることを検証
+  it("builds bump reminder job id with serviceName appended", async () => {
+    const mod = await loadModule(false);
+
+    expect(
+      mod.toBumpReminderJobId("guild-123", mod.BUMP_SERVICES.DISBOARD),
+    ).toBe("bump-reminder-guild-123:Disboard");
+  });
 });
