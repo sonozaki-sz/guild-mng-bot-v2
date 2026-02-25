@@ -19,22 +19,23 @@ export const system = {
 
   // Bumpリマインダー検知ログ
   "bump-reminder.detected":
-    "Guild {{guildId}} でBumpを検知しました ({{service}})",
-  "bump-reminder.detection_failed": "Guild {{guildId}} のBump検知処理に失敗:",
+    "Bumpリマインダー機能: Bumpを検知 GuildId: {{guildId}} Service: {{service}}",
+  "bump-reminder.detection_failed":
+    "Bumpリマインダー機能: Bump検知処理に失敗 GuildId: {{guildId}}",
 
   // ログメッセージ
   // Bump 設定変更監査ログ
   // `log.*` は主に管理コマンド経由の操作監査で利用する
   "log.bump_reminder_enabled":
-    "Guild {{guildId}} でBumpリマインダーを有効化しました（Channel: {{channelId}}）",
+    "Bumpリマインダー機能: 有効化 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.bump_reminder_disabled":
-    "Guild {{guildId}} でBumpリマインダーを無効化しました",
+    "Bumpリマインダー機能: 無効化 GuildId: {{guildId}}",
   "log.bump_reminder_mention_set":
-    "Guild {{guildId}} でBumpリマインダーのメンションロールを設定しました（Role: {{roleId}}）",
+    "Bumpリマインダー機能: メンションロール設定 GuildId: {{guildId}} RoleId: {{roleId}}",
   "log.bump_reminder_mention_removed":
-    "Guild {{guildId}} でBumpリマインダーのメンション設定を削除しました（対象: {{target}}）",
+    "Bumpリマインダー機能: メンション設定削除 GuildId: {{guildId}} Target: {{target}}",
   "log.bump_reminder_users_removed":
-    "Guild {{guildId}} でBumpリマインダーから{{count}}人のユーザーを削除しました",
+    "Bumpリマインダー機能: メンションユーザー削除 GuildId: {{guildId}} Count: {{count}}",
 
   // エラーハンドリング
   "error.reply_failed": "エラーメッセージの送信に失敗しました。",
@@ -181,22 +182,22 @@ export const system = {
 
   // AFKコマンドログ
   "afk.moved_log":
-    "Guild {{guildId}} でユーザー {{userId}} を {{channelId}} に移動。",
+    "AFK機能: ユーザーをAFKチャンネルに移動 GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}}",
   "afk.configured_log":
-    "Guild {{guildId}} でAFKチャンネル設定, channel {{channelId}}",
+    "AFK機能: AFKチャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}}",
 
   // VACログ
   // voiceState / channel lifecycle / panel 操作ログ
   // VAC 実行時ログは運用確認のため近接配置を維持する
   "vac.voice_state_update_failed": "VACのvoiceStateUpdate処理に失敗:",
   "vac.channel_created":
-    "Guild {{guildId}} でVACチャンネルを作成（Channel: {{channelId}}, Owner: {{ownerId}}）",
+    "VAC機能: VCチャンネル作成 GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",
   "vac.channel_deleted":
-    "Guild {{guildId}} でVACチャンネルを削除（Channel: {{channelId}}）",
+    "VAC機能: VCチャンネル削除 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.category_full":
-    "Guild {{guildId}} のカテゴリ {{categoryId}} はチャンネル上限に達しています",
+    "VAC機能: カテゴリがチャンネル上限に達しました GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vac.trigger_removed_by_delete":
-    "Guild {{guildId}} で削除されたトリガーチャンネルを設定から除外（Channel: {{channelId}}）",
+    "VAC機能: 削除されたトリガーチャンネルを設定から除外 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.channel_delete_sync_failed": "VACのchannelDelete同期処理に失敗:",
   "vac.panel_send_failed": "VAC操作パネルの送信に失敗:",
   "vac.startup_cleanup_failed": "VACの起動時クリーンアップに失敗:",

@@ -320,12 +320,14 @@ GitHub リポジトリ → **Settings → Secrets and variables → Actions → 
 2. ブラウザの URL から ID を確認する
 
 ```
-http://220.158.17.101:9000/#!/3/stacks/1
-                                        ^
-                                  Stack ID = 1
+http://220.158.17.101:9000/#!/3/docker/stacks/guild-mng?id=1&type=2
+                                                              ^   ^
+                                                 Stack ID = 1   type=2 は Compose スタック固定値
 ```
 
-この値を `PORTAINER_STACK_ID` に登録する。
+> `type` パラメータはスタック種別を表す固定値（`1`=Swarm / `2`=Compose / `3`=Kubernetes）。docker-compose を使う限り常に `2`。
+
+この `id` の値を `PORTAINER_STACK_ID` に登録する。
 
 ---
 
