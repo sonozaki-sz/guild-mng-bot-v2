@@ -2,7 +2,7 @@
 
 > Portainer + GitHub Actions による guild-mng-bot-v2 のデプロイフロー詳細
 
-最終更新: 2026年2月26日
+最終更新: 2026年2月26日（スタックリンク対応・コンテナ ID 取得ステップ削除）
 
 ---
 
@@ -20,9 +20,8 @@ main へ push / PR マージ
         └── [Deploy to Portainer] テスト成功時のみ
               ├── Docker イメージをビルドして GHCR にプッシュ
               ├── Portainer API で bot スタックを再デプロイ（最新イメージをプル）
-              └── デプロイ後のコンテナ ID を取得（最大 30 秒待機）
-                    ├── [Discord通知（成功）] デプロイ成功時
-                    └── [Discord通知（失敗）] test または deploy 失敗時
+              ├── [Discord通知（成功）] デプロイ成功時
+              └── [Discord通知（失敗）] test または deploy 失敗時
 ```
 
 ---
@@ -83,37 +82,23 @@ GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）により�
 
 この仕組みにより **VPS への SSH 接続は不要**。Portainer API のポート（9000）のみ開放されていればデプロイできる。
 
-### 3-3. コンテナ ID の取得（Discord 通知用リンク生成）
+### 3-3. Discord 通知の Portainer リンク
 
-デプロイ後すぐには新しいコンテナが起動していない場合があるため、最大 30 秒（5 秒 × 6 回）の起動待ちループを実行する。
-
-```bash
-for i in $(seq 1 6); do
-  CONTAINER_ID=$(curl -fsSL -G \
-    -H "X-API-Key: ${PORTAINER_TOKEN}" \
-    --data-urlencode 'filters={"label":["com.docker.compose.project=guild-mng","com.docker.compose.service=bot"]}' \
-    "http://${PORTAINER_HOST}:9000/api/endpoints/${PORTAINER_ENDPOINT_ID}/docker/containers/json" \
-    || true | jq -r '.[0].Id // empty')
-  if [ -n "$CONTAINER_ID" ]; then break; fi
-  sleep 5
-done
-echo "container_id=${CONTAINER_ID}" >> "$GITHUB_OUTPUT"
-```
-
-Docker Compose が自動付与する `com.docker.compose.project=guild-mng` と `com.docker.compose.service=bot` ラベルでコンテナを特定する。
-コンテナ名検索と異なり、ラベルフィルターは Docker Proxy API エンドポイントで確実に動作する。
-
-取得したコンテナ ID は `notify-success` / `notify-failure` ジョブに渡される。
-
-### 3-4. Discord 通知の Portainer リンク
-
-Discord の成功/失敗 Embed には以下の形式で Portainer スタックページへのリンクが付く。
+Discord の成功/失敗 Embed の Portainer フィールドには、スタック管理ページへのリンクが以下の形式で付く。
 
 ```
-http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/stacks/<PORTAINER_STACK_ID>
+http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/stacks/guild-mng?id=<PORTAINER_STACK_ID>&type=2
 ```
 
-既存のシークレット（`PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` / `PORTAINER_STACK_ID`）を組み合わせて URL を構築するため、追加のシークレット登録は不要。
+| パラメータ              | 内容                                                                 |
+| ----------------------- | -------------------------------------------------------------------- |
+| `PORTAINER_HOST`        | VPS の IP アドレス（シークレット）                                   |
+| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（シークレット、通常 `3`）                |
+| `guild-mng`             | Compose スタック名（固定値）                                         |
+| `PORTAINER_STACK_ID`    | スタックの数値 ID（シークレット）                                    |
+| `type=2`                | スタック種別の固定値（`1`=Swarm / **`2`=Compose** / `3`=Kubernetes） |
+
+既存のシークレット（`PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` / `PORTAINER_STACK_ID`）を組み合わせて URL を構築するため、追加のシークレット登録は不要。`type=2` は docker-compose を使う限り常に固定。
 
 ---
 
