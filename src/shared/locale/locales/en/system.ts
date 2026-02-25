@@ -4,17 +4,17 @@
 export const system = {
   // Bot startup & shutdown
   // High-level lifecycle logs emitted from process startup/teardown paths
-  "bot.starting": "Starting Discord Bot...",
-  "bot.commands.registering": "Registering {{count}} commands...",
-  "bot.commands.registered": "Commands registered",
+  "bot.starting": "Bot: Starting Discord Bot...",
+  "bot.commands.registering": "Bot: Registering {{count}} commands...",
+  "bot.commands.registered": "Bot: Commands registered",
   "bot.commands.command_registered": "  ✓ /{{name}}",
-  "bot.events.registering": "Registering {{count}} events...",
-  "bot.events.registered": "Events registered",
-  "bot.startup.error": "Error during bot startup:",
-  "bot.startup.failed": "Bot startup failed:",
-  "bot.client.initialized": "Discord Bot client initialized",
-  "bot.client.shutting_down": "Shutting down bot client...",
-  "bot.client.shutdown_complete": "Bot client shut down successfully",
+  "bot.events.registering": "Bot: Registering {{count}} events...",
+  "bot.events.registered": "Bot: Events registered",
+  "bot.startup.error": "Bot: Error during bot startup:",
+  "bot.startup.failed": "Bot: Bot startup failed:",
+  "bot.client.initialized": "Bot: Discord Bot client initialized",
+  "bot.client.shutting_down": "Bot: Shutting down bot client...",
+  "bot.client.shutdown_complete": "Bot: Bot client shut down successfully",
   "bot.presence_activity": "Running on {{count}} servers | by sonozaki-sz",
 
   // Log messages
@@ -36,150 +36,163 @@ export const system = {
 
   // Error handling
   // Generic process-level failure and cleanup traces
-  "error.reply_failed": "Failed to send error message",
-  "error.unhandled_rejection": "Unhandled Promise rejection:",
-  "error.uncaught_exception": "Uncaught exception:",
-  "error.unhandled_rejection_log": "Unhandled Promise Rejection:",
-  "error.uncaught_exception_log": "Uncaught Exception:",
-  "error.node_warning": "Node Warning:",
-  "error.cleanup_complete": "Cleanup completed",
-  "error.cleanup_failed": "Error during cleanup:",
+  "error.reply_failed": "Bot: Failed to send error message",
+  "error.unhandled_rejection": "Bot: Unhandled Promise rejection:",
+  "error.uncaught_exception": "Bot: Uncaught exception:",
+  "error.unhandled_rejection_log": "Bot: Unhandled Promise Rejection:",
+  "error.uncaught_exception_log": "Bot: Uncaught Exception:",
+  "error.node_warning": "Bot: Node Warning:",
+  "error.cleanup_complete": "Bot: Cleanup completed",
+  "error.cleanup_failed": "Bot: Error during cleanup:",
 
   // Locale
-  "locale.manager_initialized": "LocaleManager initialized with i18next",
+  "locale.manager_initialized": "Bot: LocaleManager initialized with i18next",
 
   // Cooldown manager
-  "cooldown.cleared_all": "All cooldowns cleared",
-  "cooldown.destroyed": "CooldownManager destroyed",
-  "cooldown.reset": "Cooldown reset: {{commandName}} for user {{userId}}",
+  "cooldown.cleared_all": "Cooldown: All cooldowns cleared",
+  "cooldown.destroyed": "Cooldown: CooldownManager destroyed",
+  "cooldown.reset":
+    "Cooldown: Reset CommandName: {{commandName}} UserId: {{userId}}",
   "cooldown.cleared_for_command":
-    "All cooldowns cleared for command: {{commandName}}",
-  "cooldown.cleanup": "Cleanup: removed {{count}} expired cooldowns",
+    "Cooldown: Cleared all for command CommandName: {{commandName}}",
+  "cooldown.cleanup": "Cooldown: Removed {{count}} expired cooldowns",
 
   // Scheduler
   // Generic job lifecycle logs
   // Common scheduler traces shared by reminder and other jobs
   // `scheduler.*` is consumed across both runtime scheduler and startup restoration
-  "scheduler.stopping": "Stopping all scheduled jobs...",
-  "scheduler.job_exists": "Job {{jobId}} already exists. Removing old job.",
-  "scheduler.executing_job": "Executing job: {{jobId}}",
-  "scheduler.job_completed": "Job completed: {{jobId}}",
-  "scheduler.job_error": "Error in job {{jobId}}:",
-  "scheduler.schedule_failed": "Failed to schedule job {{jobId}}:",
-  "scheduler.job_removed": "Job removed: {{jobId}}",
-  "scheduler.job_stopped": "Stopped job: {{jobId}}",
-  "scheduler.job_scheduled": "Job scheduled: {{jobId}}",
+  "scheduler.stopping": "Scheduler: Stopping all scheduled jobs...",
+  "scheduler.job_exists":
+    "Scheduler: Job already exists, removing old job JobId: {{jobId}}",
+  "scheduler.executing_job": "Scheduler: Executing job JobId: {{jobId}}",
+  "scheduler.job_completed": "Scheduler: Job completed JobId: {{jobId}}",
+  "scheduler.job_error": "Scheduler: Job error JobId: {{jobId}}",
+  "scheduler.schedule_failed":
+    "Scheduler: Failed to schedule job JobId: {{jobId}}",
+  "scheduler.job_removed": "Scheduler: Job removed JobId: {{jobId}}",
+  "scheduler.job_stopped": "Scheduler: Job stopped JobId: {{jobId}}",
+  "scheduler.job_scheduled": "Scheduler: Job scheduled JobId: {{jobId}}",
   // Bump reminder scheduling / restoration logs
   // Keys below are intentionally split by lifecycle: schedule / execute / restore / panel-cleanup
   "scheduler.bump_reminder_task_failed":
-    "Bump reminder task failed for guild {{guildId}}:",
+    "BumpReminder: Task failed GuildId: {{guildId}}",
   "scheduler.bump_reminder_description":
-    "Bump reminder for guild {{guildId}} at {{executeAt}}",
+    "BumpReminder: GuildId: {{guildId}} ExecuteAt: {{executeAt}}",
   "scheduler.bump_reminder_scheduled":
-    "Bump reminder scheduled for guild {{guildId}} in {{minutes}} minutes",
+    "BumpReminder: Scheduled GuildId: {{guildId}} Minutes: {{minutes}}",
   "scheduler.cancel_bump_reminder":
-    "Cancelling existing bump reminder for guild {{guildId}}",
+    "BumpReminder: Cancelling existing reminder GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelled":
-    "Bump reminder cancelled for guild {{guildId}}",
+    "BumpReminder: Reminder cancelled GuildId: {{guildId}}",
   "scheduler.bump_reminder_executing_immediately":
-    "Executing overdue bump reminder immediately for guild {{guildId}}",
+    "BumpReminder: Executing overdue reminder immediately GuildId: {{guildId}}",
   "scheduler.bump_reminders_restored":
-    "Restored {{count}} pending bump reminders from database",
+    "BumpReminder: Restored pending reminders Count: {{count}}",
   "scheduler.bump_reminder_sent":
-    "Bump reminder sent for guild {{guildId}} in channel {{channelId}}",
+    "BumpReminder: Reminder sent GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_channel_not_found":
-    "Channel {{channelId}} not found for guild {{guildId}}",
+    "BumpReminder: Channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_disabled":
-    "Bump reminder disabled for guild {{guildId}}",
-  "scheduler.bump_reminder_restore_failed":
-    "Failed to restore pending bump reminders:",
+    "BumpReminder: Disabled GuildId: {{guildId}}",
+  "scheduler.bump_reminder_restore_failed": "BumpReminder: Failed to restore:",
   "scheduler.bump_reminder_duplicates_cancelled":
-    "Cancelled {{count}} duplicate pending bump reminder(s)",
+    "BumpReminder: Cancelled duplicates Count: {{count}}",
   // Panel synchronization and channel consistency logs
   // Keep panel-related keys contiguous to simplify grep-based incident review
   "scheduler.bump_reminder_unregistered_channel":
-    "Skipping bump detection in unregistered channel {{channelId}} for guild {{guildId}} (expected: {{expectedChannelId}})",
+    "BumpReminder: Skipping unregistered channel GuildId: {{guildId}} ChannelId: {{channelId}} ExpectedChannelId: {{expectedChannelId}}",
   "scheduler.bump_reminder_orphaned_panel_delete_failed":
-    "Failed to delete orphaned bump panel message {{panelMessageId}}",
+    "BumpReminder: Failed to delete orphaned panel message PanelMessageId: {{panelMessageId}}",
   "scheduler.bump_reminder_panel_deleted":
-    "Deleted bump panel message {{panelMessageId}} in guild {{guildId}}",
+    "BumpReminder: Deleted panel message GuildId: {{guildId}} PanelMessageId: {{panelMessageId}}",
   "scheduler.bump_reminder_panel_delete_failed":
-    "Failed to delete bump panel message {{panelMessageId}}",
-  "scheduler.bump_reminder_panel_send_failed": "Failed to send bump panel",
+    "BumpReminder: Failed to delete panel message PanelMessageId: {{panelMessageId}}",
+  "scheduler.bump_reminder_panel_send_failed":
+    "BumpReminder: Failed to send panel",
 
   // Shutdown
   "shutdown.signal_received":
-    "{{signal}} received, shutting down gracefully...",
-  "shutdown.gracefully": "Shutting down gracefully...",
-  "shutdown.sigterm": "Received SIGTERM, shutting down...",
+    "Bot: {{signal}} received, shutting down gracefully...",
+  "shutdown.gracefully": "Bot: Shutting down gracefully...",
+  "shutdown.sigterm": "Bot: Received SIGTERM, shutting down...",
 
   // Database operation logs
   // GuildConfig operation logs
   // Key-value style persistence logs for guild-scoped config
-  "database.get_config_log": "Failed to get config for guild {{guildId}}:",
-  "database.save_config_log": "Failed to save config for guild {{guildId}}:",
-  "database.saved_config": "Saved config for guild {{guildId}}",
+  "database.get_config_log":
+    "Database: Failed to get config GuildId: {{guildId}}",
+  "database.save_config_log":
+    "Database: Failed to save config GuildId: {{guildId}}",
+  "database.saved_config": "Database: Config saved GuildId: {{guildId}}",
   "database.update_config_log":
-    "Failed to update config for guild {{guildId}}:",
-  "database.updated_config": "Updated config for guild {{guildId}}",
+    "Database: Failed to update config GuildId: {{guildId}}",
+  "database.updated_config": "Database: Config updated GuildId: {{guildId}}",
   "database.delete_config_log":
-    "Failed to delete config for guild {{guildId}}:",
-  "database.deleted_config": "Deleted config for guild {{guildId}}",
+    "Database: Failed to delete config GuildId: {{guildId}}",
+  "database.deleted_config": "Database: Config deleted GuildId: {{guildId}}",
   "database.check_existence_log":
-    "Failed to check existence for guild {{guildId}}:",
+    "Database: Failed to check existence GuildId: {{guildId}}",
 
   // Bump Reminder database operations
   // BumpReminder table operation logs
   // Persistence lifecycle logs for reminder records
   "database.bump_reminder_created":
-    "Bump reminder created: {{id}} for guild {{guildId}}",
+    "Database: Bump reminder created Id: {{id}} GuildId: {{guildId}}",
   "database.bump_reminder_create_failed":
-    "Failed to create bump reminder for guild {{guildId}}:",
-  "database.bump_reminder_find_failed": "Failed to find bump reminder {{id}}:",
+    "Database: Failed to create bump reminder GuildId: {{guildId}}",
+  "database.bump_reminder_find_failed":
+    "Database: Failed to find bump reminder Id: {{id}}",
   "database.bump_reminder_find_all_failed":
-    "Failed to find all pending bump reminders:",
+    "Database: Failed to find pending bump reminders",
   "database.bump_reminder_status_updated":
-    "Bump reminder {{id}} status updated to {{status}}",
+    "Database: Bump reminder status updated Id: {{id}} Status: {{status}}",
   "database.bump_reminder_update_failed":
-    "Failed to update bump reminder {{id}}:",
-  "database.bump_reminder_deleted": "Bump reminder deleted: {{id}}",
+    "Database: Failed to update bump reminder Id: {{id}}",
+  "database.bump_reminder_deleted":
+    "Database: Bump reminder deleted Id: {{id}}",
   "database.bump_reminder_delete_failed":
-    "Failed to delete bump reminder {{id}}:",
+    "Database: Failed to delete bump reminder Id: {{id}}",
   "database.bump_reminder_cancelled_by_guild":
-    "Cancelled pending bump reminders for guild {{guildId}}",
+    "Database: Cancelled pending bump reminders GuildId: {{guildId}}",
   "database.bump_reminder_cancelled_by_channel":
-    "Cancelled pending bump reminders for guild {{guildId}} / channel {{channelId}}",
+    "Database: Cancelled pending bump reminders GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.bump_reminder_cancel_failed":
-    "Failed to cancel bump reminders for guild {{guildId}}:",
+    "Database: Failed to cancel bump reminders GuildId: {{guildId}}",
   "database.bump_reminder_cleanup_completed":
-    "Cleaned up {{count}} old bump reminders (older than {{days}} days)",
+    "Database: Cleaned up old bump reminders Count: {{count}} Days: {{days}}",
   "database.bump_reminder_cleanup_failed":
-    "Failed to cleanup old bump reminders:",
+    "Database: Failed to cleanup old bump reminders:",
 
   // Bot startup event logs
   // Human-readable startup summary logs
   // These are mostly operator-facing summary lines on ready
-  "ready.bot_ready": "✅ Bot is ready! Logged in as {{tag}}",
-  "ready.servers": "📊 Servers: {{count}}",
-  "ready.users": "👥 Users: {{count}}",
-  "ready.commands": "💬 Commands: {{count}}",
+  "ready.bot_ready": "Bot: ✅ Bot is ready! Logged in as {{tag}}",
+  "ready.servers": "Bot: 📊 Servers: {{count}}",
+  "ready.users": "Bot: 👥 Users: {{count}}",
+  "ready.commands": "Bot: 💬 Commands: {{count}}",
   "ready.event_registered": "  ✓ {{name}}",
 
   // Interaction event logs
   // Command/modal/button/select execution traces
   // Unified interaction execution and failure logs
   // Keep interaction keys contiguous because handlers share common error paths
-  "interaction.unknown_command": "Unknown command: {{commandName}}",
+  "interaction.unknown_command":
+    "Interaction: Unknown command CommandName: {{commandName}}",
   "interaction.command_executed":
-    "Command executed: {{commandName}} by {{userTag}}",
-  "interaction.command_error": "Error executing command {{commandName}}:",
+    "Interaction: Command executed CommandName: {{commandName}} UserTag: {{userTag}}",
+  "interaction.command_error":
+    "Interaction: Command error CommandName: {{commandName}}",
   "interaction.autocomplete_error":
-    "Error in autocomplete for {{commandName}}:",
-  "interaction.unknown_modal": "Unknown modal: {{customId}}",
-  "interaction.modal_submitted": "Modal submitted: {{customId}} by {{userTag}}",
-  "interaction.modal_error": "Error executing modal {{customId}}:",
-  "interaction.button_error": "Error executing button {{customId}}:",
-  "interaction.select_menu_error": "Error executing select menu {{customId}}:",
+    "Interaction: Autocomplete error CommandName: {{commandName}}",
+  "interaction.unknown_modal":
+    "Interaction: Unknown modal CustomId: {{customId}}",
+  "interaction.modal_submitted":
+    "Interaction: Modal submitted CustomId: {{customId}} UserTag: {{userTag}}",
+  "interaction.modal_error": "Interaction: Modal error CustomId: {{customId}}",
+  "interaction.button_error":
+    "Interaction: Button error CustomId: {{customId}}",
+  "interaction.select_menu_error":
+    "Interaction: Select menu error CustomId: {{customId}}",
 
   // AFK command logs
   "afk.moved_log":
@@ -190,7 +203,7 @@ export const system = {
   // VAC logs
   // Voice-state / channel lifecycle / panel operation logs
   // Keep VAC runtime keys grouped for easier operator triage during incidents
-  "vac.voice_state_update_failed": "Failed to process VAC voiceStateUpdate:",
+  "vac.voice_state_update_failed": "VAC: Failed to process voiceStateUpdate",
   "vac.channel_created":
     "VAC: channel created GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",
   "vac.channel_deleted":
@@ -200,24 +213,26 @@ export const system = {
   "vac.trigger_removed_by_delete":
     "VAC: removed deleted trigger channel from config GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.channel_delete_sync_failed":
-    "Failed to sync VAC config on channelDelete:",
-  "vac.panel_send_failed": "Failed to send VAC control panel:",
-  "vac.startup_cleanup_failed": "Failed VAC startup cleanup:",
+    "VAC: Failed to sync config on channelDelete",
+  "vac.panel_send_failed": "VAC: Failed to send control panel",
+  "vac.startup_cleanup_failed": "VAC: Startup cleanup failed",
 
   // Web server
   // Startup and exception handling
   // HTTP process and request pipeline logs for the web module
-  "web.server_started": "Web server started: {{url}}",
-  "web.startup_error": "Web server startup error:",
-  "web.unhandled_rejection": "Unhandled Promise rejection:",
-  "web.uncaught_exception": "Uncaught exception:",
-  "web.startup_failed": "Web server startup failed:",
-  "web.api_error": "API Error:",
-  "web.internal_server_error": "Internal Server Error",
+  "web.server_started": "WebServer: Started URL: {{url}}",
+  "web.startup_error": "WebServer: Startup error:",
+  "web.unhandled_rejection": "WebServer: Unhandled Promise rejection:",
+  "web.uncaught_exception": "WebServer: Uncaught exception:",
+  "web.startup_failed": "WebServer: Startup failed:",
+  "web.api_error": "WebServer: API Error:",
+  "web.internal_server_error": "WebServer: Internal Server Error",
   // API authentication (Bearer API key)
   // Request-level auth result logs and user-facing messages
-  "web.auth_unauthorized": "[Auth] Unauthorized request: {{method}} {{url}}",
-  "web.auth_invalid_token": "[Auth] Invalid token: {{method}} {{url}}",
+  "web.auth_unauthorized":
+    "WebServer: [Auth] Unauthorized request Method: {{method}} URL: {{url}}",
+  "web.auth_invalid_token":
+    "WebServer: [Auth] Invalid token Method: {{method}} URL: {{url}}",
   "web.auth_unauthorized_error": "Unauthorized",
   "web.auth_forbidden_error": "Forbidden",
   // Missing/invalid Authorization header guidance

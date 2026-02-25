@@ -38,7 +38,7 @@ XServer VPS (Ubuntu 24.04)
 
 ### 1-1. サーバーの申し込み
 
-[XServer VPS コントロールパネル](https://secure.xserver.ne.jp/xapanel/login/xvps/) からサーバーを申し込む。
+[XServer VPS](https://vps.xserver.ne.jp/) のサービスページからサーバーを申し込む。
 
 | 項目           | 推奨設定                                              |
 | -------------- | ----------------------------------------------------- |
@@ -84,6 +84,7 @@ ssh deploy@<サーバーのIPアドレス>
 ```bash
 sudo ufw allow OpenSSH
 sudo ufw allow 9000/tcp   # Portainer UI + API
+sudo ufw allow 9443/tcp   # Portainer HTTPS
 sudo ufw enable
 sudo ufw status
 ```
@@ -158,9 +159,15 @@ services:
     restart: unless-stopped
     ports:
       - "9000:9000"
+      - "9443:9443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
 
 volumes:
   portainer_data:
