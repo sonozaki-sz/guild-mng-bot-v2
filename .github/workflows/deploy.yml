@@ -61,6 +61,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      container_id: ${{ steps.get-container-id.outputs.container_id }}
 
     steps:
       - uses: actions/checkout@v4
@@ -105,6 +107,27 @@ jobs:
 
           echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
 
+      - name: デプロイ後のコンテナ ID を取得
+        id: get-container-id
+        run: |
+          BASE="http://${{ secrets.PORTAINER_HOST }}:9000/api"
+          HEADERS=(-H "X-API-Key: ${{ secrets.PORTAINER_TOKEN }}" -H "Content-Type: application/json")
+          STACK_ID="${{ secrets.PORTAINER_STACK_ID }}"
+          ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
+
+          # スタック名を取得
+          STACK_NAME=$(curl -fsS "${HEADERS[@]}" "$BASE/stacks/$STACK_ID" | jq -r '.Name')
+
+          # スタックに属する running コンテナの ID を取得
+          CONTAINER_ID=$(curl -fsS "${HEADERS[@]}" \
+            --get \
+            --data-urlencode "filters={\"label\":[\"com.docker.compose.project=${STACK_NAME}\"]}" \
+            "$BASE/endpoints/$ENDPOINT_ID/docker/containers/json" \
+            | jq -r 'first | .Id')
+
+          echo "container_id=${CONTAINER_ID}" >> "$GITHUB_OUTPUT"
+          echo "==> コンテナ ID: ${CONTAINER_ID}"
+
   # ─────────────────────────────────────────────
   # Discord 通知（成功）
   #   - main への push でデプロイが成功した場合のみ
@@ -136,7 +159,7 @@ jobs:
                     },
                     {
                       "name": "Portainer",
-                      "value": "[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_URL }})",
+                      "value": "[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_BASE_URL }}${{ needs.deploy.outputs.container_id }})",
                       "inline": false
                     }
                   ],
@@ -187,7 +210,7 @@ jobs:
                     },
                     {
                       \"name\": \"Portainer\",
-                      \"value\": \"[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_URL }})\",
+                      \"value\": \"[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_BASE_URL }}${{ needs.deploy.outputs.container_id }})\",
                       \"inline\": false
                     }
                   ],
