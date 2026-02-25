@@ -228,19 +228,46 @@ sudo chown deploy:deploy /opt/guild-mng-bot/logs
 ### 5-2. スタックを作成する
 
 1. Portainer 左メニュー → **Stacks** → **Add stack**
-2. 以下の項目を設定する:
+2. **Name** に `guild-mng` を入力する
+3. **Build method** は **Web editor** を選択する
+4. 以下の内容を Web editor に貼り付ける:
 
-| 項目                 | 設定値                                            |
-| -------------------- | ------------------------------------------------- |
-| Name                 | `guild-mng`                                       |
-| Build method         | **Repository**                                    |
-| Repository URL       | `https://github.com/sonozaki-sz/guild-mng-bot-v2` |
-| Repository reference | `refs/heads/main`                                 |
-| Compose path         | `docker-compose.prod.yml`                         |
+```yaml
+# guild-mng Portainer スタック用 compose ファイル
+services:
+  bot:
+    image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
+    container_name: guild-mng-bot-v2
+    command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DISCORD_APP_ID: ${DISCORD_APP_ID}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      LOCALE: ${LOCALE:-ja}
+      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - sqlite_data:/app/storage
+      - /opt/guild-mng-bot/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-> プライベートリポジトリの場合は **Authentication** にチェックを入れ、GitHub の Personal Access Token（`read:packages` スコープ）を入力する。
+volumes:
+  sqlite_data:
+```
 
-3. **Environment variables** タブに以下を入力する:
+5. **Environment variables** セクションに以下を入力する:
 
 | キー               | 必須 | 値の例                          |
 | ------------------ | ---- | ------------------------------- |
@@ -252,7 +279,7 @@ sudo chown deploy:deploy /opt/guild-mng-bot/logs
 | `DATABASE_URL`     | ✅   | `file:./storage/db.sqlite`      |
 | `LOG_LEVEL`        | —    | `info`                          |
 
-4. **Deploy the stack** をクリック
+6. **Deploy the stack** をクリック
 
 ### 5-3. 起動確認
 
