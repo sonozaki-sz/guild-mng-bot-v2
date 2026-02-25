@@ -38,6 +38,10 @@ RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 # corepack キャッシュを /app 以下に設定（app ユーザーが書き込み可能にするため）
 ENV COREPACK_HOME=/app/.cache/corepack
 
+# Node.js 22+ で非推奨になった組み込み punycode モジュールの警告（DEP0040）を抑制
+# discord.js 等の依存ライブラリが内部的に参照しているため自プロジェクトでは対処できない
+ENV NODE_OPTIONS="--disable-warning=DEP0040"
+
 # 本番依存のみインストール
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
