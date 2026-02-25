@@ -155,7 +155,12 @@ export const vacPanelButtonHandler: ButtonHandler = {
             new TextInputBuilder()
               .setCustomId(VAC_PANEL_CUSTOM_ID.LIMIT_INPUT)
               .setLabel(title)
-              .setPlaceholder("0-99")
+              .setPlaceholder(
+                await tGuild(
+                  guild.id,
+                  "commands:vac.panel.limit_input_placeholder",
+                ),
+              )
               .setStyle(TextInputStyle.Short)
               .setRequired(true)
               .setMaxLength(2),

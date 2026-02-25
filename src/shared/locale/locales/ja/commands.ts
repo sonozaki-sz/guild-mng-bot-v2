@@ -121,7 +121,7 @@ export const commands = {
   "vac.vc-rename.description": "参加中のVC名を変更",
   "vac.vc-rename.name.description": "新しいVC名",
   "vac.vc-limit.description": "参加中VCの人数制限を変更",
-  "vac.vc-limit.limit.description": "人数制限（0=無制限、最大99）",
+  "vac.vc-limit.limit.description": "人数制限（0=無制限、0~99）",
   "vac.embed.renamed": "VC名を {{name}} に変更しました",
   "vac.embed.limit_changed": "人数制限を {{limit}} に設定しました",
   // パネル内の AFK 一括移動結果メッセージ
@@ -137,6 +137,7 @@ export const commands = {
   // ボタンは command handler の customId と対応づく
   "vac.panel.rename_button": "VC名を変更",
   "vac.panel.limit_button": "人数制限を変更",
+  "vac.panel.limit_input_placeholder": "0〜99（0: 無制限）",
   "vac.panel.afk_button": "メンバーをAFKに移動",
   "vac.panel.refresh_button": "パネルを最下部に移動",
 
@@ -160,9 +161,9 @@ export const commands = {
   "sticky-message.set.embed-modal.embed-title.label": "タイトル",
   "sticky-message.set.embed-modal.embed-title.placeholder":
     "Embed のタイトルを入力（最大256文字）",
-  "sticky-message.set.embed-modal.embed-description.label": "説明文",
+  "sticky-message.set.embed-modal.embed-description.label": "内容",
   "sticky-message.set.embed-modal.embed-description.placeholder":
-    "Embed の説明文を入力（最大4096文字）",
+    "Embed の内容を入力（最大4096文字）",
   "sticky-message.set.embed-modal.embed-color.label": "カラーコード",
   "sticky-message.set.embed-modal.embed-color.placeholder":
     "#5865F2 または 0x5865F2 形式で入力",

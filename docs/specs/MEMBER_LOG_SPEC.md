@@ -175,20 +175,15 @@
 ```prisma
 model GuildConfig {
   // ...
-  joinLeaveLogConfig String? // JSON: JoinLeaveLogConfig
+  memberLogConfig String? // JSON: MemberLogConfig
 }
 ```
 
-### JoinLeaveLogConfig 型定義
+### MemberLogConfig 型定義
 
 ```typescript
-interface JoinLeaveLogConfig {
-  enabled: boolean; // 機能有効/無効
+interface MemberLogConfig {
   channelId?: string; // 通知チャンネルID
-  joinMessage?: string; // カスタム参加メッセージ
-  leaveMessage?: string; // カスタム退出メッセージ
-  showJoinDate: boolean; // 参加日表示（デフォルト: true）
-  showAccountAge: boolean; // アカウント年齢表示（デフォルト: true）
 }
 ```
 

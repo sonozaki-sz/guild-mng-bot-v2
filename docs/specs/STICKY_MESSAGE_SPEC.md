@@ -47,11 +47,8 @@
 1. `/sticky-message set` コマンドを実行
    ↓
 2. オプションでメッセージ内容を入力
-   - message: テキストメッセージ
-   - use-embed: Embed形式を使用するか (Boolean)
-   - embed-title: Embedタイトル（オプション）
-   - embed-description: Embed説明（オプション）
-   - embed-color: カラーコード（オプション）
+   - embed: Embed形式を使用するか (Boolean スラッシュオプション)
+   - message / embed-title / embed-description / embed-color: モーダル入力
    ↓
 3. 指定チャンネルにメッセージを送信
    ↓
@@ -92,27 +89,25 @@
 
 **オプション:**
 
-| オプション名        | 型             | 必須 | 説明                                                  |
-| ------------------- | -------------- | ---- | ----------------------------------------------------- |
-| `channel`           | Channel (TEXT) | ✅   | スティッキーメッセージを設定するチャンネル            |
-| `message`           | String         | ❌   | メッセージ内容（プレーンテキスト、最大2000文字）      |
-| `use-embed`         | Boolean        | ❌   | Embed形式で設定する場合は true（デフォルト: false）   |
-| `embed-title`       | String         | ❌   | Embed タイトル（最大256文字）                         |
-| `embed-description` | String         | ❌   | Embed 説明文（最大4096文字）                          |
-| `embed-color`       | String         | ❌   | Embed カラーコード（例: `#008969` または `0x008969`） |
+| オプション名 | 型             | 必須 | 説明                                                                         |
+| ------------ | -------------- | ---- | ---------------------------------------------------------------------------- |
+| `channel`    | Channel (TEXT) | ❌   | スティッキーメッセージを設定するチャンネル（省略時はコマンド実行チャンネル） |
+| `embed`      | Boolean        | ❌   | Embed形式で設定する場合は true（デフォルト: false）                          |
 
-> `message` か `embed-description` か `embed-title` のいずれか1つ以上の指定が必要。
+> メッセージ内容（`message` / `embed-title` / `embed-description` / `embed-color`）はスラッシュオプションではなく、コマンド実行後に表示される**モーダル**で入力します。
 
 **権限**: `MANAGE_CHANNELS`
 
 **実行例:**
 
 ```
-# プレーンテキスト
-/sticky-message set channel:#rules message:このチャンネルではルールを守ってください
+# プレーンテキスト（チャンネル省略時は実行チャンネル）
+/sticky-message set channel:#rules
+# → モーダルでメッセージ内容を入力
 
 # Embed形式
-/sticky-message set channel:#rules use-embed:true embed-title:サーバールール embed-description:ルールを守ってください embed-color:#008969
+/sticky-message set channel:#rules embed:true
+# → Embed用モーダル（タイトル・説明・カラー）が表示される
 ```
 
 **処理:**
@@ -179,30 +174,25 @@
 
 **オプション:**
 
-| オプション名        | 型             | 必須 | 説明                                                  |
-| ------------------- | -------------- | ---- | ----------------------------------------------------- |
-| `channel`           | Channel (TEXT) | ✅   | 更新するスティッキーメッセージのチャンネル            |
-| `message`           | String         | ❌   | 新しいメッセージ内容（省略時は既存値を引き継ぎ）      |
-| `use-embed`         | Boolean        | ❌   | Embed形式に切り替える（true で Embed モードへ移行）   |
-| `embed-title`       | String         | ❌   | 新しい Embed タイトル（省略時は既存値を引き継ぎ）     |
-| `embed-description` | String         | ❌   | 新しい Embed 説明文（省略時は既存値を引き継ぎ）       |
-| `embed-color`       | String         | ❌   | 新しい Embed カラーコード（省略時は既存値を引き継ぎ） |
+| オプション名 | 型             | 必須 | 説明                                                                         |
+| ------------ | -------------- | ---- | ---------------------------------------------------------------------------- |
+| `channel`    | Channel (TEXT) | ❌   | 更新するスティッキーメッセージのチャンネル（省略時はコマンド実行チャンネル） |
+| `embed`      | Boolean        | ❌   | Embed形式に切り替える（true で Embed モードへ移行）                          |
 
-> 少なくとも1つのオプションを指定する必要があります。
+> 更新内容（`message` / `embed-title` / `embed-description` / `embed-color`）はコマンド実行後に表示される**モーダル**で入力します。
 
 **権限**: `MANAGE_CHANNELS`
 
 **実行例:**
 
 ```
-# テキスト内容だけ変更
-/sticky-message update channel:#rules message:新しいルールになりました
+# テキスト内容を変更
+/sticky-message update channel:#rules
+# → モーダルで新しいメッセージ内容を入力
 
-# Embedタイトルだけ変更
-/sticky-message update channel:#rules embed-title:【重要】サーバールール
-
-# Embed カラーのみ変更
-/sticky-message update channel:#rules embed-color:#ED4245
+# Embed形式に切り替えてタイトル・カラーを変更
+/sticky-message update channel:#rules embed:true
+# → Embed用モーダル（タイトル・説明・カラー）が表示される
 ```
 
 **処理:**
@@ -487,14 +477,23 @@ function hasPermission(member: GuildMember): boolean {
 // /sticky-message コマンド（全サブコマンド共通）
 "sticky-message.description": "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）"
 
-// set
+// set（スラッシュオプション）
 "sticky-message.set.description": "スティッキーメッセージを設定"
 "sticky-message.set.channel.description": "スティッキーメッセージを設定するテキストチャンネル"
-"sticky-message.set.message.description": "メッセージ内容（プレーンテキスト）"
-"sticky-message.set.use-embed.description": "Embed形式で表示する"
-"sticky-message.set.embed-title.description": "Embedタイトル"
-"sticky-message.set.embed-description.description": "Embed説明文"
-"sticky-message.set.embed-color.description": "Embedカラーコード（例: #008969 または 0x008969）"
+"sticky-message.set.embed.description": "Embed形式で表示する"
+// set（プレーンテキストモーダル）
+"sticky-message.set.modal.title": "スティッキーメッセージの内容を入力"
+"sticky-message.set.modal.message.label": "メッセージ内容"
+"sticky-message.set.modal.message.placeholder": ...
+// set（Embedモーダル）
+"sticky-message.set.embed-modal.title": "Embed スティッキーメッセージを設定"
+"sticky-message.set.embed-modal.embed-title.label": "タイトル"
+"sticky-message.set.embed-modal.embed-title.placeholder": ...
+"sticky-message.set.embed-modal.embed-description.label": "説明文"
+"sticky-message.set.embed-modal.embed-description.placeholder": ...
+"sticky-message.set.embed-modal.embed-color.label": "カラーコード"
+"sticky-message.set.embed-modal.embed-color.placeholder": ...
+// set（応答メッセージ）
 "sticky-message.set.success.title": "設定完了"
 "sticky-message.set.success.description": "スティッキーメッセージを設定しました。"
 "sticky-message.set.alreadyExists.title": "警告"
@@ -508,14 +507,17 @@ function hasPermission(member: GuildMember): boolean {
 "sticky-message.remove.notFound.title": "未設定"
 "sticky-message.remove.notFound.description": "このチャンネルにはスティッキーメッセージが設定されていません。"
 
-// update
+// update（スラッシュオプション）
 "sticky-message.update.description": "スティッキーメッセージの内容を更新"
 "sticky-message.update.channel.description": "更新対象のチャンネル"
-"sticky-message.update.message.description": "新しいメッセージ内容（省略時は既存値を引き継ぎ）"
-"sticky-message.update.use-embed.description": "Embed形式に切り替える"
-"sticky-message.update.embed-title.description": "新しいEmbedタイトル"
-"sticky-message.update.embed-description.description": "新しいEmbed説明文"
-"sticky-message.update.embed-color.description": "新しいEmbedカラーコード"
+"sticky-message.update.embed.description": "Embed形式に切り替える"
+// update（プレーンテキストモーダル）
+"sticky-message.update.modal.title": "スティッキーメッセージを更新"
+"sticky-message.update.modal.message.label": "メッセージ内容"
+"sticky-message.update.modal.message.placeholder": ...
+// update（Embedモーダル）
+"sticky-message.update.embed-modal.title": ...
+// update（応答メッセージ）
 "sticky-message.update.success.title": "更新完了"
 "sticky-message.update.success.description": "スティッキーメッセージを更新しました。"
 "sticky-message.update.notFound.title": "未設定"
