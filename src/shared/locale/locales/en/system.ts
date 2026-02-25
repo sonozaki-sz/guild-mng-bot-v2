@@ -32,7 +32,7 @@ export const system = {
   "log.bump_reminder_mention_removed":
     "BumpReminder: mention settings removed GuildId: {{guildId}} Target: {{target}}",
   "log.bump_reminder_users_removed":
-    "BumpReminder: mention users removed GuildId: {{guildId}} Count: {{count}}",
+    "BumpReminder: mention users removed GuildId: {{guildId}} UserIds: {{userIds}}",
 
   // Error handling
   // Generic process-level failure and cleanup traces

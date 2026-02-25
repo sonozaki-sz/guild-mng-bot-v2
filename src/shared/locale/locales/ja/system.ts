@@ -35,7 +35,7 @@ export const system = {
   "log.bump_reminder_mention_removed":
     "Bumpリマインダー機能: メンション設定削除 GuildId: {{guildId}} Target: {{target}}",
   "log.bump_reminder_users_removed":
-    "Bumpリマインダー機能: メンションユーザー削除 GuildId: {{guildId}} Count: {{count}}",
+    "Bumpリマインダー機能: メンションユーザー削除 GuildId: {{guildId}} UserIds: {{userIds}}",
 
   // エラーハンドリング
   "error.reply_failed": "エラーメッセージの送信に失敗しました。",
