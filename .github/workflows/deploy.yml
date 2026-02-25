@@ -112,18 +112,23 @@ jobs:
         run: |
           BASE="http://${{ secrets.PORTAINER_HOST }}:9000/api"
           HEADERS=(-H "X-API-Key: ${{ secrets.PORTAINER_TOKEN }}" -H "Content-Type: application/json")
-          STACK_ID="${{ secrets.PORTAINER_STACK_ID }}"
           ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
 
-          # スタック名を取得
-          STACK_NAME=$(curl -fsS "${HEADERS[@]}" "$BASE/stacks/$STACK_ID" | jq -r '.Name')
+          # コンテナが起動するまで最大 30 秒待機（5 秒 × 6 回）
+          # container_name: guild-mng-bot-v2 で固定されているため名前で直接検索する
+          CONTAINER_ID=""
+          for i in $(seq 1 6); do
+            CONTAINER_ID=$(curl -fsS "${HEADERS[@]}" \
+              "$BASE/endpoints/$ENDPOINT_ID/docker/containers/json?all=false" \
+              | jq -r '.[] | select(.Names[] | contains("guild-mng-bot-v2")) | .Id' \
+              | head -1)
 
-          # スタックに属する running コンテナの ID を取得
-          CONTAINER_ID=$(curl -fsS "${HEADERS[@]}" \
-            --get \
-            --data-urlencode "filters={\"label\":[\"com.docker.compose.project=${STACK_NAME}\"]}" \
-            "$BASE/endpoints/$ENDPOINT_ID/docker/containers/json" \
-            | jq -r 'first | .Id')
+            if [ -n "$CONTAINER_ID" ] && [ "$CONTAINER_ID" != "null" ]; then
+              break
+            fi
+            echo "==> コンテナ起動待ち... (${i}/6)"
+            sleep 5
+          done
 
           echo "container_id=${CONTAINER_ID}" >> "$GITHUB_OUTPUT"
           echo "==> コンテナ ID: ${CONTAINER_ID}"
