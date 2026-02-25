@@ -160,7 +160,7 @@ export const system = {
   "ready.servers": "📊 サーバー数: {{count}}",
   "ready.users": "👥 ユーザー数: {{count}}",
   "ready.commands": "💬 コマンド数: {{count}}",
-  "ready.event_registered": "イベント登録: {{name}}",
+  "ready.event_registered": "  ✓ {{name}}",
 
   // インタラクションイベントログ
   // command / modal / button / select 実行トレース

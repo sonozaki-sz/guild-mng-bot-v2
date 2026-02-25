@@ -162,7 +162,7 @@ export const system = {
   "ready.servers": "📊 Servers: {{count}}",
   "ready.users": "👥 Users: {{count}}",
   "ready.commands": "💬 Commands: {{count}}",
-  "ready.event_registered": "Event registered: {{name}}",
+  "ready.event_registered": "  ✓ {{name}}",
 
   // Interaction event logs
   // Command/modal/button/select execution traces
