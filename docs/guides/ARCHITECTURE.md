@@ -435,7 +435,8 @@ export function getReminderDelayMinutes(): number {
 
 ## 🔗 関連ドキュメント
 
-- [DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md) - 環境構築手順
+- [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) - VPS セットアップ手順
+- [PORTAINER_DEPLOYMENT.md](PORTAINER_DEPLOYMENT.md) - GitHub Actions デプロイフロー
 - [I18N_GUIDE.md](I18N_GUIDE.md) - 多言語対応
 - [TESTING_GUIDELINES.md](TESTING_GUIDELINES.md) - テスト方針
 - [COMMANDS.md](COMMANDS.md) - コマンドリファレンス

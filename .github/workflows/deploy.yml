@@ -109,21 +109,29 @@ jobs:
 
       - name: デプロイ後のコンテナ ID を取得
         id: get-container-id
+        env:
+          PORTAINER_TOKEN: ${{ secrets.PORTAINER_TOKEN }}
         run: |
           BASE="http://${{ secrets.PORTAINER_HOST }}:9000/api"
-          HEADERS=(-H "X-API-Key: ${{ secrets.PORTAINER_TOKEN }}" -H "Content-Type: application/json")
           ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
 
           # コンテナが起動するまで最大 30 秒待機（5 秒 × 6 回）
-          # container_name: guild-mng-bot-v2 で固定されているため名前で直接検索する
+          # Compose ラベル (com.docker.compose.project=guild-mng, service=bot) でフィルタリングする
+          # ※ HEADERS bash 配列は Docker プロキシ API で正常に展開されないことがあるため
+          # ※ トークンは env: で注入してヘッダーに直接埋め込む
           CONTAINER_ID=""
           for i in $(seq 1 6); do
-            CONTAINER_ID=$(curl -fsS "${HEADERS[@]}" \
-              "$BASE/endpoints/$ENDPOINT_ID/docker/containers/json?all=false" \
-              | jq -r '.[] | select(.Names[] | contains("guild-mng-bot-v2")) | .Id' \
-              | head -1)
+            CONTAINER_ID=$(curl -fsSL -G \
+              -H "X-API-Key: ${PORTAINER_TOKEN}" \
+              --data-urlencode 'filters={"label":["com.docker.compose.project=guild-mng","com.docker.compose.service=bot"]}' \
+              "${BASE}/endpoints/${ENDPOINT_ID}/docker/containers/json?all=false" \
+              2>/dev/null \
+              | jq -r '.[0].Id // empty' 2>/dev/null \
+              | head -c 64 \
+              || true)
 
-            if [ -n "$CONTAINER_ID" ] && [ "$CONTAINER_ID" != "null" ]; then
+            if [ -n "${CONTAINER_ID}" ] && [ "${CONTAINER_ID}" != "null" ]; then
+              echo "==> コンテナ ID 取得成功 (${i}/6)"
               break
             fi
             echo "==> コンテナ起動待ち... (${i}/6)"
@@ -131,7 +139,7 @@ jobs:
           done
 
           echo "container_id=${CONTAINER_ID}" >> "$GITHUB_OUTPUT"
-          echo "==> コンテナ ID: ${CONTAINER_ID}"
+          echo "==> コンテナ ID 先頭8文字: ${CONTAINER_ID:0:8}..."
 
   # ─────────────────────────────────────────────
   # Discord 通知（成功）

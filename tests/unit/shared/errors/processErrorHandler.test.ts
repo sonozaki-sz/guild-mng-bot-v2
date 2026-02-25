@@ -168,7 +168,7 @@ describe("shared/errors/processErrorHandler", () => {
     );
   });
 
-  it("ignores known DeprecationWarning codes (DEP0040 punycode)", async () => {
+  it("logs DEP0040 DeprecationWarning (no longer in ignore list)", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -194,8 +194,15 @@ describe("shared/errors/processErrorHandler", () => {
     );
     warningHandler?.(deprecation);
 
-    // DEP0040 は無視するため warn が呼ばれないこと
-    expect(loggerMock.warn).not.toHaveBeenCalled();
+    // DEP0040 は無視リストにないため warn が呼ばれること
+    // （外部ライブラリ由来の警告であり、Node.js stderr への出力を維持する）
+    expect(loggerMock.warn).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        name: "DeprecationWarning",
+        message: "The `punycode` module is deprecated.",
+      }),
+    );
   });
 
   it("logs DeprecationWarning when code is not in the ignore list", async () => {

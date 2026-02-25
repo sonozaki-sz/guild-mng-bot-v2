@@ -90,14 +90,19 @@ GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）により�
 
 ```bash
 for i in $(seq 1 6); do
-  CONTAINER_ID=$(curl ... | jq -r '.[] | select(.Names[] | contains("guild-mng-bot-v2")) | .Id' | head -1)
-  if [ -n "$CONTAINER_ID" ] && [ "$CONTAINER_ID" != "null" ]; then break; fi
+  CONTAINER_ID=$(curl -fsSL -G \
+    -H "X-API-Key: ${PORTAINER_TOKEN}" \
+    --data-urlencode 'filters={"label":["com.docker.compose.project=guild-mng","com.docker.compose.service=bot"]}' \
+    "http://${PORTAINER_HOST}:9000/api/endpoints/${PORTAINER_ENDPOINT_ID}/docker/containers/json" \
+    || true | jq -r '.[0].Id // empty')
+  if [ -n "$CONTAINER_ID" ]; then break; fi
   sleep 5
 done
 echo "container_id=${CONTAINER_ID}" >> "$GITHUB_OUTPUT"
 ```
 
-`docker-compose.prod.yml` で `container_name: guild-mng-bot-v2` と固定されているため、コンテナ名で確実に特定できる。
+Docker Compose が自動付与する `com.docker.compose.project=guild-mng` と `com.docker.compose.service=bot` ラベルでコンテナを特定する。
+コンテナ名検索と異なり、ラベルフィルターは Docker Proxy API エンドポイントで確実に動作する。
 
 取得したコンテナ ID は `notify-success` / `notify-failure` ジョブに渡される。
 
@@ -131,14 +136,11 @@ PORTAINER_CONTAINER_BASE_URL + container_id
 # GHCR からロールバック先イメージをプル
 docker pull ghcr.io/sonozaki-sz/guild-mng-bot-v2:<SHA>
 
-# コンテナを停止して旧イメージで再起動
-docker stop guild-mng-bot-v2
-docker rm guild-mng-bot-v2
-
-docker run -d \
-  --name guild-mng-bot-v2 \
-  --restart unless-stopped \
-  ... （docker-compose.prod.yml の設定に従う）
+# Portainer スタックを再デプロイ（旧イメージでも展開可能）
+# Portainer UI の Stacks → guild-mng → Editor でイメージタグを変更するのが簡単。
+# CLI が必要な場合:
+docker compose -f /opt/infra/docker-compose.infra.yml -p infra pull  # インフラ更新は不要
+docker pull ghcr.io/sonozaki-sz/guild-mng-bot-v2:<SHA>
 ```
 
 通常は Portainer UI の方が手軽。
@@ -184,5 +186,6 @@ docker logs guild-mng-bot-v2 --tail 50
 
 - [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) — VPS・Portainer の初回セットアップ手順
 - [ARCHITECTURE.md](ARCHITECTURE.md) — システム構成・アーキテクチャ解説
-- [docker-compose.prod.yml](../../docker-compose.prod.yml) — 本番用 Compose 定義
+- [docker-compose.prod.yml](../../docker-compose.prod.yml) — 本番用 Compose 定義（bot スタック）
+- [docker-compose.infra.yml](../../docker-compose.infra.yml) — Infra スタック定義（Portainer 用）
 - [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) — CI/CD ワークフロー定義

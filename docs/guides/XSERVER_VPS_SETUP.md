@@ -15,12 +15,14 @@
 
 ```
 XServer VPS (Ubuntu 24.04)
+├── Docker Compose (Infra スタック: infra)       ← /opt/infra/ で管理
+│   └── portainer コンテナ                       ← 管理 UI + GitHub Actions CD の受け口
 └── Docker Compose (Portainer スタック: guild-mng)
-    ├── bot コンテナ  (guild-mng-bot-v2)  ← Discord Bot 本体
-    └── portainer コンテナ               ← 管理 UI + GitHub Actions CD の受け口
+    └── bot コンテナ  (guild-mng-bot-v2)         ← Discord Bot 本体
 ```
 
-> Portainer は単独で `docker run` で起動し、bot スタックは Portainer から管理します。
+> Portainer 自体は `/opt/infra/docker-compose.infra.yml` で管理する **Infra スタック**として起動します。
+> bot スタック (`guild-mng`) は Portainer UI から管理します。
 
 ### 必要なもの
 
@@ -127,26 +129,54 @@ sudo usermod -aG docker deploy
 
 ---
 
-## 🌐 3. Portainer CE の起動
+## 🌐 3. Portainer CE の起動（Infra スタック）
 
-Portainer は bot スタックとは独立して、単体コンテナとして起動する。
+Portainer は bot スタックとは独立した **Infra スタック** として管理する。
+リポジトリに含まれる `docker-compose.infra.yml` を `/opt/infra/` に配置して起動する。
+
+### 3-1. ディレクトリとファイルの配置
 
 ```bash
-docker volume create portainer_data
+sudo mkdir -p /opt/infra
+sudo chown deploy:deploy /opt/infra
+```
 
-docker run -d \
-  --name portainer \
-  --restart unless-stopped \
-  -p 9000:9000 \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v portainer_data:/data \
-  portainer/portainer-ce:latest
+ローカルマシンまたはリポジトリから `docker-compose.infra.yml` をサーバーにコピーする:
+
+```bash
+# ローカル PC から scp でコピー
+scp docker-compose.infra.yml deploy@<サーバーのIPアドレス>:/opt/infra/
+```
+
+`docker-compose.infra.yml` の内容（リポジトリルートに同梱）:
+
+```yaml
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+volumes:
+  portainer_data:
+```
+
+### 3-2. Portainer の起動
+
+```bash
+docker compose -f /opt/infra/docker-compose.infra.yml -p infra up -d
 ```
 
 起動確認:
 
 ```bash
 docker ps | grep portainer
+docker compose -f /opt/infra/docker-compose.infra.yml -p infra ps
 ```
 
 ---
@@ -322,5 +352,6 @@ Portainer の **Containers → guild-mng-bot-v2** からも同じ操作が UI �
 
 - [PORTAINER_DEPLOYMENT.md](PORTAINER_DEPLOYMENT.md) — GitHub Actions によるデプロイフローの詳細
 - [ARCHITECTURE.md](ARCHITECTURE.md) — システム構成・アーキテクチャ解説
-- [docker-compose.prod.yml](../../docker-compose.prod.yml) — 本番用 Compose 定義
+- [docker-compose.prod.yml](../../docker-compose.prod.yml) — 本番用 Compose 定義（bot スタック）
+- [docker-compose.infra.yml](../../docker-compose.infra.yml) — Infra スタック定義（Portainer 用）
 - [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) — CI/CD ワークフロー定義

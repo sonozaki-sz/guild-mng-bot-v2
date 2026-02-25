@@ -353,7 +353,8 @@
 
 - ✅ ARCHITECTURE.md - アーキテクチャ・設計概要
 - ✅ COMMANDS.md - コマンドリファレンス（全コマンドの詳細）
-- ✅ DEVELOPMENT_SETUP.md - 環境構築ガイド
+- ✅ XSERVER_VPS_SETUP.md - VPS セットアップガイド
+- ✅ PORTAINER_DEPLOYMENT.md - GitHub Actions デプロイガイド
 - ✅ TESTING_GUIDELINES.md - テスト方針とガイドライン
 - ✅ I18N_GUIDE.md - 多言語対応ガイド
 
@@ -651,7 +652,8 @@ model BumpReminder {
 - [TEST_PROGRESS.md](TEST_PROGRESS.md) - テスト実装進捗
 - [TESTING_GUIDELINES.md](../guides/TESTING_GUIDELINES.md) - テスト方針
 - [ARCHITECTURE.md](../guides/ARCHITECTURE.md) - アーキテクチャ・設計概要
-- [DEVELOPMENT_SETUP.md](../guides/DEVELOPMENT_SETUP.md) - 環境構築
+- [XSERVER_VPS_SETUP.md](../guides/XSERVER_VPS_SETUP.md) - VPS セットアップ
+- [PORTAINER_DEPLOYMENT.md](../guides/PORTAINER_DEPLOYMENT.md) - GitHub Actions デプロイフロー
 - [I18N_GUIDE.md](../guides/I18N_GUIDE.md) - 多言語対応ガイド
 - [COMMANDS.md](../guides/COMMANDS.md) - コマンドリファレンス
 

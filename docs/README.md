@@ -57,39 +57,35 @@ docs/
 
 ---
 
-### [DEVELOPMENT_SETUP.md](guides/DEVELOPMENT_SETUP.md)
+### [XSERVER_VPS_SETUP.md](guides/XSERVER_VPS_SETUP.md)
 
-開発環境の構築とプロジェクト設定の詳細ガイド。
+XServer VPS の初期設定から Portainer のインストール・スタック登録までの初回セットアップ手順。
 
 **内容:**
 
-- 必要環境（Node.js、pnpm等）
-- セットアップ手順
-- Discord Bot作成方法
-- 環境変数設定
-- tsconfig.json、jest.config.ts の詳細解説
-- VSCode設定の説明
-- トラブルシューティング
+- VPS 初期設定（OS・SSH・UFW設定）
+- Docker / Docker Compose のインストール確認
+- Portainer CE の起動（`infra` スタックとして `/opt/infra/` で管理）
+- Portainer の初期設定（管理者アカウント・環境設定）
+- bot スタック（`guild-mng`）の初回作成
+- GitHub Secrets の登録方法（API キー・スタック ID 等）
+- 動作確認と手動再起動コマンド
 
-**対象:** 新規開発者、環境構築担当者
+**対象:** 運用担当者、インフラ構築担当者
 
 ---
 
-### [DEPLOYMENT_XSERVER.md](guides/DEPLOYMENT_XSERVER.md)
+### [PORTAINER_DEPLOYMENT.md](guides/PORTAINER_DEPLOYMENT.md)
 
-XServer VPS へのデプロイ手順。
+GitHub Actions + Portainer による自動デプロイフローの詳細解説。
 
 **内容:**
 
-- XServer VPS 初期セットアップ（OS・SSH・UFW設定）
-- Docker / Docker Compose によるコンテナ構成
-- Dockerfile と docker-compose.prod.yml の設定
-- DBマイグレーションと初回起動
-- systemd による自動起動設定
-- アップデート手順と運用コマンド
-- Turso Cloud への移行手順（任意）
-- k3s（Kubernetes）への発展構成（学習用）
-- セキュリティチェックリストとトラブルシューティング
+- GitHub Actions ワークフロー構成（Test / Deploy / Discord通知）
+- 必要な GitHub Secrets 一覧
+- デプロイステップ詳細（GHCR ビルド・Portainer API 更新・コンテナ ID 取得）
+- ロールバック手順（Portainer UI / CLI）
+- トラブルシューティング
 
 **対象:** 運用担当者、デプロイ担当者
 
@@ -330,4 +326,4 @@ Embed形式の統一メッセージレスポンスシステム。
 
 ---
 
-**最終更新**: 2026年2月19日
+**最終更新**: 2026年2月26日

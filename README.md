@@ -261,7 +261,8 @@ guild-mng-bot-v2/
 - [テスト進捗](docs/progress/TEST_PROGRESS.md) - テスト実装の詳細進捗
 - [アーキテクチャガイド](docs/guides/ARCHITECTURE.md) - 全体設計方針・依存方向・責務境界
 - [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
-- [開発環境セットアップ](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築とプロジェクト設定の詳細ガイド
+- [VPS セットアップ](docs/guides/XSERVER_VPS_SETUP.md) - XServer VPS・Portainer 初回セットアップ手順
+- [デプロイガイド](docs/guides/PORTAINER_DEPLOYMENT.md) - GitHub Actions による自動デプロイフロー詳細
 - [Git ワークフロー](docs/guides/GIT_WORKFLOW.md) - ブランチ戦略・コミット規約・PR運用ルール
 - [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
 - [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・直接import運用
