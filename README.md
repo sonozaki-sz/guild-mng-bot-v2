@@ -261,6 +261,7 @@ guild-mng-bot-v2/
 - [テスト進捗](docs/progress/TEST_PROGRESS.md) - テスト実装の詳細進捗
 - [アーキテクチャガイド](docs/guides/ARCHITECTURE.md) - 全体設計方針・依存方向・責務境界
 - [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
+- [Discord Bot セットアップ](docs/guides/DISCORD_BOT_SETUP.md) - Discord Developer Portal でのアプリ作成・サーバー招待手順
 - [VPS セットアップ](docs/guides/XSERVER_VPS_SETUP.md) - XServer VPS・Portainer 初回セットアップ手順
 - [デプロイガイド](docs/guides/PORTAINER_DEPLOYMENT.md) - GitHub Actions による自動デプロイフロー詳細
 - [Git ワークフロー](docs/guides/GIT_WORKFLOW.md) - ブランチ戦略・コミット規約・PR運用ルール
