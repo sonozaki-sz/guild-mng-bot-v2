@@ -172,7 +172,7 @@ jobs:
                     },
                     {
                       "name": "Portainer",
-                      "value": "[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_BASE_URL }}${{ needs.deploy.outputs.container_id }})",
+                      "value": "[Stack: guild-mng](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/stacks/${{ secrets.PORTAINER_STACK_ID }})",
                       "inline": false
                     }
                   ],
@@ -223,7 +223,7 @@ jobs:
                     },
                     {
                       \"name\": \"Portainer\",
-                      \"value\": \"[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_BASE_URL }}${{ needs.deploy.outputs.container_id }})\",
+                      \"value\": \"[Stack: guild-mng](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/stacks/${{ secrets.PORTAINER_STACK_ID }})\",
                       \"inline\": false
                     }
                   ],

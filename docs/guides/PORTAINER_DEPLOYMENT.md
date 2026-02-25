@@ -52,14 +52,13 @@ main へ push / PR マージ
 
 ## 🔑 2. 必要な GitHub Secrets
 
-| Secret 名                      | 内容                                                                                                       |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `PORTAINER_HOST`               | VPS の IP アドレス（例: `220.158.17.101`）                                                                 |
-| `PORTAINER_TOKEN`              | Portainer API キー（[XSERVER_VPS_SETUP.md § 6-1](XSERVER_VPS_SETUP.md#6-1-portainer-api-キーの取得) 参照） |
-| `PORTAINER_STACK_ID`           | スタック ID（[XSERVER_VPS_SETUP.md § 6-2](XSERVER_VPS_SETUP.md#6-2-スタック-id-の取得) 参照）              |
-| `PORTAINER_ENDPOINT_ID`        | エンドポイント ID（通常 `3`）                                                                              |
-| `PORTAINER_CONTAINER_BASE_URL` | `http://220.158.17.101:9000/#!/3/docker/containers/`（末尾スラッシュあり）                                 |
-| `DISCORD_WEBHOOK_URL`          | Discord の Webhook URL                                                                                     |
+| Secret 名               | 内容                                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `PORTAINER_HOST`        | VPS の IP アドレス（例: `220.158.17.101`）                                                                 |
+| `PORTAINER_TOKEN`       | Portainer API キー（[XSERVER_VPS_SETUP.md § 6-1](XSERVER_VPS_SETUP.md#6-1-portainer-api-キーの取得) 参照） |
+| `PORTAINER_STACK_ID`    | スタック ID（[XSERVER_VPS_SETUP.md § 6-2](XSERVER_VPS_SETUP.md#6-2-スタック-id-の取得) 参照）              |
+| `PORTAINER_ENDPOINT_ID` | エンドポイント ID（通常 `3`）                                                                              |
+| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL                                                                                     |
 
 ---
 
@@ -108,12 +107,13 @@ Docker Compose が自動付与する `com.docker.compose.project=guild-mng` と 
 
 ### 3-4. Discord 通知の Portainer リンク
 
-Discord の成功/失敗 Embed には以下の形式で Portainer コンテナ詳細ページへのリンクが付く。
+Discord の成功/失敗 Embed には以下の形式で Portainer スタックページへのリンクが付く。
 
 ```
-PORTAINER_CONTAINER_BASE_URL + container_id
-= http://220.158.17.101:9000/#!/3/docker/containers/<コンテナID>
+http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/stacks/<PORTAINER_STACK_ID>
 ```
+
+既存のシークレット（`PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` / `PORTAINER_STACK_ID`）を組み合わせて URL を構築するため、追加のシークレット登録は不要。
 
 ---
 
@@ -175,10 +175,10 @@ docker logs guild-mng-bot-v2 --tail 50
 - `DISCORD_TOKEN` / `DISCORD_APP_ID` が Portainer スタックの Env タブに設定されているか確認
 - `sqlite_data` ボリュームの権限エラーがないか確認
 
-### Discord 通知の Portainer リンクが壊れている
+### Discord 通知の Portainer リンクが機能しない
 
-- `PORTAINER_CONTAINER_BASE_URL` の末尾スラッシュを確認（`/containers/` で終わること）
-- コンテナが 30 秒以内に起動しなかった場合、コンテナ ID が空になる → deploy ステップのログで起動待ちの状況を確認
+- `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` / `PORTAINER_STACK_ID` が正しく設定されているか確認
+- Portainer UI で **Stacks** → `guild-mng` の URL からスタック ID を再確認する
 
 ---
 

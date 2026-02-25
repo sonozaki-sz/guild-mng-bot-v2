@@ -297,14 +297,13 @@ docker logs guild-mng-bot-v2 --tail 50
 
 GitHub リポジトリ → **Settings → Secrets and variables → Actions → New repository secret** から以下を登録する。
 
-| Secret 名                      | 内容                                               | 取得方法                       |
-| ------------------------------ | -------------------------------------------------- | ------------------------------ |
-| `PORTAINER_HOST`               | VPS の IP アドレス                                 | コントロールパネルで確認       |
-| `PORTAINER_TOKEN`              | Portainer API キー                                 | セクション 6-1 参照            |
-| `PORTAINER_STACK_ID`           | スタックの ID                                      | セクション 6-2 参照            |
-| `PORTAINER_ENDPOINT_ID`        | エンドポイント ID（通常 `3`）                      | セクション 4-3 参照            |
-| `PORTAINER_CONTAINER_BASE_URL` | Portainer コンテナ一覧の URL（末尾スラッシュあり） | セクション 6-3 参照            |
-| `DISCORD_WEBHOOK_URL`          | Discord の Webhook URL                             | Discord チャンネル設定から取得 |
+| Secret 名               | 内容                          | 取得方法                       |
+| ----------------------- | ----------------------------- | ------------------------------ |
+| `PORTAINER_HOST`        | VPS の IP アドレス            | コントロールパネルで確認       |
+| `PORTAINER_TOKEN`       | Portainer API キー            | セクション 6-1 参照            |
+| `PORTAINER_STACK_ID`    | スタックの ID                 | セクション 6-2 参照            |
+| `PORTAINER_ENDPOINT_ID` | エンドポイント ID（通常 `3`） | セクション 4-3 参照            |
+| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL        | Discord チャンネル設定から取得 |
 
 ### 6-1. Portainer API キーの取得
 
@@ -328,17 +327,6 @@ http://220.158.17.101:9000/#!/3/stacks/1
 
 この値を `PORTAINER_STACK_ID` に登録する。
 
-### 6-3. PORTAINER_CONTAINER_BASE_URL の値
-
-Portainer のコンテナ詳細ページの URL プレフィックスを登録する。
-**末尾にスラッシュを付けること**（GitHub Actions がコンテナ ID を末尾に結合するため）。
-
-```
-http://<VPSのIPアドレス>:9000/#!/<エンドポイントID>/docker/containers/
-```
-
-例: `http://220.158.17.101:9000/#!/3/docker/containers/`
-
 ---
 
 ## ✅ 7. 動作確認
@@ -352,7 +340,7 @@ GitHub Actions の確認手順:
 3. Test → Deploy to Portainer → Discord通知（成功）の順でグリーンになることを確認
 ```
 
-デプロイ後、登録した Discord チャンネルに成功通知が届き、Portainer のコンテナリンクが正しく機能することを確認する。
+デプロイ後、登録した Discord チャンネルに成功通知が届き、Portainer のスタックリンクが正しく機能することを確認する。
 
 ---
 
