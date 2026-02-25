@@ -6,6 +6,7 @@ export const system = {
   "bot.starting": "Discord Botを起動しています...",
   "bot.commands.registering": "{{count}}個のコマンドを登録しています...",
   "bot.commands.registered": "コマンド登録完了。",
+  "bot.commands.command_registered": "  ✓ /{{name}}",
   "bot.events.registering": "{{count}}個のイベントを登録しています...",
   "bot.events.registered": "イベント登録完了。",
   "bot.startup.error": "Bot起動中にエラーが発生しました:",
