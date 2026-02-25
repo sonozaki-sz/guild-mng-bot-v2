@@ -36,7 +36,8 @@ describe("bot/services/botEventRegistration", () => {
     expect(registerBotEventMock).toHaveBeenCalledTimes(2);
     expect(registerBotEventMock).toHaveBeenNthCalledWith(1, client, events[0]);
     expect(registerBotEventMock).toHaveBeenNthCalledWith(2, client, events[1]);
-    expect(loggerInfoMock).toHaveBeenCalledTimes(2);
-    expect(loggerDebugMock).toHaveBeenCalledTimes(2);
+    // registering + event × 2 + registered = 4
+    expect(loggerInfoMock).toHaveBeenCalledTimes(4);
+    expect(loggerDebugMock).not.toHaveBeenCalled();
   });
 });

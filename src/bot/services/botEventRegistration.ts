@@ -21,7 +21,7 @@ export function registerBotEvents(
   // 受け取ったイベント定義を順に Client へ登録
   for (const event of events) {
     registerBotEvent(client, event);
-    logger.debug(
+    logger.info(
       tDefault("system:ready.event_registered", { name: event.name }),
     );
   }

@@ -7,6 +7,7 @@ export const system = {
   "bot.starting": "Starting Discord Bot...",
   "bot.commands.registering": "Registering {{count}} commands...",
   "bot.commands.registered": "Commands registered",
+  "bot.commands.command_registered": "  ✓ /{{name}}",
   "bot.events.registering": "Registering {{count}} events...",
   "bot.events.registered": "Events registered",
   "bot.startup.error": "Error during bot startup:",
