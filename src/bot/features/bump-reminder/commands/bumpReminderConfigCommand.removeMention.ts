@@ -13,7 +13,6 @@ import { ValidationError } from "../../../../shared/errors/customErrors";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
-  BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
   BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
   type BumpReminderConfig,
 } from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
@@ -253,18 +252,13 @@ async function handleUserSelectionUI(
 
     const selectedUserIds = selectInteraction.values;
     const bumpReminderConfigService = getBotBumpReminderConfigService();
-    let removedCount = 0;
 
     // 選択されたユーザーを順次削除
     for (const userId of selectedUserIds) {
-      const result =
-        await bumpReminderConfigService.removeBumpReminderMentionUser(
-          guildId,
-          userId,
-        );
-      if (result === BUMP_REMINDER_MENTION_USER_REMOVE_RESULT.REMOVED) {
-        removedCount++;
-      }
+      await bumpReminderConfigService.removeBumpReminderMentionUser(
+        guildId,
+        userId,
+      );
     }
 
     // 削除結果をまとめて返信
@@ -272,7 +266,7 @@ async function handleUserSelectionUI(
       guildId,
       "commands:bump-reminder-config.embed.remove_mention_select",
       {
-        users: selectedUserIds.map((id: string) => `<@${id}>`).join("\n"),
+        users: selectedUserIds.map((id: string) => `<@${id}> (\`${id}\`)`).join("\n"),
       },
     );
     const successTitle = await tGuild(
@@ -290,7 +284,7 @@ async function handleUserSelectionUI(
     logger.info(
       tDefault("system:log.bump_reminder_users_removed", {
         guildId,
-        count: removedCount,
+        userIds: selectedUserIds.join(", "),
       }),
     );
   } catch (error) {

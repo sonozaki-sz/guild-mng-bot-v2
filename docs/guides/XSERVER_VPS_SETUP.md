@@ -228,19 +228,46 @@ sudo chown deploy:deploy /opt/guild-mng-bot/logs
 ### 5-2. スタックを作成する
 
 1. Portainer 左メニュー → **Stacks** → **Add stack**
-2. 以下の項目を設定する:
+2. **Name** に `guild-mng` を入力する
+3. **Build method** は **Web editor** を選択する
+4. 以下の内容を Web editor に貼り付ける:
 
-| 項目                 | 設定値                                            |
-| -------------------- | ------------------------------------------------- |
-| Name                 | `guild-mng`                                       |
-| Build method         | **Repository**                                    |
-| Repository URL       | `https://github.com/sonozaki-sz/guild-mng-bot-v2` |
-| Repository reference | `refs/heads/main`                                 |
-| Compose path         | `docker-compose.prod.yml`                         |
+```yaml
+# guild-mng Portainer スタック用 compose ファイル
+services:
+  bot:
+    image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
+    container_name: guild-mng-bot-v2
+    command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DISCORD_APP_ID: ${DISCORD_APP_ID}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      LOCALE: ${LOCALE:-ja}
+      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - sqlite_data:/app/storage
+      - /opt/guild-mng-bot/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-> プライベートリポジトリの場合は **Authentication** にチェックを入れ、GitHub の Personal Access Token（`read:packages` スコープ）を入力する。
+volumes:
+  sqlite_data:
+```
 
-3. **Environment variables** タブに以下を入力する:
+5. **Environment variables** セクションに以下を入力する:
 
 | キー               | 必須 | 値の例                          |
 | ------------------ | ---- | ------------------------------- |
@@ -252,7 +279,7 @@ sudo chown deploy:deploy /opt/guild-mng-bot/logs
 | `DATABASE_URL`     | ✅   | `file:./storage/db.sqlite`      |
 | `LOG_LEVEL`        | —    | `info`                          |
 
-4. **Deploy the stack** をクリック
+6. **Deploy the stack** をクリック
 
 ### 5-3. 起動確認
 
@@ -270,14 +297,13 @@ docker logs guild-mng-bot-v2 --tail 50
 
 GitHub リポジトリ → **Settings → Secrets and variables → Actions → New repository secret** から以下を登録する。
 
-| Secret 名                      | 内容                                               | 取得方法                       |
-| ------------------------------ | -------------------------------------------------- | ------------------------------ |
-| `PORTAINER_HOST`               | VPS の IP アドレス                                 | コントロールパネルで確認       |
-| `PORTAINER_TOKEN`              | Portainer API キー                                 | セクション 6-1 参照            |
-| `PORTAINER_STACK_ID`           | スタックの ID                                      | セクション 6-2 参照            |
-| `PORTAINER_ENDPOINT_ID`        | エンドポイント ID（通常 `3`）                      | セクション 4-3 参照            |
-| `PORTAINER_CONTAINER_BASE_URL` | Portainer コンテナ一覧の URL（末尾スラッシュあり） | セクション 6-3 参照            |
-| `DISCORD_WEBHOOK_URL`          | Discord の Webhook URL                             | Discord チャンネル設定から取得 |
+| Secret 名               | 内容                          | 取得方法                       |
+| ----------------------- | ----------------------------- | ------------------------------ |
+| `PORTAINER_HOST`        | VPS の IP アドレス            | コントロールパネルで確認       |
+| `PORTAINER_TOKEN`       | Portainer API キー            | セクション 6-1 参照            |
+| `PORTAINER_STACK_ID`    | スタックの ID                 | セクション 6-2 参照            |
+| `PORTAINER_ENDPOINT_ID` | エンドポイント ID（通常 `3`） | セクション 4-3 参照            |
+| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL        | Discord チャンネル設定から取得 |
 
 ### 6-1. Portainer API キーの取得
 
@@ -294,23 +320,14 @@ GitHub リポジトリ → **Settings → Secrets and variables → Actions → 
 2. ブラウザの URL から ID を確認する
 
 ```
-http://220.158.17.101:9000/#!/3/stacks/1
-                                        ^
-                                  Stack ID = 1
+http://220.158.17.101:9000/#!/3/docker/stacks/guild-mng?id=1&type=2
+                                                              ^   ^
+                                                 Stack ID = 1   type=2 は Compose スタック固定値
 ```
 
-この値を `PORTAINER_STACK_ID` に登録する。
+> `type` パラメータはスタック種別を表す固定値（`1`=Swarm / `2`=Compose / `3`=Kubernetes）。docker-compose を使う限り常に `2`。
 
-### 6-3. PORTAINER_CONTAINER_BASE_URL の値
-
-Portainer のコンテナ詳細ページの URL プレフィックスを登録する。
-**末尾にスラッシュを付けること**（GitHub Actions がコンテナ ID を末尾に結合するため）。
-
-```
-http://<VPSのIPアドレス>:9000/#!/<エンドポイントID>/docker/containers/
-```
-
-例: `http://220.158.17.101:9000/#!/3/docker/containers/`
+この `id` の値を `PORTAINER_STACK_ID` に登録する。
 
 ---
 
@@ -325,7 +342,7 @@ GitHub Actions の確認手順:
 3. Test → Deploy to Portainer → Discord通知（成功）の順でグリーンになることを確認
 ```
 
-デプロイ後、登録した Discord チャンネルに成功通知が届き、Portainer のコンテナリンクが正しく機能することを確認する。
+デプロイ後、登録した Discord チャンネルに成功通知が届き、Portainer のスタックリンクが正しく機能することを確認する。
 
 ---
 

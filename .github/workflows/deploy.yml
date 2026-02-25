@@ -61,8 +61,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      container_id: ${{ steps.get-container-id.outputs.container_id }}
 
     steps:
       - uses: actions/checkout@v4
@@ -107,40 +105,6 @@ jobs:
 
           echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
 
-      - name: デプロイ後のコンテナ ID を取得
-        id: get-container-id
-        env:
-          PORTAINER_TOKEN: ${{ secrets.PORTAINER_TOKEN }}
-        run: |
-          BASE="http://${{ secrets.PORTAINER_HOST }}:9000/api"
-          ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
-
-          # コンテナが起動するまで最大 30 秒待機（5 秒 × 6 回）
-          # Compose ラベル (com.docker.compose.project=guild-mng, service=bot) でフィルタリングする
-          # ※ HEADERS bash 配列は Docker プロキシ API で正常に展開されないことがあるため
-          # ※ トークンは env: で注入してヘッダーに直接埋め込む
-          CONTAINER_ID=""
-          for i in $(seq 1 6); do
-            CONTAINER_ID=$(curl -fsSL -G \
-              -H "X-API-Key: ${PORTAINER_TOKEN}" \
-              --data-urlencode 'filters={"label":["com.docker.compose.project=guild-mng","com.docker.compose.service=bot"]}' \
-              "${BASE}/endpoints/${ENDPOINT_ID}/docker/containers/json?all=false" \
-              2>/dev/null \
-              | jq -r '.[0].Id // empty' 2>/dev/null \
-              | head -c 64 \
-              || true)
-
-            if [ -n "${CONTAINER_ID}" ] && [ "${CONTAINER_ID}" != "null" ]; then
-              echo "==> コンテナ ID 取得成功 (${i}/6)"
-              break
-            fi
-            echo "==> コンテナ起動待ち... (${i}/6)"
-            sleep 5
-          done
-
-          echo "container_id=${CONTAINER_ID}" >> "$GITHUB_OUTPUT"
-          echo "==> コンテナ ID 先頭8文字: ${CONTAINER_ID:0:8}..."
-
   # ─────────────────────────────────────────────
   # Discord 通知（成功）
   #   - main への push でデプロイが成功した場合のみ
@@ -172,7 +136,7 @@ jobs:
                     },
                     {
                       "name": "Portainer",
-                      "value": "[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_BASE_URL }}${{ needs.deploy.outputs.container_id }})",
+                      "value": "Stack: [guild-mng](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/guild-mng?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)",
                       "inline": false
                     }
                   ],
@@ -223,7 +187,7 @@ jobs:
                     },
                     {
                       \"name\": \"Portainer\",
-                      \"value\": \"[guild-mng-bot-v2](${{ secrets.PORTAINER_CONTAINER_BASE_URL }}${{ needs.deploy.outputs.container_id }})\",
+                      \"value\": \"Stack: [guild-mng](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/guild-mng?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)\",
                       \"inline\": false
                     }
                   ],

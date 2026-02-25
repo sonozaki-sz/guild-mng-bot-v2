@@ -20,18 +20,19 @@ export const system = {
   // Log messages
   // Bump configuration audit logs
   // `log.*` keys are primarily emitted from command handlers (admin actions)
-  "bump-reminder.detected": "Bump detected for guild {{guildId}} ({{service}})",
+  "bump-reminder.detected":
+    "BumpReminder: bump detected GuildId: {{guildId}} Service: {{service}}",
   "bump-reminder.detection_failed":
-    "Failed to handle bump detection for guild {{guildId}}:",
+    "BumpReminder: failed to handle bump detection GuildId: {{guildId}}",
   "log.bump_reminder_enabled":
-    "Enabled bump reminder for guild {{guildId}} (Channel: {{channelId}})",
-  "log.bump_reminder_disabled": "Disabled bump reminder for guild {{guildId}}",
+    "BumpReminder: enabled GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "log.bump_reminder_disabled": "BumpReminder: disabled GuildId: {{guildId}}",
   "log.bump_reminder_mention_set":
-    "Set bump reminder mention role for guild {{guildId}} (Role: {{roleId}})",
+    "BumpReminder: mention role set GuildId: {{guildId}} RoleId: {{roleId}}",
   "log.bump_reminder_mention_removed":
-    "Removed bump reminder mention settings for guild {{guildId}} (target: {{target}})",
+    "BumpReminder: mention settings removed GuildId: {{guildId}} Target: {{target}}",
   "log.bump_reminder_users_removed":
-    "Removed {{count}} user(s) from bump reminder for guild {{guildId}}",
+    "BumpReminder: mention users removed GuildId: {{guildId}} UserIds: {{userIds}}",
 
   // Error handling
   // Generic process-level failure and cleanup traces
@@ -182,22 +183,22 @@ export const system = {
 
   // AFK command logs
   "afk.moved_log":
-    "Moved user {{userId}} to {{channelId}} in guild {{guildId}}",
+    "AFK: moved user to AFK channel GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}}",
   "afk.configured_log":
-    "AFK channel configured for guild {{guildId}}, channel {{channelId}}",
+    "AFK: channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",
 
   // VAC logs
   // Voice-state / channel lifecycle / panel operation logs
   // Keep VAC runtime keys grouped for easier operator triage during incidents
   "vac.voice_state_update_failed": "Failed to process VAC voiceStateUpdate:",
   "vac.channel_created":
-    "VAC channel created in guild {{guildId}} (Channel: {{channelId}}, Owner: {{ownerId}})",
+    "VAC: channel created GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",
   "vac.channel_deleted":
-    "VAC channel deleted in guild {{guildId}} (Channel: {{channelId}})",
+    "VAC: channel deleted GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.category_full":
-    "Category {{categoryId}} reached channel limit in guild {{guildId}}",
+    "VAC: category reached channel limit GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vac.trigger_removed_by_delete":
-    "Removed deleted trigger channel from VAC config in guild {{guildId}} (Channel: {{channelId}})",
+    "VAC: removed deleted trigger channel from config GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.channel_delete_sync_failed":
     "Failed to sync VAC config on channelDelete:",
   "vac.panel_send_failed": "Failed to send VAC control panel:",
