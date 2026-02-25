@@ -24,7 +24,6 @@ import {
 import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
 import {
   setBotStickyMessageConfigService,
-  setBotStickyMessageRepository,
   setBotStickyMessageResendService,
 } from "./botStickyMessageDependencyResolver";
 import {
@@ -68,7 +67,6 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
   const stickyMessageResendService = getStickyMessageResendService(
     stickyMessageRepository,
   );
-  setBotStickyMessageRepository(stickyMessageRepository);
   setBotStickyMessageConfigService(stickyMessageConfigService);
   setBotStickyMessageResendService(stickyMessageResendService);
 }
