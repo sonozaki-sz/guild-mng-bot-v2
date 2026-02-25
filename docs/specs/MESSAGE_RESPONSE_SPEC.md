@@ -92,7 +92,7 @@ const embed = new EmbedBuilder()
 
 ### ヘルパー関数の作成
 
-**ファイル:** `src/shared/utils/messageResponse.ts` (新規作成)
+**ファイル:** `src/bot/utils/messageResponse.ts`
 
 ```typescript
 import { EmbedBuilder } from "discord.js";
@@ -107,7 +107,7 @@ export type MessageStatus = "success" | "info" | "warning" | "error";
  */
 const STATUS_COLORS: Record<MessageStatus, number> = {
   success: 0x57f287, // Green
-  info: 0x5865f2, // Blurple
+  info: 0x3498db, // Blue
   warning: 0xfee75c, // Yellow
   error: 0xed4245, // Red
 };
@@ -123,6 +123,15 @@ const STATUS_EMOJIS: Record<MessageStatus, string> = {
 };
 
 /**
+ * オプショナルパラメータ
+ */
+export interface EmbedOptions {
+  title?: string;
+  timestamp?: boolean;
+  fields?: { name: string; value: string; inline?: boolean }[];
+}
+
+/**
  * ステータス付きEmbedメッセージを作成
  *
  * @param status メッセージステータス
@@ -135,18 +144,18 @@ export function createStatusEmbed(
   status: MessageStatus,
   title: string,
   description: string,
-  options?: {
-    timestamp?: boolean; // タイムスタンプを付与するか（デフォルト: false）
-    fields?: { name: string; value: string; inline?: boolean }[];
-  },
+  options?: EmbedOptions,
 ): EmbedBuilder {
   const emoji = STATUS_EMOJIS[status];
   const color = STATUS_COLORS[status];
 
   const embed = new EmbedBuilder()
     .setColor(color)
-    .setTitle(`${emoji} ${title}`)
-    .setDescription(description);
+    .setTitle(`${emoji} ${title}`);
+
+  if (description) {
+    embed.setDescription(description);
+  }
 
   if (options?.timestamp) {
     embed.setTimestamp();
@@ -162,29 +171,61 @@ export function createStatusEmbed(
 /**
  * 成功メッセージを作成
  */
-export function createSuccessEmbed(title: string, description: string) {
-  return createStatusEmbed("success", title, description);
+export function createSuccessEmbed(
+  description: string,
+  options?: EmbedOptions,
+): EmbedBuilder {
+  return createStatusEmbed(
+    "success",
+    options?.title ?? t("common:success"),
+    description,
+    options,
+  );
 }
 
 /**
  * 情報メッセージを作成
  */
-export function createInfoEmbed(title: string, description: string) {
-  return createStatusEmbed("info", title, description);
+export function createInfoEmbed(
+  description: string,
+  options?: EmbedOptions,
+): EmbedBuilder {
+  return createStatusEmbed(
+    "info",
+    options?.title ?? t("common:info"),
+    description,
+    options,
+  );
 }
 
 /**
  * 警告メッセージを作成
  */
-export function createWarningEmbed(title: string, description: string) {
-  return createStatusEmbed("warning", title, description);
+export function createWarningEmbed(
+  description: string,
+  options?: EmbedOptions,
+): EmbedBuilder {
+  return createStatusEmbed(
+    "warning",
+    options?.title ?? t("common:warning"),
+    description,
+    options,
+  );
 }
 
 /**
  * エラーメッセージを作成
  */
-export function createErrorEmbed(title: string, description: string) {
-  return createStatusEmbed("error", title, description);
+export function createErrorEmbed(
+  description: string,
+  options?: EmbedOptions,
+): EmbedBuilder {
+  return createStatusEmbed(
+    "error",
+    options?.title ?? t("common:error"),
+    description,
+    options,
+  );
 }
 ```
 
@@ -200,10 +241,9 @@ await interaction.reply({
 });
 
 // After (Embed)
-const embed = createSuccessEmbed(
-  "設定完了",
-  "Bumpリマインダー機能を有効化しました",
-);
+const embed = createSuccessEmbed("Bumpリマインダー機能を有効化しました", {
+  title: "設定完了",
+});
 await interaction.reply({
   embeds: [embed],
   flags: MessageFlags.Ephemeral,
@@ -232,8 +272,8 @@ await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 
 ```typescript
 const embed = createErrorEmbed(
-  "権限不足",
   "このコマンドを実行するには管理者権限が必要です",
+  { title: "権限不足" },
 );
 await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 ```
@@ -314,7 +354,7 @@ await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 ### フェーズ1: インフラ整備（優先度: 高）
 
 1. **ヘルパー関数の実装**
-   - `src/shared/utils/messageResponse.ts` を作成
+   - `src/bot/utils/messageResponse.ts` に実装済み
    - `createStatusEmbed()` とショートカット関数を実装
    - ユニットテストを作成
 
@@ -421,7 +461,7 @@ export default {
 
 ### インフラ
 
-- [ ] `src/shared/utils/messageResponse.ts` 作成
+- [x] `src/bot/utils/messageResponse.ts` 実装済み
 - [ ] ヘルパー関数の実装
 - [ ] ユニットテスト作成
 - [ ] ローカライゼーションキーの追加

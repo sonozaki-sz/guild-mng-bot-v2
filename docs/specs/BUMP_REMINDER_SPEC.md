@@ -298,8 +298,7 @@ model GuildConfig {
 
 ```typescript
 interface BumpReminderConfig {
-  enabled: boolean; // 機能有効/無効（デフォルト: true）
-  mentionRoleId?: string; // メンションロールID
+  enabled: boolean; // 機能有効/無効（デフォルト: true）  channelId?: string; // Bump検知対象チャンネルID（未設定時は全チャンネルで検知）  mentionRoleId?: string; // メンションロールID
   mentionUserIds: string[]; // メンションユーザーIDリスト
 }
 ```
@@ -691,7 +690,7 @@ TEST_MODE="true"
 - [x] BumpReminderテーブルによるDB永続化
 - [x] JobScheduler（1回実行ジョブ）によるタイマー管理
 - [x] Bot再起動時の復元（pending レコードから）
-- [x] `/bump-reminder-config` コマンド（enable/disable/set-mention/show）
+- [x] `/bump-reminder-config` コマンド（enable/disable/set-mention/view）
 - [x] サービス別メッセージ（Disboard用とDissoku用）
 - [x] メンション設定の動的反映（送信時に最新設定を取得）
 - [x] デフォルト有効化

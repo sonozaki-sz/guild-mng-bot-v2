@@ -137,6 +137,7 @@ export const commands = {
   // Button labels correspond to VAC panel interaction handlers
   "vac.panel.rename_button": "Change VC Name",
   "vac.panel.limit_button": "Change User Limit",
+  "vac.panel.limit_input_placeholder": "0–99 (0: unlimited)",
   "vac.panel.afk_button": "Move Members to AFK",
   "vac.panel.refresh_button": "Move Panel to Bottom",
 

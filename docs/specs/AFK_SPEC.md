@@ -321,7 +321,7 @@ throw new ValidationError(
         "description": "AFKチャンネル"
       }
     },
-    "show": {
+    "view": {
       "description": "現在のAFK設定を表示"
     }
   }
