@@ -18,15 +18,14 @@ on:
 
 jobs:
   # ─────────────────────────────────────────────
-  # CI: 型チェック・テスト（push/PRどちらでも実行）
-  #   - PRのcloseはテスト不要なのでスキップ
+  # CI: 型チェック・テスト
+  #   - PR時のみ実行（push to mainはPRでCIが通過済みのためスキップ）
   # ─────────────────────────────────────────────
   test:
     name: Test
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' ||
-      (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if:
+      github.event_name == 'pull_request' && github.event.action != 'closed'
 
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +56,10 @@ jobs:
     name: Deploy to Portainer
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: |
+      always() &&
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     permissions:
       contents: read
       packages: write
@@ -81,6 +83,7 @@ jobs:
           context: .
           target: runner
           push: true
+          provenance: false
           tags: |
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -154,6 +157,7 @@ jobs:
     needs: [test, deploy]
     runs-on: ubuntu-latest
     if: |
+      always() &&
       failure() &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main'
