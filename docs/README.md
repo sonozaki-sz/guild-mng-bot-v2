@@ -57,6 +57,22 @@ docs/
 
 ---
 
+### [DISCORD_BOT_SETUP.md](guides/DISCORD_BOT_SETUP.md)
+
+Discord Developer Portal でのアプリ作成からサーバーへの招待までの手順。
+
+**内容:**
+
+- Discord アプリの作成
+- Bot トークンの取得
+- Privileged Gateway Intents の有効化（MessageContent / GuildMembers）
+- OAuth2 URL Generator でのスコープ・パーミッション設定
+- サーバーへの招待と動作確認
+
+**対象:** 運用担当者、初回セットアップ担当者
+
+---
+
 ### [XSERVER_VPS_SETUP.md](guides/XSERVER_VPS_SETUP.md)
 
 XServer VPS の初期設定から Portainer のインストール・スタック登録までの初回セットアップ手順。
