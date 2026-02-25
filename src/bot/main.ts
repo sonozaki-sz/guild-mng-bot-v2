@@ -100,6 +100,15 @@ async function startBot() {
       );
     }
 
+    // 登録したコマンドを 1 件ずつログ出力
+    for (const command of commands) {
+      logger.info(
+        tDefault("system:bot.commands.command_registered", {
+          name: command.data.name,
+        }),
+      );
+    }
+
     // Discord イベントをクライアントへ登録
     registerBotEvents(client, events);
 
