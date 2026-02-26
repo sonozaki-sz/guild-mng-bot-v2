@@ -8,7 +8,7 @@
 
 ## 📋 概要
 
-このドキュメントは、guild-mng-bot-v2 における Git ブランチ戦略とコミットメッセージ規約を定義します。
+このドキュメントは、ayasono における Git ブランチ戦略とコミットメッセージ規約を定義します。
 
 ---
 
@@ -239,7 +239,7 @@ PR に対して以下の CI が自動で実行される：
 
 ## 🏷️ ブランチ保護の設定（Branch Protection Rules）
 
-[Settings > Branches](https://github.com/sonozaki-sz/guild-mng-bot-v2/settings/branches) で管理。
+[Settings > Branches](https://github.com/sonozaki-sz/ayasono/settings/branches) で管理。
 
 ### `main` ブランチ
 

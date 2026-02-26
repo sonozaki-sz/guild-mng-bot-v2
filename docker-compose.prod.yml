@@ -1,11 +1,11 @@
-# guild-mng Portainer スタック用 compose ファイル
+# ayasono Portainer スタック用 compose ファイル
 # このファイルを Portainer の "Add Stack" で登録し、Webhook を有効化して使用する
-# スタック名: guild-mng（ボリューム guild-mng_sqlite_data が自動で割り当てられる）
+# スタック名: ayasono（ボリューム ayasono_sqlite_data が自動で割り当てられる）
 
 services:
   bot:
-    image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
-    container_name: guild-mng-bot-v2
+    image: ghcr.io/sonozaki-sz/ayasono:latest
+    container_name: ayasono-bot
     command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
     restart: unless-stopped
     environment:
@@ -18,7 +18,7 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
       - sqlite_data:/app/storage
-      - /opt/guild-mng-bot/logs:/app/logs
+      - /opt/ayasono/logs:/app/logs
     healthcheck:
       test: ["CMD", "node", "-e", "process.exit(0)"]
       interval: 30s
@@ -30,6 +30,23 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
+  # web層（現在凍結中 — 実装完了後にコメントアウトを解除）
+  # web:
+  #   image: ghcr.io/sonozaki-sz/ayasono:latest
+  #   container_name: ayasono-web
+  #   command: sh -c "node dist/web/server.js"
+  #   restart: unless-stopped
+  #   environment:
+  #     NODE_ENV: ${NODE_ENV:-production}
+  #     PORT: ${PORT:-3000}
+  #   ports:
+  #     - "${PORT:-3000}:3000"
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
 
 volumes:
   sqlite_data:

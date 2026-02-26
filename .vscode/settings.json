@@ -104,7 +104,7 @@
   "path-intellisense.autoSlashAfterDirectory": true,
   "path-intellisense.extensionOnImport": true,
   "chat.tools.terminal.autoApprove": {
-    "/^cd /home/shun/dev/guild-mng-bot-v2 && python3 - <<'PY'\nimport pathlib\nrows=\\[\\]\nfor p in pathlib\\.Path\\('src'\\)\\.rglob\\('\\*\\.ts'\\):\n    s=p\\.read_text\\(encoding='utf-8'\\)\\.splitlines\\(\\)\n    code=sum\\(1 for l in s if l\\.strip\\(\\)\\)\n    c=sum\\(1 for l in s if l\\.strip\\(\\)\\.startswith\\('//'\\) or l\\.strip\\(\\)\\.startswith\\('/\\*\\*'\\) or l\\.strip\\(\\)\\.startswith\\('\\*'\\)\\)\n    rows\\.append\\(\\(c/\\(code or 1\\),c,code,str\\(p\\)\\)\\)\nrows\\.sort\\(key=lambda x:\\(x\\[0\\],x\\[1\\]\\)\\)\nfor r in rows\\[:15\\]:\n    print\\(f\"\\{r\\[0\\]:\\.3f\\}\\\\t\\{r\\[1\\]:3d\\}/\\{r\\[2\\]:3d\\}\\\\t\\{r\\[3\\]\\}\"\\)\nPY$/": {
+    "/^cd /home/shun/dev/ayasono && python3 - <<'PY'\nimport pathlib\nrows=\\[\\]\nfor p in pathlib\\.Path\\('src'\\)\\.rglob\\('\\*\\.ts'\\):\n    s=p\\.read_text\\(encoding='utf-8'\\)\\.splitlines\\(\\)\n    code=sum\\(1 for l in s if l\\.strip\\(\\)\\)\n    c=sum\\(1 for l in s if l\\.strip\\(\\)\\.startswith\\('//'\\) or l\\.strip\\(\\)\\.startswith\\('/\\*\\*'\\) or l\\.strip\\(\\)\\.startswith\\('\\*'\\)\\)\n    rows\\.append\\(\\(c/\\(code or 1\\),c,code,str\\(p\\)\\)\\)\nrows\\.sort\\(key=lambda x:\\(x\\[0\\],x\\[1\\]\\)\\)\nfor r in rows\\[:15\\]:\n    print\\(f\"\\{r\\[0\\]:\\.3f\\}\\\\t\\{r\\[1\\]:3d\\}/\\{r\\[2\\]:3d\\}\\\\t\\{r\\[3\\]\\}\"\\)\nPY$/": {
       "approve": true,
       "matchCommandLine": true
     }

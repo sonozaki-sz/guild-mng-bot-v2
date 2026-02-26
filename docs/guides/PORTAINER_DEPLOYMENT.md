@@ -1,6 +1,6 @@
 # Portainer デプロイガイド
 
-> Portainer + GitHub Actions による guild-mng-bot-v2 のデプロイフロー詳細
+> Portainer + GitHub Actions による ayasono のデプロイフロー詳細
 
 最終更新: 2026年2月26日（スタックリンク対応・コンテナ ID 取得ステップ削除）
 
@@ -67,10 +67,10 @@ main へ push / PR マージ
 
 `docker/build-push-action` を使って `Dockerfile` の `runner` ステージをビルドし、以下のタグで GHCR にプッシュする。
 
-| タグ                                          | 用途                             |
-| --------------------------------------------- | -------------------------------- |
-| `ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest` | Portainer スタックが参照するタグ |
-| `ghcr.io/sonozaki-sz/guild-mng-bot-v2:<SHA>`  | ロールバック用                   |
+| タグ                                 | 用途                             |
+| ------------------------------------ | -------------------------------- |
+| `ghcr.io/sonozaki-sz/ayasono:latest` | Portainer スタックが参照するタグ |
+| `ghcr.io/sonozaki-sz/ayasono:<SHA>`  | ロールバック用                   |
 
 GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）によりビルド時間を短縮している。
 
@@ -87,14 +87,14 @@ GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）により�
 Discord の成功/失敗 Embed の Portainer フィールドには、スタック管理ページへのリンクが以下の形式で付く。
 
 ```
-http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/stacks/guild-mng?id=<PORTAINER_STACK_ID>&type=2
+http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/stacks/ayasono?id=<PORTAINER_STACK_ID>&type=2
 ```
 
 | パラメータ              | 内容                                                                 |
 | ----------------------- | -------------------------------------------------------------------- |
 | `PORTAINER_HOST`        | VPS の IP アドレス（シークレット）                                   |
 | `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（シークレット、通常 `3`）                |
-| `guild-mng`             | Compose スタック名（固定値）                                         |
+| `ayasono`               | Compose スタック名（固定値）                                         |
 | `PORTAINER_STACK_ID`    | スタックの数値 ID（シークレット）                                    |
 | `type=2`                | スタック種別の固定値（`1`=Swarm / **`2`=Compose** / `3`=Kubernetes） |
 
@@ -108,10 +108,10 @@ http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/stacks/guild-mng?
 
 ### 4-1. Portainer UI でのロールバック
 
-1. Portainer → **Stacks** → `guild-mng` → **Editor** タブ
+1. Portainer → **Stacks** → `ayasono` → **Editor** タブ
 2. イメージタグを `latest` から `<SHA>` に変更する
    ```yaml
-   image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:<前のSHA>
+   image: ghcr.io/sonozaki-sz/ayasono:<前のSHA>
    ```
 3. **Update the stack** をクリック
 
@@ -119,13 +119,13 @@ http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/stacks/guild-mng?
 
 ```bash
 # GHCR からロールバック先イメージをプル
-docker pull ghcr.io/sonozaki-sz/guild-mng-bot-v2:<SHA>
+docker pull ghcr.io/sonozaki-sz/ayasono:<SHA>
 
 # Portainer スタックを再デプロイ（旧イメージでも展開可能）
-# Portainer UI の Stacks → guild-mng → Editor でイメージタグを変更するのが簡単。
+# Portainer UI の Stacks → ayasono → Editor でイメージタグを変更するのが簡単。
 # CLI が必要な場合:
 docker compose -f /opt/infra/docker-compose.infra.yml -p infra pull  # インフラ更新は不要
-docker pull ghcr.io/sonozaki-sz/guild-mng-bot-v2:<SHA>
+docker pull ghcr.io/sonozaki-sz/ayasono:<SHA>
 ```
 
 通常は Portainer UI の方が手軽。
@@ -154,7 +154,7 @@ curl -H "X-API-Key: <YOUR_TOKEN>" http://220.158.17.101:9000/api/stacks
 ### bot コンテナの起動後すぐクラッシュする
 
 ```bash
-docker logs guild-mng-bot-v2 --tail 50
+docker logs ayasono-bot --tail 50
 ```
 
 - `DISCORD_TOKEN` / `DISCORD_APP_ID` が Portainer スタックの Env タブに設定されているか確認
@@ -163,7 +163,7 @@ docker logs guild-mng-bot-v2 --tail 50
 ### Discord 通知の Portainer リンクが機能しない
 
 - `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` / `PORTAINER_STACK_ID` が正しく設定されているか確認
-- Portainer UI で **Stacks** → `guild-mng` の URL からスタック ID を再確認する
+- Portainer UI で **Stacks** → `ayasono` の URL からスタック ID を再確認する
 
 ---
 

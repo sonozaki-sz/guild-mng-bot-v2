@@ -1,6 +1,6 @@
 # XServer VPS セットアップガイド
 
-> XServer VPS に Docker + Portainer CE を導入し、guild-mng-bot-v2 を稼働させるための初回セットアップ手順
+> XServer VPS に Docker + Portainer CE を導入し、ayasono を稼働させるための初回セットアップ手順
 
 最終更新: 2026年2月26日
 
@@ -17,12 +17,12 @@
 XServer VPS (Ubuntu 24.04)
 ├── Docker Compose (Infra スタック: infra)       ← /opt/infra/ で管理
 │   └── portainer コンテナ                       ← 管理 UI + GitHub Actions CD の受け口
-└── Docker Compose (Portainer スタック: guild-mng)
-    └── bot コンテナ  (guild-mng-bot-v2)         ← Discord Bot 本体
+└── Docker Compose (Portainer スタック: ayasono)
+    └── bot コンテナ  (ayasono-bot)         ← Discord Bot 本体
 ```
 
 > Portainer 自体は `/opt/infra/docker-compose.infra.yml` で管理する **Infra スタック**として起動します。
-> bot スタック (`guild-mng`) は Portainer UI から管理します。
+> bot スタック (`ayasono`) は Portainer UI から管理します。
 
 ### 必要なもの
 
@@ -70,7 +70,7 @@ usermod -aG docker deploy   # sudo なしで docker コマンドを使えるよ�
 
 ```bash
 # ローカル PC で実行
-ssh-keygen -t ed25519 -C "guild-mng-bot-deploy"
+ssh-keygen -t ed25519 -C "ayasono-deploy"
 ssh-copy-id deploy@<サーバーのIPアドレス>
 
 # キーで接続できることを確認
@@ -228,23 +228,66 @@ Portainer の **Stacks** 機能を使って bot を登録する。
 bot コンテナがホスト側にログを書き出すためのディレクトリを作成する。
 
 ```bash
-sudo mkdir -p /opt/guild-mng-bot/logs
-sudo chown deploy:deploy /opt/guild-mng-bot/logs
+sudo mkdir -p /opt/ayasono/logs
+sudo chown deploy:deploy /opt/ayasono/logs
 ```
 
 ### 5-2. スタックを作成する
 
+#### 方法 A: Repository（推奨）
+
+リポジトリに含まれる `docker-compose.prod.yml` を Portainer に直接読み込む方法。YAML を手動でコピーする必要がないため簡単で、ファイルの変更も追従しやすい。
+
 1. Portainer 左メニュー → **Stacks** → **Add stack**
-2. **Name** に `guild-mng` を入力する
+2. **Name** に `ayasono` を入力する
+3. **Build method** で **Repository** を選択する
+4. 以下の値を入力する:
+
+| 項目                   | 値                                                     |
+| ---------------------- | ------------------------------------------------------ |
+| Repository URL         | `https://github.com/sonozaki-sz/ayasono`               |
+| Repository reference   | `refs/heads/main`                                      |
+| Compose path           | `docker-compose.prod.yml`                              |
+| Authentication         | オフ（パブリックリポジトリのため不要）                 |
+| Skip TLS Verification  | オフ                                                   |
+
+5. **GitOps updates** は**オフのまま**にする
+
+> ⚠️ オンにすると Portainer がリポジトリの変更を検知して自動デプロイを行うが、本プロジェクトでは GitHub Actions 経由（Portainer API）でデプロイを管理しているため**二重デプロイ**になる。必ずオフにすること。
+
+6. **Environment variables** セクションで環境変数を登録する
+
+> ℹ️ Repository 方式では `.env` ファイルは自動生成されない。**`+ Add an environment variable`** で1件ずつ入力するか、**`Load variables from .env file`** でローカルの `.env` ファイルを読み込む。
+
+| キー               | 必須 | 値の例                          |
+| ------------------ | ---- | ------------------------------- |
+| `DISCORD_TOKEN`    | ✅   | Discord Developer Portal で取得 |
+| `DISCORD_APP_ID`   | ✅   | Discord Developer Portal で取得 |
+| `DISCORD_GUILD_ID` | —    | 空欄でグローバル登録            |
+| `NODE_ENV`         | ✅   | `production`                    |
+| `LOCALE`           | ✅   | `ja`                            |
+| `DATABASE_URL`     | ✅   | `file:./storage/db.sqlite`      |
+| `LOG_LEVEL`        | —    | `info`                          |
+
+7. **Deploy the stack** をクリック
+
+---
+
+#### 方法 B: Web editor（代替）
+
+リポジトリにアクセスできない場合や、内容を直接確認しながら設定したい場合に使う。
+
+1. Portainer 左メニュー → **Stacks** → **Add stack**
+2. **Name** に `ayasono` を入力する
 3. **Build method** は **Web editor** を選択する
-4. 以下の内容を Web editor に貼り付ける:
+4. 以下の内容を Web editor に貼り付ける（内容は `docker-compose.prod.yml` と同一）:
 
 ```yaml
-# guild-mng Portainer スタック用 compose ファイル
+# ayasono Portainer スタック用 compose ファイル
 services:
   bot:
-    image: ghcr.io/sonozaki-sz/guild-mng-bot-v2:latest
-    container_name: guild-mng-bot-v2
+    image: ghcr.io/sonozaki-sz/ayasono:latest
+    container_name: ayasono-bot
     command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
     restart: unless-stopped
     environment:
@@ -257,7 +300,7 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
       - sqlite_data:/app/storage
-      - /opt/guild-mng-bot/logs:/app/logs
+      - /opt/ayasono/logs:/app/logs
     healthcheck:
       test: ["CMD", "node", "-e", "process.exit(0)"]
       interval: 30s
@@ -274,28 +317,17 @@ volumes:
   sqlite_data:
 ```
 
-5. **Environment variables** セクションに以下を入力する:
-
-| キー               | 必須 | 値の例                          |
-| ------------------ | ---- | ------------------------------- |
-| `DISCORD_TOKEN`    | ✅   | Discord Developer Portal で取得 |
-| `DISCORD_APP_ID`   | ✅   | Discord Developer Portal で取得 |
-| `DISCORD_GUILD_ID` | —    | 空欄でグローバル登録            |
-| `NODE_ENV`         | ✅   | `production`                    |
-| `LOCALE`           | ✅   | `ja`                            |
-| `DATABASE_URL`     | ✅   | `file:./storage/db.sqlite`      |
-| `LOG_LEVEL`        | —    | `info`                          |
-
+5. **Environment variables** セクションに方法 A と同様の値を入力する
 6. **Deploy the stack** をクリック
 
 ### 5-3. 起動確認
 
-Portainer 左メニュー → **Containers** で `guild-mng-bot-v2` が `running` になっていることを確認する。
+Portainer 左メニュー → **Containers** で `ayasono-bot` が `running` になっていることを確認する。
 
 ログの確認:
 
 ```bash
-docker logs guild-mng-bot-v2 --tail 50
+docker logs ayasono-bot --tail 50
 ```
 
 ---
@@ -323,11 +355,11 @@ GitHub リポジトリ → **Settings → Secrets and variables → Actions → 
 
 ### 6-2. スタック ID の取得
 
-1. Portainer 左メニュー → **Stacks** → `guild-mng` をクリック
+1. Portainer 左メニュー → **Stacks** → `ayasono` をクリック
 2. ブラウザの URL から ID を確認する
 
 ```
-http://220.158.17.101:9000/#!/3/docker/stacks/guild-mng?id=1&type=2
+http://220.158.17.101:9000/#!/3/docker/stacks/ayasono?id=1&type=2
                                                               ^   ^
                                                  Stack ID = 1   type=2 は Compose スタック固定値
 ```
@@ -359,16 +391,16 @@ GitHub Actions の確認手順:
 
 ```bash
 # コンテナの再起動
-docker restart guild-mng-bot-v2
+docker restart ayasono-bot
 
 # ログ確認（リアルタイム）
-docker logs guild-mng-bot-v2 -f
+docker logs ayasono-bot -f
 
 # コンテナ内でコマンド実行
-docker exec -it guild-mng-bot-v2 sh
+docker exec -it ayasono-bot sh
 ```
 
-Portainer の **Containers → guild-mng-bot-v2** からも同じ操作が UI で行える。
+Portainer の **Containers → ayasono-bot** からも同じ操作が UI で行える。
 
 ---
 

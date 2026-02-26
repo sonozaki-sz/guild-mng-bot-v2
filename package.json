@@ -1,7 +1,7 @@
 {
-  "name": "guild-mng-bot-v2",
+  "name": "ayasono",
   "version": "2.0.0",
-  "description": "Discord Guild Management Bot with Web UI",
+  "description": "サーバーに彩りを加える、使いやすさ重視の多機能 Discord Bot",
   "main": "dist/bot/main.js",
   "type": "module",
   "scripts": {
@@ -29,7 +29,7 @@
   "keywords": [
     "discord",
     "bot",
-    "guild-management"
+    "ayasono"
   ],
   "author": "",
   "license": "Apache-2.0",
