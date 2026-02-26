@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/index.test.ts
 describe("bot/features/bump-reminder/handlers/index", () => {
   it("exposes handler functions", async () => {
     const messageCreateModule =

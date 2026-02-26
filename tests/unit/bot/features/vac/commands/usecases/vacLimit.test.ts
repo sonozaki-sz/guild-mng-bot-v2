@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/usecases/vacLimit.test.ts
 import type { Mock } from "vitest";
 import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
 import { executeVacLimit } from "@/bot/features/vac/commands/usecases/vacLimit";

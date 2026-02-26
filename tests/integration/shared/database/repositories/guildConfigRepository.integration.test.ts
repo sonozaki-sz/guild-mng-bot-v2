@@ -1,3 +1,4 @@
+// tests/integration/shared/database/repositories/guildConfigRepository.integration.test.ts
 /**
  * GuildConfigRepository Integration Tests
  * Prisma Repositoryの統合テスト

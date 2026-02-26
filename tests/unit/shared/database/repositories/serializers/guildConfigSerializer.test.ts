@@ -1,3 +1,4 @@
+// tests/unit/shared/database/repositories/serializers/guildConfigSerializer.test.ts
 import {
   parseJsonSafe,
   toGuildConfig,
@@ -5,6 +6,7 @@ import {
   toGuildConfigUpdateData,
 } from "@/shared/database/repositories/serializers/guildConfigSerializer";
 
+// DBレコード ↔ ドメインオブジェクト間のJSONシリアライズ・デシリアライズ変換ロジックを検証する
 describe("shared/database/repositories/serializers/guildConfigSerializer", () => {
   it("parseJsonSafe returns parsed value and undefined for null/invalid json", () => {
     expect(parseJsonSafe<{ a: number }>('{"a":1}')).toEqual({ a: 1 });
@@ -45,6 +47,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     });
   });
 
+  // 不正なJSON文字列やnullフィールドが破壊的エラーにならずundefinedへフォールバックすることを確認
   it("toGuildConfig falls back to undefined for invalid JSON fields", () => {
     const record = {
       id: "id-2",
@@ -67,6 +70,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     expect(mapped.memberLogConfig).toBeUndefined();
   });
 
+  // localeが空の場合はデフォルト値で補完され、各フィールドがJSON文字列化されundefinedはnullに変換されることを確認
   it("toGuildConfigCreateData serializes values and applies default locale", () => {
     const data = toGuildConfigCreateData(
       {
@@ -119,6 +123,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     });
   });
 
+  // フィールドを一切渡さない場合は空オブジェクトが返り、余分なキーが混入しないことを確認
   it("toGuildConfigUpdateData returns empty object when no fields are provided", () => {
     expect(toGuildConfigUpdateData({})).toEqual({});
   });

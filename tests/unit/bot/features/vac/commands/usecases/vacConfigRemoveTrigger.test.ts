@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/usecases/vacConfigRemoveTrigger.test.ts
 import {
   findTriggerChannelByCategory,
   resolveTargetCategory,

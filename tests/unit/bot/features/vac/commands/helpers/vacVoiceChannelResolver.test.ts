@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/helpers/vacVoiceChannelResolver.test.ts
 import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { tGuild } from "@/shared/locale/localeManager";

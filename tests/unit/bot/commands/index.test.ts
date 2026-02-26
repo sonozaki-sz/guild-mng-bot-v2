@@ -1,3 +1,4 @@
+// tests/unit/bot/commands/index.test.ts
 import { afkCommand } from "@/bot/commands/afk";
 import { afkConfigCommand } from "@/bot/commands/afk-config";
 import { bumpReminderConfigCommand } from "@/bot/commands/bump-reminder-config";

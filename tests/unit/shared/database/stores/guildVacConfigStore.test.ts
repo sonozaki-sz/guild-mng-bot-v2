@@ -1,5 +1,7 @@
+// tests/unit/shared/database/stores/guildVacConfigStore.test.ts
 import { GuildVacConfigStore } from "@/shared/database/stores/guildVacConfigStore";
 
+// VACコンフィグのDB読み書き（JSONシリアライズ・パース・upsert）が正しく機能することを検証するグループ
 describe("shared/database/stores/guildVacConfigStore", () => {
   const defaultLocale = "ja";
 
@@ -36,6 +38,7 @@ describe("shared/database/stores/guildVacConfigStore", () => {
     expect(safeJsonParse).toHaveBeenCalledWith(JSON.stringify(parsed));
   });
 
+  // レコード自体が存在しない場合とJSONパースが失敗した場合の両方でnullが返ることを、1テスト内で連続検証する
   it("returns null when config is missing or parse fails", async () => {
     const prisma = createPrismaMock();
     const safeJsonParse = vi.fn().mockReturnValue(undefined);
@@ -56,6 +59,7 @@ describe("shared/database/stores/guildVacConfigStore", () => {
     expect(safeJsonParse).toHaveBeenNthCalledWith(2, "invalid");
   });
 
+  // 新規ギルドのレコードが存在しない場合でも、createブランチにデフォルトロケールが正しく埋め込まれてupsertされることを確認する
   it("upserts vac config JSON with default locale on create", async () => {
     const prisma = createPrismaMock();
     const safeJsonParse = vi.fn();

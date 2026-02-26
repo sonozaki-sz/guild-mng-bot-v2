@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/handlers/ui/vacPanelUserSelect.test.ts
 import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
 import { safeReply } from "@/bot/utils/interaction";
 
@@ -107,7 +108,10 @@ function createInteraction(options?: {
   };
 }
 
+// VACパネルの「AFKへ移動」ユーザー選択ハンドラーを検証する
+// customId マッチング・AFK設定未設定時のエラー返答・ボイスチャンネル在籍メンバーのみの選択的移動を確認する
 describe("bot/features/vac/handlers/ui/vacPanelUserSelect", () => {
+  // 各テストの前提として管理チャンネル判定と有効な AFK 設定が返るよう設定する
   beforeEach(() => {
     vi.clearAllMocks();
     isManagedVacChannelMock.mockResolvedValue(true);
@@ -133,6 +137,8 @@ describe("bot/features/vac/handlers/ui/vacPanelUserSelect", () => {
     });
   });
 
+  // 選択されたユーザーのうち対象ボイスチャンネルにいるメンバーだけ AFK チャンネルへ移動し、
+  // 別チャンネルにいるメンバーの setChannel は呼ばれないことを検証
   it("moves only members currently in target voice channel and replies moved count", async () => {
     const { interaction, user1SetChannel, user2SetChannel } =
       createInteraction();

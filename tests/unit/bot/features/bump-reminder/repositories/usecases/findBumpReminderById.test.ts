@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/repositories/usecases/findBumpReminderById.test.ts
 import { findBumpReminderByIdUseCase } from "@/bot/features/bump-reminder/repositories/usecases/findBumpReminderById";
 
 describe("bot/features/bump-reminder/repositories/usecases/findBumpReminderById", () => {

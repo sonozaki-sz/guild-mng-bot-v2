@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view.test.ts
 import { handleBumpReminderConfigView } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view";
 
 const ensureManageGuildPermissionMock = vi.fn();

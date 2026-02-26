@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/handlers/vacChannelDelete.test.ts
 import { handleVacChannelDelete } from "@/bot/features/vac/handlers/vacChannelDelete";
 
 const handleChannelDeleteMock = vi.fn();

@@ -1,3 +1,4 @@
+// tests/unit/shared/locale/localeManager.test.ts
 import type { Mock } from "vitest";
 
 const initMock: Mock = vi.fn();
@@ -22,7 +23,11 @@ vi.mock("@/shared/utils/logger", () => ({
   logger: loggerMock,
 }));
 
+// LocaleManager の初期化景筘・翻訳・ロケールキャッシュ・エラーハンドリング・
+// シングルトンアクセサー機能を網羅的に検証するテスト群
 describe("shared/locale/localeManager", () => {
+  // vi.resetModules を使わずモックをクリアし、
+  // 各テストでモック定義を初期値に戻すことでテスト間の翻訳・ init 呼び出しの影響を排除する
   beforeEach(() => {
     vi.clearAllMocks();
     initMock.mockResolvedValue(undefined);
@@ -35,6 +40,8 @@ describe("shared/locale/localeManager", () => {
     );
   });
 
+  // Promise.all で同時呼び出ししても i18next.init が 1 回しか実行されないことを検証
+  // (競合条件に対する冪等性のガード)
   it("initializes i18next only once for concurrent calls", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
@@ -55,6 +62,7 @@ describe("shared/locale/localeManager", () => {
     expect(initMock).toHaveBeenCalledTimes(1);
   });
 
+  // 初化失敗後にペンディング Promise がクリアされ、再呼び出しで正常に初期化できるリトライ動作を検証
   it("resets pending init promise after failure and allows retry", async () => {
     const initializeError = new Error("init failed");
     initMock
@@ -92,6 +100,8 @@ describe("shared/locale/localeManager", () => {
     );
   });
 
+  // サポート外ロケール(例: fr)や guildId なしケースでデフォルトロケール(ja)に
+  // フォールバックすることと、追加オプション(value)が訳文呼び出しに引き継がれることを検証
   it("falls back to default locale when guild locale is unsupported or guildId is undefined", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");

@@ -1,10 +1,11 @@
-import type { MockedFunction } from "vitest";
+// tests/unit/shared/database/stores/usecases/updateBumpReminderConfig.test.ts
 import {
   casUpdateBumpReminderConfig,
   fetchBumpReminderConfigSnapshot,
   initializeBumpReminderConfigIfMissing,
 } from "@/shared/database/stores/helpers/bumpReminderConfigCas";
 import { updateBumpReminderConfigUseCase } from "@/shared/database/stores/usecases/updateBumpReminderConfig";
+import type { MockedFunction } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn(() => "update-config-failed"),
@@ -17,6 +18,8 @@ vi.mock("@/shared/database/stores/helpers/bumpReminderConfigCas", () => ({
   casUpdateBumpReminderConfig: vi.fn(),
 }));
 
+// updateBumpReminderConfigUseCase の CAS（楽観的排他制御）ロジックと
+// 最大リトライ上限・各分岐（レコード未存在・JSON一致・競合）が正しく動作するかを検証する
 describe("shared/database/stores/usecases/updateBumpReminderConfig", () => {
   const fetchSnapshotMock =
     fetchBumpReminderConfigSnapshot as MockedFunction<
@@ -36,10 +39,12 @@ describe("shared/database/stores/usecases/updateBumpReminderConfig", () => {
     safeJsonParse: vi.fn(),
   };
 
+  // 各テストが独立したモック状態から始まることを保証するためにモックをリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  // 既存 JSON とペイロードが一致する場合は DB 書き込みをスキップする最適化を確認
   it("returns immediately when persisted JSON already matches", async () => {
     const payload = { enabled: true, mentionUserIds: [] };
     fetchSnapshotMock.mockResolvedValueOnce({
@@ -90,6 +95,7 @@ describe("shared/database/stores/usecases/updateBumpReminderConfig", () => {
     expect(casUpdateMock).toHaveBeenCalledTimes(1);
   });
 
+  // CAS の競合（count=0）がリトライ上限（3回）を超え続けた場合に DatabaseError を投げることを確認
   it("throws DatabaseError after CAS conflicts exceed retry limit", async () => {
     const payload = { enabled: true, mentionUserIds: [] };
     fetchSnapshotMock.mockResolvedValue({

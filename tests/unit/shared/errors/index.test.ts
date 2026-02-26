@@ -1,3 +1,4 @@
+// tests/unit/shared/errors/index.test.ts
 describe("shared/errors/index", () => {
   it("loads direct error modules", async () => {
     const customErrors = await import("@/shared/errors/customErrors");

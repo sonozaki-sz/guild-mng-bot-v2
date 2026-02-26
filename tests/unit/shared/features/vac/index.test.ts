@@ -1,3 +1,4 @@
+// tests/unit/shared/features/vac/index.test.ts
 import type { VacChannelPair, VacConfig } from "@/shared/database/types";
 
 // GuildConfigRepository の VAC 関連メソッドをテスト用にモック

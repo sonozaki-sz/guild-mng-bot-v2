@@ -1,3 +1,4 @@
+// tests/integration/bot/features/bump-reminder/repositories/bumpReminderRepository.integration.test.ts
 /**
  * BumpReminderRepository Integration Tests
  * Bumpリマインダー永続化の統合テスト

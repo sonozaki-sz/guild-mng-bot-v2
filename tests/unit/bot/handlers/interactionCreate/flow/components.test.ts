@@ -1,3 +1,4 @@
+// tests/unit/bot/handlers/interactionCreate/flow/components.test.ts
 import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
 import {
   handleButton,
@@ -50,11 +51,15 @@ vi.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => ({
   ],
 }));
 
+// ボタン・セレクトメニューのインタラクションが、customId に合致した最初のハンドラだけに
+// ディスパッチされることと、エラー時の委譲動作を検証するグループ
 describe("bot/handlers/interactionCreate/flow/components", () => {
+  // モックの呼び出し履歴が他のテストに漏れないよう、各テスト前にリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  // handlers 配列の先頭マッチが実行されるべきで、後続ハンドラは呼ばれないことを確認
   it("executes first matching button handler only", async () => {
     const interaction = { customId: "target" };
     const uiModule = (await vi.importMock(
@@ -69,6 +74,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     expect(uiModule.buttonHandlers[1].execute).not.toHaveBeenCalled();
   });
 
+  // ハンドラ内で例外が起きた場合、呼び出し元に伝播させず handleInteractionError に委譲することを検証
   it("delegates button handler error to interaction error handler", async () => {
     const error = new Error("button failed");
     const uiModule = (await vi.importMock(
@@ -109,6 +115,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     );
   });
 
+  // customId が一致しないハンドラは execute が呼ばれないことを確認（フィルタ漏れがないか）
   it("skips non-matching string-select handler", async () => {
     const interaction = { customId: "no-match" };
     const uiModule = (await vi.importMock(
@@ -120,6 +127,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     expect(uiModule.stringSelectHandlers[0].execute).not.toHaveBeenCalled();
   });
 
+  // ストリングセレクトハンドラのエラーも同様に handleInteractionError へ委譲されることを確認
   it("delegates string-select handler error to interaction error handler", async () => {
     const error = new Error("select failed");
     const uiModule = (await vi.importMock(

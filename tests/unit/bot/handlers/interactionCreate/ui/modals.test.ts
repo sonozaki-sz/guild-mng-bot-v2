@@ -1,3 +1,4 @@
+// tests/unit/bot/handlers/interactionCreate/ui/modals.test.ts
 const vacPanelModalHandlerMock = { name: "vac-modal" };
 const stickyMessageSetModalHandlerMock = { name: "sticky-message-set-modal" };
 const stickyMessageSetEmbedModalHandlerMock = {

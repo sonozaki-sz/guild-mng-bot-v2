@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute.test.ts
 import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.constants";
 import { executeBumpReminderConfigCommand } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute";
@@ -72,7 +73,10 @@ function createInteraction(subcommand: string) {
   };
 }
 
+// executeBumpReminderConfigCommand がサブコマンド名に応じて適切なハンドラーへ処理を
+// 振り分けるルーティングロジックを検証する
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute", () => {
+  // 権限チェックがデフォルトで通過するよう設定し、ルーティング以外の要因でテストが失敗しないようにする
   beforeEach(() => {
     vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
@@ -98,6 +102,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute"
     expect(showMock).toHaveBeenCalledWith(interaction, "guild-1");
   });
 
+  // 未定義のサブコマンドが渡された場合は handleCommandError に委譲し、サイレントに無視しないことを保証
   it("delegates invalid subcommand error to command error handler", async () => {
     const interaction = createInteraction("unknown");
 

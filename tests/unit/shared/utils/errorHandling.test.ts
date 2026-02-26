@@ -1,3 +1,4 @@
+// tests/unit/shared/utils/errorHandling.test.ts
 import { DatabaseError } from "@/shared/errors/customErrors";
 import {
   executeWithDatabaseError,

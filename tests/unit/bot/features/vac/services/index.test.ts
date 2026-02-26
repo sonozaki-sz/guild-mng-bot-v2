@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/services/index.test.ts
 describe("bot/features/vac/services/vacService", () => {
   it("exports vac service APIs", async () => {
     const serviceModule =

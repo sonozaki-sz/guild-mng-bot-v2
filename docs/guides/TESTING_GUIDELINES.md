@@ -2,7 +2,7 @@
 
 > Testing Guidelines - テスト設計とベストプラクティス
 
-最終更新: 2026年2月25日
+最終更新: 2026年2月27日
 
 ---
 
@@ -245,9 +245,87 @@ resolve: {
 
 ## 📝 テストコメント規約
 
-- `describe` 単位で「何を検証するか」を短く記述
-- `beforeEach` / `afterEach` / 分岐前に「なぜ必要か」を記述
-- 日本語で 1〜2 行、意図・前提・期待結果を中心に書く
+### 1. ファイル先頭コメント
+
+**必須**: 全テストファイルの先頭 1 行目に `// tests/path/to/file.test.ts` 形式でファイルパスを記載する。
+
+```typescript
+// tests/unit/bot/features/foo/fooHandler.test.ts
+```
+
+### 2. describe ブロック前のコメント
+
+**必須**: `describe` の直前に、そのグループが検証する内容（何を・どの観点で）を 1 行で記載する。
+
+```typescript
+// fooHandler の正常フロー・早期リターン・エラー委譲を検証
+describe("bot/features/foo/fooHandler", () => {
+```
+
+ネストした `describe` には、サブグループの観点を同様に付与する。
+
+```typescript
+// 入力バリデーション系のケース
+describe("validation", () => {
+```
+
+### 3. beforeEach / afterEach 前のコメント
+
+**必須**: なぜそのセットアップ・後処理が必要かを記述する。
+
+```typescript
+// 各ケースでモック呼び出し記録をリセットし、テスト間の副作用を排除する
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+// 偽タイマーを実タイマーに戻して後続テストへの影響を防ぐ
+afterEach(() => {
+  vi.useRealTimers();
+});
+```
+
+### 4. it ブロック前のコメント（任意・推奨）
+
+`it` の説明文が自明でないケース（境界値・エラーパス・Discord 仕様上の制約など）には、1 行の補足コメントを付ける。
+
+```typescript
+// Discord の embed フィールドは 1024 文字上限のため切り詰めを確認
+it("truncates content over 1024 chars", () => { ... });
+
+// panelMessageId が null の場合は finally での削除処理をスキップする
+it("skips panel deletion when panelMessageId is null", () => { ... });
+```
+
+自明な正常系については省略してよい。
+
+```typescript
+// これはコメント不要（it の説明でわかる）
+it("returns null when record is not found", () => { ... });
+```
+
+### 5. 動的インポート / モジュールキャッシュ起因のセットアップ
+
+`vi.resetModules()` + `vi.doMock()` を使う場合は、その理由を明記する。
+
+```typescript
+// シングルトンキャッシュをテスト間でリセットするため動的インポートを使用
+async function loadModule() {
+  vi.resetModules();
+  vi.doMock("@/shared/config/env", () => ({ env: { ... } }));
+  return import("@/bot/features/foo/fooService");
+}
+```
+
+### コメントの書き方まとめ
+
+| 場所 | 必須/推奨 | 内容 |
+| --- | --- | --- |
+| ファイル先頭 | 必須 | `// tests/path/to/file.test.ts` |
+| `describe` 直前 | 必須 | 検証グループの目的（1行） |
+| `beforeEach` / `afterEach` 直前 | 必須 | セットアップ・後処理の理由（1行） |
+| 非自明な `it` 直前 | 推奨 | 条件・制約・エラーパスの補足（1行） |
+| 動的インポート関数 | 必須 | モジュールキャッシュリセットの理由（1行） |
 
 ---
 

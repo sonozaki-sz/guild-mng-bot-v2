@@ -33,7 +33,10 @@ function makeSticky(
   };
 }
 
+// スティッキーメッセージの設定データからDiscord送信ペイロードを構築するロジックと
+// 色文字列パースのエッジケースを網羅的に検証するグループ
 describe("bot/features/sticky-message/services/stickyMessagePayloadBuilder", () => {
+  // embedData の有無・有効性によって content ペイロードと embed ペイロードを切り替える動作を検証
   describe("buildStickyMessagePayload", () => {
     it("returns content payload when embedData is null", () => {
       const sticky = makeSticky({
@@ -59,6 +62,7 @@ describe("bot/features/sticky-message/services/stickyMessagePayloadBuilder", () 
       expect(payload.embeds![0]).toBeInstanceOf(EmbedBuilder);
     });
 
+    // embedData に description がない場合、content フィールドを embed の description として代替使用することを確認
     it("uses fallback content description when embedData has no description", () => {
       const embedData = JSON.stringify({ title: "Only Title" });
       const sticky = makeSticky({ content: "Fallback content", embedData });
@@ -80,6 +84,7 @@ describe("bot/features/sticky-message/services/stickyMessagePayloadBuilder", () 
       expect(embed.color).toBe(0x008969);
     });
 
+    // embedData が壊れた JSON でも例外を上げず、content をフォールバックとして embed を生成することを確認
     it("falls back to plain embed on invalid JSON embedData", () => {
       const sticky = makeSticky({
         content: "Fallback",
@@ -94,6 +99,7 @@ describe("bot/features/sticky-message/services/stickyMessagePayloadBuilder", () 
     });
   });
 
+  // #RRGGBB・0xRRGGBB・プレフィックスなし HEX など複数フォーマットと、無効値でのデフォルト返却を検証
   describe("parseColorStr", () => {
     it("returns default color for null input", () => {
       expect(parseColorStr(null)).toBe(0x008969);
@@ -123,6 +129,7 @@ describe("bot/features/sticky-message/services/stickyMessagePayloadBuilder", () 
       expect(parseColorStr("123456")).toBe(0x123456);
     });
 
+    // 解釈不能な文字列を渡した場合にデフォルト色にフォールバックすることを確認（サイレント耐障害性）
     it("returns default color on invalid hex string", () => {
       expect(parseColorStr("gggggg")).toBe(0x008969);
     });

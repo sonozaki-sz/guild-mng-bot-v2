@@ -1,3 +1,4 @@
+// tests/unit/bot/commands/ping.test.ts
 import type { Mock } from "vitest";
 import { pingCommand } from "@/bot/commands/ping";
 import { handleCommandError } from "@/bot/errors/interactionErrorHandler";

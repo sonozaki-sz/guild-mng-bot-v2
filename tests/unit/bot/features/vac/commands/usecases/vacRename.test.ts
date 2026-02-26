@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/usecases/vacRename.test.ts
 import type { Mock } from "vitest";
 import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
 import { executeVacRename } from "@/bot/features/vac/commands/usecases/vacRename";

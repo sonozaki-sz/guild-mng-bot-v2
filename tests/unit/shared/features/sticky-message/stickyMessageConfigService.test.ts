@@ -12,7 +12,10 @@ function createRepoMock() {
   };
 }
 
+// StickyMessageConfigService の各メソッドがリポジトリへ正しい引数を委譲するか、
+// およびシングルトン管理関数（set/get/create）のライフサイクルが正しく機能するかを検証する
 describe("shared/features/sticky-message/stickyMessageConfigService", () => {
+  // vi.resetModules でモジュールを再評価し、テスト間でシングルトン状態が持ち越されないようにする
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -48,6 +51,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(result).toBe(expected);
   });
 
+  // 引数が多い create メソッドが全引数を過不足なくリポジトリに転送することを確認
   it("create delegates to repository with all args", async () => {
     const repo = createRepoMock();
     const expected = { id: "s1" };
@@ -133,6 +137,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(service).toBeInstanceOf(StickyMessageConfigService);
   });
 
+  // set より前に get を呼び出した場合は例外となり、初期化前アクセスを防止していることを確認
   it("getStickyMessageConfigService throws when not initialized", async () => {
     const { getStickyMessageConfigService } = await loadModule();
 
@@ -141,6 +146,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     );
   });
 
+  // set → get のライフサイクルで同一インスタンスが返ることを確認し、シングルトン登録の一貫性を検証する
   it("setStickyMessageConfigService and getStickyMessageConfigService work together", async () => {
     const repo = createRepoMock();
     const {

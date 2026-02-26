@@ -1,3 +1,4 @@
+// tests/unit/bot/handlers/interactionCreate/ui/buttons.test.ts
 const bumpPanelButtonHandlerMock = { name: "bump" };
 const vacPanelButtonHandlerMock = { name: "vac" };
 

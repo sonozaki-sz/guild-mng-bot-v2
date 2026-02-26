@@ -1,3 +1,4 @@
+// tests/setup.ts
 /**
  * Vitest Setup File
  * テスト実行前のグローバル設定

@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/sendBumpReminder.test.ts
 import { BUMP_SERVICES } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { sendBumpReminder } from "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder";
 
@@ -27,12 +28,15 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+// sendBumpReminder ユースケースを検証: テキストチャンネル不在・無効化・正常送信の各シナリオをカバーする
 describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => {
+  // モックの呼び出し記録をリセットし、翻訳関数がキーをそのまま返すデフォルト動作をセット
   beforeEach(() => {
     vi.clearAllMocks();
     getGuildTranslatorMock.mockResolvedValue((key: string) => key);
   });
 
+  // テキストベースでないチャンネルに対しては送信せず警告ログを出力することを確認
   it("warns and returns when channel is not text-based", async () => {
     const client = {
       channels: {
@@ -53,6 +57,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerWarnMock).toHaveBeenCalled();
   });
 
+  // リマインダー設定で enabled: false の場合はメッセージ送信をスキップすることを確認
   it("returns when reminder is disabled", async () => {
     const send = vi.fn();
     const client = {
@@ -81,6 +86,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerDebugMock).toHaveBeenCalled();
   });
 
+  // panelId が渡された場合、送信後の finally でパネルメッセージを削除し、リプライにメンション文字列が含まれることを確認
   it("sends reply and deletes panel in finally", async () => {
     const panelDelete = vi.fn().mockResolvedValue(undefined);
     const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });

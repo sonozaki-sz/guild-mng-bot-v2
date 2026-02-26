@@ -1,3 +1,4 @@
+// tests/unit/bot/commands/vac-config.test.ts
 import type {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
@@ -191,6 +192,8 @@ function createAutocompleteInteraction(
   };
 }
 
+// vac-config コマンドの各サブコマンド（create-trigger-vc / remove-trigger-vc / view）と
+// オートコンプリートについて、権限チェック／カテゴリ解決／DB操作／応答内容を検証する
 describe("bot/commands/vac-config", () => {
   // ケース間でモック状態を初期化する
   beforeEach(() => {
@@ -309,6 +312,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
+  // 現在チャンネルの取得に失敗した場合、カテゴリなし（トップレベル）でVCを作成することを検証
   it("creates trigger at top when current channel fetch fails", async () => {
     const interaction = createCommandInteraction({
       guild: createGuildWithChannels({
@@ -460,6 +464,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
+  // 既に同カテゴリにトリガーVCが存在する場合、重複作成を防いでエラーハンドラへ委譲することを検証
   it("delegates error when trigger already exists in target category", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
@@ -500,6 +505,7 @@ describe("bot/commands/vac-config", () => {
     expect(addTriggerChannelMock).not.toHaveBeenCalled();
   });
 
+  // トリガーVCの親がカテゴリ以外（テキストチャンネル等）の場合、TOPレベル指定と同居とみなし重複エラーになることを検証
   it("treats trigger with non-category parent as top-level existing trigger", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
@@ -532,6 +538,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.guild?.channels.create).not.toHaveBeenCalled();
   });
 
+  // Discord カテゴリの上限 50 チャンネルに達している場合は作成せずエラーハンドラへ委譲することを検証
   it("delegates error when target category is full", async () => {
     const category = {
       id: "cat-full",
@@ -616,6 +623,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
+  // 2回目の fetch で音声チャンネル以外が返っても設定削除は実行される（実際の山の削除はスキップ）ことを検証
   it("removes trigger setting even when fetched channel is not voice", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
@@ -730,6 +738,7 @@ describe("bot/commands/vac-config", () => {
     expect(removeTriggerChannelMock).not.toHaveBeenCalled();
   });
 
+  // トリガーVCが別カテゴリに属する場合、指定カテゴリに対応するトリガーが見つからずエラーになることを検証
   it("delegates remove error when trigger channels exist but category does not match", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
@@ -935,6 +944,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
+  // view サブコマンドでトリガーチャンネルの fetch が失敗した場合、カテゴリ名の代わりにチャンネルメンションのみを表示することを検証
   it("shows top label for trigger channel when trigger fetch throws", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,

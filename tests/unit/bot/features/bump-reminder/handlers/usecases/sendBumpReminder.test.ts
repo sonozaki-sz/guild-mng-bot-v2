@@ -1,3 +1,6 @@
+// tests/unit/bot/features/bump-reminder/handlers/usecases/sendBumpReminder.test.ts
+// チャンネル状態・設定状態・サービス種別(Disboard/Dissoku)・パネルメッセージの有無など
+// 多様な条件下でリマインダー送信ユースケースが正しく動作することを検証するテスト群
 describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => {
   const tDefaultMock = vi.fn((key: string) => key);
   const loggerMock = {
@@ -9,6 +12,8 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
   const getGuildTranslatorMock = vi.fn();
   const tGuildMock = vi.fn((key: string) => key);
 
+  // vi.doMock を使う都合上、各テストでモジュールキャッシュをリセットして
+  // 新しいモック定義が確実に適用された状態でインポートできるようにする
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -99,6 +104,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(channel.send).not.toHaveBeenCalled();
   });
 
+  // Disboard は bump 元メッセージへのリプライ形式で通知する必要があるため reply フィールドが含まれているか確認
   it("sends message with reply when messageId is provided (Disboard)", async () => {
     const channel = makeChannel();
     const client = makeClient(channel);
@@ -172,6 +178,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(channel.send).toHaveBeenCalled();
   });
 
+  // ロールメンションと複数ユーザーメンションが Discord の書式(<@&...>, <@...>)で本文に含まれることを確認
   it("includes mention role and user ids in message content", async () => {
     const channel = makeChannel();
     const client = makeClient(channel);
@@ -228,6 +235,8 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerMock.debug).toHaveBeenCalled();
   });
 
+  // 最初の fetch でテキストベース外チャンネルが返った場合でも、finally 節でパネルメッセージ削除用に
+  // 再 fetch が行われる分岐を検証(fetchMock が 2 回呼ばれることで確認)
   it("re-fetches channel for panel cleanup when channel is not text-based in finally", async () => {
     const panelMsgDeleteMock = vi.fn().mockResolvedValue(undefined);
     const textChannelForPanel = makeChannel({

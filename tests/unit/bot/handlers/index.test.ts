@@ -1,3 +1,4 @@
+// tests/unit/bot/handlers/index.test.ts
 import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
 import { stickyMessageSetEmbedModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler";
 import { stickyMessageSetModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler";

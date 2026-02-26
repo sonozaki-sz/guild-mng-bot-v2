@@ -1,3 +1,4 @@
+// tests/unit/bot/features/afk/commands/index.test.ts
 describe("bot/features/afk/commands modules", () => {
   it("exposes afk command executors", async () => {
     const afkModule =

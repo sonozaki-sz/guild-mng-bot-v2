@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner.test.ts
 import { createBumpReminderRestorePlan } from "@/bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner";
 
 describe("bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner", () => {

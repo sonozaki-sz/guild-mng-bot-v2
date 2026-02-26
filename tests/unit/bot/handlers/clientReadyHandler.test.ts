@@ -1,3 +1,4 @@
+// tests/unit/bot/handlers/clientReadyHandler.test.ts
 import { handleClientReady } from "@/bot/handlers/clientReadyHandler";
 import { ActivityType, PresenceUpdateStatus } from "discord.js";
 
@@ -33,6 +34,9 @@ vi.mock("@/bot/features/vac/handlers/vacStartupCleanup", () => ({
   cleanupVacOnStartup: (...args: unknown[]) => cleanupVacOnStartupMock(...args),
 }));
 
+// clientReady ハンドラーが
+// 起動ログ出力・プレゼンス設定・各スタートアップタスク（バンプリマインダー復元 / VAC クリーンアップ）の
+// 実行順序とエラー伝播を正しく行うかを検証する
 describe("bot/handlers/clientReadyHandler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -65,6 +69,7 @@ describe("bot/handlers/clientReadyHandler", () => {
     expect(cleanupVacOnStartupMock).toHaveBeenCalledWith(client);
   });
 
+  // 先行するスタートアップタスクが失敗した場合、後続タスクは実行されず例外が伝播することを確認
   it("propagates startup task failure", async () => {
     restoreBumpRemindersOnStartupMock.mockRejectedValueOnce(
       new Error("restore failed"),

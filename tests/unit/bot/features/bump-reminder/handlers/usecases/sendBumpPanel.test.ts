@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/usecases/sendBumpPanel.test.ts
 describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
   it("exports sendBumpPanel function", async () => {
     const module =

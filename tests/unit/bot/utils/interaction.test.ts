@@ -1,3 +1,4 @@
+// tests/unit/bot/utils/interaction.test.ts
 import type { Mock } from "vitest";
 import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { safeReply } from "@/bot/utils/interaction";

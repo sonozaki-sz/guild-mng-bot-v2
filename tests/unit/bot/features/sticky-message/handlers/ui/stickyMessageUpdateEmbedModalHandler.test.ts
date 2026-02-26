@@ -89,7 +89,9 @@ function createInteractionMock({
   };
 }
 
+// Embed 更新モーダル送信時のバリデーション・DB 更新・メッセージ再送信フローを検証
 describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler", () => {
+  // 各テストで独立したモック状態を保証し、前テストの呼び出し記録や戻り値を排除する
   beforeEach(() => {
     vi.clearAllMocks();
     updateContentMock.mockResolvedValue({
@@ -124,6 +126,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).not.toHaveBeenCalled();
   });
 
+  // バリデーション異常系: タイトルと説明が両方空の場合は DB 更新を行わず警告を Ephemeral 返信すること
   it("replies with warning when both title and description are empty", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
@@ -154,6 +157,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(updateContentMock).not.toHaveBeenCalled();
   });
 
+  // 正常系: コンテンツ更新・旧メッセージ削除・新規送信・lastMessageId 更新が一連の順序で実行されること
   it("updates embed content and resends sticky message", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
@@ -198,6 +202,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
+  // 準正常系: 旧メッセージの取得・削除に失敗しても例外を伝播させず処理を続行すること
   it("ignores error when deleting old message fails", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
@@ -246,6 +251,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
+  // 異常系: DB 書き込み失敗時はエラーをロギングしたうえで呼び出し元に再スローすること
   it("rethrows error when updateContent fails", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");

@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/bumpReminderService.test.ts
 import {
   BumpReminderManager,
   getBumpReminderManager,

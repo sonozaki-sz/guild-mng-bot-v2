@@ -1,3 +1,4 @@
+// tests/unit/bot/events/voiceStateUpdate.test.ts
 import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
 import { Events } from "discord.js";
 

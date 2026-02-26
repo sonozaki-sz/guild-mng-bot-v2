@@ -1,3 +1,4 @@
+// tests/unit/shared/locale/index.test.ts
 describe("shared/locale modules", () => {
   it("exports locale related values from direct modules", async () => {
     const commandLocalizationsModule = await import(

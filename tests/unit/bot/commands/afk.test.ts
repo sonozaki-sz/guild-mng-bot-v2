@@ -1,3 +1,4 @@
+// tests/unit/bot/commands/afk.test.ts
 import type { Mock } from "vitest";
 import type { ChatInputCommandInteraction } from "discord.js";
 

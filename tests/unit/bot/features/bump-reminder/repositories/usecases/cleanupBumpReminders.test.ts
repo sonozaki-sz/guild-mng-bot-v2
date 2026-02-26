@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders.test.ts
 import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { cleanupOldBumpRemindersUseCase } from "@/bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders";
 

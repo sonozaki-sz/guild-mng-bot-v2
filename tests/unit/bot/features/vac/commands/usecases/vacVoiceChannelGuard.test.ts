@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/usecases/vacVoiceChannelGuard.test.ts
 import type { Mock } from "vitest";
 import { getManagedVacVoiceChannel } from "@/bot/features/vac/commands/usecases/vacVoiceChannelGuard";
 import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";

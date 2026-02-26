@@ -1,3 +1,4 @@
+// tests/unit/shared/database/index.test.ts
 describe("shared/database/guildConfigRepositoryProvider", () => {
   beforeEach(() => {
     vi.resetModules();

@@ -1,8 +1,9 @@
-import type { Mock, Mocked } from "vitest";
+// tests/unit/bot/features/vac/services/usecases/handleVacCreate.test.ts
 import { sendVacControlPanel } from "@/bot/features/vac/handlers/ui/vacControlPanel";
 import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
+import type { Mock, Mocked } from "vitest";
 
 const loggerInfoMock = vi.fn();
 const loggerWarnMock = vi.fn();
@@ -107,7 +108,9 @@ function createVoiceStateInput(options?: {
   };
 }
 
+// VAC (Voice Auto Channel) の作成ユースケースがトリガー・権限・チャンネル作成・ユーザー移動を正しく制御することを検証
 describe("bot/features/vac/services/usecases/handleVacCreate", () => {
+  // 各テストでモック状態をリセットし、createdAt の決定論的な動作のため Date.now を固定値にする
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(Date, "now").mockReturnValue(1700000000000);
@@ -157,6 +160,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
   });
 
+  // ユーザー所有の管理チャンネルが既存する場合は新規作成をスキップしてそちらへ移動すること
   it("moves user to existing owned managed channel and skips creation", async () => {
     const repository = createRepositoryMock();
     const { newState, fetchMock, createMock, setChannelMock } =
@@ -227,6 +231,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
   });
 
+  // 正常系: VACチャンネル作成からコントロールパネル送信・ユーザー移動・レコード保存まで一連する処理が正しく実行されること
   it("creates managed voice channel, sends panel, moves user, and stores record", async () => {
     const repository = createRepositoryMock();
     const { newState, createMock, setChannelMock } = createVoiceStateInput({
@@ -290,6 +295,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
   });
 
+  // コントロールパネル送信が失敗してもユーザー移動とチャンネル保存は続行されること (静默したエラーヘルパー)
   it("logs panel send failure and still continues move + save", async () => {
     const repository = createRepositoryMock();
     const { newState, setChannelMock } = createVoiceStateInput();

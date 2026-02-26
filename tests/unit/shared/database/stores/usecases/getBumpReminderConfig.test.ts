@@ -1,3 +1,4 @@
+// tests/unit/shared/database/stores/usecases/getBumpReminderConfig.test.ts
 import { getBumpReminderConfigUseCase } from "@/shared/database/stores/usecases/getBumpReminderConfig";
 
 describe("shared/database/stores/usecases/getBumpReminderConfig", () => {
