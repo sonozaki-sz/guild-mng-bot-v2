@@ -1,4 +1,8 @@
+// tests/unit/web/webAppBuilder.test.ts
+// 環境(development/production)に応じたFastifyプラグイン登録・ルート設定・
+// CORSポリシー・エラーハンドラの挙動を検証するグループ
 describe("web/webAppBuilder", () => {
+  // vi.resetModules()でモジュールキャッシュを初期化し、環境変数同士で異なるインスタンスを取得する
   const setup = async (options: {
     nodeEnv: "development" | "production";
     corsOrigin?: string;
@@ -89,6 +93,7 @@ describe("web/webAppBuilder", () => {
     );
   });
 
+  // productionではCORS_ORIGINのカンマ区切り文字列が配列に変換され、エラーハンドラが内部エラー詳細をクライアントに漏洗しないことを確認
   it("uses origin allow-list in production and hides internal error message", async () => {
     const { module, fastifyInstance, logger, tDefault } = await setup({
       nodeEnv: "production",
@@ -135,6 +140,7 @@ describe("web/webAppBuilder", () => {
     expect(tDefault).toHaveBeenCalledWith("system:web.api_error");
   });
 
+  // 開発環境ではエラーハンドラーが message をそのままレスポンスに含めることでデバッグしやすくすることを確認
   it("returns detailed message from error handler in development", async () => {
     const { module, fastifyInstance } = await setup({ nodeEnv: "development" });
     await module.buildWebApp("/tmp/base");
@@ -162,6 +168,7 @@ describe("web/webAppBuilder", () => {
     });
   });
 
+  // CORS_ORIGINが未設定の場合は空配列が設定され、全オリジンからのクロスオリジンリクエストが拒否されることを確認
   it("uses empty allow-list when CORS_ORIGIN is undefined in production", async () => {
     const { module, fastifyInstance } = await setup({
       nodeEnv: "production",

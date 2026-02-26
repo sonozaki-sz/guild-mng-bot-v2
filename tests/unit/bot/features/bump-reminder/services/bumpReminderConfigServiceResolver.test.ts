@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver.test.ts
 import type { Mock } from "vitest";
 
 const createBumpReminderConfigServiceMock: Mock = vi.fn();

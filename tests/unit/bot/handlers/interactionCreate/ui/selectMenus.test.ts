@@ -1,3 +1,4 @@
+// tests/unit/bot/handlers/interactionCreate/ui/selectMenus.test.ts
 const vacPanelUserSelectHandlerMock = { name: "vac-select" };
 const stickyMessageViewSelectHandlerMock = { name: "sticky-view-select" };
 

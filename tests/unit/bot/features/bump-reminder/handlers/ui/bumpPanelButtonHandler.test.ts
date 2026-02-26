@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler.test.ts
 import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
 import { getBotBumpReminderConfigService } from "@/bot/services/botBumpReminderDependencyResolver";
 import {

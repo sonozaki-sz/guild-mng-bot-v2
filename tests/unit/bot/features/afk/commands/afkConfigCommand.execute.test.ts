@@ -1,3 +1,4 @@
+// tests/unit/bot/features/afk/commands/afkConfigCommand.execute.test.ts
 import { executeAfkConfigCommand } from "@/bot/features/afk/commands/afkConfigCommand.execute";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
@@ -55,7 +56,10 @@ function createInteraction(subcommand: string) {
   };
 }
 
+// afkConfigCommand の実行ロジックが
+// 権限チェック・サブコマンド分岐（set-channel / view）を正しく処理するかを検証する
 describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
+  // 各ケースで翻訳・設定取得のモックが一定の返却値を持つよう準備する
   beforeEach(() => {
     vi.clearAllMocks();
     tGuildMock.mockResolvedValue("translated");
@@ -65,6 +69,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
     });
   });
 
+  // ManageGuild 権限を持たないメンバーがコマンドを実行した場合に適切に弾かれるかを確認
   it("throws ValidationError when member lacks manage-guild permission", async () => {
     const interaction = createInteraction("set-channel");
     interaction.memberPermissions.has.mockReturnValue(false);

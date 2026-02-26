@@ -1,3 +1,4 @@
+// tests/unit/bot/handlers/interactionCreate/ui/index.test.ts
 describe("bot/handlers/interactionCreate/ui/index", () => {
   it("exposes ui handler registries", async () => {
     const buttonsModule =

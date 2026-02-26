@@ -1,3 +1,4 @@
+// tests/unit/bot/events/channelDelete.test.ts
 import { channelDeleteEvent } from "@/bot/events/channelDelete";
 import { ChannelType, Events } from "discord.js";
 const handleVacChannelDeleteMock = vi.fn();

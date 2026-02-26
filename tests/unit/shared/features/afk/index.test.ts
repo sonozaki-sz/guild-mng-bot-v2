@@ -1,3 +1,4 @@
+// tests/unit/shared/features/afk/index.test.ts
 describe("shared/features/afk modules", () => {
   it("exports afk config service values from direct module", async () => {
     const serviceModule =

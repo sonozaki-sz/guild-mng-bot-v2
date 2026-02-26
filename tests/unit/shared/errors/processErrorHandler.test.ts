@@ -1,3 +1,5 @@
+// tests/unit/shared/errors/processErrorHandler.test.ts
+// process イベントハンドラの登録・重複防止・エラー分類・グレースフルシャットダウンの正確な動作を検証
 describe("shared/errors/processErrorHandler", () => {
   const tDefaultMock = vi.fn(
     (key: string, options?: { signal?: string }) =>
@@ -10,6 +12,7 @@ describe("shared/errors/processErrorHandler", () => {
   };
   const logErrorMock = vi.fn();
 
+  // vi.doMock は vi.resetModules() 後に有効なので、各テストで独立したモックが得られるよう毎回リセットする
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -79,6 +82,7 @@ describe("shared/errors/processErrorHandler", () => {
     expect(logErrorMock).toHaveBeenCalledTimes(1);
   });
 
+  // non-operational （回復不可能なエラー）の場合はプロセス終了すること・ operational なら終了しないことを検証
   it("exits on non-operational BaseError from uncaughtException", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
@@ -275,6 +279,7 @@ describe("shared/errors/processErrorHandler", () => {
     );
   });
 
+  // グレースフルシャットダウンのクリーンアップ成功・失敗後の exit コードとログ、および二重登録防止を一つの IT で網羅的に検証
   it("registers graceful shutdown once and handles cleanup outcomes", async () => {
     const onceHandlers = new Map<string, () => void>();
     vi.spyOn(process, "once").mockImplementation(((
@@ -354,6 +359,7 @@ describe("shared/errors/processErrorHandler", () => {
     expect(secondExitSpy).toHaveBeenCalledWith(1);
   });
 
+  // シャットダウン中に同じシグナルが再度山るケース: 二重処理を防いで warn だけ出すことを検証
   it("logs already-shutting-down warning when signal arrives again", async () => {
     const onceHandlers = new Map<string, () => void>();
     vi.spyOn(process, "once").mockImplementation(((

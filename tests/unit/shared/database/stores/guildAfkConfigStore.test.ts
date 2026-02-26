@@ -1,4 +1,4 @@
-import type { MockedFunction } from "vitest";
+// tests/unit/shared/database/stores/guildAfkConfigStore.test.ts
 import { GuildAfkConfigStore } from "@/shared/database/stores/guildAfkConfigStore";
 import {
   casUpdateAfkConfig,
@@ -6,6 +6,7 @@ import {
   initializeAfkConfigIfMissing,
 } from "@/shared/database/stores/helpers/afkConfigCas";
 import { DatabaseError } from "@/shared/errors/customErrors";
+import type { MockedFunction } from "vitest";
 
 vi.mock("@/shared/database/stores/helpers/afkConfigCas", () => ({
   AFK_CONFIG_CAS_MAX_RETRIES: 3,
@@ -14,6 +15,7 @@ vi.mock("@/shared/database/stores/helpers/afkConfigCas", () => ({
   casUpdateAfkConfig: vi.fn(),
 }));
 
+// CAS（Compare-and-Swap）パターンを用いたAFK設定の楽観的ロック更新と、初期化・スキップ・競合リトライ各ブランチを検証する
 describe("shared/database/stores/guildAfkConfigStore", () => {
   const fetchSnapshotMock = fetchAfkConfigSnapshot as MockedFunction<
     typeof fetchAfkConfigSnapshot
@@ -38,6 +40,7 @@ describe("shared/database/stores/guildAfkConfigStore", () => {
     return { store, prisma, safeJsonParse };
   };
 
+  // 各テストでモック呼び出し状態をリセットし、前のテストのスナップショットやCAS結果が漏れないようにする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -60,9 +63,7 @@ describe("shared/database/stores/guildAfkConfigStore", () => {
 
   it("setAfkChannel delegates to updateAfkConfig with enabled=true", async () => {
     const { store } = createStore();
-    const spy = vi
-      .spyOn(store, "updateAfkConfig")
-      .mockResolvedValue(undefined);
+    const spy = vi.spyOn(store, "updateAfkConfig").mockResolvedValue(undefined);
 
     await store.setAfkChannel("g1", "channel-1");
     expect(spy).toHaveBeenCalledWith("g1", {
@@ -93,6 +94,7 @@ describe("shared/database/stores/guildAfkConfigStore", () => {
     );
   });
 
+  // マージ後の設定が現在値と完全一致する場合、無駄なCAS更新を実行しないことを確認する
   it("updateAfkConfig returns early when merged config does not change", async () => {
     const { store, safeJsonParse } = createStore();
     const raw = '{"enabled":true,"channelId":"x"}';
@@ -129,6 +131,7 @@ describe("shared/database/stores/guildAfkConfigStore", () => {
     );
   });
 
+  // 初期化試行で他プロセスが先に作成済み（false返却）の場合、スナップショットを再取得してCAS更新にフォールスルーすることを確認する
   it("updateAfkConfig continues when initialize returns false, then updates", async () => {
     const { store, safeJsonParse } = createStore();
     const raw = '{"enabled":false,"channelId":"x"}';
@@ -162,6 +165,7 @@ describe("shared/database/stores/guildAfkConfigStore", () => {
     );
   });
 
+  // CASが最大リトライ回数を超えても競合が解消しない場合にDatabaseErrorが投げられることを確認する
   it("updateAfkConfig throws DatabaseError when conflicts persist", async () => {
     const { store, safeJsonParse } = createStore();
     const raw = '{"enabled":false}';

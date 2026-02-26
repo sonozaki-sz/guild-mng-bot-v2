@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/usecases/setBumpReminderUsecase.test.ts
 import { setBumpReminderUsecase } from "@/bot/features/bump-reminder/services/usecases/setBumpReminderUsecase";
 
 const toBumpReminderJobIdMock = vi.fn();
@@ -39,7 +40,10 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+// setBumpReminderUsecase がリマインダーの DB 登録・インメモリスケジュール・既存リマインダーのキャンセルを
+// 正しいタイミングで行うかを検証する
 describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", () => {
+  // 各テストが独立した初期状態で動くよう、モックの呼び出し履歴と戻り値をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
     toBumpReminderJobIdMock.mockReturnValue("job-g1");
@@ -58,6 +62,7 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
     );
   });
 
+  // 既存リマインダーが存在しない通常フローで DB 作成とインメモリスケジュールが呼ばれることを確認
   it("creates and schedules reminder", async () => {
     const repository = {
       create: vi.fn().mockResolvedValue({ id: "r1" }),
@@ -85,6 +90,7 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
     expect(loggerInfoMock).toHaveBeenCalled();
   });
 
+  // 同一ギルドにすでにリマインダーが登録されている場合、新規スケジュール前に既存ジョブをキャンセルする必要がある
   it("cancels existing reminder before scheduling replacement", async () => {
     const repository = {
       create: vi.fn().mockResolvedValue({ id: "r1" }),

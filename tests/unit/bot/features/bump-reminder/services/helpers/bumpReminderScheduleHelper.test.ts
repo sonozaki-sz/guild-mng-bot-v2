@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper.test.ts
 const addOneTimeJobMock = vi.fn();
 const removeJobMock = vi.fn();
 

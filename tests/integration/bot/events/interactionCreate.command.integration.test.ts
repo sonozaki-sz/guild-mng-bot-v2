@@ -1,3 +1,4 @@
+// tests/integration/bot/events/interactionCreate.command.integration.test.ts
 import type { Mock } from "vitest";
 import { pingCommand } from "@/bot/commands/ping";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";

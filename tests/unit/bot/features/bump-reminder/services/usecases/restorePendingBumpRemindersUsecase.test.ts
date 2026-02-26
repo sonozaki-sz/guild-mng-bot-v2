@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/usecases/restorePendingBumpRemindersUsecase.test.ts
 import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { restorePendingBumpRemindersUsecase } from "@/bot/features/bump-reminder/services/usecases/restorePendingBumpRemindersUsecase";
 
@@ -56,7 +57,10 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+// バンプリマインダーの起動時復元ユースケースを検証する
+// 古い（stale）リマインダーのキャンセル処理・将来分のスケジュール登録・即時実行の各分岐を網羅する
 describe("bot/features/bump-reminder/services/usecases/restorePendingBumpRemindersUsecase", () => {
+  // 各テストでモックの呼び出し状態をリセットし、デフォルトの正常系戻り値を設定する
   beforeEach(() => {
     vi.clearAllMocks();
     isBumpServiceNameMock.mockReturnValue(true);
@@ -71,6 +75,7 @@ describe("bot/features/bump-reminder/services/usecases/restorePendingBumpReminde
     );
   });
 
+  // stale リマインダーを CANCELLED に更新し、未来の最新リマインダーだけをインメモリスケジューラに登録することを検証
   it("cancels stale reminders and schedules latest future reminder", async () => {
     const stale = { id: "stale-1", guildId: "g1" };
     const latest = {
@@ -117,6 +122,7 @@ describe("bot/features/bump-reminder/services/usecases/restorePendingBumpReminde
     );
   });
 
+  // scheduledAt が過去日時の場合はスケジュール登録をスキップしてタスクを即時実行することを検証
   it("executes immediately when reminder is already due", async () => {
     const latest = {
       id: "latest-1",

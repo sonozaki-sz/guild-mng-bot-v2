@@ -1,3 +1,4 @@
+// tests/unit/bot/commands/bump-reminder-config.test.ts
 import type { ChatInputCommandInteraction } from "discord.js";
 import { DiscordAPIError, MessageFlags, PermissionFlagsBits } from "discord.js";
 import type { Mock } from "vitest";

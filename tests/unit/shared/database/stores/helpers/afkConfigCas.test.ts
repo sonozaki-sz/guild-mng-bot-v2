@@ -1,9 +1,12 @@
+// tests/unit/shared/database/stores/helpers/afkConfigCas.test.ts
 import {
   casUpdateAfkConfig,
   fetchAfkConfigSnapshot,
   initializeAfkConfigIfMissing,
 } from "@/shared/database/stores/helpers/afkConfigCas";
 
+// AFK設定の楽観的排他制御（CAS）ヘルパー関数群が
+// レコードの有無・updateMany/upsert の分岐・競合検出を正しく処理するかを検証する
 describe("shared/database/stores/helpers/afkConfigCas", () => {
   const createPrisma = () => ({
     guildConfig: {
@@ -41,6 +44,7 @@ describe("shared/database/stores/helpers/afkConfigCas", () => {
     });
   });
 
+  // レコードが既存の場合は upsert ではなく updateMany（WHERE afkConfig IS NULL）で初期化する分岐を確認
   it("initializeAfkConfigIfMissing uses updateMany when record exists", async () => {
     const prisma = createPrisma();
     prisma.guildConfig.updateMany.mockResolvedValueOnce({ count: 1 });
@@ -85,6 +89,7 @@ describe("shared/database/stores/helpers/afkConfigCas", () => {
     });
   });
 
+  // 旧値とのマッチングで更新成功なら true、競合（他が先に更新）なら false を返すことを確認
   it("casUpdateAfkConfig returns true when update succeeds and false otherwise", async () => {
     const prisma = createPrisma();
     prisma.guildConfig.updateMany.mockResolvedValueOnce({ count: 1 });

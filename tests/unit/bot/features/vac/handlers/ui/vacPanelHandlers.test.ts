@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/handlers/ui/vacPanelHandlers.test.ts
 import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
 import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
 import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
@@ -56,6 +57,8 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((message: string) => ({ message })),
 }));
 
+// VACパネルのボタン・モーダル・ユーザーセレクト 3種ハンドラについて、
+// customId マッチング／VC 存在確認／操作者在籍チェック／各アクションの正常系と異常系を網羅的に検証する
 describe("bot/features/vac/ui handlers", () => {
   // 各ケース前にモックを初期化する
   beforeEach(() => {
@@ -508,6 +511,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
+  // customId.startsWith を全て偽に制御した場合でも、例外を投げず副作用なしで終了することを検証
   it("falls through when no button action matches after channel resolution", async () => {
     const startsWithMock = vi
       .fn()
@@ -898,6 +902,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
+  // Discord では userLimit=0 が「人数制限なし（無制限）」を意味するため、0 入力を正しく処理することを検証
   it("updates channel user limit and treats zero as unlimited", async () => {
     const voiceChannel = {
       id: "voice-1",
@@ -1156,6 +1161,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
+  // AFK設定がDBに未登録（null）の場合、移動処理をスキップしエラー応答することを検証
   it("replies error when AFK config is missing", async () => {
     const interaction = {
       guild: {
@@ -1191,6 +1197,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
+  // AFK設定は存在するが対象チャンネルが削除済み等で null になる場合のエラー応答を検証
   it("replies error when AFK channel is not found", async () => {
     const interaction = {
       guild: {
@@ -1287,6 +1294,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
+  // setChannel が全員分失敗した場合にのみ afk_move_failed エラーを返すことを検証
   it("replies error when all moves fail (setChannel throws)", async () => {
     const failingMoveMember = {
       voice: {
@@ -1352,6 +1360,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
+  // 選択メンバーの一部 fetch が失敗しても残りを正常に移動し成功応答する、部分失敗への回復性を検証
   it("continues when selected member fetch fails and still replies success", async () => {
     const movableMember = {
       voice: {

@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/vacConfigCommand.execute.test.ts
 import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 import { handleVacConfigCreateTrigger } from "@/bot/features/vac/commands/usecases/vacConfigCreateTrigger";
 import { handleVacConfigRemoveTrigger } from "@/bot/features/vac/commands/usecases/vacConfigRemoveTrigger";
@@ -48,11 +49,15 @@ function createInteraction(overrides?: {
   };
 }
 
+// vacConfig コマンドの実行エントリポイントが、ギルド制限・権限チェック・サブコマンド分岐を
+// 正しく各ユースケースハンドラへ委譲することを検証するグループ
 describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
+  // サブコマンドごとに呼び出されるべきハンドラが異なるため、呼び出し履歴をテスト間でリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  // DM 等 guildId が null の環境ではギルド専用コマンドとして拒否し、エラーハンドラに委譲することを確認
   it("delegates guild-only validation error to handleCommandError", async () => {
     const interaction = createInteraction({ guildId: null });
 
@@ -62,6 +67,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
+  // ManageGuild 権限を持たないユーザーのコマンド実行が拒否されることを確認
   it("delegates permission validation error to handleCommandError", async () => {
     const interaction = createInteraction({ hasManageGuild: false });
 
@@ -115,6 +121,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleVacConfigRemoveTrigger).not.toHaveBeenCalled();
   });
 
+  // 網羅していないサブコマンド名を渡した場合に unhandled として handleCommandError に委譲されることを確認
   it("delegates invalid subcommand error to handleCommandError", async () => {
     const interaction = createInteraction({ subcommand: "invalid-subcommand" });
 

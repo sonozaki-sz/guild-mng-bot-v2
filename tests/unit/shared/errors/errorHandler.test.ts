@@ -1,3 +1,4 @@
+// tests/unit/shared/errors/errorHandler.test.ts
 describe("shared/errors/errorHandler", () => {
   it("re-exports error utils and process handlers", async () => {
     const indexModule = await import("@/shared/errors/errorHandler");

@@ -1,3 +1,4 @@
+// tests/unit/bot/events/index.test.ts
 import { channelDeleteEvent } from "@/bot/events/channelDelete";
 import { clientReadyEvent } from "@/bot/events/clientReady";
 import { events } from "@/bot/events/events";

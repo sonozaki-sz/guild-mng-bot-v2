@@ -1,3 +1,4 @@
+// tests/unit/shared/features/bump-reminder/index.test.ts
 describe("shared/features/bump-reminder modules", () => {
   it("exports bump reminder config service values from direct module", async () => {
     const serviceModule = await import(

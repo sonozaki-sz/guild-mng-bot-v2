@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/sendBumpPanel.test.ts
 import { sendBumpPanel } from "@/bot/features/bump-reminder/handlers/usecases/sendBumpPanel";
 
 const toScheduledAtMock = vi.fn();
@@ -40,7 +41,10 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+// バンプリマインダーのパネルメッセージをチャンネルに送信するユースケースを検証するグループ
+// チャンネルタイプ・送信成功・フェッチエラーの3パターンを網羅する
 describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
+  // 各テストで送信モック・翻訳モック・スケジュール計算モックを一貫した初期状態にリセットする
   beforeEach(() => {
     vi.clearAllMocks();
     toScheduledAtMock.mockReturnValue(new Date("2026-02-21T00:00:00.000Z"));
@@ -59,6 +63,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     });
   });
 
+  // テキストベースでないチャンネル（VCなど）にはパネルを送らず undefined を返すことを確認
   it("returns undefined when target channel is not text-based", async () => {
     const client = {
       channels: {
@@ -107,6 +112,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     );
   });
 
+  // チャンネルフェッチ自体が失敗した場合にエラーをログして undefined を返し、例外を上位に伝播させないことを確認
   it("logs and returns undefined when fetch fails", async () => {
     const error = new Error("fetch failed");
     const client = {

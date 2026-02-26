@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable.test.ts
 import { handleBumpReminderConfigEnable } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable";
 
 const ensureManageGuildPermissionMock = vi.fn();

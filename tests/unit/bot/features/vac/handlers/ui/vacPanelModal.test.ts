@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/handlers/ui/vacPanelModal.test.ts
 import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
 import { safeReply } from "@/bot/utils/interaction";
 
@@ -83,7 +84,10 @@ function createBaseInteraction(overrides?: {
   };
 }
 
+// VACパネルのリネーム・人数制限モーダルハンドラーを検証する
+// customId マッチング・管理外チャンネルのエラー・入力トリム・数値バリデーション違反の各フローを確認する
 describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
+  // 毎テストで isManagedVacChannel が true を返すデフォルト正常状態に戻す
   beforeEach(() => {
     vi.clearAllMocks();
     isManagedVacChannelMock.mockResolvedValue(true);
@@ -107,6 +111,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
     });
   });
 
+  // 入力値の前後空白をトリムして channel.edit に渡し、成功メッセージを返すことを検証
   it("renames voice channel and replies success", async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createBaseInteraction({
@@ -124,6 +129,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
     });
   });
 
+  // 数値に変換できない入力（"abc"）ではチャンネル編集を行わずバリデーションエラーを返すことを検証
   it("replies range error when limit input is invalid", async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createBaseInteraction({

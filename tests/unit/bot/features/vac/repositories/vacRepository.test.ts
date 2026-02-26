@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/repositories/vacRepository.test.ts
 import type { Mock } from "vitest";
 
 const getVacConfigServiceMock: Mock = vi.fn();
@@ -47,12 +48,17 @@ function createRepositoryMock(): {
   };
 }
 
+// リポジトリ層がデータ操作を全て VacConfigService に委譲するデレゲーション構造と
+// インスタンスキャッシュの蓋え替え・内部シングルトン管理を検証するテスト群
 describe("bot/features/vac/repositories/vacRepository", () => {
+  // vi.doMock を用いた動的インポートのため、各テスト前にモジュールキャッシュをリセットして
+  // 前のテストケースで設定されたテープル状態が次のテストに漏れア出ないようにする
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
   });
 
+  // 7つの操作すべてが第一引数のサービスインスタンスにそのまま委譲され、guildId/引数が正しく渡ることを一括検証
   it("delegates all repository operations to injected vac config service", async () => {
     const vacConfigService = createVacConfigServicePortMock();
     const expectedConfig = {
@@ -142,6 +148,8 @@ describe("bot/features/vac/repositories/vacRepository", () => {
     expect(getVacConfigServiceMock).not.toHaveBeenCalled();
   });
 
+  // 引数なしで 2 回呼んでも getVacConfigService は 1 回しか呼ばれず
+  // 内部ライブラリ実装がレイジーシングルトンであることを検証
   it("creates default repository once from getVacConfigService", async () => {
     const vacConfigService = createVacConfigServicePortMock();
     getVacConfigServiceMock.mockReturnValue(vacConfigService);
@@ -156,6 +164,7 @@ describe("bot/features/vac/repositories/vacRepository", () => {
     expect(getVacConfigServiceMock).toHaveBeenCalledTimes(1);
   });
 
+  // 外部からリポジトリを注入するとデフォルトキャッシュが上書きされ、以降の呼び出しでも注入内容が使われることを検証
   it("replaces cached default repository when injected repository is provided", async () => {
     const vacConfigService = createVacConfigServicePortMock();
     getVacConfigServiceMock.mockReturnValue(vacConfigService);

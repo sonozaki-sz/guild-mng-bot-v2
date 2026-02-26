@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/repositories/types.test.ts
 import type {
   BumpReminder,
   IBumpReminderRepository,

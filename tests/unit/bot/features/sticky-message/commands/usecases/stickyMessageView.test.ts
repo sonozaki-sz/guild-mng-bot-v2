@@ -24,6 +24,9 @@ function createInteractionMock(channelCache?: Map<string, { name: string }>) {
   };
 }
 
+// stickyMessageView ユースケースが
+// 登録件数ゼロ・件数あり・チャンネルキャッシュなし・25件超えの各条件で
+// 適切なレスポンス（Ephemeral info / セレクトメニュー）を返すかを検証する
 describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -63,6 +66,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
     );
   });
 
+  // チャンネルがキャッシュに存在しない場合はチャンネル名の代わりに ID をラベル表示することを確認
   it("uses channel ID as label when channel is not in cache", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
@@ -75,6 +79,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
     expect(interaction.reply).toHaveBeenCalled();
   });
 
+  // Discord のセレクトメニューは最大 25 項目のため、30件あっても 25件に切り捨てられることを確認
   it("limits to 25 options even if more stickies exist", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");

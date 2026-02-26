@@ -1,3 +1,4 @@
+// tests/unit/bot/features/afk/commands/afkCommand.execute.test.ts
 import { executeAfkCommand } from "@/bot/features/afk/commands/afkCommand.execute";
 import { ValidationError } from "@/shared/errors/customErrors";
 
@@ -59,6 +60,9 @@ function createInteraction() {
   };
 }
 
+// afkCommand の実行ロジックが
+// ギルドコンテキストの検証・対象ユーザーの AFK チャンネルへの移動・
+// 成功 Embed の返信を正しく行うかを検証する
 describe("bot/features/afk/commands/afkCommand.execute", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -69,6 +73,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     tGuildMock.mockResolvedValue("translated");
   });
 
+  // guildId が null（DM などギルド外）の場合はコマンド実行前に弾かれることを確認
   it("throws ValidationError when guildId is missing", async () => {
     const interaction = createInteraction();
     interaction.guildId = null as never;

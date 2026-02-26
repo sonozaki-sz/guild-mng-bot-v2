@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard.test.ts
 import type { Mock } from "vitest";
 import { ensureManageGuildPermission } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard";
 import { ValidationError } from "@/shared/errors/customErrors";

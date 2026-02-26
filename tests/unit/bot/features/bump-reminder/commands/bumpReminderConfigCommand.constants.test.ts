@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.constants.test.ts
 import { BUMP_REMINDER_CONFIG_COMMAND } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.constants";
 
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.constants", () => {

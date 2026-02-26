@@ -1,3 +1,4 @@
+// tests/unit/bot/services/botGuildConfigRepositoryResolver.test.ts
 describe("bot/services/botGuildConfigRepositoryResolver", () => {
   beforeEach(() => {
     vi.resetModules();

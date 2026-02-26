@@ -74,7 +74,9 @@ function createInteractionMock({
   };
 }
 
+// スティッキーメッセージの削除ユースケースを検証する。DB記録削除とDiscordメッセージ削除の協調動作、および各エラーケースの耐性を確認する
 describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", () => {
+  // deleteMockのデフォルト成功値を設定し、テスト間のモック状態汚染を防ぐ
   beforeEach(() => {
     vi.clearAllMocks();
     deleteMock.mockResolvedValue(undefined);
@@ -109,6 +111,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(deleteMock).not.toHaveBeenCalled();
   });
 
+  // DBレコード削除とDiscordの投稿削除が両方呼ばれ、成功返信が送られる正常系フロー全体を確認する
   it("deletes existing sticky message and replies with success", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
@@ -143,6 +146,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
+  // Discordのメッセージが既に削除済み等で取得・削除に失敗しても、DBレコード削除は続行されエラーが上位に伝播しないことを確認する
   it("ignores error when fetching/deleting previous message fails", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
@@ -161,6 +165,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(deleteMock).toHaveBeenCalledWith("sticky-1");
   });
 
+  // guildチャンネルキャッシュに対象チャンネルがない場合でも、DBのスティッキー設定は正常に削除されることを確認する
   it("skips delete when guild channels cache has no channel", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");

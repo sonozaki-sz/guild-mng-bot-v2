@@ -1,3 +1,4 @@
+// tests/unit/shared/utils/index.test.ts
 describe("shared/utils modules", () => {
   it("exports utility functions and logger from direct modules", async () => {
     const errorHandlingModule = await import("@/shared/utils/errorHandling");
