@@ -24,8 +24,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    if:
-      github.event_name == 'pull_request' && github.event.action != 'closed'
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
 
     steps:
       - uses: actions/checkout@v4
@@ -134,12 +133,12 @@ jobs:
                   "fields": [
                     {
                       "name": "リポジトリ",
-                      "value": "[guild-mng-bot-v2](https://github.com/${{ github.repository }})",
+                      "value": "[ayasono](https://github.com/${{ github.repository }})",
                       "inline": false
                     },
                     {
                       "name": "Portainer",
-                      "value": "Stack: [guild-mng](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/guild-mng?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)",
+                      "value": "Stack: [ayasono](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)",
                       "inline": false
                     }
                   ],
@@ -186,12 +185,12 @@ jobs:
                     },
                     {
                       \"name\": \"リポジトリ\",
-                      \"value\": \"[guild-mng-bot-v2](https://github.com/${{ github.repository }})\",
+                      \"value\": \"[ayasono](https://github.com/${{ github.repository }})\",
                       \"inline\": false
                     },
                     {
                       \"name\": \"Portainer\",
-                      \"value\": \"Stack: [guild-mng](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/guild-mng?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)\",
+                      \"value\": \"Stack: [ayasono](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)\",
                       \"inline\": false
                     }
                   ],

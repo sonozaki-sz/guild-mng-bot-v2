@@ -1,6 +1,6 @@
 # VSCode 開発環境設定
 
-このディレクトリには、Guild Management Bot v2の開発を効率化するVSCode設定が含まれています。
+このディレクトリには、ayasono の開発を効率化するVSCode設定が含まれています。
 
 ## 📁 ファイル構成
 
@@ -64,7 +64,7 @@
 - `Lint: Check/Fix` - ESLintチェック
 - `Format: Check/Write` - Prettierフォーマット
 
-### guild-mng-bot-v2.code-snippets
+### ayasono.code-snippets
 
 プロジェクト専用のコードスニペットです。
 
@@ -140,7 +140,7 @@ logger; // ロガー生成
 
 ### スニペットの追加
 
-`guild-mng-bot-v2.code-snippets` に新しいスニペットを追加できます:
+`ayasono.code-snippets` に新しいスニペットを追加できます:
 
 ```json
 {

@@ -23,7 +23,7 @@ describe("web/routes/api/index", () => {
     expect(fastifyMock.get).toHaveBeenCalledWith("/", expect.any(Function));
 
     await expect(registeredRootHandler?.()).resolves.toEqual({
-      message: "Guild Management Bot API",
+      message: "Ayasono API",
       version: "2.0.0",
     });
   });

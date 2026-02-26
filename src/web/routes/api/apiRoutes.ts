@@ -9,7 +9,7 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.get("/", async () => {
     return {
-      message: "Guild Management Bot API",
+      message: "Ayasono API",
       version: "2.0.0",
     };
   });

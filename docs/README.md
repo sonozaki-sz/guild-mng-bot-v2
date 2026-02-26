@@ -1,6 +1,6 @@
 # ドキュメント構成
 
-> Guild Management Bot v2 のドキュメント一覧
+> ayasono のドキュメント一覧
 
 最終更新: 2026年2月22日
 
@@ -83,7 +83,7 @@ XServer VPS の初期設定から Portainer のインストール・スタック
 - Docker / Docker Compose のインストール確認
 - Portainer CE の起動（`infra` スタックとして `/opt/infra/` で管理）
 - Portainer の初期設定（管理者アカウント・環境設定）
-- bot スタック（`guild-mng`）の初回作成
+- bot スタック（`ayasono`）の初回作成
 - GitHub Secrets の登録方法（API キー・スタック ID 等）
 - 動作確認と手動再起動コマンド
 
