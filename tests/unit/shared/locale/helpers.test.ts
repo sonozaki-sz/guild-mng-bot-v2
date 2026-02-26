@@ -1,3 +1,4 @@
+// tests/unit/shared/locale/helpers.test.ts
 import {
   getGuildTranslator,
   invalidateGuildLocaleCache,

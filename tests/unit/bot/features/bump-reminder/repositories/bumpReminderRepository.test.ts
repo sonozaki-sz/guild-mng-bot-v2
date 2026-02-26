@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/repositories/bumpReminderRepository.test.ts
 import type { Mock } from "vitest";
 
 const executeWithDatabaseErrorMock = vi.fn(
@@ -82,11 +83,15 @@ vi.mock(
   }),
 );
 
+// リポジトリクラスが全CRUD操作を各ユースケースへ正しく委譲し、
+// シングルトンキャッシュが同一prismaインスタンス内で機能することを検証するグループ
 describe("bot/features/bump-reminder/repositories/bumpReminderRepository", () => {
+  // モジュールキャッシュとモック呼び出し記録をテスト毎にリセットしてテスト間干渉を防ぐ
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  // 全メソッドが対応するユースケースに正しい引数で委譲されることを一括検証(デフォルト保持期間 7日も確認)
   it("delegates CRUD-style operations to usecases", async () => {
     const now = new Date("2026-02-21T00:00:00.000Z");
     const created = { id: "r1", guildId: "g1" };
@@ -166,6 +171,7 @@ describe("bot/features/bump-reminder/repositories/bumpReminderRepository", () =>
     expect(loggerInfoMock).toHaveBeenCalled();
   });
 
+  // 同一prismaインスタンスでは同一リポジトリを返し、異なるprismaでは新規リポジトリを生成することを確認
   it("reuses singleton for same prisma and recreates for different prisma", async () => {
     const { getBumpReminderRepository } =
       await import("@/bot/features/bump-reminder/repositories/bumpReminderRepository");

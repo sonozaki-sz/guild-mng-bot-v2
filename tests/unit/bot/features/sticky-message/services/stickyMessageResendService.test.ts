@@ -42,13 +42,16 @@ function createRepoMock() {
   };
 }
 
+// 5秒デバウンスタイマー・前メッセージ削除・エラー耐性・シングルトン管理を一通り検証
 describe("bot/features/sticky-message/services/stickyMessageResendService", () => {
+  // デバウンスタイマーを制御するために偽タイマーが必要。モジュールキャッシュも毎回クリアして独立性を保つ
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
     vi.useFakeTimers();
   });
 
+  // テスト後にシステム時計を本物に戻し、他テストのタイマー動作に影響させない
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -137,6 +140,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(deleteMock).toHaveBeenCalled();
   });
 
+  // 削除済みメッセージへの fetch が 404 エラーになるケース: サービスはクラッシュせず debug ログだけ出すべき
   it("ignores error when previous sticky message is already deleted", async () => {
     const repo = createRepoMock();
     const fetchMessageMock = vi.fn().mockRejectedValue(new Error("Not Found"));
@@ -207,6 +211,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(channel.send).not.toHaveBeenCalled();
   });
 
+  // タイマー登録後に cancelTimer を呼ぶと、その後タイマーが発火しても resend が実行されないことを確認
   it("cancelTimer removes the scheduled timer", async () => {
     const repo = createRepoMock();
     const sticky = {
@@ -241,6 +246,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(() => service.cancelTimer("no-such-channel")).not.toThrow();
   });
 
+  // 引数なしで呼ぶと「未初期化」エラーになる初期化ガードを検証
   it("getStickyMessageResendService throws when not initialized", async () => {
     const { getStickyMessageResendService } =
       await import("@/bot/features/sticky-message/services/stickyMessageResendService");

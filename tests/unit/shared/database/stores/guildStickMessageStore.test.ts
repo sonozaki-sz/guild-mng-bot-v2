@@ -1,3 +1,4 @@
+// tests/unit/shared/database/stores/guildStickMessageStore.test.ts
 import type { MockedFunction } from "vitest";
 import { findStickMessagesJson } from "@/shared/database/repositories/persistence/guildConfigReadPersistence";
 import { GuildStickMessageStore } from "@/shared/database/stores/guildStickMessageStore";

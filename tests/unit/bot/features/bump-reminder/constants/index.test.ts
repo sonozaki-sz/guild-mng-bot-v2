@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/constants/index.test.ts
 describe("bot/features/bump-reminder/constants/index", () => {
   it("exposes core constants and helpers", async () => {
     const rawModule =

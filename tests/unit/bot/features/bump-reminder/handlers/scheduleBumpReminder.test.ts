@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/scheduleBumpReminder.test.ts
 import { scheduleBumpReminder } from "@/bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder";
 
 const SERVICE_NAME = "Disboard" as const;
@@ -35,7 +36,10 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+// バンプリマインダーのスケジュール登録ユースケース全体を検証するグループ:
+// 正常登録・登録失敗時の孤立パネルクリーンアップ・登録済みタスクの実行内容を確認する
 describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", () => {
+  // 各テスト前にモックをリセットし、リマインダー遅延120分とマネージャーの標準動作を設定する
   beforeEach(() => {
     vi.clearAllMocks();
     getReminderDelayMinutesMock.mockReturnValue(120);
@@ -64,6 +68,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     expect(setReminderMock.mock.calls[0][6]).toBe("Disboard");
   });
 
+  // リマインダー登録失敗時に孤立パネルメッセージをチャンネルから削除したうえでエラーを再スローする正常系クリーンアップを検証
   it("deletes orphan panel and rethrows on registration error", async () => {
     const panelDelete = vi.fn().mockResolvedValue(undefined);
     const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });
@@ -122,6 +127,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     );
   });
 
+  // パネル削除自体も失敗した場合、クリーンアップエラーを握りつぶしてデバッグログに記録し元エラーを再スローすることを確認
   it("logs debug when orphan panel deletion fails", async () => {
     const fetchMessage = vi.fn().mockRejectedValue(new Error("fetch failed"));
     const fetchChannel = vi.fn().mockResolvedValue({
@@ -151,6 +157,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     );
   });
 
+  // panelMessageId が未定義の場合はチャンネルフェッチを行わず元エラーをそのまま再スローする(不要なIO回避)
   it("rethrows without orphan cleanup when panelMessageId is undefined", async () => {
     const fetchChannel = vi.fn();
     const client = { channels: { fetch: fetchChannel } };
@@ -172,6 +179,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     expect(fetchChannel).not.toHaveBeenCalled();
   });
 
+  // 取得したチャンネルがテキストチャンネルでない場合はメッセージ削除をスキップし元エラーだけを再スローすることを確認
   it("skips panel deletion when fetched channel is not text based", async () => {
     const fetchChannel = vi.fn().mockResolvedValue({
       isTextBased: () => false,

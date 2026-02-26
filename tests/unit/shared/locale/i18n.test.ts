@@ -1,3 +1,6 @@
+// tests/unit/shared/locale/i18n.test.ts
+// i18n モジュールの初期化設定（ロケール定数・i18next オプション・debug フラグ）と
+// addResources / changeLanguage / t のラッパーが i18next に正しく委譲するかを検証する
 describe("shared/locale/i18n", () => {
   const loadModule = async (nodeEnv: "development" | "production" | "test") => {
     vi.resetModules();
@@ -54,6 +57,7 @@ describe("shared/locale/i18n", () => {
     );
   });
 
+  // 本番・テスト環境では i18next の debug ログを無効化して余分な出力を抑制することを確認
   it("sets debug false outside development", async () => {
     const { module, i18nextMock } = await loadModule("production");
     await module.initI18n();
@@ -63,6 +67,7 @@ describe("shared/locale/i18n", () => {
     );
   });
 
+  // addResources が merge フラグ付きで addResourceBundle を呼び出し、changeLanguage が委譲されることを確認
   it("delegates addResources and changeLanguage to i18next", async () => {
     const { module, i18nextMock } = await loadModule("test");
 

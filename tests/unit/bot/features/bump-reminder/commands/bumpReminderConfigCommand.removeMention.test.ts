@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMention.test.ts
 import { handleBumpReminderConfigRemoveMention } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMention";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-reminder/bumpReminderConfigService";
@@ -40,6 +41,9 @@ vi.mock(
   }),
 );
 
+// remove-mention サブコマンドが
+// ロール未設定時の ValidationError 送出と設定済みロール削除時の成功応答を
+// サービス層の結果コードに応じて正しく分岐するかを検証する
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMention", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -51,6 +55,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
     });
   });
 
+  // サービスが NOT_CONFIGURED を返した場合（削除対象のロールが存在しない）は ValidationError を投げることを確認
   it("throws ValidationError when role target is not configured", async () => {
     setMentionRoleMock.mockResolvedValue(
       BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED,

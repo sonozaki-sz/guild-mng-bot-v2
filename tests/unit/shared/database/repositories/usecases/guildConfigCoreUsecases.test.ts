@@ -1,4 +1,4 @@
-import type { MockedFunction } from "vitest";
+// tests/unit/shared/database/repositories/usecases/guildConfigCoreUsecases.test.ts
 import {
   existsGuildConfigRecord,
   findGuildConfigRecord,
@@ -23,6 +23,7 @@ import {
   updateGuildConfigUsecase,
   updateGuildLocaleUsecase,
 } from "@/shared/database/repositories/usecases/guildConfigCoreUsecases";
+import type { MockedFunction } from "vitest";
 
 vi.mock(
   "@/shared/database/repositories/persistence/guildConfigReadPersistence",
@@ -51,6 +52,8 @@ vi.mock(
   }),
 );
 
+// guild設定に対するCRUD・ロケール取得ユースケースが、永続化層・シリアライザーを
+// 正しくオーケストレーションしエラーをラップして返すことを検証するグループ
 describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => {
   const deps = {
     prisma: { guildConfig: {} } as never,
@@ -94,6 +97,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     typeof findGuildLocale
   >;
 
+  // テスト間でモックの呼び出し記録が持ち越されないようにクリアする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -115,6 +119,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     await expect(getGuildConfigUsecase(deps, "g2")).resolves.toBeNull();
   });
 
+  // DBエラーが toDatabaseError でラップされ、適切なプレフィックス付きメッセージで再スローされることを確認
   it("getGuildConfigUsecase wraps errors with toDatabaseError", async () => {
     findGuildConfigRecordMock.mockRejectedValueOnce(new Error("db down"));
 
@@ -137,6 +142,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     );
   });
 
+  // upsertペイロードが(updateData + createFallback)として正しく構築され、失敗時はエラーがラップされることを検証
   it("updateGuildConfigUsecase builds upsert payload and wraps failures", async () => {
     toUpdateDataMock.mockReturnValueOnce({ afkConfig: "{}" });
 
@@ -172,6 +178,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     );
   });
 
+  // ロケールが見つからない(null)場合とDBエラー発生時の両方でデフォルトロケールにフォールバックすることを確認
   it("getGuildLocaleUsecase returns locale, fallback, and fallback-on-error", async () => {
     findGuildLocaleMock.mockResolvedValueOnce("en");
     await expect(getGuildLocaleUsecase(deps, "g1")).resolves.toBe("en");

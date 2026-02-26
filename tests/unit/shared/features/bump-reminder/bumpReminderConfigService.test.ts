@@ -1,3 +1,5 @@
+// tests/unit/shared/features/bump-reminder/bumpReminderConfigService.test.ts
+// BumpReminderConfigService のデータ取得・保存・シングルトン管理・トップレベル関数委譲の動作を検証
 describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
   const CLEAR = "CLEAR";
   const ROLE = "ROLE";
@@ -16,6 +18,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     clearBumpReminderMentions: vi.fn(),
   });
 
+  // vi.resetModules() で ESM キャッシュを破棄し、各テストで独立したモジュールスコープ・定数マッピングを使用するためのヘルパー
   const loadModule = async () => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -51,6 +54,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(module.BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT).toBe(USERS_CLEAR);
   });
 
+  // 取得したコンフィグが参照ではなくディープコピーとして返り、元データと別インスタンスになることを検証
   it("returns normalized config and null when repository has no config", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
@@ -73,6 +77,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(config?.mentionUserIds).not.toBe(rawConfig.mentionUserIds);
   });
 
+  // リポジトリにデータがない場合に毎回新しいデフォルト配列インスタンスを返し、呼び出し間で共有されないことを検証
   it("returns fresh default config when repository config is missing", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
@@ -170,6 +175,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     );
   });
 
+  // 同一リポジトリインスタンスに対してはシングルトンが返り、異なるリポジトリでは別インスタンスが生成されることを検証
   it("reuses singleton for same repository and recreates for different repository", async () => {
     const { module } = await loadModule();
     const repositoryA = createRepositoryMock();
@@ -183,6 +189,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(serviceA1).not.toBe(serviceB);
   });
 
+  // モジュールが公開するトップレベル関数がリポジトリファクトリ経由のシングルトンサービスに処理を委譲することを検証
   it("function APIs delegate to singleton service resolved from repository factory", async () => {
     const { module, getGuildConfigRepositoryMock } = await loadModule();
     const repository = createRepositoryMock();

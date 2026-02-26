@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/index.test.ts
 describe("bot/features/vac/commands modules", () => {
   it("exposes vac command modules", async () => {
     const vacConstants =

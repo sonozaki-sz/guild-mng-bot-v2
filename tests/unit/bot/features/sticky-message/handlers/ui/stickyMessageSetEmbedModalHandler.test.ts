@@ -77,7 +77,9 @@ function createInteractionMock({
   };
 }
 
+// Embedスタイルのスティッキーメッセージをモーダルから新規作成する際の入力バリデーション・DB登録・Discord送信フローを検証する
 describe("bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler", () => {
+  // テスト間でモック状態を完全リセットし、createMockのデフォルト応答を設定して各ケースを独立させる
   beforeEach(() => {
     vi.clearAllMocks();
     createMock.mockResolvedValue({ id: "sticky-1" });
@@ -126,6 +128,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHand
     expect(createMock).not.toHaveBeenCalled();
   });
 
+  // 対象チャンネルにすでにスティッキーメッセージが存在する場合、重複作成を防ぐガード処理が働くことを確認する
   it("replies with warning when sticky already exists", async () => {
     const { stickyMessageSetEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler");
@@ -140,6 +143,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHand
     expect(createMock).not.toHaveBeenCalled();
   });
 
+  // Discordチャンネルキャッシュに対象チャンネルが存在しない場合、バリデーションエラーが上位へ伝播することを確認する
   it("throws ValidationError when channel not in cache", async () => {
     const { stickyMessageSetEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler");
@@ -173,6 +177,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHand
     );
   });
 
+  // 説明文が空の場合、タイトルのみでcreateが呼ばれること（contentフォールバック）を確認する
   it("uses embedTitle as content when no description", async () => {
     const { stickyMessageSetEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler");

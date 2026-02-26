@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/vacConfigCommand.constants.test.ts
 import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand.constants";
 
 describe("bot/features/vac/commands/vacConfigCommand.constants", () => {

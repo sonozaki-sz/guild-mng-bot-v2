@@ -72,7 +72,9 @@ function createInteractionMock({
   };
 }
 
+// モーダル送信時にスティッキーメッセージの内容を更新し、Discord上の投稿を差し替える一連のフローを検証する
 describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler", () => {
+  // 各テストが独立して動くよう、モックの呼び出し履歴をリセットし updateContent の成功レスポンスを初期化する
   beforeEach(() => {
     vi.clearAllMocks();
     updateContentMock.mockResolvedValue({
@@ -134,6 +136,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
     expect(updateContentMock).not.toHaveBeenCalled();
   });
 
+  // DB更新→旧メッセージ削除→新メッセージ送信という正常系の連鎖フロー全体が正しく実行されることを確認する
   it("updates content and resends sticky message when channel and lastMessageId exist", async () => {
     const { stickyMessageUpdateModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
@@ -159,6 +162,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
     );
   });
 
+  // 旧メッセージの取得・削除に失敗しても例外を握りつぶして後続処理（返信）が完了することを確認する
   it("ignores error when deleting old message fails", async () => {
     const { stickyMessageUpdateModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
@@ -174,6 +178,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
+  // DB更新は成功したがDiscordへの再送信が失敗した場合に、エラーがログに記録されることを確認する
   it("logs error when resend fails after update", async () => {
     const { stickyMessageUpdateModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
@@ -208,6 +213,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
+  // updateContent でDBエラーが発生した場合に例外が上位へ伝播し、かつエラーログが記録されることを確認する
   it("rethrows error when updateContent fails", async () => {
     const { stickyMessageUpdateModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");

@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/handlers/ui/vacPanelButton.test.ts
 import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
 import { safeReply } from "@/bot/utils/interaction";
 
@@ -41,7 +42,9 @@ vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
   sendVacControlPanel: (...args: unknown[]) => sendVacControlPanelMock(...args),
 }));
 
+// VACパネルの各ボタン（リネーム・人数制限・AFK・リフレッシュ）操作に対するインタラクション処理を検証するグループ
 describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
+  // テスト間でモック状態が汚染されないよう履歴をリセットし、正常系のデフォルト動作を設定する
   beforeEach(() => {
     vi.clearAllMocks();
     isManagedVacChannelMock.mockResolvedValue(true);
@@ -76,6 +79,7 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
     expect(safeReply).not.toHaveBeenCalled();
   });
 
+  // 古いパネルメッセージの削除に失敗しても、コントロールパネルの再送信と成功返信が中断されないことを確認する
   it("refreshes control panel and replies success even when old message deletion fails", async () => {
     const channel = {
       id: "voice-1",
@@ -139,6 +143,7 @@ describe("bot/features/vac/handlers/ui/vacPanelButton", () => {
     });
   });
 
+  // AFKボタンは移動先チャンネルのメンバーが対象となるため、VCが空の場合は「VCに参加していない」エラーを返すことを確認する
   it("replies not-in-vc error when afk button is pressed but vc is empty", async () => {
     const channel = {
       id: "voice-1",

@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/index.test.ts
 describe("bot/features/bump-reminder/index", () => {
   it("exposes core symbols from concrete modules", async () => {
     const constantsModule =

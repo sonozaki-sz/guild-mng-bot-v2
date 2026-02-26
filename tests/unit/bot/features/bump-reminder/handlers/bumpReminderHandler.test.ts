@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/bumpReminderHandler.test.ts
 import {
   handleBumpDetected,
   sendBumpPanel,
@@ -247,6 +248,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
     });
 
+    // ロール ID とユーザー ID からメンション文字列が構築され、サービス対応のフォーマットで送信されることを検証
     it("sends reply message with mentions for known service", async () => {
       const sendMock = vi.fn().mockResolvedValue(undefined);
       const channel = {
@@ -363,6 +365,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
     });
 
+    // 通知送信後の finally ブロックでパネルメッセージが消去されることを検証
     it("deletes panel message in finally when panelMessageId is provided", async () => {
       const deleteMock = vi.fn().mockResolvedValue(undefined);
       const channel = {
@@ -406,6 +409,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
     });
 
+    // finally 内のパネル削除時にフェッチが失敗した場合、創り投げず debug ログだけ出すことを検証
     it("logs panel deletion failure in finally", async () => {
       const channel = {
         isTextBased: () => true,
@@ -445,6 +449,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
     });
 
+    // チャンネル取得失敗時、finally 内でもパネル削除のために再フェッチを試むことを検証
     it("tries re-fetch in finally when initial channel fetch fails", async () => {
       const client = {
         channels: {
@@ -632,6 +637,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
     });
 
+    // scheduleBumpReminder が例外を投げた場合にエラーをそのまま浜に出さず、ログだけ戻る補償処理を検証
     it("logs detection failure when scheduling throws", async () => {
       getBotBumpReminderConfigServiceMock.mockReturnValue({
         getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: true }),

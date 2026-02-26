@@ -47,7 +47,9 @@ function createInteractionMock({
   };
 }
 
+// stickyMessageViewSelectHandler の UI インタラクション処理（表示切替・フォーマット分岐・エラー耐性）を検証
 describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler", () => {
+  // 各テストケースで embed モックの状態をリセットし、テスト間の副作用を排除
   beforeEach(() => {
     vi.clearAllMocks();
     infoEmbedMock.mockReturnValue(infoEmbedInstance);
@@ -68,6 +70,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     ).toBe(false);
   });
 
+  // values が空配列の場合（チャンネル未選択）はチャンネル ID を取得できず、コンポーネントのみクリアして早期リターンすることを検証
   it("calls update with empty components when no channelId", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
@@ -98,6 +101,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     );
   });
 
+  // embedData が null の場合はプレーンテキスト表示パスに分岐し、setColor が呼ばれないことを検証
   it("shows plain format for sticky without embedData", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
@@ -174,6 +178,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     );
   });
 
+  // Discord の embed フィールド文字数上限（1024）を超えるコンテンツが "..." で切り詰められることを検証
   it("truncates content longer than 1024 chars", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
@@ -221,6 +226,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(contentField?.value).not.toContain("...");
   });
 
+  // embedData が不正な JSON 文字列でも例外を投げず、更新処理が正常完了することを検証
   it("ignores JSON parse errors in embedData", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
@@ -241,6 +247,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(updateMock).toHaveBeenCalled();
   });
 
+  // guildId が null の場合に null 合体演算子で undefined にフォールバックし、クラッシュせず更新できることを検証
   it("treats guildId as undefined when null (null-coalescing fallback)", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");

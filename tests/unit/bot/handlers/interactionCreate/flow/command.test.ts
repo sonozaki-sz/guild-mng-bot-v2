@@ -1,9 +1,10 @@
-import type { Mock } from "vitest";
+// tests/unit/bot/handlers/interactionCreate/flow/command.test.ts
 import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 import {
   handleAutocomplete,
   handleChatInputCommand,
 } from "@/bot/handlers/interactionCreate/flow/command";
+import type { Mock } from "vitest";
 
 const tDefaultMock = vi.fn((key: string) => `default:${key}`);
 const tGuildMock: Mock = vi.fn(async () => "guild:cooldown");
@@ -30,7 +31,10 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: vi.fn(),
 }));
 
+// コマンドハンドラーのルーティング制御を検証する
+// 未登録コマンド・クールダウン中・実行エラー・オートコンプリートの各分岐が正しく処理されるかを確認する
 describe("bot/handlers/interactionCreate/flow/command", () => {
+  // テスト間でモック呼び出し履歴が混入しないようにリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -47,6 +51,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
   });
 
+  // cooldownManager.check が正の値を返した場合、コマンドは実行せずクールダウンメッセージを ephemeral で返す
   it("replies cooldown message when user is in cooldown", async () => {
     const interaction = {
       commandName: "ping",
@@ -72,6 +77,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     expect(command.execute).not.toHaveBeenCalled();
   });
 
+  // コマンドの execute が例外を投げた場合、handleCommandError に委譲し自前でエラーを握りつぶさないことを確認
   it("delegates execution error to handleCommandError", async () => {
     const error = new Error("execute failed");
     const interaction = {

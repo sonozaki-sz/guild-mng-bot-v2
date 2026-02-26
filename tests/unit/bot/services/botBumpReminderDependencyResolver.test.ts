@@ -1,3 +1,4 @@
+// tests/unit/bot/services/botBumpReminderDependencyResolver.test.ts
 describe("bot/services/botBumpReminderDependencyResolver", () => {
   beforeEach(() => {
     vi.resetModules();

@@ -1,3 +1,4 @@
+// tests/unit/bot/features/ping/commands/pingCommand.execute.test.ts
 import type { Mock } from "vitest";
 import { executePingCommand } from "@/bot/features/ping/commands/pingCommand.execute";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";

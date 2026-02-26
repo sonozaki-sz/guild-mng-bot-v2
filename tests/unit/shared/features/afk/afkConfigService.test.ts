@@ -1,3 +1,5 @@
+// tests/unit/shared/features/afk/afkConfigService.test.ts
+// AfkConfigService クラスのメソッド動作・シングルトンキャッシュ挙動・モジュールレベル関数 API を検証するグループ
 describe("shared/features/afk/afkConfigService", () => {
   const createRepositoryMock = () => ({
     getAfkConfig: vi.fn(),
@@ -5,6 +7,7 @@ describe("shared/features/afk/afkConfigService", () => {
     updateAfkConfig: vi.fn(),
   });
 
+  // シングルトンのキャッシュ状態が各テストに持ち越されないよう、毎回モジュールを再ロードする
   const loadModule = async () => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -22,6 +25,7 @@ describe("shared/features/afk/afkConfigService", () => {
     };
   };
 
+  // リポジトリが null を返す場合と値を返す場合の両方を検証し、かつ正規化コピーであることを確認（参照が異なる）
   it("returns null and normalized config from getAfkConfig", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
@@ -92,6 +96,7 @@ describe("shared/features/afk/afkConfigService", () => {
     );
   });
 
+  // 同一リポジトリインスタンスならサービスを再生成せずキャッシュを返し、別インスタンスでは新規生成されることを確認
   it("reuses singleton for same repository and recreates for different repository", async () => {
     const { module } = await loadModule();
     const repositoryA = createRepositoryMock();
@@ -105,6 +110,7 @@ describe("shared/features/afk/afkConfigService", () => {
     expect(serviceA1).not.toBe(serviceB);
   });
 
+  // モジュールが公開するトップレベル関数がリポジトリファクトリ経由でシングルトンサービスに委譲することを検証
   it("function APIs delegate to singleton service resolved from repository factory", async () => {
     const { module, getGuildConfigRepositoryMock } = await loadModule();
     const repository = createRepositoryMock();

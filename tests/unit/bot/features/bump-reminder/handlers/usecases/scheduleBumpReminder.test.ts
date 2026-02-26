@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder.test.ts
 describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", () => {
   it("exports scheduleBumpReminder function", async () => {
     const module =

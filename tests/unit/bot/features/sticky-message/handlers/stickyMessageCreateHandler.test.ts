@@ -30,6 +30,9 @@ function createMessageMock(
   };
 }
 
+// メッセージ作成イベントハンドラーが
+// Bot メッセージ・DM・非テキストチャンネルを正しくフィルタリングし、
+// 有効なメッセージのみスティッキーメッセージの再送サービスに委譲するかを検証する
 describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,6 +62,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     expect(handleMessageCreateMock).not.toHaveBeenCalled();
   });
 
+  // DM（guildId が null）はギルドスコープの機能対象外のため無視されることを確認
   it("ignores messages without guildId (DMs)", async () => {
     const { handleStickyMessageCreate } =
       await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
@@ -81,6 +85,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     expect(handleMessageCreateMock).not.toHaveBeenCalled();
   });
 
+  // 再送サービスが例外を投げても呼び出し元に伝播させずエラーログのみ記録することを確認
   it("logs error when resend service throws", async () => {
     const { handleStickyMessageCreate } =
       await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");

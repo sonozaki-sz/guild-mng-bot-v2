@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/repositories/usecases/deleteBumpReminder.test.ts
 import { deleteBumpReminderUseCase } from "@/bot/features/bump-reminder/repositories/usecases/deleteBumpReminder";
 
 describe("bot/features/bump-reminder/repositories/usecases/deleteBumpReminder", () => {

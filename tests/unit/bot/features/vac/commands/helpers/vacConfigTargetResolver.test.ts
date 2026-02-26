@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/helpers/vacConfigTargetResolver.test.ts
 import {
   findTriggerChannelByCategory,
   resolveTargetCategory,

@@ -1,3 +1,6 @@
+// tests/unit/shared/utils/logger.test.ts
+// NODE_ENV と LOG_LEVEL の組み合わせに応じてトランスポート構成・ログレベル・
+// フォーマット関数の出力が正しく切り替わるかを検証する
 describe("Logger", () => {
   const loadLoggerModule = async (
     nodeEnv: "development" | "production" | "test",
@@ -49,6 +52,7 @@ describe("Logger", () => {
     };
   };
 
+  // development 環境では Console + DailyRotateFile×2 の計3トランスポートと debug レベルが設定されることを確認
   it("configures development logger with debug-level console and two rotate files", async () => {
     const { module, createLoggerMock, consoleTransportMock, dailyRotateMock } =
       await loadLoggerModule("development", "debug");
@@ -81,6 +85,8 @@ describe("Logger", () => {
     expect(createLoggerArgs.transports).toHaveLength(3);
   });
 
+  // コンソール用 printf が stack の有無でフォーマットを切り替えること、
+  // stack がある場合は改行で続けて出力されることを検証する
   it("formats console output with and without stack in development", async () => {
     const { winstonMock } = await loadLoggerModule("development", "debug");
 
@@ -112,6 +118,8 @@ describe("Logger", () => {
     ).toBe("2026-02-21 00:00:00 [error]: boom\nSTACK_TRACE");
   });
 
+  // ファイル用 printf が余剰メタフィールドを JSON 文字列として末尾に付加し、
+  // stack は改行区切りで最後に出力されることを確認する
   it("formats file output with meta and optional stack", async () => {
     const { winstonMock } = await loadLoggerModule("development", "debug");
 
@@ -144,6 +152,7 @@ describe("Logger", () => {
     ).toBe('2026-02-21 00:00:00 [ERROR]: boom{"guildId":"g1"}\nSTACK_TRACE');
   });
 
+  // LOG_LEVEL が未設定の開発環境ではデフォルト値として debug が適用されることを確認
   it("uses debug default level when LOG_LEVEL is missing in development", async () => {
     const { consoleTransportMock } = await loadLoggerModule(
       "development",

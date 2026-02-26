@@ -1,3 +1,4 @@
+// tests/unit/shared/errors/customErrors.test.ts
 /**
  * CustomErrors Unit Tests
  * カスタムエラークラスのテスト

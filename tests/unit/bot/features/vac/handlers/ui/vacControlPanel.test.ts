@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/handlers/ui/vacControlPanel.test.ts
 import {
   VAC_PANEL_CUSTOM_ID,
   getVacPanelChannelId,
@@ -19,7 +20,9 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   ),
 }));
 
+// VACコントロールパネルのカスタムIDパース・送信可否チェック・送信ペイロード内容を検証する
 describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
+  // ロケール翻訳・Embed生成モックの状態をテスト間でリセット
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -42,6 +45,7 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
     ).toBe("");
   });
 
+  // isTextBased()がfalseの場合、isSendableも送信も呼ばれずに早期リターンすることを確認
   it("returns early when voice channel is not text based", async () => {
     const send = vi.fn();
     const voiceChannel = {
@@ -73,6 +77,7 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
     expect(send).not.toHaveBeenCalled();
   });
 
+  // 送信ペイロードが4行のボタンとembedを持ち、各ボタンのcustom_idにチャンネルIDが正しく組み込まれているか確認
   it("sends VAC control panel with four button rows", async () => {
     const send = vi.fn().mockResolvedValue(undefined);
     const voiceChannel = {

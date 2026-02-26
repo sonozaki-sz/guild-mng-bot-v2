@@ -1,4 +1,4 @@
-import type { MockedFunction } from "vitest";
+// tests/unit/shared/database/stores/usecases/mutateBumpReminderConfig.test.ts
 import {
   casUpdateBumpReminderConfig,
   createInitialBumpReminderConfig,
@@ -15,6 +15,7 @@ import {
   BUMP_REMINDER_MENTION_USER_MODE,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
 } from "@/shared/database/types";
+import type { MockedFunction } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn(() => "db-update-failed"),
@@ -31,19 +32,18 @@ vi.mock("@/shared/database/stores/helpers/bumpReminderConfigCas", () => ({
   casUpdateBumpReminderConfig: vi.fn(),
 }));
 
+// BumpReminderConfig の変更ユースケース (CAS ループ・初期化・メンションユーザー管理) の動作を検証
 describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
-  const fetchSnapshotMock =
-    fetchBumpReminderConfigSnapshot as MockedFunction<
-      typeof fetchBumpReminderConfigSnapshot
-    >;
+  const fetchSnapshotMock = fetchBumpReminderConfigSnapshot as MockedFunction<
+    typeof fetchBumpReminderConfigSnapshot
+  >;
   const initializeIfMissingMock =
     initializeBumpReminderConfigIfMissing as MockedFunction<
       typeof initializeBumpReminderConfigIfMissing
     >;
-  const createInitialMock =
-    createInitialBumpReminderConfig as MockedFunction<
-      typeof createInitialBumpReminderConfig
-    >;
+  const createInitialMock = createInitialBumpReminderConfig as MockedFunction<
+    typeof createInitialBumpReminderConfig
+  >;
   const casUpdateMock = casUpdateBumpReminderConfig as MockedFunction<
     typeof casUpdateBumpReminderConfig
   >;
@@ -54,6 +54,7 @@ describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
     safeJsonParse: vi.fn(),
   };
 
+  // 各ケースでモックの呼び出し記録をリセットし、テスト間の副作用を排除する
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -72,6 +73,7 @@ describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
     ).resolves.toBe(BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED);
   });
 
+  // レコード未存在時に初期化を呼び出し、2回目のスナップショット取得後に CAS 書き込みが成功するまでリトライすること
   it("initializes config if missing and retries until CAS update succeeds", async () => {
     fetchSnapshotMock
       .mockResolvedValueOnce({ recordExists: false, rawConfig: null })
@@ -130,6 +132,7 @@ describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
     expect(result).toBe(BUMP_REMINDER_MENTION_ROLE_RESULT.UPDATED);
   });
 
+  // CAS が最大リトライ回数を超えて競合し続けた場合に DatabaseError をスローすること
   it("throws DatabaseError when CAS keeps conflicting", async () => {
     fetchSnapshotMock.mockResolvedValue({
       recordExists: true,
@@ -303,6 +306,7 @@ describe("shared/database/stores/usecases/mutateBumpReminderConfig", () => {
     ).rejects.toMatchObject({ name: "DatabaseError" });
   });
 
+  // mentionUserIds が配列でない不正データを受け取った場合も空配列として正規化し ADD が成功すること
   it("normalizes non-array mentionUserIds in mention-user mutation", async () => {
     fetchSnapshotMock.mockResolvedValueOnce({
       recordExists: true,

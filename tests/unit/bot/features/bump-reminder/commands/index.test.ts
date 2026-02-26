@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/commands/index.test.ts
 describe("bot/features/bump-reminder/commands/index", () => {
   it("exposes command definitions", async () => {
     const constantsModule =

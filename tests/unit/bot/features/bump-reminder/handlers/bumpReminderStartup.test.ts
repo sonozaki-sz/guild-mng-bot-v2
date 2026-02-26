@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/handlers/bumpReminderStartup.test.ts
 import { restoreBumpRemindersOnStartup } from "@/bot/features/bump-reminder/handlers/bumpReminderStartup";
 
 const getBotBumpReminderConfigServiceMock = vi.fn();
@@ -23,7 +24,11 @@ vi.mock("@/bot/features/bump-reminder/handlers/bumpReminderHandler", () => ({
   sendBumpReminder: (...args: unknown[]) => sendBumpReminderMock(...args),
 }));
 
+// Bot 起動時のバンプリマインダー復元処理が
+// タスクファクトリーを正しく構築して sendBumpReminder に委譲するか、
+// および復元失敗をログに記録して例外を握り潰すかを検証する
 describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
+  // 各テストで依存サービスのモックが正しい初期状態（restorePendingReminders を持つオブジェクト）を返すよう準備する
   beforeEach(() => {
     vi.clearAllMocks();
     getBotBumpReminderConfigServiceMock.mockReturnValue({
@@ -71,6 +76,7 @@ describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
     );
   });
 
+  // 復元処理が失敗しても Bot 起動を止めないよう例外をキャッチしてエラーログのみ残すことを確認
   it("logs and swallows restore error", async () => {
     restorePendingRemindersMock.mockRejectedValueOnce(
       new Error("restore failed"),

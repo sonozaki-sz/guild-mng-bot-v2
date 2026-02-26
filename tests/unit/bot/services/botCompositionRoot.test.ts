@@ -1,3 +1,4 @@
+// tests/unit/bot/services/botCompositionRoot.test.ts
 import { initializeBotCompositionRoot } from "@/bot/services/botCompositionRoot";
 
 const getGuildConfigRepositoryMock = vi.fn();
@@ -75,11 +76,14 @@ vi.mock("@/bot/services/botVacDependencyResolver", () => ({
   setBotVacService: (...args: unknown[]) => setBotVacServiceMock(...args),
 }));
 
+// Prismaインスタンスを起点として全ボット依存関係が正しく構築・各セッターへ注入されるDIの正確さを検証する
 describe("bot/services/botCompositionRoot", () => {
+  // 前テストのモック呼び出し記録が次テストに混入しないようリセット
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  // 各ファクトリの戻り値が対応するセッターへ漏れなく渡されるか、全依存を一括で確認
   it("wires all bot dependencies from prisma root", () => {
     const prisma = { id: "prisma" };
     const guildConfigRepository = { id: "guild-config-repo" };

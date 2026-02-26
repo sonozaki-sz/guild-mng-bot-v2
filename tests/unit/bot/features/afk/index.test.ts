@@ -1,3 +1,4 @@
+// tests/unit/bot/features/afk/index.test.ts
 describe("bot/features/afk commands", () => {
   it("loads afk feature executors", async () => {
     const afkModule =

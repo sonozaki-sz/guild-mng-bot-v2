@@ -1,3 +1,4 @@
+// tests/unit/bot/events/interactionCreate.test.ts
 import {
   handleCommandError,
   handleInteractionError,

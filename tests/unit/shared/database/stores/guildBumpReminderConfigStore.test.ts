@@ -1,4 +1,4 @@
-import type { MockedFunction } from "vitest";
+// tests/unit/shared/database/stores/guildBumpReminderConfigStore.test.ts
 import { GuildBumpReminderConfigStore } from "@/shared/database/stores/guildBumpReminderConfigStore";
 import { getBumpReminderConfigUseCase } from "@/shared/database/stores/usecases/getBumpReminderConfig";
 import {
@@ -13,6 +13,7 @@ import {
   BUMP_REMINDER_MENTION_USER_MODE,
   BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
 } from "@/shared/database/types";
+import type { MockedFunction } from "vitest";
 
 vi.mock("@/shared/database/stores/usecases/getBumpReminderConfig", () => ({
   getBumpReminderConfigUseCase: vi.fn(),
@@ -28,6 +29,7 @@ vi.mock("@/shared/database/stores/usecases/mutateBumpReminderConfig", () => ({
   mutateBumpReminderMentionUsersUseCase: vi.fn(),
 }));
 
+// GuildBumpReminderConfigStore が各ユースケースへの委譲・ミューテーターの内部ロジックを正しく呼び出すことを検証
 describe("shared/database/stores/guildBumpReminderConfigStore", () => {
   const getConfigMock = getBumpReminderConfigUseCase as MockedFunction<
     typeof getBumpReminderConfigUseCase
@@ -35,14 +37,12 @@ describe("shared/database/stores/guildBumpReminderConfigStore", () => {
   const setEnabledMock = setBumpReminderEnabledUseCase as MockedFunction<
     typeof setBumpReminderEnabledUseCase
   >;
-  const updateConfigMock =
-    updateBumpReminderConfigUseCase as MockedFunction<
-      typeof updateBumpReminderConfigUseCase
-    >;
-  const mutateConfigMock =
-    mutateBumpReminderConfigUseCase as MockedFunction<
-      typeof mutateBumpReminderConfigUseCase
-    >;
+  const updateConfigMock = updateBumpReminderConfigUseCase as MockedFunction<
+    typeof updateBumpReminderConfigUseCase
+  >;
+  const mutateConfigMock = mutateBumpReminderConfigUseCase as MockedFunction<
+    typeof mutateBumpReminderConfigUseCase
+  >;
   const mutateUsersMock =
     mutateBumpReminderMentionUsersUseCase as MockedFunction<
       typeof mutateBumpReminderMentionUsersUseCase
@@ -59,6 +59,7 @@ describe("shared/database/stores/guildBumpReminderConfigStore", () => {
     return { store, prisma, safeJsonParse };
   };
 
+  // 各テストでモックの呼び出し回数・引数をリセットし、テスト間の割り込みを防いで独立性を確保する
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -117,6 +118,7 @@ describe("shared/database/stores/guildBumpReminderConfigStore", () => {
     );
   });
 
+  // 正常系: mutator 内で mentionUserIds を [] に初期化しつつロール ID を設定し UPDATED を返すこと
   it("setBumpReminderMentionRole normalizes mentionUserIds and returns UPDATED", async () => {
     const { store } = createStore();
     mutateConfigMock.mockImplementationOnce(
@@ -158,6 +160,7 @@ describe("shared/database/stores/guildBumpReminderConfigStore", () => {
     );
   });
 
+  // 境界値: mentionUserIds が配列でない不正データの場合でも [] に正規化して適切なクリア結果を返すこと
   it("normalizes invalid mentionUserIds in clear methods", async () => {
     const { store } = createStore();
     mutateConfigMock
@@ -221,6 +224,7 @@ describe("shared/database/stores/guildBumpReminderConfigStore", () => {
     );
   });
 
+  // 分岐検証: ロール・ユーザーが未設定の場合は ALREADY_CLEARED、設定済みの場合は CLEARED となり設定がリセットされること
   it("clearBumpReminderMentions handles already-cleared and cleared branches", async () => {
     const { store } = createStore();
     mutateConfigMock

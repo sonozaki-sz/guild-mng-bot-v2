@@ -58,7 +58,10 @@ function createInteractionMock({
   };
 }
 
+// guildId の有無・ManageChannels 権限・各サブコマンド名に応じて
+// 対応するユースケース関数が呼び出されるか、またはバリデーションエラーとして処理されるかを検証する
 describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", () => {
+  // 全ユースケースモックとエラーハンドラーモックをリセットしてテスト間の干渉を防ぐ
   beforeEach(() => {
     vi.clearAllMocks();
     handleStickyMessageSetMock.mockResolvedValue(undefined);
@@ -68,6 +71,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     handleCommandErrorMock.mockResolvedValue(undefined);
   });
 
+  // DM など guildId が null のインタラクションはギルド外として早期検証エラーになることを確認
   it("throws ValidationError when no guildId", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
@@ -140,6 +144,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     );
   });
 
+  // 定義外のサブコマンド名が渡された場合は網羅外として ValidationError 扱いになることを確認
   it("throws ValidationError for unknown subcommand", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
@@ -150,6 +155,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     expect(handleCommandErrorMock).toHaveBeenCalled();
   });
 
+  // ユースケース内で予期せぬ例外が発生した場合、handleCommandError へ委譲されて握りつぶされないことを確認
   it("calls handleCommandError when an error is thrown", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");

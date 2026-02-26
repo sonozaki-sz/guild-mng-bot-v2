@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/index.test.ts
 describe("bot/features/bump-reminder/services/index", () => {
   it("exposes config resolver and manager", async () => {
     const resolverModule =

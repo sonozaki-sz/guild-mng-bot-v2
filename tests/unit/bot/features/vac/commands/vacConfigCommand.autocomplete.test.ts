@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/commands/vacConfigCommand.autocomplete.test.ts
 import { autocompleteVacConfigCommand } from "@/bot/features/vac/commands/vacConfigCommand.autocomplete";
 import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand.constants";
 import { ChannelType } from "discord.js";

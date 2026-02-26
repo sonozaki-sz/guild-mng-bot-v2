@@ -1,6 +1,7 @@
-import type { MockedFunction } from "vitest";
+// tests/unit/shared/database/stores/guildMemberLogConfigStore.test.ts
 import { findMemberLogConfigJson } from "@/shared/database/repositories/persistence/guildConfigReadPersistence";
 import { GuildMemberLogConfigStore } from "@/shared/database/stores/guildMemberLogConfigStore";
+import type { MockedFunction } from "vitest";
 
 vi.mock(
   "@/shared/database/repositories/persistence/guildConfigReadPersistence",
@@ -9,12 +10,14 @@ vi.mock(
   }),
 );
 
+// メンバーログコンフィグの取得・パース・更新委譲が正しく機能することを検証するグループ
 describe("shared/database/stores/guildMemberLogConfigStore", () => {
   const findMemberLogConfigJsonMock =
     findMemberLogConfigJson as MockedFunction<
       typeof findMemberLogConfigJson
     >;
 
+  // 各テストが前のテストのモック呼び出し状態に影響されないよう、必ずクリアする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -55,6 +58,7 @@ describe("shared/database/stores/guildMemberLogConfigStore", () => {
     await expect(store.getMemberLogConfig("guild-2")).resolves.toBeNull();
   });
 
+  // 更新処理がStoreに直接書かれず共通updateConfig関数に委譲されることで、ロケール設定など他フィールドへの副作用を防ぐアーキテクチャを確認する
   it("delegates update through shared updateConfig path", async () => {
     const safeJsonParse = vi.fn();
     const updateConfig = vi.fn().mockResolvedValue(undefined);

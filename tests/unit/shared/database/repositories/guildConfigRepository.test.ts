@@ -1,5 +1,9 @@
+// tests/unit/shared/database/repositories/guildConfigRepository.test.ts
 import type { Mock } from "vitest";
+// PrismaGuildConfigRepository が core usecases・各機能 store へ正しく委譲し、エラー変換も行うことを検証
 describe("shared/database/repositories/guildConfigRepository", () => {
+  // vi.resetModules() + vi.doMock() を使って各テストに新鮮なモジュールを提供し、
+  // ESM キャッシュによるモック汚染を防ぐ
   const loadModule = async () => {
     vi.resetModules();
 
@@ -133,6 +137,7 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     expect(coreUsecases.updateGuildLocaleUsecase).toHaveBeenCalled();
   });
 
+  // 非 Error 型を渡したとき toDatabaseError ヘルパーが "unknown error" サフィックス付きの DatabaseError に変換することを検証
   it("converts unknown errors to DatabaseError via toDatabaseError helper", async () => {
     const { module, coreUsecases } = await loadModule();
     const prisma = { guildConfig: {} };
@@ -152,6 +157,8 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     });
   });
 
+  // 各 Store コンストラクタが 1 度だけ生成され、それぞれのメソッドがリポジトリ経由で呼び出されること、
+  // また StickMessage/MemberLog Store には updateGuildConfig コールバックが正しく渡されることを検証
   it("delegates feature-specific operations to each store", async () => {
     const {
       module,
@@ -258,6 +265,7 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     );
   });
 
+  // ファクトリ関数が PrismaGuildConfigRepository のインスタンスを返すことを確認
   it("createGuildConfigRepository returns repository instance", async () => {
     const { module } = await loadModule();
     const prisma = { guildConfig: {} };

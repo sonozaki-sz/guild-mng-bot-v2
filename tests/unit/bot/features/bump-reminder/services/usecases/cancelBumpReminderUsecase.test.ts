@@ -1,3 +1,4 @@
+// tests/unit/bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase.test.ts
 import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import { cancelBumpReminderUsecase } from "@/bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase";
 

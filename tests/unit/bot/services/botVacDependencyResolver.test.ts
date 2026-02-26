@@ -1,3 +1,4 @@
+// tests/unit/bot/services/botVacDependencyResolver.test.ts
 describe("bot/services/botVacDependencyResolver", () => {
   beforeEach(() => {
     vi.resetModules();

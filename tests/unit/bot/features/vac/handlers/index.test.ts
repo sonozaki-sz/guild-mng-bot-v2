@@ -1,3 +1,4 @@
+// tests/unit/bot/features/vac/handlers/index.test.ts
 describe("bot/features/vac/handlers/index", () => {
   it("exposes vac handlers", async () => {
     const uiPanel =
