@@ -143,10 +143,10 @@ export async function handleStickyMessageUpdate(
       .setTitle(tDefault("commands:sticky-message.update.embed-modal.title"))
       .addComponents(
         new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput),
+        new ActionRowBuilder<TextInputBuilder>().addComponents(colorInput),
         new ActionRowBuilder<TextInputBuilder>().addComponents(
           descriptionInput,
         ),
-        new ActionRowBuilder<TextInputBuilder>().addComponents(colorInput),
       );
 
     await interaction.showModal(modal);
