@@ -131,8 +131,8 @@ export async function handleStickyMessageSet(
 
     modal.addComponents(
       new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput),
       new ActionRowBuilder<TextInputBuilder>().addComponents(colorInput),
+      new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput),
     );
 
     await interaction.showModal(modal);

@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年2月22日（sticky-message 実装完了）
+最終更新: 2026年2月27日（message-delete 仕様拡張・VC募集機能仕様書追加）
 
 ---
 
@@ -31,6 +31,7 @@
 | メッセージ固定       | ✅   | 100%   | 完全実装（set/remove/update/view） |
 | 参加・脱退ログ       | 📋   | 0%     | 仕様書のみ                         |
 | メッセージ削除       | 📋   | 0%     | 仕様書のみ                         |
+| VC募集               | 📋   | 0%     | 仕様書のみ                         |
 | Web UI               | 🚧   | 10%    | 基盤のみ                           |
 
 **凡例**: ✅ 完了 | 🚧 実装中 | 📋 仕様書作成済み
@@ -616,10 +617,36 @@ model BumpReminder {
 
 **実装予定内容**:
 
-- `/message-delete` コマンド
-- ユーザー指定、件数指定、チャンネル指定オプション
+- `/message-delete [count] [user] [keyword] [days] [after] [before] [channel]` コマンド
+  - `count`: 削除件数（デフォルト10件）
+  - `user`: 特定ユーザーのメッセージのみ対象
+  - `keyword`: キーワードを含むメッセージのみ対象
+  - `days`/`after`/`before`: 相対・絶対日時による絞り込み
+  - `channel`: 全チャンネル横断削除（省略時は現在チャンネル）
+- 確認ダイアログ（削除前のプレビュー表示）
+- ページネーション付き削除結果表示
 - 権限チェック（MANAGE_MESSAGES）
+- `/message-delete-config` コマンド（ギルド別デフォルト設定）
 - 削除ログ
+
+---
+
+### 📢 VC募集機能（仕様書のみ）
+
+**状態**: 📋 仕様書作成済み、実装待ち
+
+**仕様書**: [docs/specs/VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md)
+
+**実装予定内容**:
+
+- `/vc-recruit-config setup` — 募集機能の有効化・チャンネル設定
+- `/vc-recruit-config teardown` — 募集機能の無効化
+- `/vc-recruit-config add-role` — 参加可能ロール追加
+- `/vc-recruit-config remove-role` — 参加可能ロール削除
+- `/vc-recruit-config view` — 設定内容確認
+- 2ステップモーダルフロー（募集画面作成）
+- VC作成・削除の自動管理
+- Prismaスキーマ追加（`VcRecruitConfig`・`VcRecruitSession` テーブル）
 
 ---
 
@@ -666,10 +693,11 @@ model BumpReminder {
 - [MEMBER_LOG_SPEC.md](../specs/MEMBER_LOG_SPEC.md) - メンバーログ
 - [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除
 - [MESSAGE_RESPONSE_SPEC.md](../specs/MESSAGE_RESPONSE_SPEC.md) - メッセージレスポンス
+- [VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md) - VC募集機能
 
 ---
 
-**最終更新**: 2026年2月22日
+**最終更新**: 2026年2月27日
 
 ---
 

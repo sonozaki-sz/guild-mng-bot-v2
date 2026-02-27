@@ -163,9 +163,9 @@ export const commands = {
   "sticky-message.set.embed-modal.embed-description.label": "Description",
   "sticky-message.set.embed-modal.embed-description.placeholder":
     "Embed body text (leave blank for none)",
-  "sticky-message.set.embed-modal.embed-color.label": "Color code",
+  "sticky-message.set.embed-modal.embed-color.label": "Color code (optional)",
   "sticky-message.set.embed-modal.embed-color.placeholder":
-    "#5865F2 or 0x5865F2 (leave blank for default)",
+    "#008969 or 0x008969 (default: #008969)",
   "sticky-message.set.success.title": "Done",
   "sticky-message.set.success.description": "Sticky message has been set.",
   "sticky-message.set.alreadyExists.title": "Warning",
