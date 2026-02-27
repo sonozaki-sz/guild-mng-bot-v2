@@ -43,13 +43,14 @@ export async function restorePendingBumpRemindersUsecase(
     ),
   );
 
-  if (restorePlan.staleReminders.length > 0) {
-    logger.info(
-      tDefault("system:scheduler.bump_reminder_duplicates_cancelled", {
-        count: restorePlan.staleReminders.length,
-      }),
-    );
-  }
+  logger.info(
+    tDefault(
+      restorePlan.staleReminders.length > 0
+        ? "system:scheduler.bump_reminder_duplicates_cancelled"
+        : "system:scheduler.bump_reminder_duplicates_none",
+      { count: restorePlan.staleReminders.length },
+    ),
+  );
 
   for (const reminder of restorePlan.latestByGuild.values()) {
     const now = new Date();
@@ -101,9 +102,12 @@ export async function restorePendingBumpRemindersUsecase(
   }
 
   logger.info(
-    tDefault("system:scheduler.bump_reminders_restored", {
-      count: restoredCount,
-    }),
+    tDefault(
+      restoredCount > 0
+        ? "system:scheduler.bump_reminders_restored"
+        : "system:scheduler.bump_reminders_restored_none",
+      { count: restoredCount },
+    ),
   );
 
   return restoredCount;
