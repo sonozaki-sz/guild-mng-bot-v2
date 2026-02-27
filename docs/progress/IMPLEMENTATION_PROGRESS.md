@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年2月27日（message-delete 仕様拡張・VC募集機能仕様書追加）
+最終更新: 2026年2月28日（ログのi18n化・DB操作ログ整備）
 
 ---
 
@@ -355,7 +355,7 @@
 - ✅ ARCHITECTURE.md - アーキテクチャ・設計概要
 - ✅ COMMANDS.md - コマンドリファレンス（全コマンドの詳細）
 - ✅ XSERVER_VPS_SETUP.md - VPS セットアップガイド
-- ✅ PORTAINER_DEPLOYMENT.md - GitHub Actions デプロイガイド
+- ✅ DEPLOYMENT.md - GitHub Actions デプロイガイド
 - ✅ TESTING_GUIDELINES.md - テスト方針とガイドライン
 - ✅ I18N_GUIDE.md - 多言語対応ガイド
 
@@ -590,7 +590,7 @@ model BumpReminder {
 
 **テスト**:
 
-- ✅ ユニットテスト・インテグレーションテスト実装済み（816 tests / 187 suites）
+- ✅ ユニットテスト・インテグレーションテスト実装済み（987 tests / 206 suites）
 
 ---
 
@@ -656,8 +656,8 @@ model BumpReminder {
 
 - **総ファイル数**: ~120+
 - **TypeScriptファイル**: ~100+（index.ts 撤廃によりバレルファイルを削減済み）
-- **テストファイル**: 187
-- **テスト数**: 816
+- **テストファイル**: 206
+- **テスト数**: 987
 - **総行数**: ~10000+ 行
 
 ### コンポーネント統計
@@ -680,7 +680,7 @@ model BumpReminder {
 - [TESTING_GUIDELINES.md](../guides/TESTING_GUIDELINES.md) - テスト方針
 - [ARCHITECTURE.md](../guides/ARCHITECTURE.md) - アーキテクチャ・設計概要
 - [XSERVER_VPS_SETUP.md](../guides/XSERVER_VPS_SETUP.md) - VPS セットアップ
-- [PORTAINER_DEPLOYMENT.md](../guides/PORTAINER_DEPLOYMENT.md) - GitHub Actions デプロイフロー
+- [DEPLOYMENT.md](../guides/DEPLOYMENT.md) - GitHub Actions デプロイフロー
 - [I18N_GUIDE.md](../guides/I18N_GUIDE.md) - 多言語対応ガイド
 - [COMMANDS.md](../guides/COMMANDS.md) - コマンドリファレンス
 
@@ -697,7 +697,7 @@ model BumpReminder {
 
 ---
 
-**最終更新**: 2026年2月27日
+**最終更新**: 2026年2月28日
 
 ---
 
@@ -717,7 +717,7 @@ model BumpReminder {
 - ✅ `stickyMessageViewSelectHandler.ts` 実装（選択チャンネルの詳細を Embed 返信）
 - ✅ 全レスポンスを `tGuild` によるギルド別言語対応に統一
 - ✅ コメント規約対応（全関数 JSDoc `@param`/`@returns` 追加・処理ブロックコメント整備）
-- ✅ テスト追加（816 tests / 187 suites、全件 PASS）
+- ✅ テスト追加（987 tests / 206 suites、全件 PASS）
 
 ### `index.ts`撤廃スプリント（直接import化）
 
@@ -729,6 +729,36 @@ model BumpReminder {
 - ✅ `src/bot/features/bump-reminder/` 配下全 `index.ts` 削除（commands, constants, handlers, handlers/ui, repositories, services）
 - ✅ 全ソースまたはテストの `jest.mock()` / `import` を実解決先（直接モジュールパス）へ全面追従
 - ✅ 全テスト（805 tests / 185 suites）の回帰確認完了
+
+---
+
+## ✅ 最近の完了項目 (2026年2月28日 追記分 — ログのi18n化・DB操作ログ整備)
+
+### 🌐 ログメッセージの全面i18n化
+
+- ✅ 全 `logger.*()` 呼び出しを `tDefault("system:...")` 経由に統一
+  - 生文字列を logger に直接渡すことを廃止
+  - `src/shared/locale/locales/ja/system.ts` / `en/system.ts` にすべての system ロケールキーを定義
+- ✅ system名前空間のキー構造を feature プレフィックスで整理
+  - `log.bump_reminder_*` → `bump-reminder.config_*`
+  - `error.cleanup_*` → `shutdown.cleanup_*`
+  - `afk.*_log` → `afk.*`（`_log` サフィックス廃止）
+  - `scheduler.cancel_bump_reminder` → `scheduler.bump_reminder_cancelling`
+- ✅ StickyMessage系ハンドラー・サービス・リポジトリを system 名前空間に対応
+
+### 🗄️ VAC・AFK のDB操作ログ追加
+
+- ✅ `VacConfigService` の4メソッドに `executeWithDatabaseError` + `logger.debug` を適用
+  - `addTriggerChannel` / `removeTriggerChannel` / `addCreatedVacChannel` / `removeCreatedVacChannel`
+- ✅ `AfkConfigService` の2メソッドに同パターンを適用
+  - `setAfkChannel` / `saveAfkConfig`
+- ✅ DB操作ログキー12件追加（VAC 8件・AFK 4件）
+  - `system:database.vac_trigger_added/failed` 等
+
+### 📊 テスト
+
+- ✅ 全テスト成功（206 suites / 987 tests）
+- ✅ カバレッジ: statements 100% / functions 100% / lines 100% / branches 99.19%
 
 ---
 

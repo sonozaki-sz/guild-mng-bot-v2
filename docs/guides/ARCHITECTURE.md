@@ -2,7 +2,7 @@
 
 > Architecture Guide - コード設計・モジュール構成・設計パターンの解説
 
-最終更新: 2026年2月22日
+最終更新: 2026年2月28日
 
 ---
 
@@ -44,7 +44,7 @@ ayasono は **Bot プロセス**と **Web プロセス**の2プロセス構成�
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  ayasono                                                   │
+│  ayasono                                                │
 │                                                         │
 │  ┌──────────────────┐    ┌──────────────────────────┐   │
 │  │  Bot プロセス      │    │  Web プロセス             │   │
@@ -90,18 +90,18 @@ pnpm start     # 両方
 
 ```
 src/
-├── bot/                    # Bot プロセス専用
+├── bot/                   # Bot プロセス専用
 │   ├── main.ts            # エントリーポイント
 │   ├── client.ts          # BotClient クラス（discord.js Client 拡張）
 │   ├── types/
-│   │   └── discord.ts    # Bot専用のdiscord.js型拡張
+│   │   └── discord.ts     # Bot専用のdiscord.js型拡張
 │   ├── commands/          # スラッシュコマンド実装
 │   ├── events/            # Discord イベントハンドラ
 │   ├── features/          # Bot専用機能（bump-reminder, vac など）
 │   ├── handlers/interactionCreate/
-│   │   ├── flow/         # command/components/modal のフロー制御
+│   │   ├── flow/          # command/components/modal のフロー制御
 │   │   ├── handleInteractionCreate.ts # interactionCreate 入口
-│   │   └── ui/           # UIインタラクションハンドラレジストリ
+│   │   └── ui/            # UIインタラクションハンドラレジストリ
 │   ├── errors/
 │   │   └── interactionErrorHandler.ts
 │   ├── utils/
@@ -111,7 +111,7 @@ src/
 │       ├── cooldownManager.ts
 │       └── botEventRegistration.ts
 │
-├── shared/                  # Bot・Web 両プロセスで使用する共有コード
+├── shared/                # Bot・Web 両プロセスで使用する共有コード
 │   ├── config/
 │   │   └── env.ts         # 環境変数定義（Zod バリデーション）
 │   ├── database/
@@ -126,7 +126,7 @@ src/
 │   ├── features/
 │   │   ├── vac/           # 共有可能なVAC設定サービス（Repository依存）
 │   │   └── bump-reminder/ # 共有可能なBump設定サービス（Repository依存）
-│   ├── locale/             # i18n（i18next）
+│   ├── locale/            # i18n（i18next）
 │   ├── scheduler/
 │   │   └── jobScheduler.ts
 │   ├── types/
@@ -134,16 +134,16 @@ src/
 │       ├── logger.ts
 │       └── prisma.ts
 │
-└── web/                    # Web プロセス専用
-    ├── server.ts           # Fastify サーバー起動
-    ├── webAppBuilder.ts    # Webアプリ組み立て
+└── web/                   # Web プロセス専用
+    ├── server.ts          # Fastify サーバー起動
+    ├── webAppBuilder.ts   # Webアプリ組み立て
     ├── middleware/
     │   └── auth.ts        # Bearer トークン認証
     ├── routes/
     │   ├── health.ts      # GET /health, GET /ready
     │   └── api/           # GET /api/*
-    ├── schemas/            # リクエスト/レスポンス型
-    └── public/             # 静的ファイル配信
+    ├── schemas/           # リクエスト/レスポンス型
+    └── public/            # 静的ファイル配信
 ```
 
 ### 設計原則
@@ -287,13 +287,13 @@ const afkConfig = safeJsonParse<AfkConfig>(record.afkConfig);
 
 **各設定の型**:
 
-| フィールド名         | 型                   | 用途                             |
-| -------------------- | -------------------- | -------------------------------- |
-| `afkConfig`          | `AfkConfig`          | enabled フラグ + AFKチャンネルID |
-| `bumpReminderConfig` | `BumpReminderConfig` | Bump通知の enabled + mention設定 |
-| `vacConfig`          | `VacConfig`          | VC自動作成設定（未実装）         |
-| `memberLogConfig`    | `MemberLogConfig`    | メンバーログ設定（未実装）       |
-| `stickMessages`      | `StickMessage[]`     | 固定メッセージ一覧（未実装）     |
+| フィールド名         | 型                   | 用途                                                            |
+| -------------------- | -------------------- | --------------------------------------------------------------- |
+| `afkConfig`          | `AfkConfig`          | enabled フラグ + AFKチャンネルID                                |
+| `bumpReminderConfig` | `BumpReminderConfig` | Bump通知の enabled + mention設定                                |
+| `vacConfig`          | `VacConfig`          | VC自動作成設定                                                  |
+| `memberLogConfig`    | `MemberLogConfig`    | メンバーログ設定（未実装）                                      |
+| `stickMessages`      | `StickMessage[]`     | 固定メッセージ一覧（専用テーブル `sticky_messages` に移行済み） |
 
 ---
 
@@ -436,7 +436,7 @@ export function getReminderDelayMinutes(): number {
 ## 🔗 関連ドキュメント
 
 - [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) - VPS セットアップ手順
-- [PORTAINER_DEPLOYMENT.md](PORTAINER_DEPLOYMENT.md) - GitHub Actions デプロイフロー
+- [DEPLOYMENT.md](DEPLOYMENT.md) - GitHub Actions デプロイフロー
 - [I18N_GUIDE.md](I18N_GUIDE.md) - 多言語対応
 - [TESTING_GUIDELINES.md](TESTING_GUIDELINES.md) - テスト方針
 - [COMMANDS.md](COMMANDS.md) - コマンドリファレンス

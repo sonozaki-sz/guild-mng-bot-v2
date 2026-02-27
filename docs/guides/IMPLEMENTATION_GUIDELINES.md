@@ -2,7 +2,7 @@
 
 > Implementation Guidelines - 実装方針とコーディング規約
 
-最終更新: 2026年2月22日
+最終更新: 2026年2月28日
 
 ---
 
@@ -52,6 +52,11 @@
 4. **型安全を維持する**
    - `any` の導入は避ける
    - `pnpm run typecheck` を必ず通す
+
+5. **ログメッセージを i18n 化する**
+   - `logger.*()` の引数には生文字列を渡さず、`tDefault("system:...")` を使う
+   - キーは `src/shared/locale/locales/ja/system.ts` / `en/system.ts` に定義する
+   - DB操作は `executeWithDatabaseError` でラップし、成功時は `logger.debug`、失敗時はキー付きエラーメッセージを渡す
 
 ---
 
@@ -306,6 +311,7 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] 共用定数に説明コメントがある
 - [ ] 処理ブロックの意図コメントがある
 - [ ] `typecheck` が通る
+- [ ] ログメッセージは `tDefault("system:...")` 経由になっている（生文字列を logger に渡していない）
 - [ ] （src整備時）再分析 → コメント反映 → ドキュメント同期 → TODO同期の順序を守っている
 
 ---
@@ -314,5 +320,5 @@ src整備スプリントでは、次の順序を固定する。
 
 - [ARCHITECTURE.md](ARCHITECTURE.md)
 - [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md)
-- [PORTAINER_DEPLOYMENT.md](PORTAINER_DEPLOYMENT.md)
+- [DEPLOYMENT.md](DEPLOYMENT.md)
 - [TESTING_GUIDELINES.md](TESTING_GUIDELINES.md)

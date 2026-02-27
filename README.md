@@ -278,7 +278,7 @@ ayasono/
 - [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
 - [Discord Bot セットアップ](docs/guides/DISCORD_BOT_SETUP.md) - Discord Developer Portal でのアプリ作成・サーバー招待手順
 - [VPS セットアップ](docs/guides/XSERVER_VPS_SETUP.md) - XServer VPS・Portainer 初回セットアップ手順
-- [デプロイガイド](docs/guides/PORTAINER_DEPLOYMENT.md) - GitHub Actions による自動デプロイフロー詳細
+- [デプロイガイド](docs/guides/DEPLOYMENT.md) - GitHub Actions による自動デプロイフロー詳細
 - [Git ワークフロー](docs/guides/GIT_WORKFLOW.md) - ブランチ戦略・コミット規約・PR運用ルール
 - [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
 - [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・直接import運用
