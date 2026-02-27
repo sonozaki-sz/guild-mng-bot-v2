@@ -1,6 +1,6 @@
-# ayasono Portainer スタック用 compose ファイル
-# このファイルを Portainer の "Add Stack" で登録し、Webhook を有効化して使用する
-# スタック名: ayasono（ボリューム ayasono_sqlite_data が自動で割り当てられる）
+# ayasono 本番用 compose ファイル
+# VPS の /opt/ayasono/ に配置して使用する
+# 環境変数は /opt/ayasono/.env で管理する
 
 services:
   bot:
@@ -8,14 +8,9 @@ services:
     container_name: ayasono-bot
     command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
     restart: unless-stopped
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      DISCORD_TOKEN: ${DISCORD_TOKEN}
-      DISCORD_APP_ID: ${DISCORD_APP_ID}
-      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
-      LOCALE: ${LOCALE:-ja}
-      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
+    env_file:
+      - path: /opt/ayasono/.env
+        required: true
     volumes:
       - sqlite_data:/app/storage
       - /opt/ayasono/logs:/app/logs
