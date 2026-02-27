@@ -2,6 +2,7 @@
 // Discord Webhook へエラーログを転送するカスタム Winston トランスポート
 
 import TransportStream from "winston-transport";
+import { name as PROJECT_NAME } from "../../../package.json";
 
 // Discord Embed の description 文字数上限（Discord API の制限に準拠）
 const DISCORD_EMBED_DESCRIPTION_MAX_LENGTH = 4096;
@@ -36,7 +37,7 @@ export class DiscordWebhookTransport extends TransportStream {
     const payload = {
       embeds: [
         {
-          title: "🚨 Bot エラー通知",
+          title: `🚨 ${PROJECT_NAME} エラー通知`,
           description,
           color: DISCORD_EMBED_COLOR.ERROR,
           timestamp: new Date().toISOString(),
