@@ -1,6 +1,15 @@
 // tests/unit/shared/features/sticky-message/stickyMessageConfigService.test.ts
+import type { Mock } from "vitest";
 
-function createRepoMock() {
+function createRepoMock(): {
+  findByChannel: Mock;
+  findAllByGuild: Mock;
+  create: Mock;
+  updateLastMessageId: Mock;
+  updateContent: Mock;
+  delete: Mock;
+  deleteByChannel: Mock;
+} {
   return {
     findByChannel: vi.fn(),
     findAllByGuild: vi.fn(),
