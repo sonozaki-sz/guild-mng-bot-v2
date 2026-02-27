@@ -88,7 +88,7 @@ export const system = {
   "scheduler.bump_reminder_description":
     "[BumpReminder] GuildId: {{guildId}} ExecuteAt: {{executeAt}}",
   "scheduler.bump_reminder_scheduled":
-    "[BumpReminder] Scheduled GuildId: {{guildId}} Minutes: {{minutes}}",
+    "[BumpReminder] Scheduled reminder in {{minutes}} minutes GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelling":
     "[BumpReminder] Cancelling existing reminder GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelled":
@@ -96,7 +96,9 @@ export const system = {
   "scheduler.bump_reminder_executing_immediately":
     "[BumpReminder] Executing overdue reminder immediately GuildId: {{guildId}}",
   "scheduler.bump_reminders_restored":
-    "[BumpReminder] Restored pending reminders Count: {{count}}",
+    "[BumpReminder] Restored {{count}} pending reminders",
+  "scheduler.bump_reminders_restored_none":
+    "[BumpReminder] No pending reminders to restore",
   "scheduler.bump_reminder_sent":
     "[BumpReminder] Reminder sent GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_channel_not_found":
@@ -105,7 +107,9 @@ export const system = {
     "[BumpReminder] Disabled GuildId: {{guildId}}",
   "scheduler.bump_reminder_restore_failed": "[BumpReminder] Failed to restore:",
   "scheduler.bump_reminder_duplicates_cancelled":
-    "[BumpReminder] Cancelled duplicates Count: {{count}}",
+    "[BumpReminder] Cancelled {{count}} duplicate reminders",
+  "scheduler.bump_reminder_duplicates_none":
+    "[BumpReminder] No duplicate reminders to cancel",
   // Panel synchronization and channel consistency logs
   // Keep panel-related keys contiguous to simplify grep-based incident review
   "scheduler.bump_reminder_unregistered_channel":
@@ -174,7 +178,7 @@ export const system = {
   "database.bump_reminder_cancel_failed":
     "[Database] Failed to cancel bump reminders GuildId: {{guildId}}",
   "database.bump_reminder_cleanup_completed":
-    "[Database] Cleaned up old bump reminders Count: {{count}} Days: {{days}}",
+    "[Database] Cleaned up {{count}} old bump reminders older than {{days}} days",
   "database.bump_reminder_cleanup_failed":
     "[Database] Failed to cleanup old bump reminders:",
 
@@ -290,6 +294,17 @@ export const system = {
   // VAC logs
   // Voice-state / channel lifecycle / panel operation logs
   // Keep VAC runtime keys grouped for easier operator triage during incidents
+  // VAC startup cleanup logs
+  "vac.startup_cleanup_stale_trigger_removed":
+    "[VAC] Startup cleanup: removed stale trigger channel GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vac.startup_cleanup_orphaned_channel_removed":
+    "[VAC] Startup cleanup: removed orphaned VAC channel from DB GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vac.startup_cleanup_empty_channel_deleted":
+    "[VAC] Startup cleanup: deleted empty VAC channel GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vac.startup_cleanup_done":
+    "[VAC] Startup cleanup done: removed {{removedTriggers}} triggers and {{removedChannels}} channels",
+  "vac.startup_cleanup_done_none":
+    "[VAC] Startup cleanup done No inconsistencies found",
   "vac.voice_state_update_failed": "[VAC] Failed to process voiceStateUpdate",
   "vac.channel_created":
     "[VAC] channel created GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",

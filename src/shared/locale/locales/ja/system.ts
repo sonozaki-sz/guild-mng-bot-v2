@@ -94,7 +94,7 @@ export const system = {
   "scheduler.bump_reminder_description":
     "[Bumpリマインダー機能] GuildId: {{guildId}} ExecuteAt: {{executeAt}}",
   "scheduler.bump_reminder_scheduled":
-    "[Bumpリマインダー機能] スケジュール登録 GuildId: {{guildId}} Minutes: {{minutes}}",
+    "[Bumpリマインダー機能] {{minutes}} 分後にリマインダーをスケジュール GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelling":
     "[Bumpリマインダー機能] 既存リマインダーをキャンセル中 GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelled":
@@ -102,7 +102,9 @@ export const system = {
   "scheduler.bump_reminder_executing_immediately":
     "[Bumpリマインダー機能] 期限切れリマインダーを即座に実行 GuildId: {{guildId}}",
   "scheduler.bump_reminders_restored":
-    "[Bumpリマインダー機能] 保留中リマインダーを復元 Count: {{count}}",
+    "[Bumpリマインダー機能] 保留中リマインダー {{count}} 件を復元",
+  "scheduler.bump_reminders_restored_none":
+    "[Bumpリマインダー機能] 復元対象のリマインダーなし",
   "scheduler.bump_reminder_sent":
     "[Bumpリマインダー機能] リマインダーを送信 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_channel_not_found":
@@ -112,7 +114,9 @@ export const system = {
   "scheduler.bump_reminder_restore_failed":
     "[Bumpリマインダー機能] 復元に失敗:",
   "scheduler.bump_reminder_duplicates_cancelled":
-    "[Bumpリマインダー機能] 重複リマインダーをキャンセル Count: {{count}}",
+    "[Bumpリマインダー機能] 重複リマインダー {{count}} 件をキャンセル",
+  "scheduler.bump_reminder_duplicates_none":
+    "[Bumpリマインダー機能] 重複リマインダーなし",
   // パネル同期・チャンネル整合性チェック関連ログ
   // パネル関連キーは近接配置して grep 時の追跡コストを下げる
   "scheduler.bump_reminder_unregistered_channel":
@@ -184,7 +188,7 @@ export const system = {
   "database.bump_reminder_cancel_failed":
     "[データベース] Bumpリマインダーキャンセルに失敗 GuildId: {{guildId}}",
   "database.bump_reminder_cleanup_completed":
-    "[データベース] 古いBumpリマインダーをクリーンアップ Count: {{count}} Days: {{days}}",
+    "[データベース] 古いBumpリマインダー {{count}} 件をクリーンアップ ({{days}} 日以前)",
   "database.bump_reminder_cleanup_failed":
     "[データベース] 古いBumpリマインダーのクリーンアップに失敗",
 
@@ -301,6 +305,17 @@ export const system = {
   // VACログ
   // voiceState / channel lifecycle / panel 操作ログ
   // VAC 実行時ログは運用確認のため近接配置を維持する
+  // VAC 起動時クリーンアップログ
+  "vac.startup_cleanup_stale_trigger_removed":
+    "[VAC機能] 起動クリーンアップ: 不正トリガーチャンネルを除去 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vac.startup_cleanup_orphaned_channel_removed":
+    "[VAC機能] 起動クリーンアップ: 存在しないVACチャンネルをDB削除 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vac.startup_cleanup_empty_channel_deleted":
+    "[VAC機能] 起動クリーンアップ: 空VACチャンネルを削除 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vac.startup_cleanup_done":
+    "[VAC機能] 起動クリーンアップ完了 トリガー {{removedTriggers}} 件・チャンネル {{removedChannels}} 件を削除",
+  "vac.startup_cleanup_done_none":
+    "[VAC機能] 起動クリーンアップ完了 不整合なし",
   "vac.voice_state_update_failed": "[VAC機能] voiceStateUpdate処理失敗",
   "vac.channel_created":
     "[VAC機能] VCチャンネル作成 GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",
