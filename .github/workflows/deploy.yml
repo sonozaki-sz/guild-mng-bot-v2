@@ -135,7 +135,7 @@ jobs:
                     },
                     {
                       "name": "Portainer",
-                      "value": "Stack: [ayasono](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)",
+                      "value": "Container: [ayasono-bot](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/containers)",
                       "inline": false
                     }
                   ],
@@ -187,7 +187,7 @@ jobs:
                     },
                     {
                       \"name\": \"Portainer\",
-                      \"value\": \"Stack: [ayasono](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)\",
+                      \"value\": \"Container: [ayasono-bot](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/containers)\",
                       \"inline\": false
                     }
                   ],
