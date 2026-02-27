@@ -3,6 +3,7 @@
 
 import { DiscordWebhookTransport } from "@/shared/utils/discordWebhookTransport";
 import type { Mock } from "vitest";
+import { name as PROJECT_NAME } from "../../../../package.json";
 
 const TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/123/token";
 
@@ -61,7 +62,7 @@ describe("shared/utils/discordWebhookTransport", () => {
       embeds: { title: string; color: number; timestamp: string }[];
     };
     expect(body.embeds).toHaveLength(1);
-    expect(body.embeds[0]?.title).toBe("🚨 Bot エラー通知");
+    expect(body.embeds[0]?.title).toBe(`🚨 ${PROJECT_NAME} エラー通知`);
     expect(body.embeds[0]?.color).toBe(0xe74c3c);
     expect(body.embeds[0]?.timestamp).toBeDefined();
   });
