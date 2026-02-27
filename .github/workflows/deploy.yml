@@ -126,7 +126,7 @@ jobs:
               "embeds": [
                 {
                   "title": "✅ デプロイに成功しました",
-                  "color": 32895,
+                  "color": 5763719,
                   "fields": [
                     {
                       "name": "リポジトリ",
