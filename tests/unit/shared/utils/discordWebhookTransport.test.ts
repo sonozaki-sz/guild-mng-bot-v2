@@ -5,6 +5,17 @@ import { DiscordWebhookTransport } from "@/shared/utils/discordWebhookTransport"
 import type { Mock } from "vitest";
 import { name as PROJECT_NAME } from "../../../../package.json";
 
+// i18next をモックして t() が期待値を返すようにする
+vi.mock("i18next", () => ({
+  default: {
+    t: vi.fn((key: string, opts?: Record<string, unknown>) =>
+      key === "system:discord.error_notification_title"
+        ? `🚨 ${String(opts?.appName ?? "")} エラー通知`
+        : key,
+    ),
+  },
+}));
+
 const TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/123/token";
 
 // Discord Embed の description 文字数上限
