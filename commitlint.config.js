@@ -2,7 +2,11 @@
 export default {
   extends: ["@commitlint/config-conventional"],
   // "Merge: <branch> → <target>" 形式の手動マージコミットをスキップ
-  ignores: [(commit) => /^Merge: .+ → .+/.test(commit)],
+  // PR スカッシュマージ時に生成される複合 type（例: "test/ci:"）も許容
+  ignores: [
+    (commit) => /^Merge: .+ → .+/.test(commit),
+    (commit) => /^\w+\/\w+:/.test(commit),
+  ],
   rules: {
     // type の許可リスト（Conventional Commits 標準 + このプロジェクト独自）
     "type-enum": [
