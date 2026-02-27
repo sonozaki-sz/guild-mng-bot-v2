@@ -53,7 +53,7 @@ COPY prisma.config.ts ./
 RUN mkdir -p /app/storage /app/logs /app/.cache/corepack
 
 # セキュリティ: root 以外のユーザーで実行
-RUN groupadd --system app && useradd --system --gid app app
+RUN groupadd --system --gid 1000 app && useradd --system --uid 1000 --gid app app
 RUN chown -R app:app /app
 USER app
 
