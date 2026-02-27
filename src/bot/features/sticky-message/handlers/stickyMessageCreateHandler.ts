@@ -2,6 +2,7 @@
 // スティッキーメッセージ messageCreate イベントハンドラー
 
 import { ChannelType, type Message } from "discord.js";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotStickyMessageResendService } from "../../../services/botStickyMessageDependencyResolver";
 
@@ -24,10 +25,12 @@ export async function handleStickyMessageCreate(
     const service = getBotStickyMessageResendService();
     await service.handleMessageCreate(message.channel, message.guildId);
   } catch (err) {
-    logger.error("StickyMessage handleMessageCreate error", {
-      channelId: message.channelId,
-      guildId: message.guildId,
-      err,
-    });
+    logger.error(
+      tDefault("system:sticky-message.create_handler_error", {
+        channelId: message.channelId,
+        guildId: message.guildId,
+      }),
+      { channelId: message.channelId, guildId: message.guildId, err },
+    );
   }
 }

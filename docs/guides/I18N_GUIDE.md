@@ -38,7 +38,7 @@ const cooldownMsg = await tGuild(guildId, "commands:cooldown.message", {
 #### デフォルト言語での翻訳
 
 ```typescript
-import { tDefault } from "@/shared/locale";
+import { tDefault } from "@/shared/locale/localeManager";
 
 // デフォルト言語（日本語）で翻訳
 const message = tDefault("common:error");
@@ -75,13 +75,15 @@ src/shared/locale/
     │   ├── common.ts         # 共通
     │   ├── commands.ts       # コマンド
     │   ├── errors.ts         # エラー
-    │   └── events.ts         # イベント
+    │   ├── events.ts         # イベント
+    │   └── system.ts         # システムログ（operator向け）
     └── en/                   # 英語
     ├── resources.ts
         ├── common.ts
         ├── commands.ts
         ├── errors.ts
-        └── events.ts
+        ├── events.ts
+        └── system.ts
 ```
 
 ## ✍️ 翻訳の追加方法
@@ -128,6 +130,7 @@ const message = await tGuild(guildId, "commands:newCommand.success");
 | `commands` | コマンド関連         | `commands:example.description` |
 | `errors`   | エラーメッセージ     | `errors:not_found`             |
 | `events`   | イベントメッセージ   | `events:ready.logged_in`       |
+| `system`   | オペレーター向けログ | `system:vac.channel_created`   |
 
 ## 💡 型安全性
 
@@ -176,7 +179,37 @@ import { localeManager } from "@/shared/locale/localeManager";
 await localeManager.changeLanguage("en");
 ```
 
-## 📌 ベストプラクティス
+## �️ システムログのi18n化
+
+`logger.*()` の引数には生文字列を渡さず、必ず `tDefault("system:...")` 経由のロケールキーを使います。
+
+```typescript
+import { tDefault } from "@/shared/locale/localeManager";
+import { logger } from "@/shared/utils/logger";
+
+// ✅ 正しい: system名前空間のキーを使う
+logger.info(tDefault("system:vac.channel_created", { guildId, channelId }));
+logger.error(tDefault("system:database.vac_channel_register_failed", { guildId, voiceChannelId }), error);
+
+// ❌ 禁止: 生文字列
+logger.info("VAC channel created");
+```
+
+### system名前空間のキー構造
+
+| プレフィックス       | 用途                         | 例                                          |
+| -------------------- | ---------------------------- | ------------------------------------------- |
+| `bot.*`              | Bot起動・シャットダウン      | `system:bot.starting`                       |
+| `bump-reminder.*`    | Bumpリマインダー操作         | `system:bump-reminder.config_enabled`       |
+| `database.*`         | DB操作の成否                 | `system:database.vac_channel_registered`    |
+| `error.*`            | グローバルエラーハンドラー   | `system:error.global_handlers_registered`   |
+| `shutdown.*`         | シャットダウン処理           | `system:shutdown.cleanup_complete`          |
+| `afk.*`              | AFK操作ログ                  | `system:afk.moved`                          |
+| `vac.*`              | VAC操作ログ                  | `system:vac.channel_created`                |
+| `sticky-message.*`   | スティッキーメッセージログ   | `system:sticky-message.send_failed`         |
+| `scheduler.*`        | スケジューラー操作           | `system:scheduler.bump_reminder_cancelling` |
+
+## �📌 ベストプラクティス
 
 1. **キーは階層的に**: `category.subcategory.key` の形式
 2. **名前空間を活用**: 関連する翻訳をグループ化

@@ -181,7 +181,7 @@ describe("shared/features/bump-reminder/manager", () => {
       "cancelled",
     );
     expect(logger.info).toHaveBeenCalledWith(
-      "system:scheduler.cancel_bump_reminder",
+      "system:scheduler.bump_reminder_cancelling",
     );
   });
 

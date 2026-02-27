@@ -20,7 +20,7 @@ vi.mock(
   "@/bot/features/sticky-message/services/stickyMessagePayloadBuilder",
   () => ({ buildStickyMessagePayload: buildPayloadMock }),
 );
-vi.mock("@/shared/locale/localeManager", () => ({ tGuild: tGuildMock }));
+vi.mock("@/shared/locale/localeManager", () => ({ tGuild: tGuildMock, tDefault: vi.fn((key: string) => key) }));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: vi.fn((msg: string) => ({ type: "warning", msg })),

@@ -12,6 +12,7 @@ vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
 }));
 
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
+vi.mock("@/shared/locale/localeManager", () => ({ tDefault: vi.fn((key: string) => key) }));
 
 function createMessageMock(
   overrides: Partial<{
@@ -95,7 +96,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     await handleStickyMessageCreate(message as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "StickyMessage handleMessageCreate error",
+      "system:sticky-message.create_handler_error",
       expect.objectContaining({ channelId: "channel-1" }),
     );
   });

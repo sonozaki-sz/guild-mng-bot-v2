@@ -64,6 +64,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 

@@ -98,7 +98,7 @@ async function handleSetChannel(
   });
 
   logger.info(
-    tDefault("system:afk.configured_log", { guildId, channelId: channel.id }),
+    tDefault("system:afk.configured", { guildId, channelId: channel.id }),
   );
 }
 

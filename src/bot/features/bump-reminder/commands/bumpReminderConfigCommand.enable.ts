@@ -48,6 +48,6 @@ export async function handleBumpReminderConfigEnable(
 
   // 監査用ログ
   logger.info(
-    tDefault("system:log.bump_reminder_enabled", { guildId, channelId }),
+    tDefault("system:bump-reminder.config_enabled", { guildId, channelId }),
   );
 }

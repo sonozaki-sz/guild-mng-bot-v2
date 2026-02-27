@@ -42,6 +42,22 @@ docs/
 
 ---
 
+### [USER_MANUAL.md](guides/USER_MANUAL.md)
+
+ユーザー（サーバーメンバー・管理者）向けの取扱説明書。
+
+**内容:**
+
+- 各機能の概要とユースケース
+- メンバー向けの操作手順（/afk、/vac、Bumpリマインダーのボタン操作など）
+- 管理者向けの初期設定手順
+- よくある質問（FAQ）
+- Botに必要なサーバー権限一覧
+
+**対象:** サーバーメンバー、サーバー管理者
+
+---
+
 ### [COMMANDS.md](guides/COMMANDS.md)
 
 全スラッシュコマンドの完全なリファレンス。
@@ -91,7 +107,7 @@ XServer VPS の初期設定から Portainer のインストール・スタック
 
 ---
 
-### [PORTAINER_DEPLOYMENT.md](guides/PORTAINER_DEPLOYMENT.md)
+### [DEPLOYMENT.md](guides/DEPLOYMENT.md)
 
 GitHub Actions + Portainer による自動デプロイフローの詳細解説。
 

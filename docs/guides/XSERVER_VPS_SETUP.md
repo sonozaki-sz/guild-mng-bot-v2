@@ -2,7 +2,7 @@
 
 > XServer VPS に Docker + Portainer CE を導入し、ayasono を稼働させるための初回セットアップ手順
 
-最終更新: 2026年2月26日
+最終更新: 2026年2月28日（SSH デプロイ方式に移行）
 
 ---
 
@@ -16,13 +16,14 @@
 ```
 XServer VPS (Ubuntu 24.04)
 ├── Docker Compose (Infra スタック: infra)       ← /opt/infra/ で管理
-│   └── portainer コンテナ                       ← 管理 UI + GitHub Actions CD の受け口
-└── Docker Compose (Portainer スタック: ayasono)
-    └── bot コンテナ  (ayasono-bot)         ← Discord Bot 本体
+│   └── portainer コンテナ                       ← コンテナ管理 UI
+└── Docker Compose (ayasono)                     ← /opt/ayasono/ で管理
+    └── bot コンテナ  (ayasono-bot)              ← Discord Bot 本体
 ```
 
 > Portainer 自体は `/opt/infra/docker-compose.infra.yml` で管理する **Infra スタック**として起動します。
-> bot スタック (`ayasono`) は Portainer UI から管理します。
+> bot は `/opt/ayasono/` の compose ファイルで管理し、**GitHub Actions が SSH 経由でデプロイ**します。
+> Portainer はコンテナの監視・管理 UI として使用します（デプロイには使用しません）。
 
 ### 必要なもの
 
@@ -219,114 +220,65 @@ http://220.158.17.101:9000/#!/3/docker/dashboard
 
 ---
 
-## 📦 5. スタックの作成（初回のみ）
+## 📦 5. ayasono のファイル配置（初回のみ）
 
-Portainer の **Stacks** 機能を使って bot を登録する。
-
-### 5-1. ログ保存ディレクトリの作成
-
-bot コンテナがホスト側にログを書き出すためのディレクトリを作成する。
+### 5-1. ディレクトリとファイルの配置
 
 ```bash
 sudo mkdir -p /opt/ayasono/logs
-sudo chown deploy:deploy /opt/ayasono/logs
+sudo chown deploy:deploy /opt/ayasono
 ```
 
-### 5-2. スタックを作成する
-
-#### 方法 A: Repository（推奨）
-
-リポジトリに含まれる `docker-compose.prod.yml` を Portainer に直接読み込む方法。YAML を手動でコピーする必要がないため簡単で、ファイルの変更も追従しやすい。
-
-1. Portainer 左メニュー → **Stacks** → **Add stack**
-2. **Name** に `ayasono` を入力する
-3. **Build method** で **Repository** を選択する
-4. 以下の値を入力する:
-
-| 項目                   | 値                                                     |
-| ---------------------- | ------------------------------------------------------ |
-| Repository URL         | `https://github.com/sonozaki-sz/ayasono`               |
-| Repository reference   | `refs/heads/main`                                      |
-| Compose path           | `docker-compose.prod.yml`                              |
-| Authentication         | オフ（パブリックリポジトリのため不要）                 |
-| Skip TLS Verification  | オフ                                                   |
-
-5. **GitOps updates** は**オフのまま**にする
-
-> ⚠️ オンにすると Portainer がリポジトリの変更を検知して自動デプロイを行うが、本プロジェクトでは GitHub Actions 経由（Portainer API）でデプロイを管理しているため**二重デプロイ**になる。必ずオフにすること。
-
-6. **Environment variables** セクションで環境変数を登録する
-
-> ℹ️ Repository 方式では `.env` ファイルは自動生成されない。**`+ Add an environment variable`** で1件ずつ入力するか、**`Load variables from .env file`** でローカルの `.env` ファイルを読み込む。
-
-| キー               | 必須 | 値の例                          |
-| ------------------ | ---- | ------------------------------- |
-| `DISCORD_TOKEN`    | ✅   | Discord Developer Portal で取得 |
-| `DISCORD_APP_ID`   | ✅   | Discord Developer Portal で取得 |
-| `DISCORD_GUILD_ID` | —    | 空欄でグローバル登録            |
-| `NODE_ENV`         | ✅   | `production`                    |
-| `LOCALE`           | ✅   | `ja`                            |
-| `DATABASE_URL`     | ✅   | `file:./storage/db.sqlite`      |
-| `LOG_LEVEL`        | —    | `info`                          |
-
-7. **Deploy the stack** をクリック
-
----
-
-#### 方法 B: Web editor（代替）
-
-リポジトリにアクセスできない場合や、内容を直接確認しながら設定したい場合に使う。
-
-1. Portainer 左メニュー → **Stacks** → **Add stack**
-2. **Name** に `ayasono` を入力する
-3. **Build method** は **Web editor** を選択する
-4. 以下の内容を Web editor に貼り付ける（内容は `docker-compose.prod.yml` と同一）:
-
-```yaml
-# ayasono Portainer スタック用 compose ファイル
-services:
-  bot:
-    image: ghcr.io/sonozaki-sz/ayasono:latest
-    container_name: ayasono-bot
-    command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
-    restart: unless-stopped
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      DISCORD_TOKEN: ${DISCORD_TOKEN}
-      DISCORD_APP_ID: ${DISCORD_APP_ID}
-      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
-      LOCALE: ${LOCALE:-ja}
-      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-    volumes:
-      - sqlite_data:/app/storage
-      - /opt/ayasono/logs:/app/logs
-    healthcheck:
-      test: ["CMD", "node", "-e", "process.exit(0)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-volumes:
-  sqlite_data:
-```
-
-5. **Environment variables** セクションに方法 A と同様の値を入力する
-6. **Deploy the stack** をクリック
-
-### 5-3. 起動確認
-
-Portainer 左メニュー → **Containers** で `ayasono-bot` が `running` になっていることを確認する。
-
-ログの確認:
+ローカルマシンから `docker-compose.prod.yml` をサーバーにコピーする:
 
 ```bash
+# ローカル PC から scp でコピー
+scp docker-compose.prod.yml deploy@<サーバーのIPアドレス>:/opt/ayasono/
+```
+
+### 5-2. .env ファイルの作成
+
+VPS 上で直接 `.env` を作成し、権限を制限する。
+
+```bash
+cat > /opt/ayasono/.env << 'EOF'
+DISCORD_TOKEN=<Discord Developer Portal で取得>
+DISCORD_APP_ID=<Discord Developer Portal で取得>
+DISCORD_GUILD_ID=
+NODE_ENV=production
+DATABASE_URL=file:/storage/db.sqlite
+LOCALE=ja
+LOG_LEVEL=info
+DISCORD_ERROR_WEBHOOK_URL=<Discord Webhook URL>
+EOF
+chmod 600 /opt/ayasono/.env
+```
+
+> ⚠️ `.env` はトークン等の機密情報を含むため、権限は必ず `600` にすること。
+> 環境変数を追加・変更する場合は `.env` を編集するだけでよい（compose ファイルの変更は不要）。
+
+### 5-3. GitHub Actions 用 SSH 鍵の設定
+
+GitHub Actions が SSH でデプロイできるよう、専用の鍵ペアを生成して登録する。
+
+```bash
+# VPS 上で鍵ペアを生成
+ssh-keygen -t ed25519 -C "github-actions-ayasono" -f ~/.ssh/ayasono_deploy -N ""
+
+# 公開鍵を authorized_keys に追加
+cat ~/.ssh/ayasono_deploy.pub >> ~/.ssh/authorized_keys
+
+# 秘密鍵の中身を表示 → GitHub Secrets に登録する
+cat ~/.ssh/ayasono_deploy
+```
+
+### 5-4. 起動確認
+
+初回は手動で起動して動作を確認する。
+
+```bash
+cd /opt/ayasono
+docker compose -f docker-compose.prod.yml up -d
 docker logs ayasono-bot --tail 50
 ```
 
@@ -336,35 +288,28 @@ docker logs ayasono-bot --tail 50
 
 GitHub リポジトリ → **Settings → Secrets and variables → Actions → New repository secret** から以下を登録する。
 
-| Secret 名               | 内容                          | 取得方法                       |
-| ----------------------- | ----------------------------- | ------------------------------ |
-| `PORTAINER_HOST`        | VPS の IP アドレス            | コントロールパネルで確認       |
-| `PORTAINER_TOKEN`       | Portainer API キー            | セクション 6-1 参照            |
-| `PORTAINER_STACK_ID`    | スタックの ID                 | セクション 6-2 参照            |
-| `PORTAINER_ENDPOINT_ID` | エンドポイント ID（通常 `3`） | セクション 4-3 参照            |
-| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL        | Discord チャンネル設定から取得 |
+| Secret 名               | 内容                                    | 取得方法                              |
+| ----------------------- | --------------------------------------- | ------------------------------------- |
+| `SSH_HOST`              | VPS の IP アドレス                      | コントロールパネルで確認              |
+| `SSH_USER`              | SSH ユーザー名（例: `deploy`）          | 固定値                                |
+| `SSH_PRIVATE_KEY`       | デプロイ用 SSH 秘密鍵                   | セクション 5-3 で生成した秘密鍵の中身 |
+| `PORTAINER_HOST`        | VPS の IP アドレス                      | コントロールパネルで確認（通知用）    |
+| `PORTAINER_STACK_ID`    | Portainer スタック ID                   | セクション 6-1 参照（通知用）         |
+| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（通常 `3`） | セクション 4-3 参照（通知用）         |
+| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL                  | Discord チャンネル設定から取得        |
 
-### 6-1. Portainer API キーの取得
+> `PORTAINER_*` の3つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
 
-1. Portainer 右上のユーザーアイコン → **My account**
-2. **Access tokens** → **Add access token**
-3. Token 名を入力（例: `github-actions`）して作成
-4. 表示されたトークンをコピーして `PORTAINER_TOKEN` に登録
+### 6-1. Portainer スタック ID の取得（通知リンク用）
 
-> ⚠️ トークンはこの画面を閉じると再表示されない。必ずコピーしてから閉じること。
-
-### 6-2. スタック ID の取得
-
-1. Portainer 左メニュー → **Stacks** → `ayasono` をクリック
+1. Portainer 左メニュー → **Stacks** → `ayasono` をクリック（スタックが存在しない場合は不要）
 2. ブラウザの URL から ID を確認する
 
 ```
 http://220.158.17.101:9000/#!/3/docker/stacks/ayasono?id=1&type=2
-                                                              ^   ^
-                                                 Stack ID = 1   type=2 は Compose スタック固定値
+                                                              ^
+                                                 Stack ID = 1
 ```
-
-> `type` パラメータはスタック種別を表す固定値（`1`=Swarm / `2`=Compose / `3`=Kubernetes）。docker-compose を使う限り常に `2`。
 
 この `id` の値を `PORTAINER_STACK_ID` に登録する。
 
@@ -378,10 +323,10 @@ http://220.158.17.101:9000/#!/3/docker/stacks/ayasono?id=1&type=2
 GitHub Actions の確認手順:
 1. GitHub リポジトリ → Actions タブ
 2. 「CI / Deploy」ワークフローを選択
-3. Test → Deploy to Portainer → Discord通知（成功）の順でグリーンになることを確認
+3. Test → Deploy to VPS → Discord通知（成功）の順でグリーンになることを確認
 ```
 
-デプロイ後、登録した Discord チャンネルに成功通知が届き、Portainer のスタックリンクが正しく機能することを確認する。
+デプロイ後、登録した Discord チャンネルに成功通知が届き、Portainer でコンテナが `running` 状態になっていることを確認する。
 
 ---
 
@@ -406,7 +351,7 @@ Portainer の **Containers → ayasono-bot** からも同じ操作が UI で行�
 
 ## 📖 関連ドキュメント
 
-- [PORTAINER_DEPLOYMENT.md](PORTAINER_DEPLOYMENT.md) — GitHub Actions によるデプロイフローの詳細
+- [DEPLOYMENT.md](DEPLOYMENT.md) — GitHub Actions によるデプロイフローの詳細
 - [ARCHITECTURE.md](ARCHITECTURE.md) — システム構成・アーキテクチャ解説
 - [docker-compose.prod.yml](../../docker-compose.prod.yml) — 本番用 Compose 定義（bot スタック）
 - [docker-compose.infra.yml](../../docker-compose.infra.yml) — Infra スタック定義（Portainer 用）

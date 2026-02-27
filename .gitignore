@@ -150,5 +150,3 @@ vite.config.ts.timestamp-*
 storage/*.sqlite
 storage/*.sqlite-shm
 storage/*.sqlite-wal
-prisma/storage/*
-!prisma/storage/.gitkeep

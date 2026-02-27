@@ -104,4 +104,4 @@ Bot がサーバーに参加したら、以下を確認する。
 ## 📖 関連ドキュメント
 
 - [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) — VPS・Portainer セットアップ手順
-- [PORTAINER_DEPLOYMENT.md](PORTAINER_DEPLOYMENT.md) — GitHub Actions による自動デプロイフロー
+- [DEPLOYMENT.md](DEPLOYMENT.md) — GitHub Actions による自動デプロイフロー

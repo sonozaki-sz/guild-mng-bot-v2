@@ -8,11 +8,6 @@ import { logError } from "./errorUtils";
 
 // プロセスイベント名・シグナル名・終了コードを集約する定数
 const PROCESS_ERROR_CONSTANTS = {
-  GLOBAL_ALREADY_REGISTERED:
-    "Global error handlers already registered, skipping.",
-  SHUTDOWN_ALREADY_REGISTERED:
-    "Graceful shutdown handlers already registered, skipping.",
-  SHUTDOWN_IN_PROGRESS_SUFFIX: " (already shutting down)",
   PROCESS_EVENT: {
     UNHANDLED_REJECTION: "unhandledRejection",
     UNCAUGHT_EXCEPTION: "uncaughtException",
@@ -50,7 +45,7 @@ let _shutdownInProgress = false;
 export const setupGlobalErrorHandlers = (): void => {
   // 多重登録を防止
   if (_globalHandlersRegistered) {
-    logger.warn(PROCESS_ERROR_CONSTANTS.GLOBAL_ALREADY_REGISTERED);
+    logger.warn(tDefault("system:error.global_handlers_already_registered"));
     return;
   }
   _globalHandlersRegistered = true;
@@ -112,7 +107,7 @@ export const setupGlobalErrorHandlers = (): void => {
 export const setupGracefulShutdown = (cleanup?: () => Promise<void>): void => {
   // 多重登録を防止
   if (_gracefulShutdownRegistered) {
-    logger.warn(PROCESS_ERROR_CONSTANTS.SHUTDOWN_ALREADY_REGISTERED);
+    logger.warn(tDefault("system:error.shutdown_handlers_already_registered"));
     return;
   }
   _gracefulShutdownRegistered = true;
@@ -120,10 +115,7 @@ export const setupGracefulShutdown = (cleanup?: () => Promise<void>): void => {
   const shutdown = async (signal: string) => {
     // 多重実行を防止
     if (_shutdownInProgress) {
-      logger.warn(
-        tDefault("system:shutdown.signal_received", { signal }) +
-          PROCESS_ERROR_CONSTANTS.SHUTDOWN_IN_PROGRESS_SUFFIX,
-      );
+      logger.warn(tDefault("system:shutdown.already_in_progress", { signal }));
       return;
     }
     _shutdownInProgress = true;
@@ -135,12 +127,12 @@ export const setupGracefulShutdown = (cleanup?: () => Promise<void>): void => {
       if (cleanup) {
         await cleanup();
       }
-      logger.info(tDefault("system:error.cleanup_complete"));
+      logger.info(tDefault("system:shutdown.cleanup_complete"));
       // 正常クリーンアップ完了として 0 終了
       process.exit(PROCESS_ERROR_CONSTANTS.EXIT_CODE.SUCCESS);
     } catch (error) {
       // クリーンアップ失敗時は異常終了
-      logger.error(tDefault("system:error.cleanup_failed"), error);
+      logger.error(tDefault("system:shutdown.cleanup_failed"), error);
       process.exit(PROCESS_ERROR_CONSTANTS.EXIT_CODE.FAILURE);
     }
   };

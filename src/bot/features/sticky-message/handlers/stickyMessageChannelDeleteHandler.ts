@@ -2,6 +2,7 @@
 // スティッキーメッセージ channelDelete ハンドラー
 
 import { ChannelType, type Channel } from "discord.js";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {
   getBotStickyMessageConfigService,
@@ -27,11 +28,15 @@ export async function handleStickyMessageChannelDelete(
   // DB にレコードがあれば削除する
   try {
     await getBotStickyMessageConfigService().deleteByChannel(channelId);
-    logger.debug("StickyMessage: cleaned up on channel delete", { channelId });
+    logger.debug(
+      tDefault("system:sticky-message.channel_delete_cleanup", { channelId }),
+    );
   } catch (err) {
-    logger.error("StickyMessage: failed to delete record on channel delete", {
-      channelId,
-      err,
-    });
+    logger.error(
+      tDefault("system:sticky-message.channel_delete_cleanup_failed", {
+        channelId,
+      }),
+      { channelId, err },
+    );
   }
 }
