@@ -1,6 +1,7 @@
 // tests/unit/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler.test.ts
+import type { Mock } from "vitest";
 
-const findByChannelMock = vi.fn();
+const findByChannelMock: Mock = vi.fn();
 const tGuildMock = vi.fn(
   async (_guildId: string | undefined, key: string) => `[${key}]`,
 );
@@ -10,11 +11,11 @@ const warningEmbedMock = vi.fn((msg: string, opts?: object) => ({
   msg,
   ...opts,
 }));
-const infoEmbedInstance = {
+const infoEmbedInstance: { setColor: Mock; setTimestamp: Mock } = {
   setColor: vi.fn().mockReturnThis(),
   setTimestamp: vi.fn().mockReturnThis(),
 };
-const infoEmbedMock = vi.fn(() => infoEmbedInstance);
+const infoEmbedMock: Mock = vi.fn(() => infoEmbedInstance);
 
 vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
@@ -36,8 +37,14 @@ function createInteractionMock({
   guildId?: string | null;
   values?: string[];
   messageComponents?: unknown[];
-  updateMock?: ReturnType<typeof vi.fn>;
-} = {}) {
+  updateMock?: Mock;
+} = {}): {
+  guildId: string | null;
+  values: string[];
+  update: Mock;
+  message: { components: unknown[] };
+  _updateMock: Mock;
+} {
   return {
     guildId,
     values,
@@ -197,7 +204,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     await stickyMessageViewSelectHandler.execute(interaction as never);
 
     const infoCall = infoEmbedMock.mock.calls[0];
-    const opts = infoCall?.[1] as { fields?: { value: string }[] };
+    const opts = (infoCall as unknown as unknown[])?.[1] as
+      | { fields?: { value: string }[] }
+      | undefined;
     const contentField = opts?.fields?.find((f) => f.value.includes("..."));
     expect(contentField).toBeDefined();
   });
@@ -219,9 +228,11 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
 
     await stickyMessageViewSelectHandler.execute(interaction as never);
 
-    const opts = infoEmbedMock.mock.calls[0]?.[1] as {
-      fields?: { value: string }[];
-    };
+    const opts = (infoEmbedMock.mock.calls[0] as unknown as unknown[])?.[1] as
+      | {
+          fields?: { value: string }[];
+        }
+      | undefined;
     const contentField = opts?.fields?.find((f) => f.value.includes("aaa"));
     expect(contentField?.value).not.toContain("...");
   });

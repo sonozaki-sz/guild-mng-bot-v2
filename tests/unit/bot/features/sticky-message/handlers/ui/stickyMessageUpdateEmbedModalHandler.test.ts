@@ -41,7 +41,6 @@ function createInteractionMock({
   embedDescription = "My Description",
   embedColor = "#ff0000",
   channelInCache = true,
-  lastMessageId = "old-msg-id" as string | null,
   sendResult = { id: "new-msg-id" },
   fetchSuccess = true,
 }: {

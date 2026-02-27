@@ -1,12 +1,24 @@
 // tests/unit/bot/features/sticky-message/repositories/stickyMessageRepository.test.ts
+import type { Mock } from "vitest";
 
-const executeWithDatabaseErrorMock = vi.fn(async (fn: () => unknown) => fn());
+const executeWithDatabaseErrorMock: Mock = vi.fn(async (fn: () => unknown) =>
+  fn(),
+);
 
 vi.mock("@/shared/utils/errorHandling", () => ({
   executeWithDatabaseError: executeWithDatabaseErrorMock,
 }));
 
-function createPrismaMock() {
+function createPrismaMock(): {
+  stickyMessage: {
+    findUnique: Mock;
+    findMany: Mock;
+    create: Mock;
+    update: Mock;
+    delete: Mock;
+    deleteMany: Mock;
+  };
+} {
   return {
     stickyMessage: {
       findUnique: vi.fn(),

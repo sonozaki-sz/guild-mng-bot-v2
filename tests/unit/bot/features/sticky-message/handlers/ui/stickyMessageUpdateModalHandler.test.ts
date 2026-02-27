@@ -33,7 +33,6 @@ function createInteractionMock({
   customId = "sticky-message:update-modal:ch-1",
   contentValue = "Updated content",
   channelInCache = true,
-  lastMessageId = "old-msg-id" as string | undefined,
   sendResult = { id: "new-msg-id" },
   fetchSuccess = true,
 }: {

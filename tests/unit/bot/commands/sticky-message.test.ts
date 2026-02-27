@@ -1,6 +1,7 @@
 // tests/unit/bot/commands/sticky-message.test.ts
+import type { Mock } from "vitest";
 
-const executeStickyMessageCommandMock = vi.fn();
+const executeStickyMessageCommandMock: Mock = vi.fn();
 
 vi.mock(
   "@/bot/features/sticky-message/commands/stickyMessageCommand.execute",
