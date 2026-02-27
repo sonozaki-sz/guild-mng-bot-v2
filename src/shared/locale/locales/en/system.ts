@@ -239,6 +239,9 @@ export const system = {
   "web.auth_header_required":
     "Authorization: Bearer <api-key> header is required",
   "web.auth_invalid_token_message": "Invalid token",
+
+  // Discord error notification
+  "discord.error_notification_title": "🚨 {{appName}} Error Notification",
 } as const;
 
 export type SystemTranslations = typeof system;

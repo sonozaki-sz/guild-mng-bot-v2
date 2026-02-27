@@ -1,6 +1,7 @@
 // src/shared/utils/discordWebhookTransport.ts
 // Discord Webhook へエラーログを転送するカスタム Winston トランスポート
 
+import i18next from "i18next";
 import TransportStream from "winston-transport";
 import { name as PROJECT_NAME } from "../../../package.json";
 
@@ -37,7 +38,14 @@ export class DiscordWebhookTransport extends TransportStream {
     const payload = {
       embeds: [
         {
-          title: `🚨 ${PROJECT_NAME} エラー通知`,
+          title: (
+            i18next.t as unknown as (
+              key: string,
+              opts: Record<string, unknown>,
+            ) => string
+          )("system:discord.error_notification_title", {
+            appName: PROJECT_NAME,
+          }),
           description,
           color: DISCORD_EMBED_COLOR.ERROR,
           timestamp: new Date().toISOString(),

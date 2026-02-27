@@ -247,6 +247,9 @@ export const system = {
   "web.auth_header_required":
     "Authorization: Bearer <api-key> ヘッダーが必要です",
   "web.auth_invalid_token_message": "無効なトークンです",
+
+  // Discord エラー通知
+  "discord.error_notification_title": "🚨 {{appName}} エラー通知",
 } as const;
 
 export type SystemTranslations = typeof system;
