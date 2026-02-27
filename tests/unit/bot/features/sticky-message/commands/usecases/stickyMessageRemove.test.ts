@@ -36,7 +36,6 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 
 function createInteractionMock({
   channelType = ChannelType.GuildText,
-  lastMessageId = null as string | null,
   guildChannels = true,
   deleteMsgSuccess = true,
 }: {
