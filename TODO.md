@@ -2,7 +2,7 @@
 
 > プロジェクト全体のタスク管理と残件リスト
 
-最終更新: 2026年2月27日（Botエラー Discord通知実装完了）
+最終更新: 2026年2月27日（message-delete 仕様拡張・VC募集機能仕様書作成）
 
 ---
 
@@ -10,8 +10,8 @@
 
 ### 残タスク統計
 
-- 残タスク合計: **45件**
-- bot優先対象（1～3）: **21件**
+- 残タスク合計: **54件**
+- bot優先対象（1～3）: **30件**
 - デプロイ・運用（4）: **11件**
 - Web UI実装（5 / 凍結中）: **12件**
 
@@ -19,7 +19,7 @@
 
 | No. | 内容               | 残件 | 状態 |
 | --- | ------------------ | ---- | ---- |
-| 1   | 主要機能実装       | 10   | 🚧   |
+| 1   | 主要機能実装       | 19   | 🚧   |
 | 2   | 基本コマンド追加   | 6    | 📋   |
 | 3   | テスト・品質向上   | 6    | 🚧   |
 | 4   | デプロイ・運用     | 11   | 🚧   |
@@ -33,7 +33,7 @@
 
 > 運用方針（2026-02-21）: Web系（5系統）は一旦凍結し、bot層（1〜3）を優先。bot層が安定したら4（デプロイ・運用）へ進み、5（Web UI実装）を再開する。
 
-### 1. 主要機能実装 - 残14件
+### 1. 主要機能実装 - 残19件
 
 #### 1.1 VC自動作成機能（VAC） - 残1件
 
@@ -63,14 +63,28 @@
 
 **仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md)
 
-#### 1.4 メッセージ削除機能 - 残4件
+#### 1.4 メッセージ削除機能 - 残7件
 
-- [ ] `/message-delete` コマンド実装（user、count、channelオプション）
-- [ ] 権限チェック（MANAGE_MESSAGES）
-- [ ] 削除実行ログと通知
+- [ ] `/message-delete` コマンド実装（user / keyword / count / days / after / before / channel オプション）
+- [ ] サーバー全チャンネル横断削除（channel 未指定時）
+- [ ] 実行確認ダイアログ（`/message-delete-config confirm` でスキップ設定）
+- [ ] ユーザー設定の永続化（`skipConfirm` を DB に保存）
+- [ ] 削除結果詳細表示（ページネイション＋フィルター）
+- [ ] 権限チェック（MANAGE_MESSAGES / VIEW_CHANNEL）・削除実行ログ
 - [ ] テスト実装
 
 **仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md)
+
+#### 1.5 VC募集機能 - 残6件
+
+- [ ] `/vc-recruit-config` コマンド実装（setup / teardown / add-role / remove-role / view）
+- [ ] パネルチャンネル・投稿チャンネルの自動作成・権限設定
+- [ ] ボタン→モーダル→セレクトメニューの2ステップ募集フロー
+- [ ] 新規VC作成・設定パネル送信・全員退出時の自動削除
+- [ ] Prisma Schema 更新（`GuildConfig.vcRecruitConfig`）
+- [ ] テスト実装
+
+**仕様書**: [docs/specs/VC_RECRUIT_SPEC.md](docs/specs/VC_RECRUIT_SPEC.md)
 
 ### 2. 基本コマンド追加 - 残6件
 

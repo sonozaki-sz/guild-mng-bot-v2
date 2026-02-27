@@ -164,9 +164,9 @@ export const commands = {
   "sticky-message.set.embed-modal.embed-description.label": "内容",
   "sticky-message.set.embed-modal.embed-description.placeholder":
     "Embed の内容を入力（最大4096文字）",
-  "sticky-message.set.embed-modal.embed-color.label": "カラーコード",
+  "sticky-message.set.embed-modal.embed-color.label": "カラーコード(任意)",
   "sticky-message.set.embed-modal.embed-color.placeholder":
-    "#5865F2 または 0x5865F2 形式で入力",
+    "#008969 または 0x008969 形式で入力（省略時: #008969）",
   "sticky-message.set.success.title": "設定完了",
   "sticky-message.set.success.description":
     "スティッキーメッセージを設定しました。",
