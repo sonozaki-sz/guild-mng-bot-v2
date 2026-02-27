@@ -9,8 +9,7 @@ services:
     command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
     restart: unless-stopped
     env_file:
-      - path: /opt/ayasono/.env
-        required: true
+      - /opt/ayasono/.env
     volumes:
       - sqlite_data:/app/storage
       - /opt/ayasono/logs:/app/logs
