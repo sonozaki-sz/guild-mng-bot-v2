@@ -15,7 +15,7 @@ const AFK_I18N_KEYS = {
   ERROR_USER_NOT_IN_VOICE: "errors:afk.user_not_in_voice",
   ERROR_CHANNEL_NOT_FOUND: "errors:afk.channel_not_found",
   EMBED_MOVED: "commands:afk.embed.moved",
-  LOG_MOVED: "system:afk.moved_log",
+  LOG_MOVED: "system:afk.moved",
 } as const;
 
 /**

@@ -26,7 +26,7 @@ vi.mock(
     parseColorStr: parseColorStrMock,
   }),
 );
-vi.mock("@/shared/locale/localeManager", () => ({ tGuild: tGuildMock }));
+vi.mock("@/shared/locale/localeManager", () => ({ tGuild: tGuildMock, tDefault: vi.fn((key: string) => key) }));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: vi.fn((msg: string) => ({ type: "warning", msg })),
@@ -230,7 +230,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     await stickyMessageUpdateEmbedModalHandler.execute(interaction as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "Failed to resend sticky message after embed update",
+      "system:sticky-message.resend_after_embed_update_failed",
       expect.any(Object),
     );
     expect(interaction._replyMock).toHaveBeenCalled();

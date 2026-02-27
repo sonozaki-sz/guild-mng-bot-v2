@@ -229,7 +229,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     await bumpPanelButtonHandler.execute(interaction as never);
 
     expect(logger.error).toHaveBeenCalledWith(
-      "Failed to handle bump panel button",
+      "system:bump-reminder.panel_handle_failed",
       expect.any(Error),
     );
     expect(tDefault).toHaveBeenCalledWith("errors:general.error_title");
@@ -251,11 +251,11 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     await bumpPanelButtonHandler.execute(interaction as never);
 
     expect(logger.error).toHaveBeenCalledWith(
-      "Failed to handle bump panel button",
+      "system:bump-reminder.panel_handle_failed",
       expect.any(Error),
     );
     expect(logger.error).toHaveBeenCalledWith(
-      "Failed to send error reply",
+      "system:bump-reminder.panel_reply_failed",
       expect.any(Error),
     );
   });

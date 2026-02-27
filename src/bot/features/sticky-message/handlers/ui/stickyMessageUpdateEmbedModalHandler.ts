@@ -6,7 +6,7 @@ import {
   type ModalSubmitInteraction,
   type TextChannel,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
@@ -142,10 +142,12 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
           const sent = await textChannel.send(payload);
           await service.updateLastMessageId(updated.id, sent.id);
         } catch (err) {
-          logger.error("Failed to resend sticky message after embed update", {
-            channelId,
-            err,
-          });
+          logger.error(
+            tDefault("system:sticky-message.resend_after_embed_update_failed", {
+              channelId,
+            }),
+            { channelId, err },
+          );
         }
       }
 
@@ -167,11 +169,13 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
-      logger.error("Failed to update sticky message (embed modal)", {
-        channelId,
-        guildId,
-        err,
-      });
+      logger.error(
+        tDefault("system:sticky-message.update_embed_failed", {
+          channelId,
+          guildId,
+        }),
+        { channelId, guildId, err },
+      );
       throw err;
     }
   },

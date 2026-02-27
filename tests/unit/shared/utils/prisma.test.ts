@@ -11,6 +11,10 @@ describe("shared/utils/prisma", () => {
     vi.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
     }));
+
+    vi.doMock("@/shared/locale/localeManager", () => ({
+      tDefault: vi.fn((key: string) => key),
+    }));
   });
 
   it("returns null before client is initialized", async () => {
@@ -40,9 +44,10 @@ describe("shared/utils/prisma", () => {
   it("throws and logs when requirePrismaClient is called before initialization", async () => {
     const { requirePrismaClient } = await import("@/shared/utils/prisma");
 
-    expect(() => requirePrismaClient()).toThrow("Prisma client not available");
+    expect(() => requirePrismaClient()).toThrow("system:database.prisma_not_available");
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "Prisma client not available",
+      "system:database.prisma_not_available",
+      expect.any(Error),
     );
   });
 });

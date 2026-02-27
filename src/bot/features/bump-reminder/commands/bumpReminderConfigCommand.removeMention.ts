@@ -80,7 +80,7 @@ export async function handleBumpReminderConfigRemoveMention(
         flags: MessageFlags.Ephemeral,
       });
       logger.info(
-        tDefault("system:log.bump_reminder_mention_removed", {
+        tDefault("system:bump-reminder.config_mention_removed", {
           guildId,
           target,
         }),
@@ -117,7 +117,7 @@ export async function handleBumpReminderConfigRemoveMention(
         flags: MessageFlags.Ephemeral,
       });
       logger.info(
-        tDefault("system:log.bump_reminder_mention_removed", {
+        tDefault("system:bump-reminder.config_mention_removed", {
           guildId,
           target,
         }),
@@ -149,7 +149,7 @@ export async function handleBumpReminderConfigRemoveMention(
         flags: MessageFlags.Ephemeral,
       });
       logger.info(
-        tDefault("system:log.bump_reminder_mention_removed", {
+        tDefault("system:bump-reminder.config_mention_removed", {
           guildId,
           target,
         }),
@@ -266,7 +266,9 @@ async function handleUserSelectionUI(
       guildId,
       "commands:bump-reminder-config.embed.remove_mention_select",
       {
-        users: selectedUserIds.map((id: string) => `<@${id}> (\`${id}\`)`).join("\n"),
+        users: selectedUserIds
+          .map((id: string) => `<@${id}> (\`${id}\`)`)
+          .join("\n"),
       },
     );
     const successTitle = await tGuild(
@@ -282,7 +284,7 @@ async function handleUserSelectionUI(
 
     // 監査用ログ
     logger.info(
-      tDefault("system:log.bump_reminder_users_removed", {
+      tDefault("system:bump-reminder.config_users_removed", {
         guildId,
         userIds: selectedUserIds.join(", "),
       }),

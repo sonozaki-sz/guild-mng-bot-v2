@@ -44,7 +44,7 @@ describe("shared/errors/processErrorHandler", () => {
 
     expect(onSpy).toHaveBeenCalledTimes(3);
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      "Global error handlers already registered, skipping.",
+      "system:error.global_handlers_already_registered",
     );
   });
 
@@ -301,7 +301,7 @@ describe("shared/errors/processErrorHandler", () => {
     setupGracefulShutdown(cleanup);
 
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      "Graceful shutdown handlers already registered, skipping.",
+      "system:error.shutdown_handlers_already_registered",
     );
 
     onceHandlers.get("SIGTERM")?.();
@@ -313,7 +313,7 @@ describe("shared/errors/processErrorHandler", () => {
       "system:shutdown.signal_received:SIGTERM",
     );
     expect(loggerMock.info).toHaveBeenCalledWith(
-      "system:error.cleanup_complete",
+      "system:shutdown.cleanup_complete",
     );
     expect(exitSpy).toHaveBeenCalledWith(0);
 
@@ -353,7 +353,7 @@ describe("shared/errors/processErrorHandler", () => {
     await Promise.resolve();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:error.cleanup_failed",
+      "system:shutdown.cleanup_failed",
       expect.any(Error),
     );
     expect(secondExitSpy).toHaveBeenCalledWith(1);
@@ -393,7 +393,7 @@ describe("shared/errors/processErrorHandler", () => {
     await Promise.resolve();
 
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      expect.stringContaining("(already shutting down)"),
+      "system:shutdown.already_in_progress:SIGTERM",
     );
 
     resolveCleanup?.();
@@ -422,7 +422,7 @@ describe("shared/errors/processErrorHandler", () => {
     await Promise.resolve();
 
     expect(loggerMock.info).toHaveBeenCalledWith(
-      "system:error.cleanup_complete",
+      "system:shutdown.cleanup_complete",
     );
     expect(exitSpy).toHaveBeenCalledWith(0);
   });

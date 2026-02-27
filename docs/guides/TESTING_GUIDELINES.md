@@ -2,7 +2,7 @@
 
 > Testing Guidelines - テスト設計とベストプラクティス
 
-最終更新: 2026年2月27日
+最終更新: 2026年2月28日
 
 ---
 
@@ -27,10 +27,10 @@
    - statements / functions / lines: **100%**
    - branches: **99%以上**（v8 async内部ブランチのアーティファクトにより 100% 初期は達成不可）
 
-### 現状（2026-02-25）
+### 現状（2026-02-28）
 
-- 全テスト成功（205 suites / 972 tests）
-- カバレッジ: statements 100% / functions 100% / lines 100% / branches 99.27%
+- 全テスト成功（206 suites / 987 tests）
+- カバレッジ: statements 100% / functions 100% / lines 100% / branches 99.19%
 - `unit` / `integration` の配置を `src` 対称へ再編済み
 - `e2e` は次フェーズで実施
 
@@ -74,6 +74,27 @@ test("should do something", () => {
 - 外部依存（Discord API / DB / 外部サービス）はモック化
 - 時刻依存は fake timers を優先
 - ログ出力はモックし、テスト出力を安定化
+
+### tDefault のモック（systemログアサーション）
+
+`tDefault("system:xxx")` を呼び出す実装をテストする場合、`localeManager` モックにキーをそのまま返す実装を指定する：
+
+```typescript
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string, options?: Record<string, unknown>) =>
+    options?.signal ? `${key}:${options.signal}` : key
+  ),
+  tGuild: tGuildMock,
+}));
+
+// アサーション例
+expect(loggerMock.error).toHaveBeenCalledWith(
+  "system:bump-reminder.panel_handle_failed",
+  expect.any(Error),
+);
+```
+
+キーがそのまま返るため、アサーションで `"system:xxx.yyy"` 形式の文字列を期待値として指定すればよい。
 
 ### テスト命名規則
 

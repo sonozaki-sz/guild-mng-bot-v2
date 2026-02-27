@@ -12,6 +12,7 @@ vi.mock(
   }),
 );
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
+vi.mock("@/shared/locale/localeManager", () => ({ tDefault: vi.fn((key: string) => key) }));
 
 function createChannelMock(
   overrides: Partial<{
@@ -191,7 +192,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     await vi.runAllTimersAsync();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "Failed to send sticky message",
+      "system:sticky-message.send_failed",
       expect.objectContaining({ channelId: "channel-5" }),
     );
   });
@@ -281,7 +282,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     await vi.runAllTimersAsync();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "StickyMessage resend scheduled error",
+      "system:sticky-message.resend_scheduled_error",
       expect.any(Error),
     );
   });

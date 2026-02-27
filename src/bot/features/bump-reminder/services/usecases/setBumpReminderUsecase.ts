@@ -57,7 +57,9 @@ export async function setBumpReminderUsecase(
   const jobId = toBumpReminderJobId(guildId, serviceName);
 
   if (reminders.has(reminderKey)) {
-    logger.info(tDefault("system:scheduler.cancel_bump_reminder", { guildId }));
+    logger.info(
+      tDefault("system:scheduler.bump_reminder_cancelling", { guildId }),
+    );
     await cancelReminder(guildId, serviceName);
   }
 

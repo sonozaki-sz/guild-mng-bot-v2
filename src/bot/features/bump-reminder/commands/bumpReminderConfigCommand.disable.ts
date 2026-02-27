@@ -50,5 +50,5 @@ export async function handleBumpReminderConfigDisable(
   });
 
   // 監査用ログ
-  logger.info(tDefault("system:log.bump_reminder_disabled", { guildId }));
+  logger.info(tDefault("system:bump-reminder.config_disabled", { guildId }));
 }

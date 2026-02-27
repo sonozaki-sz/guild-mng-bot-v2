@@ -7,7 +7,7 @@ import {
   type TextChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
@@ -160,11 +160,13 @@ export const stickyMessageSetEmbedModalHandler: ModalHandler = {
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
-      logger.error("Failed to set sticky message (embed modal)", {
-        channelId,
-        guildId,
-        err,
-      });
+      logger.error(
+        tDefault("system:sticky-message.set_embed_failed", {
+          channelId,
+          guildId,
+        }),
+        { channelId, guildId, err },
+      );
       throw err;
     }
   },

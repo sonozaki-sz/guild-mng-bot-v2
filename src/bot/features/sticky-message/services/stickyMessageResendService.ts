@@ -3,6 +3,7 @@
 
 import type { TextChannel } from "discord.js";
 import type { IStickyMessageRepository } from "../../../../shared/database/types";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { buildStickyMessagePayload } from "./stickyMessagePayloadBuilder";
 
@@ -44,7 +45,10 @@ export class StickyMessageResendService {
     const timer = setTimeout(() => {
       resendTimers.delete(channelId);
       void this.resend(channel, guildId).catch((err) => {
-        logger.error("StickyMessage resend scheduled error", err);
+        logger.error(
+          tDefault("system:sticky-message.resend_scheduled_error"),
+          err,
+        );
       });
     }, RESEND_DELAY_MS);
 
@@ -73,11 +77,13 @@ export class StickyMessageResendService {
       await this.repository.updateLastMessageId(sticky.id, sent.id);
       lastResendAt.set(channel.id, Date.now());
     } catch (err) {
-      logger.error("Failed to send sticky message", {
-        channelId: channel.id,
-        guildId,
-        err,
-      });
+      logger.error(
+        tDefault("system:sticky-message.send_failed", {
+          channelId: channel.id,
+          guildId,
+        }),
+        { channelId: channel.id, guildId, err },
+      );
     }
   }
 
@@ -96,10 +102,12 @@ export class StickyMessageResendService {
       await msg.delete();
     } catch {
       // 既に削除済みの場合は無視
-      logger.debug("Previous sticky message already deleted or not found", {
-        channelId: channel.id,
-        messageId,
-      });
+      logger.debug(
+        tDefault("system:sticky-message.previous_deleted_or_not_found", {
+          channelId: channel.id,
+        }),
+        { channelId: channel.id, messageId },
+      );
     }
   }
 

@@ -6,6 +6,7 @@ import type {
   IStickyMessageRepository,
   StickyMessage,
 } from "../../../../shared/database/types";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { executeWithDatabaseError } from "../../../../shared/utils/errorHandling";
 
 /**
@@ -20,7 +21,9 @@ export class StickyMessageRepository implements IStickyMessageRepository {
         this.prisma.stickyMessage.findUnique({
           where: { channelId },
         }),
-      "StickyMessageRepository.findByChannel",
+      tDefault("system:database.sticky_message_find_by_channel_failed", {
+        channelId,
+      }),
     );
   }
 
@@ -31,7 +34,9 @@ export class StickyMessageRepository implements IStickyMessageRepository {
           where: { guildId },
           orderBy: { createdAt: "asc" },
         }),
-      "StickyMessageRepository.findAllByGuild",
+      tDefault("system:database.sticky_message_find_all_by_guild_failed", {
+        guildId,
+      }),
     );
   }
 
@@ -53,7 +58,10 @@ export class StickyMessageRepository implements IStickyMessageRepository {
             updatedBy: updatedBy ?? null,
           },
         }),
-      "StickyMessageRepository.create",
+      tDefault("system:database.sticky_message_create_failed", {
+        guildId,
+        channelId,
+      }),
     );
   }
 
@@ -64,7 +72,9 @@ export class StickyMessageRepository implements IStickyMessageRepository {
           where: { id },
           data: { lastMessageId },
         }),
-      "StickyMessageRepository.updateLastMessageId",
+      tDefault("system:database.sticky_message_update_last_message_id_failed", {
+        id,
+      }),
     );
   }
 
@@ -85,7 +95,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
             ...(updatedBy !== undefined && { updatedBy }),
           },
         }),
-      "StickyMessageRepository.updateContent",
+      tDefault("system:database.sticky_message_update_content_failed", { id }),
     );
   }
 
@@ -95,7 +105,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
         this.prisma.stickyMessage.delete({
           where: { id },
         }),
-      "StickyMessageRepository.delete",
+      tDefault("system:database.sticky_message_delete_failed", { id }),
     );
   }
 
@@ -105,7 +115,9 @@ export class StickyMessageRepository implements IStickyMessageRepository {
         this.prisma.stickyMessage.deleteMany({
           where: { channelId },
         }),
-      "StickyMessageRepository.deleteByChannel",
+      tDefault("system:database.sticky_message_delete_by_channel_failed", {
+        channelId,
+      }),
     );
   }
 }
