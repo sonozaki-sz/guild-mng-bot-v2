@@ -19,17 +19,6 @@ import {
 } from "../../../../utils/messageResponse";
 import { BUMP_CONSTANTS } from "../../constants/bumpReminderConstants";
 
-// Bump パネル操作のログ文言を一貫化するための定数
-const BUMP_PANEL_LOG_CONSTANTS = {
-  // 追加/解除の最終結果ログで共通利用する定型文
-  ACTION_PREFIX: "Bump mention",
-  ACTION_FOR_USER: "for user",
-  ACTION_IN_GUILD: "in guild",
-  // 失敗時ログ（処理本体 / エラー返信）
-  HANDLE_FAILED: "Failed to handle bump panel button",
-  REPLY_FAILED: "Failed to send error reply",
-} as const;
-
 // Bump パネルの ON/OFF ボタン操作を処理する UI ハンドラー
 export const bumpPanelButtonHandler: ButtonHandler = {
   /**
@@ -185,16 +174,18 @@ export const bumpPanelButtonHandler: ButtonHandler = {
 
       logger.debug(
         // 操作結果を guild/user 単位で追跡可能な形式で記録
-        `${BUMP_PANEL_LOG_CONSTANTS.ACTION_PREFIX} ${
-          isAdding
+        tDefault("system:bump-reminder.panel_mention_updated", {
+          action: isAdding
             ? BUMP_REMINDER_MENTION_USER_ADD_RESULT.ADDED
-            : BUMP_REMINDER_MENTION_USER_REMOVE_RESULT.REMOVED
-        } ${BUMP_PANEL_LOG_CONSTANTS.ACTION_FOR_USER} ${userId} ${BUMP_PANEL_LOG_CONSTANTS.ACTION_IN_GUILD} ${guildId}`,
+            : BUMP_REMINDER_MENTION_USER_REMOVE_RESULT.REMOVED,
+          userId,
+          guildId,
+        }),
       );
     } catch (error) {
       // 想定外エラーはログ化し、ユーザーには汎用エラーを返す
       // safeReply 失敗時の二次例外も握りつぶさず別ログへ送る
-      logger.error(BUMP_PANEL_LOG_CONSTANTS.HANDLE_FAILED, error);
+      logger.error(tDefault("system:bump-reminder.panel_handle_failed"), error);
       try {
         await safeReply(interaction, {
           embeds: [
@@ -205,7 +196,10 @@ export const bumpPanelButtonHandler: ButtonHandler = {
           flags: MessageFlags.Ephemeral,
         });
       } catch (replyError) {
-        logger.error(BUMP_PANEL_LOG_CONSTANTS.REPLY_FAILED, replyError);
+        logger.error(
+          tDefault("system:bump-reminder.panel_reply_failed"),
+          replyError,
+        );
       }
     }
   },

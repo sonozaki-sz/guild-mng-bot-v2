@@ -159,7 +159,7 @@ export async function handleBumpReminderConfigSetMention(
 
   // 監査用ログ
   logger.info(
-    tDefault("system:log.bump_reminder_mention_set", {
+    tDefault("system:bump-reminder.config_mention_set", {
       guildId,
       roleId: finalMentionRoleId || "none",
       userIds: finalMentionUserIds.join(",") || "none",

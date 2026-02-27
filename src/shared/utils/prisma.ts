@@ -2,6 +2,7 @@
 // Prisma関連のユーティリティ関数
 
 import type { PrismaClient } from "@prisma/client";
+import { tDefault } from "../locale/localeManager";
 import { logger } from "./logger";
 
 // モジュールレベルでPrismaクライアントを保持（global変数を使わない）
@@ -33,8 +34,9 @@ export function requirePrismaClient(): PrismaClient {
   const prisma = getPrismaClient();
   if (!prisma) {
     // 必須経路で未初期化は即時エラーとして扱う
-    const error = new Error("Prisma client not available");
-    logger.error(error.message);
+    const message = tDefault("system:database.prisma_not_available");
+    const error = new Error(message);
+    logger.error(message, error);
     throw error;
   }
   // 利用可能なクライアントを返す
