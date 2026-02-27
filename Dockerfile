@@ -53,8 +53,8 @@ COPY prisma.config.ts ./
 RUN mkdir -p /app/storage /app/logs /app/.cache/corepack
 
 # セキュリティ: root 以外のユーザーで実行
-RUN groupadd --system --gid 1000 app && useradd --system --uid 1000 --gid app app
-RUN chown -R app:app /app
-USER app
+# node:24-slim には node ユーザー（UID 1000 / GID 1000）が既に存在するため、それを利用する
+RUN chown -R node:node /app
+USER node
 
 EXPOSE 3000
