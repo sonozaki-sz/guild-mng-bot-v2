@@ -298,7 +298,7 @@ Discord 標準の「ピン留め」は上に固定されますが、スティッ
 **Embed（カード形式）で設定する:**
 
 ```
-/sticky-message set channel:#チャンネル名 embed:true
+/sticky-message set channel:#チャンネル名 mode:embed
 ```
 
 Embed で設定するとタイトル・説明文・カラーを設定でき、より見やすいメッセージになります。
@@ -310,7 +310,7 @@ Embed で設定するとタイトル・説明文・カラーを設定でき、�
 /sticky-message set channel:#rules
 
 # お知らせチャンネルにEmbed（緑色）で設定
-/sticky-message set channel:#announcements embed:true
+/sticky-message set channel:#announcements mode:embed
 ```
 
 > コマンド実行後にポップアップが開きます。内容を入力して送信してください。

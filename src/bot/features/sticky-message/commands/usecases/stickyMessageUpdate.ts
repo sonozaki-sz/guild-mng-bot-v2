@@ -77,8 +77,8 @@ export async function handleStickyMessageUpdate(
   }
 
   const useEmbed =
-    interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.EMBED) ??
-    false;
+    interaction.options.getString(STICKY_MESSAGE_COMMAND.OPTION.MODE) ===
+    STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED;
 
   if (useEmbed) {
     // 既存の Embed データを読み込んでモーダルを事前入力する

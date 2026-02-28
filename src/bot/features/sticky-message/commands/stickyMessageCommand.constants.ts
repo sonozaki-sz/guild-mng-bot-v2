@@ -31,6 +31,10 @@ export const STICKY_MESSAGE_COMMAND = {
   },
   OPTION: {
     CHANNEL: "channel",
+    MODE: "mode",
+  },
+  OPTION_VALUE: {
+    TEXT: "text",
     EMBED: "embed",
   },
 } as const;
