@@ -47,6 +47,54 @@
 
 ---
 
+## ✅ 新機能テスト実装チェックリスト
+
+新機能を実装した際は、`src/` の **すべてのレイヤ** に対応するテストを作成する。
+特定レイヤだけでなく、薄いラッパーファイルもカバレッジ対象であることに注意する。
+
+### 対象ファイルマップ（例: member-log 機能）
+
+| src/ ファイル                                     | テスト必須 | 備考                                   |
+| ------------------------------------------------- | ---------- | -------------------------------------- |
+| `bot/commands/xxx-config.ts`                      | ✅         | コマンド名・execute委譲を検証          |
+| `bot/events/xxxEvent.ts`                          | ✅         | イベント名・once・execute委譲を検証    |
+| `bot/services/botXxxDependencyResolver.ts`        | ✅         | set/get・未初期化例外を検証            |
+| `bot/features/xxx/commands/xxxCommand.execute.ts` | ✅         | サブコマンドルーティングを検証         |
+| `bot/features/xxx/commands/xxxCommand.guard.ts`   | ✅         | 権限チェック分岐を検証                 |
+| `bot/features/xxx/commands/xxxCommand.yyyy.ts`    | ✅         | 各サブコマンドの正常・エラーを検証     |
+| `bot/features/xxx/handlers/xxxHandler.ts`         | ✅         | 早期リターン・正常フロー・エラーを検証 |
+| `shared/features/xxx/xxxConfigService.ts`         | ✅         | DB操作の全分岐を検証                   |
+
+### チェックリスト
+
+- [ ] `bot/commands/` の定義ファイルにテストを作成した
+- [ ] `bot/events/` の定義ファイルにテストを作成した
+- [ ] `bot/services/*DependencyResolver.ts` に set/get/未初期化例外テストを作成した
+- [ ] ハンドラーの早期リターン分岐をすべて網羅した（config=null/enabled=false/channelId=null/チャンネル不在/型不一致）
+- [ ] ハンドラーの条件式（`if (x > 0)` の複数条件の組み合わせ）を網羅した
+- [ ] `pnpm test:coverage` で **Stmts/Funcs/Lines 100%、Branches 99%以上** を確認した
+
+### 条件式の分岐網羅について
+
+`if (years > 0) ... if (months > 0) ... if (days > 0 || parts.length === 0)` のような複数条件が連なるハンドラーでは、**各条件が true/false になるケースを組み合わせて**テストする。
+
+```typescript
+// NG: デフォルトのモックが { years: 5, months: 3, days: 7 } のみ → years=0/months=0 の分岐が未カバー
+calcDurationMock.mockReturnValue({ years: 5, months: 3, days: 7 });
+
+// OK: 追加テストで各条件の false パスをカバー
+it("years=0, months=0 の場合でも送信される", async () => {
+  calcDurationMock.mockReturnValueOnce({ years: 0, months: 0, days: 5 });
+  // ...
+});
+it("years>0, months=0, days=0 の場合でも送信される", async () => {
+  calcDurationMock.mockReturnValueOnce({ years: 1, months: 0, days: 0 });
+  // ...
+});
+```
+
+---
+
 ## 🏗️ テスト設計
 
 ### AAA パターン
@@ -77,7 +125,7 @@ test("should do something", () => {
 ```typescript
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string, options?: Record<string, unknown>) =>
-    options?.signal ? `${key}:${options.signal}` : key
+    options?.signal ? `${key}:${options.signal}` : key,
   ),
   tGuild: tGuildMock,
 }));
@@ -334,13 +382,13 @@ async function loadModule() {
 
 ### コメントの書き方まとめ
 
-| 場所 | 必須/推奨 | 内容 |
-| --- | --- | --- |
-| ファイル先頭 | 必須 | `// tests/path/to/file.test.ts` |
-| `describe` 直前 | 必須 | 検証グループの目的（1行） |
-| `beforeEach` / `afterEach` 直前 | 必須 | セットアップ・後処理の理由（1行） |
-| `it` 直前 | **必須** | 検証内容・条件・制約の補足（1行） |
-| 動的インポート関数 | 必須 | モジュールキャッシュリセットの理由（1行） |
+| 場所                            | 必須/推奨 | 内容                                      |
+| ------------------------------- | --------- | ----------------------------------------- |
+| ファイル先頭                    | 必須      | `// tests/path/to/file.test.ts`           |
+| `describe` 直前                 | 必須      | 検証グループの目的（1行）                 |
+| `beforeEach` / `afterEach` 直前 | 必須      | セットアップ・後処理の理由（1行）         |
+| `it` 直前                       | **必須**  | 検証内容・条件・制約の補足（1行）         |
+| 動的インポート関数              | 必須      | モジュールキャッシュリセットの理由（1行） |
 
 ---
 
