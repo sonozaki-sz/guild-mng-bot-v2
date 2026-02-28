@@ -30,7 +30,7 @@ const tDefaultMock = vi.fn(
   (key: string, _opts?: Record<string, unknown>) => key,
 );
 const tGuildMock = vi.fn(async (key: string) => key);
-const getGuildTranslatorMock = vi.fn(async () => tGuildMock);
+const getGuildTranslatorMock = vi.fn(async (_guildId: string) => tGuildMock);
 
 const loggerMock = {
   info: vi.fn(),
@@ -39,7 +39,11 @@ const loggerMock = {
   error: vi.fn(),
 };
 
-const calcDurationMock = vi.fn(() => ({ years: 2, months: 1, days: 5 }));
+const calcDurationMock = vi.fn((_ts: number) => ({
+  years: 2,
+  months: 1,
+  days: 5,
+}));
 
 vi.mock("@/bot/services/botMemberLogDependencyResolver", () => ({
   getBotMemberLogConfigService: () => getBotMemberLogConfigServiceMock(),

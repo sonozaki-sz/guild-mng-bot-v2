@@ -7,8 +7,12 @@ import { ChannelType } from "discord.js";
 // ---- モック定義 ----
 const ensurePermissionMock = vi.fn();
 const setChannelIdMock = vi.fn();
-const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
-const tDefaultMock = vi.fn((key: string) => key);
+const tGuildMock = vi.fn(
+  async (_guildId: string, key: string, _opts?: Record<string, unknown>) => key,
+);
+const tDefaultMock = vi.fn(
+  (key: string, _opts?: Record<string, unknown>) => key,
+);
 const loggerInfoMock = vi.fn();
 const createSuccessEmbedMock = vi.fn(
   (desc: string, opts?: { title?: string }) => ({
