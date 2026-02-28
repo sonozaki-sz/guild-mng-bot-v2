@@ -12,10 +12,9 @@ vi.mock(
 
 // メンバーログコンフィグの取得・パース・更新委譲が正しく機能することを検証するグループ
 describe("shared/database/stores/guildMemberLogConfigStore", () => {
-  const findMemberLogConfigJsonMock =
-    findMemberLogConfigJson as MockedFunction<
-      typeof findMemberLogConfigJson
-    >;
+  const findMemberLogConfigJsonMock = findMemberLogConfigJson as MockedFunction<
+    typeof findMemberLogConfigJson
+  >;
 
   // 各テストが前のテストのモック呼び出し状態に影響されないよう、必ずクリアする
   beforeEach(() => {
@@ -70,7 +69,7 @@ describe("shared/database/stores/guildMemberLogConfigStore", () => {
       updateConfig,
     );
 
-    const payload = { channelId: "member-log" };
+    const payload = { enabled: true, channelId: "member-log" };
     await store.updateMemberLogConfig("guild-3", payload);
 
     expect(updateConfig).toHaveBeenCalledWith("guild-3", {

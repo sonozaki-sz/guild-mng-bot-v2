@@ -1,6 +1,7 @@
 // tests/unit/bot/commands/message-delete.test.ts
+import type { Mock } from "vitest";
 
-const executeMessageDeleteCommandMock = vi.fn();
+const executeMessageDeleteCommandMock: Mock = vi.fn();
 
 vi.mock(
   "@/bot/features/message-delete/commands/messageDeleteCommand.execute",
@@ -16,9 +17,8 @@ describe("bot/commands/message-delete", () => {
 
   // messageDeleteCommand が data・execute・cooldown を持つオブジェクトとして正しくエクスポートされることを検証
   it("messageDeleteCommand を正しい構造でエクスポートする", async () => {
-    const { messageDeleteCommand } = await import(
-      "@/bot/commands/message-delete"
-    );
+    const { messageDeleteCommand } =
+      await import("@/bot/commands/message-delete");
 
     expect(messageDeleteCommand).toBeDefined();
     expect(messageDeleteCommand.data).toBeDefined();
@@ -28,18 +28,16 @@ describe("bot/commands/message-delete", () => {
 
   // data.name が "message-delete" であることを検証
   it("コマンド名が message-delete である", async () => {
-    const { messageDeleteCommand } = await import(
-      "@/bot/commands/message-delete"
-    );
+    const { messageDeleteCommand } =
+      await import("@/bot/commands/message-delete");
 
     expect(messageDeleteCommand.data.name).toBe("message-delete");
   });
 
   // execute 呼び出し時に executeMessageDeleteCommand へ interaction が転送されることを検証
   it("execute が executeMessageDeleteCommand を呼ぶ", async () => {
-    const { messageDeleteCommand } = await import(
-      "@/bot/commands/message-delete"
-    );
+    const { messageDeleteCommand } =
+      await import("@/bot/commands/message-delete");
     const interaction = { id: "int-1" } as never;
     executeMessageDeleteCommandMock.mockResolvedValue(undefined);
 

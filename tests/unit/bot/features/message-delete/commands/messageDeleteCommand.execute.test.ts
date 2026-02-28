@@ -854,7 +854,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     ])(
       "モーダル(%s): awaitModalSubmit が null の場合は何もしない",
       async (customId) => {
-        const { collector, interaction } = await runWithPagination();
+        const { collector } = await runWithPagination();
         const i = makeButtonI({
           customId,
           awaitModalSubmitResult: null,
@@ -1458,8 +1458,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
 
     // CONFIRM_NO でキャンセルメッセージが表示されて処理が終了することを検証
     it("CONFIRM_NO でキャンセルメッセージを表示して終了する", async () => {
-      const { confirmCollector, interaction, promise } =
-        await runWithConfirmDialog();
+      const { confirmCollector, promise } = await runWithConfirmDialog();
 
       await confirmCollector.triggerEnd(MSG_DEL_CUSTOM_ID.CONFIRM_NO);
       await promise;
@@ -1472,8 +1471,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
 
     // 確認ダイアログがタイムアウトした場合に timed_out 警告が表示されることを検証
     it("タイムアウトの場合は timed_out 警告を表示して終了する", async () => {
-      const { confirmCollector, interaction, promise } =
-        await runWithConfirmDialog();
+      const { confirmCollector, promise } = await runWithConfirmDialog();
 
       await confirmCollector.triggerEnd("time");
       await promise;
@@ -1574,9 +1572,8 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
   // ---- countOption=null → count=Infinity ----
 
   it("countOption が null の場合 count は Infinity になる", async () => {
-    const { executeMessageDeleteCommand } = await import(
-      "@/bot/features/message-delete/commands/messageDeleteCommand.execute"
-    );
+    const { executeMessageDeleteCommand } =
+      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
     deleteMessagesMock.mockResolvedValue({
       totalDeleted: 0,
       channelBreakdown: {},
@@ -1695,9 +1692,8 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
 
     // daysOption 指定での削除成功後にログが記録されることを検証
     it("削除成功後にログを記録する（daysOption 指定）", async () => {
-      const { executeMessageDeleteCommand } = await import(
-        "@/bot/features/message-delete/commands/messageDeleteCommand.execute"
-      );
+      const { executeMessageDeleteCommand } =
+        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
       const collector = makeCollector();
       const response = makeResponse(collector);
       const records = makeManyRecords(3);
