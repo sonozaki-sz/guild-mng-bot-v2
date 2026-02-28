@@ -405,6 +405,8 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] 共用定数に説明コメントがある
 - [ ] 処理ブロックの意図コメントがある
 - [ ] テストの全 `it()` ブロックの直前に `//` コメントがある
+- [ ] 新機能実装時は `bot/commands/`・`bot/events/`・`bot/services/*DependencyResolver.ts` のテストも作成している（[テストチェックリスト参照](TESTING_GUIDELINES.md#-新機能テスト実装チェックリスト)）
+- [ ] `pnpm test:coverage` で Stmts/Funcs/Lines 100%・Branches 99%以上を確認した
 - [ ] `typecheck` が通る
 - [ ] ユーザー向け応答文字列（`editReply` / `followUp` / `reply` の `content`・ボタンラベル・Embedタイトル/説明文等）に生文字列をハードコードしていない
 - [ ] エラー・警告・情報・成功のステータス通知を `create*Embed` ユーティリティ（`createErrorEmbed` 等）で返しており、`editReply(string)` のようなプレーンテキスト返しを使っていない
