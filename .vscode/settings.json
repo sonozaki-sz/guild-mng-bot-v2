@@ -106,6 +106,7 @@
   "chat.tools.terminal.autoApprove": {
     // GitHub CLI
     "gh": true,
+    "git": true,
     // 読み取り系コマンド
     "ls": true,
     "ll": true,
