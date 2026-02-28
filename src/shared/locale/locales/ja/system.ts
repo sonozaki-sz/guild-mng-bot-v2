@@ -16,7 +16,7 @@ export const system = {
     "[Bot] Botクライアントをシャットダウンしています...",
   "bot.client.shutdown_complete":
     "[Bot] Botクライアントのシャットダウンが完了しました。",
-  "bot.presence_activity": "{{count}}個のサーバーで稼働中 | by sonozaki-sz",
+  "bot.presence_activity": "{{count}}個のサーバーで稼働中 | by sonozaki",
 
   // Bumpリマインダー検知ログ
   "bump-reminder.detected":
