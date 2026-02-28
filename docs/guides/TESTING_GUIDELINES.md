@@ -301,9 +301,10 @@ afterEach(() => {
 });
 ```
 
-### 4. it ブロック前のコメント（任意・推奨）
+### 4. it ブロック前のコメント（必須）
 
-`it` の説明文が自明でないケース（境界値・エラーパス・Discord 仕様上の制約など）には、1 行の補足コメントを付ける。
+**必須**: `it` の直前に、そのテストが何を検証しているかを 1 行で記載する。
+`it` 文字列と重複していてもよいが、**テスト対象の条件・制約・前提**を補足する形が望ましい。
 
 ```typescript
 // Discord の embed フィールドは 1024 文字上限のため切り詰めを確認
@@ -311,14 +312,12 @@ it("truncates content over 1024 chars", () => { ... });
 
 // panelMessageId が null の場合は finally での削除処理をスキップする
 it("skips panel deletion when panelMessageId is null", () => { ... });
+
+// getUserSetting: DB にレコードが存在する場合はその値を返すことを検証
+it("returns saved value when record exists", () => { ... });
 ```
 
-自明な正常系については省略してよい。
-
-```typescript
-// これはコメント不要（it の説明でわかる）
-it("returns null when record is not found", () => { ... });
-```
+> **背景**: message-delete テスト追加時（2026-02-28）にコメントなしの `it()` ブロックが多数含まれており、一括修正が必要になった事例。再発防止のため全 `it()` でのコメントを必須にした。
 
 ### 5. 動的インポート / モジュールキャッシュ起因のセットアップ
 
@@ -340,7 +339,7 @@ async function loadModule() {
 | ファイル先頭 | 必須 | `// tests/path/to/file.test.ts` |
 | `describe` 直前 | 必須 | 検証グループの目的（1行） |
 | `beforeEach` / `afterEach` 直前 | 必須 | セットアップ・後処理の理由（1行） |
-| 非自明な `it` 直前 | 推奨 | 条件・制約・エラーパスの補足（1行） |
+| `it` 直前 | **必須** | 検証内容・条件・制約の補足（1行） |
 | 動的インポート関数 | 必須 | モジュールキャッシュリセットの理由（1行） |
 
 ---
