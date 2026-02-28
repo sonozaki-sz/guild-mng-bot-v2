@@ -26,8 +26,14 @@ export async function createBumpReminderUseCase(
   serviceName?: string,
 ): Promise<BumpReminder> {
   const reminder = await prisma.$transaction(async (tx) => {
+    // 同一 guildId + 同一 serviceName の pending のみキャンセル
+    // serviceName が異なるサービス（Disboard/Dissoku）のリマインダーに影響しないよう絞り込む
     await tx.bumpReminder.updateMany({
-      where: { guildId, status: BUMP_REMINDER_STATUS.PENDING },
+      where: {
+        guildId,
+        status: BUMP_REMINDER_STATUS.PENDING,
+        serviceName: serviceName ?? null,
+      },
       data: { status: BUMP_REMINDER_STATUS.CANCELLED },
     });
 
