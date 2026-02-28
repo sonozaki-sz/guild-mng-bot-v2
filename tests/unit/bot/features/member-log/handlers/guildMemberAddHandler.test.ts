@@ -3,7 +3,7 @@ import { ChannelType } from "discord.js";
 
 // discord.js は static import のため vi.mock factory がホイスト時点で実行される
 // EmbedBuilderMock は vi.hoisted() で定義して TDZ を回避する
-const { EmbedBuilderMock, embedInstance } = vi.hoisted(() => {
+const { EmbedBuilderMock } = vi.hoisted(() => {
   const embedInstance = {
     setColor: vi.fn().mockReturnThis(),
     setTitle: vi.fn().mockReturnThis(),
@@ -30,7 +30,7 @@ const tDefaultMock = vi.fn(
   (key: string, _opts?: Record<string, unknown>) => key,
 );
 const tGuildMock = vi.fn(async (key: string) => key);
-const getGuildTranslatorMock = vi.fn(async () => tGuildMock);
+const getGuildTranslatorMock = vi.fn(async (_guildId: string) => tGuildMock);
 
 const loggerMock = {
   info: vi.fn(),
@@ -39,7 +39,11 @@ const loggerMock = {
   error: vi.fn(),
 };
 
-const calcDurationMock = vi.fn(() => ({ years: 5, months: 3, days: 7 }));
+const calcDurationMock = vi.fn((_ts: number) => ({
+  years: 5,
+  months: 3,
+  days: 7,
+}));
 
 vi.mock("@/bot/services/botMemberLogDependencyResolver", () => ({
   getBotMemberLogConfigService: () => getBotMemberLogConfigServiceMock(),

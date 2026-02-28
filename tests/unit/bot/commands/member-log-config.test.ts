@@ -1,6 +1,7 @@
 // tests/unit/bot/commands/member-log-config.test.ts
+import type { Mock } from "vitest";
 
-const executeMemberLogConfigCommandMock = vi.fn();
+const executeMemberLogConfigCommandMock: Mock = vi.fn();
 
 vi.mock(
   "@/bot/features/member-log/commands/memberLogConfigCommand.execute",

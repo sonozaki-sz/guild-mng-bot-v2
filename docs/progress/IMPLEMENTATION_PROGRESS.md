@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年2月28日（ログのi18n化・DB操作ログ整備）
+最終更新: 2026年3月1日（メンバーログ・メッセージ削除機能実装完了）
 
 ---
 
@@ -13,10 +13,10 @@
 | カテゴリ             | 実装済み | 未実装 | 進捗率 |
 | -------------------- | -------- | ------ | ------ |
 | コア機能             | 13       | 0      | 100%   |
-| コマンド             | 8        | 4      | 67%    |
-| イベント             | 5        | 2      | 71%    |
-| サービス             | 5        | 2      | 71%    |
-| 主要機能             | 4        | 3      | 57%    |
+| コマンド             | 11       | 1      | 92%    |
+| イベント             | 7        | 0      | 100%   |
+| サービス             | 7        | 0      | 100%   |
+| 主要機能             | 6        | 1      | 86%    |
 | データベーステーブル | 4        | 4      | 50%    |
 
 ### 機能別実装状況
@@ -29,8 +29,8 @@
 | メッセージレスポンス | ✅   | 100%   | 完全実装                           |
 | VAC                  | ✅   | 100%   | 自動作成・操作パネルまで実装完了   |
 | メッセージ固定       | ✅   | 100%   | 完全実装（set/remove/update/view） |
-| 参加・脱退ログ       | 📋   | 0%     | 仕様書のみ                         |
-| メッセージ削除       | 📋   | 0%     | 仕様書のみ                         |
+| 参加・脱退ログ       | ✅   | 100%   | 完全実装                           |
+| メッセージ削除       | ✅   | 100%   | 完全実装                           |
 | VC募集               | 📋   | 0%     | 仕様書のみ                         |
 | Web UI               | 🚧   | 10%    | 基盤のみ                           |
 
@@ -304,6 +304,119 @@
 
 ---
 
+### 🎤 VC自動作成機能（VAC）（100%完了）
+
+**状態**: ✅ 完全実装・テスト済み
+
+**仕様書**: [docs/specs/VAC_SPEC.md](../specs/VAC_SPEC.md)
+
+**実装内容**:
+
+- `voiceStateUpdate` でトリガー参加時に専用VCを自動作成
+- 作成済みVCの空室検知による自動削除
+- `channelDelete`/`clientReady` で設定と実体の同期クリーンアップ
+- `/vac-config`（`create-trigger-vc` / `remove-trigger-vc` / `view`）
+- `/vac`（`vc-rename` / `vc-limit`）
+- 操作パネル（button/modal/user select）
+- パネルUIを縦一列化し、全ボタン `ButtonStyle.Primary` に統一
+- 応答APIを `flags: MessageFlags.Ephemeral` へ統一
+
+---
+
+### 📌 メッセージ固定機能（100%完了）
+
+**状態**: ✅ 完全実装・テスト済み
+
+**仕様書**: [docs/specs/STICKY_MESSAGE_SPEC.md](../specs/STICKY_MESSAGE_SPEC.md)
+
+**実装内容**:
+
+- `/sticky-message set` — チャンネルへスティッキーメッセージ設定（プレーン/Embed両対応）
+- `/sticky-message remove` — スティッキーメッセージ削除（Discord上のメッセージも削除）
+- `/sticky-message update` — 内容上書き更新と即時再送信
+- `/sticky-message view` — ギルド内設定一覧を StringSelectMenu で提示、詳細を Embed 表示
+- `messageCreate` イベントでデバウンス（5秒）再送信（`StickyMessageResendService`）
+- `StickyMessage` テーブル追加（`channelId UNIQUE`、`embedData` JSON、`lastMessageId`）
+- 各応答はギルド別言語設定（`tGuild`）に対応
+- StringSelectMenu ルーティング基盤（`StringSelectHandler` / `handleStringSelectMenu`）新設
+
+**テスト**:
+
+- ✅ ユニットテスト・インテグレーションテスト実装済み（1264 tests / 232 suites）
+
+---
+
+### 👥 メンバーログ機能（100%完了）
+
+**状態**: ✅ 完全実装・テスト済み
+
+**仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](../specs/MEMBER_LOG_SPEC.md)
+
+**実装内容**:
+
+- `guildMemberAdd` / `guildMemberRemove` イベントハンドラ
+- Embed形式の参加・退出通知（ビリジアン・茶色カラー）
+- アカウント年齢計算（`date-fns` 利用 / `accountAge.ts`）
+- カスタムメッセージ（`{user}` / `{username}` / `{count}` プレースホルダー対応）
+- `/member-log-config` コマンド（set-channel / enable / disable / set-join-message / set-leave-message / view）
+- `GuildConfig.memberLogConfig`（JSON）への設定永続化
+- `botMemberLogDependencyResolver.ts` による DI 解決
+
+**関連ファイル**:
+
+- `src/bot/events/guildMemberAdd.ts`
+- `src/bot/events/guildMemberRemove.ts`
+- `src/bot/commands/member-log-config.ts`
+- `src/bot/features/member-log/handlers/guildMemberAddHandler.ts`
+- `src/bot/features/member-log/handlers/guildMemberRemoveHandler.ts`
+- `src/bot/features/member-log/handlers/accountAge.ts`
+- `src/bot/features/member-log/commands/memberLogConfigCommand.execute.ts`
+- `src/shared/features/member-log/memberLogConfigService.ts`
+
+**テスト**:
+
+- ✅ 13テストファイル ・ statements/functions/lines 100% ・ branches 100%
+
+---
+
+### 🗑️ メッセージ削除機能（100%完了）
+
+**状態**: ✅ 完全実装・テスト済み
+
+**仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md)
+
+**実装内容**:
+
+- `/message-delete [count] [user] [bot] [keyword] [days] [after] [before] [channel]` コマンド
+  - `count`: 削除件数（デフォルト10件）
+  - `user`: 特定ユーザーのメッセージのみ対象
+  - `bot`: Botメッセージのみ対象
+  - `keyword`: キーワードを含むメッセージのみ対象
+  - `days`/`after`/`before`: 相対・絶対日時による絞り込み
+  - `channel`: 指定チャンネルのみ対象（省略時は現在チャンネル）
+- 確認ダイアログ（削除前のプレビュー表示）
+- Embed形式の削除結果表示（`messageDeleteEmbedBuilder.ts`）
+- 権限チェック（MANAGE_MESSAGES）
+- `/message-delete-config confirm:<boolean>` コマンド（確認ダイアログスキップ機能）
+- `MessageDeleteUserSettingRepository` / `MessageDeleteUserSettingService`（設定永続化）
+
+**関連ファイル**:
+
+- `src/bot/commands/message-delete.ts`
+- `src/bot/commands/message-delete-config.ts`
+- `src/bot/features/message-delete/commands/messageDeleteCommand.execute.ts`
+- `src/bot/features/message-delete/commands/messageDeleteConfigCommand.execute.ts`
+- `src/bot/features/message-delete/commands/messageDeleteEmbedBuilder.ts`
+- `src/bot/features/message-delete/services/messageDeleteService.ts`
+- `src/bot/features/message-delete/repositories/messageDeleteUserSettingRepository.ts`
+- `src/shared/features/message-delete/messageDeleteUserSettingService.ts`
+
+**テスト**:
+
+- ✅ 9テストファイル ・ statements/functions/lines 100% ・ branches 100%
+
+---
+
 ### 💻 Web UI基盤（10%完了）
 
 **状態**: 🚧 基盤のみ実装
@@ -346,16 +459,19 @@
 
 | コマンド                 | 説明                                         | 状態 | 備考     |
 | ------------------------ | -------------------------------------------- | ---- | -------- |
-| `/ping`                  | 疎通確認                                     | ✅   | 完全実装 |
-| `/afk`                   | AFKチャンネルへ移動                          | ✅   | 完全実装 |
-| `/afk-config`            | AFK機能設定                                  | ✅   | 完全実装 |
-| `/bump-reminder-config`  | Bumpリマインダー機能設定                     | ✅   | 完全実装 |
-| `/vac-config`            | VAC設定（作成/削除/表示）                    | ✅   | 完全実装 |
-| `/vac`                   | VAC VC操作（名前/人数）                      | ✅   | 完全実装 |
-| `/sticky-message set`    | スティッキーメッセージ設定                   | ✅   | 完全実装 |
-| `/sticky-message remove` | スティッキーメッセージ削除                   | ✅   | 完全実装 |
-| `/sticky-message update` | スティッキーメッセージ更新                   | ✅   | 完全実装 |
-| `/sticky-message view`   | スティッキーメッセージ一覧表示（SelectMenu） | ✅   | 完全実装 |
+| `/ping`                  | 疎通確認                                         | ✅   | 完全実装 |
+| `/afk`                   | AFKチャンネルへ移動                              | ✅   | 完全実装 |
+| `/afk-config`            | AFK機能設定                                      | ✅   | 完全実装 |
+| `/bump-reminder-config`  | Bumpリマインダー機能設定                         | ✅   | 完全実装 |
+| `/vac-config`            | VAC設定（作成/削除/表示）                        | ✅   | 完全実装 |
+| `/vac`                   | VAC VC操作（名前/人数）                          | ✅   | 完全実装 |
+| `/sticky-message set`    | スティッキーメッセージ設定                       | ✅   | 完全実装 |
+| `/sticky-message remove` | スティッキーメッセージ削除                       | ✅   | 完全実装 |
+| `/sticky-message update` | スティッキーメッセージ更新                       | ✅   | 完全実装 |
+| `/sticky-message view`   | スティッキーメッセージ一覧表示（SelectMenu）     | ✅   | 完全実装 |
+| `/member-log-config`     | メンバーログ機能設定                             | ✅   | 完全実装 |
+| `/message-delete`        | メッセージ一括削除                               | ✅   | 完全実装 |
+| `/message-delete-config` | メッセージ削除内容設定                           | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -365,6 +481,10 @@
 - `src/bot/commands/bump-reminder-config.ts`
 - `src/bot/commands/vac-config.ts`
 - `src/bot/commands/vac.ts`
+- `src/bot/commands/sticky-message.ts`
+- `src/bot/commands/member-log-config.ts`
+- `src/bot/commands/message-delete.ts`
+- `src/bot/commands/message-delete-config.ts`
 - `src/bot/commands/commands.ts`
 - `src/shared/utils/messageResponse.ts`
 
@@ -379,6 +499,8 @@
 | `messageCreate`     | メッセージ作成（Bump検知・sticky再送信） | ✅   | 完全実装 |
 | `voiceStateUpdate`  | VAC自動作成・自動削除                    | ✅   | 完全実装 |
 | `channelDelete`     | VAC設定同期                              | ✅   | 完全実装 |
+| `guildMemberAdd`    | メンバー参加通知（メンバーログ）           | ✅   | 完全実装 |
+| `guildMemberRemove` | メンバー退出通知（メンバーログ）           | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -387,6 +509,8 @@
 - `src/bot/events/messageCreate.ts`
 - `src/bot/events/voiceStateUpdate.ts`
 - `src/bot/events/channelDelete.ts`
+- `src/bot/events/guildMemberAdd.ts`
+- `src/bot/events/guildMemberRemove.ts`
 - `src/bot/events/events.ts`
 - `src/bot/handlers/interactionCreate/ui/buttons.ts`
 - `src/bot/handlers/interactionCreate/ui/modals.ts`
@@ -403,6 +527,8 @@
 | messageResponse            | Embedメッセージユーティリティ              | ✅   | 完全実装 |
 | VacControlPanel            | VAC操作パネル送信ユーティリティ            | ✅   | 完全実装 |
 | StickyMessageResendService | スティッキーメッセージ再送信（デバウンス） | ✅   | 完全実装 |
+| MemberLogConfigService     | メンバーログ設定管理                         | ✅   | 完全実装 |
+| MessageDeleteService       | メッセージ削除実行ロジック                   | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -411,6 +537,8 @@
 - `src/bot/services/botCompositionRoot.ts`
 - `src/bot/features/vac/handlers/ui/vacControlPanel.ts`
 - `src/shared/features/bump-reminder/bumpReminderConfigService.ts`
+- `src/shared/features/member-log/memberLogConfigService.ts`
+- `src/bot/features/message-delete/services/messageDeleteService.ts`
 - `src/shared/utils/messageResponse.ts`
 
 ---
@@ -488,100 +616,7 @@ model BumpReminder {
 
 以下は仕様書が作成済みで、実装待ちの機能です。
 
-### 🎤 VC自動作成機能（VAC）
-
-**状態**: ✅ 実装完了
-
-**仕様書**: [docs/specs/VAC_SPEC.md](../specs/VAC_SPEC.md)
-
-**実装内容**:
-
-- `voiceStateUpdate` でトリガー参加時に専用VCを自動作成
-- 作成済みVCの空室検知による自動削除
-- `channelDelete`/`clientReady` で設定と実体の同期クリーンアップ
-- `/vac-config`（`create-trigger-vc` / `remove-trigger-vc` / `view`）
-- `/vac`（`vc-rename` / `vc-limit`）
-- 操作パネル（button/modal/user select）
-- パネルUIを縦一列化し、全ボタン `ButtonStyle.Primary` に統一
-- 応答APIを `flags: MessageFlags.Ephemeral` へ統一
-
----
-
-### 📌 メッセージ固定機能
-
-**状態**: ✅ 実装完了
-
-**仕様書**: [docs/specs/STICKY_MESSAGE_SPEC.md](../specs/STICKY_MESSAGE_SPEC.md)
-
-**実装内容**:
-
-- `/sticky-message set` — チャンネルへスティッキーメッセージ設定（プレーン/Embed両対応）
-- `/sticky-message remove` — スティッキーメッセージ削除（Discord上のメッセージも削除）
-- `/sticky-message update` — 内容上書き更新と即時再送信
-- `/sticky-message view` — ギルド内設定一覧を StringSelectMenu で提示、詳細を Embed 表示
-- `messageCreate` イベントでデバウンス（5秒）再送信（`StickyMessageResendService`）
-- `StickyMessage` テーブル追加（`channelId UNIQUE`、`embedData` JSON、`lastMessageId`）
-- 各応答はギルド別言語設定（`tGuild`）に対応
-- StringSelectMenu ルーティング基盤（`StringSelectHandler` / `handleStringSelectMenu`）新設
-
-**関連ファイル**:
-
-- `src/bot/commands/sticky-message.ts`
-- `src/bot/features/sticky-message/commands/stickyMessageCommand.execute.ts`
-- `src/bot/features/sticky-message/commands/usecases/stickyMessageSet.ts`
-- `src/bot/features/sticky-message/commands/usecases/stickyMessageRemove.ts`
-- `src/bot/features/sticky-message/commands/usecases/stickyMessageUpdate.ts`
-- `src/bot/features/sticky-message/commands/usecases/stickyMessageView.ts`
-- `src/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler.ts`
-- `src/bot/features/sticky-message/services/stickyMessageResendService.ts`
-- `src/bot/features/sticky-message/services/stickyMessagePayloadBuilder.ts`
-- `src/bot/features/sticky-message/repositories/stickyMessageRepository.ts`
-- `src/bot/features/sticky-message/handlers/stickyMessageCreateHandler.ts`
-
-**テスト**:
-
-- ✅ ユニットテスト・インテグレーションテスト実装済み（987 tests / 206 suites）
-
----
-
-### 👥 メンバーログ機能（仕様書のみ）
-
-**状態**: 📋 仕様書作成済み、実装待ち
-
-**仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](../specs/MEMBER_LOG_SPEC.md)
-
-**実装予定内容**:
-
-- guildMemberAdd、guildMemberRemoveイベントハンドラ
-- Embed形式の通知メッセージ
-- `/member-log-config` コマンド
-- データベーススキーマ追加
-
----
-
-### 🗑️ メッセージ削除機能（仕様書のみ）
-
-**状態**: 📋 仕様書作成済み、実装待ち
-
-**仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md)
-
-**実装予定内容**:
-
-- `/message-delete [count] [user] [keyword] [days] [after] [before] [channel]` コマンド
-  - `count`: 削除件数（デフォルト10件）
-  - `user`: 特定ユーザーのメッセージのみ対象
-  - `keyword`: キーワードを含むメッセージのみ対象
-  - `days`/`after`/`before`: 相対・絶対日時による絞り込み
-  - `channel`: 全チャンネル横断削除（省略時は現在チャンネル）
-- 確認ダイアログ（削除前のプレビュー表示）
-- ページネーション付き削除結果表示
-- 権限チェック（MANAGE_MESSAGES）
-- `/message-delete-config` コマンド（ギルド別デフォルト設定）
-- 削除ログ
-
----
-
-### 📢 VC募集機能（仕様書のみ）
+### 📢 VC募集機能
 
 **状態**: 📋 仕様書作成済み、実装待ち
 
@@ -589,11 +624,7 @@ model BumpReminder {
 
 **実装予定内容**:
 
-- `/vc-recruit-config setup` — 募集機能の有効化・チャンネル設定
-- `/vc-recruit-config teardown` — 募集機能の無効化
-- `/vc-recruit-config add-role` — 参加可能ロール追加
-- `/vc-recruit-config remove-role` — 参加可能ロール削除
-- `/vc-recruit-config view` — 設定内容確認
+- `/vc-recruit-config setup` / `teardown` / `add-role` / `remove-role` / `view`
 - 2ステップモーダルフロー（募集画面作成）
 - VC作成・削除の自動管理
 - Prismaスキーマ追加（`VcRecruitConfig`・`VcRecruitSession` テーブル）
@@ -612,10 +643,10 @@ model BumpReminder {
 
 | コンポーネント | 実装済み | 未実装 | 合計 |
 | -------------- | -------- | ------ | ---- |
-| コマンド       | 8        | 4      | 12   |
-| イベント       | 5        | 2      | 7    |
-| サービス       | 5        | 2      | 7    |
-| リポジトリ     | 3        | 4      | 7    |
+| コマンド       | 11       | 1      | 12   |
+| イベント       | 7        | 0      | 7    |
+| サービス       | 7        | 0      | 7    |
+| リポジトリ     | 4        | 3      | 7    |
 | ユーティリティ | 9        | 1      | 10   |
 
 ---

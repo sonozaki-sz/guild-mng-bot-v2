@@ -133,7 +133,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
 
     const callArg = createInfoEmbedMock.mock.calls[0][1];
     const statusField = (
-      callArg.fields as Array<{ name: string; value: string }>
+      callArg!.fields as Array<{ name: string; value: string }>
     ).find((f) => f.name === "commands:member-log-config.embed.field.status");
     expect(statusField?.value).toBe("common:enabled");
   });
@@ -154,7 +154,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
 
     const callArg = createInfoEmbedMock.mock.calls[0][1];
     const statusField = (
-      callArg.fields as Array<{ name: string; value: string }>
+      callArg!.fields as Array<{ name: string; value: string }>
     ).find((f) => f.name === "commands:member-log-config.embed.field.status");
     expect(statusField?.value).toBe("common:disabled");
   });
@@ -175,7 +175,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
 
     const callArg = createInfoEmbedMock.mock.calls[0][1];
     const channelField = (
-      callArg.fields as Array<{ name: string; value: string }>
+      callArg!.fields as Array<{ name: string; value: string }>
     ).find((f) => f.name === "commands:member-log-config.embed.field.channel");
     expect(channelField?.value).toBe("<#ch-99>");
   });
@@ -196,7 +196,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
 
     const callArg = createInfoEmbedMock.mock.calls[0][1];
     const joinField = (
-      callArg.fields as Array<{ name: string; value: string }>
+      callArg!.fields as Array<{ name: string; value: string }>
     ).find(
       (f) => f.name === "commands:member-log-config.embed.field.join_message",
     );

@@ -252,7 +252,7 @@ ayasono/
 │   └── shared/               # 共有コード
 │       ├── config/           # 環境変数定義
 │       ├── database/         # Repository・Store・型定義
-        ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
+│       ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
 │       ├── locale/           # i18n（i18next）
 │       ├── scheduler/        # ジョブスケジューラ
 │       ├── errors/           # カスタムエラー・エラーハンドラ
