@@ -2,6 +2,8 @@
 import { channelDeleteEvent } from "@/bot/events/channelDelete";
 import { clientReadyEvent } from "@/bot/events/clientReady";
 import { events } from "@/bot/events/events";
+import { guildMemberAddEvent } from "@/bot/events/guildMemberAdd";
+import { guildMemberRemoveEvent } from "@/bot/events/guildMemberRemove";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
 import { messageCreateEvent } from "@/bot/events/messageCreate";
 import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
@@ -12,6 +14,12 @@ vi.mock("@/bot/events/channelDelete", () => ({
 }));
 vi.mock("@/bot/events/clientReady", () => ({
   clientReadyEvent: { name: "clientReady" },
+}));
+vi.mock("@/bot/events/guildMemberAdd", () => ({
+  guildMemberAddEvent: { name: "guildMemberAdd" },
+}));
+vi.mock("@/bot/events/guildMemberRemove", () => ({
+  guildMemberRemoveEvent: { name: "guildMemberRemove" },
 }));
 vi.mock("@/bot/events/interactionCreate", () => ({
   interactionCreateEvent: { name: "interactionCreate" },
@@ -28,6 +36,8 @@ describe("bot/events index", () => {
   it("exports all events in expected order", () => {
     expect(events).toEqual([
       channelDeleteEvent,
+      guildMemberAddEvent,
+      guildMemberRemoveEvent,
       interactionCreateEvent,
       clientReadyEvent,
       messageCreateEvent,
