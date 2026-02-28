@@ -3,12 +3,14 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import { createMessageDeleteUserSettingService } from "../../shared/features/message-delete/messageDeleteUserSettingService";
 import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
 import { localeManager } from "../../shared/locale/localeManager";
 import { getBumpReminderRepository } from "../features/bump-reminder/repositories/bumpReminderRepository";
 import { getBumpReminderFeatureConfigService } from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
 import { getBumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
+import { getMessageDeleteUserSettingRepository } from "../features/message-delete/repositories/messageDeleteUserSettingRepository";
 import { getStickyMessageRepository } from "../features/sticky-message/repositories/stickyMessageRepository";
 import { getStickyMessageResendService } from "../features/sticky-message/services/stickyMessageResendService";
 import {
@@ -22,6 +24,7 @@ import {
   setBotBumpReminderRepository,
 } from "./botBumpReminderDependencyResolver";
 import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
+import { setBotMessageDeleteUserSettingService } from "./botMessageDeleteDependencyResolver";
 import {
   setBotStickyMessageConfigService,
   setBotStickyMessageResendService,
@@ -69,4 +72,12 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
   );
   setBotStickyMessageConfigService(stickyMessageConfigService);
   setBotStickyMessageResendService(stickyMessageResendService);
+
+  // message-delete ユーザー設定サービスを初期化
+  const messageDeleteUserSettingRepository =
+    getMessageDeleteUserSettingRepository(prisma);
+  const messageDeleteUserSettingService = createMessageDeleteUserSettingService(
+    messageDeleteUserSettingRepository,
+  );
+  setBotMessageDeleteUserSettingService(messageDeleteUserSettingService);
 }

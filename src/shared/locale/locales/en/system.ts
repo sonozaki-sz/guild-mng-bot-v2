@@ -199,6 +199,13 @@ export const system = {
   "database.sticky_message_delete_by_channel_failed":
     "[Database] Failed to delete sticky message by channel ChannelId: {{channelId}}",
 
+  // UserSetting DB operations
+  // user_settings table operation logs
+  "database.user_setting_find_failed":
+    "[Database] Failed to find user setting UserId: {{userId}} GuildId: {{guildId}}",
+  "database.user_setting_upsert_failed":
+    "[Database] Failed to upsert user setting UserId: {{userId}} GuildId: {{guildId}}",
+
   // VAC database operation logs
   "database.vac_trigger_added":
     "[Database] VAC trigger channel added GuildId: {{guildId}} ChannelId: {{channelId}}",
