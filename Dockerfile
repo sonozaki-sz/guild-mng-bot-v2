@@ -29,8 +29,9 @@ FROM node:24-slim AS runner
 WORKDIR /app
 
 # OS パッケージを最新化してセキュリティ脆弱性を修正 + OpenSSL（Prisma が必要）
+# gosu: entrypoint で root → node への安全な権限降格に使用
 RUN apt-get update && apt-get upgrade -y --no-install-recommends \
-    && apt-get install -y --no-install-recommends openssl \
+    && apt-get install -y --no-install-recommends openssl gosu \
     && rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
@@ -49,12 +50,20 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
+# 起動時権限修正スクリプトをコピー
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # ストレージ・ログ・corepack キャッシュディレクトリを作成
 RUN mkdir -p /app/storage /app/logs /app/.cache/corepack
 
-# セキュリティ: root 以外のユーザーで実行
-# node:24-slim には node ユーザー（UID 1000 / GID 1000）が既に存在するため、それを利用する
+# アプリファイルの所有権を node ユーザーに設定
+# (マウントされるボリューム /app/storage、/app/logs は entrypoint で起動時に修正)
 RUN chown -R node:node /app
-USER node
+
+# entrypoint が root → node へ権限降格するため USER は設定しない
+# (gosu node で実行するため実質 node ユーザーで動作する)
 
 EXPOSE 3000
+
+ENTRYPOINT ["docker-entrypoint.sh"]
