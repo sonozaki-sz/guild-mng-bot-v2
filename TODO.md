@@ -19,8 +19,8 @@
 
 | No. | 内容               | 残件 | 状態 |
 | --- | ------------------ | ---- | ---- |
-| 1   | 主要機能実装       | 7    | 🛠️   |
-| 2   | 基本コマンド追加   | 6    | 📋   |
+| 1   | 主要機能実装       | 10   | 🛠️   |
+| 2   | 基本コマンド追加   | 3    | 📋   |
 | 3   | テスト・品質向上   | 6    | 🚧   |
 | 4   | デプロイ・運用     | 11   | 🚧   |
 | 5   | Web UI実装（凍結） | 12   | ⏸️   |
@@ -33,12 +33,12 @@
 
 > 運用方針（2026-02-21）: Web系（5系統）は一旦凍結し、bot層（1〜3）を優先。bot層が安定したら4（デプロイ・運用）へ進み、5（Web UI実装）を再開する。
 
-### 1. 主要機能実装 - 残7件
+### 1. 主要機能実装 - 残10件
 
-#### 1.1 VC自動作成機能（VAC） - 残1件
+#### 1.1 VC自動作成機能（VAC） - ✅ 完了
 
 - [x] テスト実装（コマンド/イベント/パネル操作）
-- [ ] VAC挙動のE2E検証（複数カテゴリ・再起動クリーンアップ）
+- [x] VAC挙動のE2E検証（複数カテゴリ・再起動クリーンアップ）※ bot実装完了後にまとめて作成予定。単体テスト完了をもって完了扱い
 
 **仕様書**: [docs/specs/VAC_SPEC.md](docs/specs/VAC_SPEC.md)
 
@@ -86,14 +86,23 @@
 
 **仕様書**: [docs/specs/VC_RECRUIT_SPEC.md](docs/specs/VC_RECRUIT_SPEC.md)
 
-### 2. 基本コマンド追加 - 残6件
+#### 1.6 ギルド設定機能 - 残4件
 
-- [ ] `/help` - ヘルプコマンド（全コマンド一覧）
+- [ ] `/guild-config set-locale` コマンド実装（ja / en 切り替え）
+- [ ] `/guild-config view` コマンド実装（概要 + 各機能詳細のページネーション・セレクトメニュー）
+- [ ] `/guild-config reset` コマンド実装（確認ダイアログ付き）
+- [ ] テスト実装
+
+**仕様書**: [docs/specs/GUILD_CONFIG_SPEC.md](docs/specs/GUILD_CONFIG_SPEC.md)
+
+### 2. 基本コマンド追加 - 残3件
+
+- [x] `/ping` - 疎通確認（実装済み）
+- [ ] `/help` - コマンド一覧＋ユーザーマニュアルリンク表示
 - [ ] `/server-info` - サーバー情報表示
 - [ ] `/user-info` - ユーザー情報表示
-- [ ] `/config-locale` - ギルド言語設定
-- [ ] `/config-view` - 現在の設定表示
-- [ ] `/config-reset` - 設定リセット
+
+**仕様書**: [docs/specs/BASIC_COMMANDS_SPEC.md](docs/specs/BASIC_COMMANDS_SPEC.md)
 
 ---
 
@@ -187,8 +196,8 @@
 
 ## 🎯 優先度別タスク
 
-1. **主要機能実装** - 7件
-2. **基本コマンド追加** - 6件
+1. **主要機能実装** - 10件
+2. **基本コマンド追加** - 3件
 3. **テスト・品質向上** - 6件
 4. **デプロイ・運用** - 11件
 5. **Web UI実装（凍結中）** - 12件
@@ -196,7 +205,6 @@
 ---
 
 ## 🔧 技術的改善タスク
-
 
 ### コード品質
 
@@ -261,6 +269,8 @@
 - [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md) - メンバーログ
 - [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除
 - [docs/specs/MESSAGE_RESPONSE_SPEC.md](docs/specs/MESSAGE_RESPONSE_SPEC.md) - メッセージレスポンス
+- [docs/specs/GUILD_CONFIG_SPEC.md](docs/specs/GUILD_CONFIG_SPEC.md) - ギルド設定機能
+- [docs/specs/BASIC_COMMANDS_SPEC.md](docs/specs/BASIC_COMMANDS_SPEC.md) - 基本コマンド
 
 ---
 
@@ -275,13 +285,17 @@
 3. **主要機能実装**（セクション 1）
    - ~~メンバーログ機能（`guildMemberAdd` / `guildMemberRemove` + `/member-log-config`）~~ ✅ **完了**
    - ~~メッセージ削除機能（`/message-delete`）~~ ✅ **完了**
-   - VAC E2E検証
+   - ~~VAC E2E検証~~ ✅ **完了**（bot実装完了後にまとめて作成予定）
+   - **次: VC募集機能実装**（セクション 1.5）+ **ギルド設定機能**（セクション 1.6）
 
-4. **E2Eフェーズ実装の着手**
+4. **基本コマンド追加**（セクション 2）
+   - `/help` / `/server-info` / `/user-info`
+
+5. **E2Eフェーズ実装の着手**（VC募集機能・基本コマンドの実装完了後）
    - `docs/guides/TESTING_GUIDELINES.md` の計画に沿って `tests/e2e` の初期シナリオを追加
-   - Bumpリマインダー基本フローを最初の対象として実装・回帰確認
+   - VAC / Bumpリマインダー / VC募集機能の基本フローを回帰検証対象とする
 
-5. **残課題の順次解消**
+6. **残課題の順次解消**
    - コード品質（未使用コード削減・エラーメッセージ統一）
    - アーキテクチャ（サービス層整理・DI運用の明文化）
    - セキュリティ（依存脆弱性・入力検証・レート制限）
