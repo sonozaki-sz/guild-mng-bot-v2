@@ -104,6 +104,7 @@
   "path-intellisense.autoSlashAfterDirectory": true,
   "path-intellisense.extensionOnImport": true,
   "chat.tools.terminal.autoApprove": {
+    // GitHub CLI
     "gh": true,
     // 読み取り系コマンド
     "ls": true,
@@ -116,6 +117,7 @@
     "rg": true,
     "wc": true,
     "pwd": true,
+    "cd": true,
     "which": true,
     "stat": true,
     "file": true,
@@ -134,34 +136,75 @@
     "uname": true,
     "whoami": true,
     "id": true,
-    "date": true
+    "date": true,
+    // Web 取得系コマンド
+    "curl": true,
+    "wget": true,
+    "ping": true,
+    "nslookup": true,
+    "dig": true,
+    "host": true,
+    // プロセス・システム情報
+    "ps": true,
+    "htop": true,
+    "free": true,
+    "uptime": true,
+    "lsof": true,
+    "lscpu": true,
+    "lsblk": true,
+    "lspci": true,
+    "lsusb": true,
+    "pgrep": true,
+    "pidof": true,
+    // ネットワーク状態確認
+    "ss": true,
+    "netstat": true,
+    "traceroute": true,
+    "tracepath": true,
+    "ifconfig": true,
+    "ip": true,
+    "hostname": true,
+    "mtr": true,
+    // テキスト処理
+    "tr": true,
+    "sed": true,
+    "tac": true,
+    "nl": true,
+    "rev": true,
+    "od": true,
+    "xxd": true,
+    "hexdump": true,
+    "base64": true,
+    "md5sum": true,
+    "sha1sum": true,
+    "sha256sum": true,
+    "sha512sum": true,
+    "column": true,
+    "fold": true,
+    "paste": true,
+    "strings": true,
+    "fmt": true,
+    // ファイル・パス操作
+    "readlink": true,
+    "realpath": true,
+    "basename": true,
+    "dirname": true,
+    "whereis": true,
+    "type": true,
+    "command": true,
+    // ログ確認
+    "journalctl": true,
+    "dmesg": true,
+    // その他ユーティリティ
+    "seq": true,
+    "printf": true,
+    "bc": true,
+    "expr": true,
+    "xargs": true,
+    "man": true,
+    "less": true,
+    "more": true,
+    "sleep": true
   },
-  // Copilot ツール自動許可（ファイル作成・編集・削除系は除外）
-  "chat.tools.autoApprove": [
-    // 読み取り系
-    "read_file",
-    "list_dir",
-    "file_search",
-    "grep_search",
-    "semantic_search",
-    "get_errors",
-    "get_changed_files",
-    // GitKraken MCP: git 操作
-    "mcp_gitkraken_git_add_or_commit",
-    "mcp_gitkraken_git_push",
-    "mcp_gitkraken_git_branch",
-    "mcp_gitkraken_git_checkout",
-    "mcp_gitkraken_git_stash",
-    "mcp_gitkraken_git_worktree",
-    "mcp_gitkraken_git_blame",
-    // GitKraken MCP: GitLens
-    "mcp_gitkraken_gitlens_commit_composer",
-    "mcp_gitkraken_gitlens_launchpad",
-    "mcp_gitkraken_gitkraken_workspace_list",
-    // GitKraken MCP: PR / Issue
-    "mcp_gitkraken_pull_request_create",
-    "mcp_gitkraken_issues_add_comment",
-    "mcp_gitkraken_issues_assigned_to_me",
-    "mcp_gitkraken_repository_get_file_content"
-  ]
+  "chat.tools.autoApprove": true
 }
