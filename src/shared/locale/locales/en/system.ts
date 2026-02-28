@@ -15,7 +15,7 @@ export const system = {
   "bot.client.initialized": "[Bot] Discord Bot client initialized",
   "bot.client.shutting_down": "[Bot] Shutting down bot client...",
   "bot.client.shutdown_complete": "[Bot] Bot client shut down successfully",
-  "bot.presence_activity": "Running on {{count}} servers | by sonozaki-sz",
+  "bot.presence_activity": "Running on {{count}} servers | by sonozaki",
 
   // BumpReminder feature logs
   "bump-reminder.detected":

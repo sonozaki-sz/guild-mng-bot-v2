@@ -7,6 +7,7 @@ import {
   BUMP_REMINDER_STATUS,
   isBumpServiceName,
   toBumpReminderJobId,
+  toBumpReminderKey,
 } from "../../constants/bumpReminderConstants";
 import { type IBumpReminderRepository } from "../../repositories/types";
 import { type BumpReminderTaskFactory } from "../bumpReminderService";
@@ -84,10 +85,11 @@ export async function restorePendingBumpRemindersUsecase(
     }
 
     const delayMs = reminder.scheduledAt.getTime() - now.getTime();
-    const jobId = toBumpReminderJobId(reminder.guildId);
+    const jobId = toBumpReminderJobId(reminder.guildId, serviceName);
+    const reminderKey = toBumpReminderKey(reminder.guildId, serviceName);
     scheduleReminderInMemory(
       reminders,
-      reminder.guildId,
+      reminderKey,
       jobId,
       reminder.id,
       delayMs,

@@ -207,12 +207,25 @@ docker exec ayasono-bot ls -la /app/storage/
 
 ### 対象ファイル
 
-| ファイル | ローカルテスト方法 |
-| -------- | ------------------ |
-| `Dockerfile` | `docker build --target runner .` が成功すること |
-| `docker-compose.prod.yml` | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること |
-| `docker-compose.infra.yml` | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること |
+| ファイル                       | ローカルテスト方法                                                                  |
+| ------------------------------ | ----------------------------------------------------------------------------------- |
+| `Dockerfile`                   | `docker build --target runner .` が成功すること                                     |
+| `docker-compose.prod.yml`      | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること       |
+| `docker-compose.infra.yml`     | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること      |
 | `.github/workflows/deploy.yml` | [act](https://github.com/nektos/act) または PR を作成してテストジョブを確認すること |
+
+> **ローカルで `docker-compose.prod.yml config` を実行する場合の注意**
+> `env_file:` が `/opt/ayasono/.env` を参照しているため、ファイルが存在しないとエラーになる。
+> 事前に以下のいずれかを実行しておくこと。
+>
+> ```bash
+> # 方法A: ローカルの .env をシンボリックリンクで配置（推奨）
+> sudo mkdir -p /opt/ayasono
+> sudo ln -s "$(pwd)/.env" /opt/ayasono/.env
+>
+> # 方法B: ダミーファイルを配置（構文チェックのみ目的の場合）
+> sudo mkdir -p /opt/ayasono && sudo touch /opt/ayasono/.env
+> ```
 
 ### Dockerfile 変更時の必須手順
 
