@@ -47,6 +47,21 @@ model BumpReminder {
   @@map("bump_reminders")
 }
 
+// MessageDelete User Setting (message-delete 機能のユーザー個別設定)
+model MessageDeleteUserSetting {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  guildId     String   @map("guild_id")
+  skipConfirm Boolean  @default(false) @map("skip_confirm") // message-delete 確認ダイアログをスキップするか
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, guildId])
+  @@index([guildId])
+  @@map("message_delete_user_settings")
+}
+
 // Sticky Message (スティッキーメッセージ)
 model StickyMessage {
   id            String   @id @default(cuid())

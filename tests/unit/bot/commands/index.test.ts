@@ -3,6 +3,8 @@ import { afkCommand } from "@/bot/commands/afk";
 import { afkConfigCommand } from "@/bot/commands/afk-config";
 import { bumpReminderConfigCommand } from "@/bot/commands/bump-reminder-config";
 import { commands } from "@/bot/commands/commands";
+import { messageDeleteCommand } from "@/bot/commands/message-delete";
+import { messageDeleteConfigCommand } from "@/bot/commands/message-delete-config";
 import { pingCommand } from "@/bot/commands/ping";
 import { stickyMessageCommand } from "@/bot/commands/sticky-message";
 import { vacCommand } from "@/bot/commands/vac";
@@ -17,6 +19,12 @@ vi.mock("@/bot/commands/afk-config", () => ({
 }));
 vi.mock("@/bot/commands/bump-reminder-config", () => ({
   bumpReminderConfigCommand: { data: { name: "bump-reminder-config" } },
+}));
+vi.mock("@/bot/commands/message-delete", () => ({
+  messageDeleteCommand: { data: { name: "message-delete" } },
+}));
+vi.mock("@/bot/commands/message-delete-config", () => ({
+  messageDeleteConfigCommand: { data: { name: "message-delete-config" } },
 }));
 vi.mock("@/bot/commands/sticky-message", () => ({
   stickyMessageCommand: { data: { name: "sticky-message" } },
@@ -38,6 +46,8 @@ describe("bot/commands index", () => {
       afkCommand,
       afkConfigCommand,
       bumpReminderConfigCommand,
+      messageDeleteCommand,
+      messageDeleteConfigCommand,
       stickyMessageCommand,
       vacCommand,
       vacConfigCommand,

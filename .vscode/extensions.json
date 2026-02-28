@@ -15,6 +15,10 @@
     "eamodio.gitlens",
     "mhutchie.git-graph",
 
+    // GitHub連携
+    "github.vscode-pull-request-github",
+    "github.vscode-github-actions",
+
     // パス補完
     "christian-kohler.path-intellisense",
     "christian-kohler.npm-intellisense",
@@ -24,6 +28,18 @@
 
     // スペルチェック
     "streetsidesoftware.code-spell-checker",
+
+    // 日本語命名補助
+    "pizzacat83.codic",
+
+    // .gitignore生成
+    "codezombiech.gitignore",
+
+    // アイコンテーマ
+    "pkief.material-icon-theme",
+
+    // 日本語UIパック
+    "ms-ceintl.vscode-language-pack-ja",
 
     // === プロジェクト固有 ===
     // テスト

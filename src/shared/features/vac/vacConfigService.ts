@@ -95,32 +95,41 @@ export class VacConfigService {
     guildId: string,
     channelId: string,
   ): Promise<VacConfig> {
-    return executeWithDatabaseError(async () => {
-      // 現在設定を取得し、差分がある場合のみ永続化する
-      const config = await this.getVacConfigOrDefault(guildId);
-      let updated = false;
+    return executeWithDatabaseError(
+      async () => {
+        // 現在設定を取得し、差分がある場合のみ永続化する
+        const config = await this.getVacConfigOrDefault(guildId);
+        let updated = false;
 
-      // 重複登録を避けてトリガー一覧へ追加
-      if (!config.triggerChannelIds.includes(channelId)) {
-        config.triggerChannelIds.push(channelId);
-        updated = true;
-      }
+        // 重複登録を避けてトリガー一覧へ追加
+        if (!config.triggerChannelIds.includes(channelId)) {
+          config.triggerChannelIds.push(channelId);
+          updated = true;
+        }
 
-      // トリガー追加時は機能を有効化
-      if (!config.enabled) {
-        config.enabled = true;
-        updated = true;
-      }
+        // トリガー追加時は機能を有効化
+        if (!config.enabled) {
+          config.enabled = true;
+          updated = true;
+        }
 
-      if (updated) {
-        await this.saveVacConfig(guildId, config);
-        logger.debug(
-          tDefault("system:database.vac_trigger_added", { guildId, channelId }),
-        );
-      }
+        if (updated) {
+          await this.saveVacConfig(guildId, config);
+          logger.debug(
+            tDefault("system:database.vac_trigger_added", {
+              guildId,
+              channelId,
+            }),
+          );
+        }
 
-      return config;
-    }, tDefault("system:database.vac_trigger_add_failed", { guildId, channelId }));
+        return config;
+      },
+      tDefault("system:database.vac_trigger_add_failed", {
+        guildId,
+        channelId,
+      }),
+    );
   }
 
   /**
@@ -130,23 +139,32 @@ export class VacConfigService {
     guildId: string,
     channelId: string,
   ): Promise<VacConfig> {
-    return executeWithDatabaseError(async () => {
-      // 対象ID除去前後で件数を比較し、変化時のみ保存
-      const config = await this.getVacConfigOrDefault(guildId);
-      const previousLength = config.triggerChannelIds.length;
-      config.triggerChannelIds = config.triggerChannelIds.filter(
-        (id) => id !== channelId,
-      );
-
-      if (config.triggerChannelIds.length !== previousLength) {
-        await this.saveVacConfig(guildId, config);
-        logger.debug(
-          tDefault("system:database.vac_trigger_removed", { guildId, channelId }),
+    return executeWithDatabaseError(
+      async () => {
+        // 対象ID除去前後で件数を比較し、変化時のみ保存
+        const config = await this.getVacConfigOrDefault(guildId);
+        const previousLength = config.triggerChannelIds.length;
+        config.triggerChannelIds = config.triggerChannelIds.filter(
+          (id) => id !== channelId,
         );
-      }
 
-      return config;
-    }, tDefault("system:database.vac_trigger_remove_failed", { guildId, channelId }));
+        if (config.triggerChannelIds.length !== previousLength) {
+          await this.saveVacConfig(guildId, config);
+          logger.debug(
+            tDefault("system:database.vac_trigger_removed", {
+              guildId,
+              channelId,
+            }),
+          );
+        }
+
+        return config;
+      },
+      tDefault("system:database.vac_trigger_remove_failed", {
+        guildId,
+        channelId,
+      }),
+    );
   }
 
   /**
@@ -156,22 +174,28 @@ export class VacConfigService {
     guildId: string,
     channel: VacChannelPair,
   ): Promise<VacConfig> {
-    return executeWithDatabaseError(async () => {
-      // 同一VCの二重登録を避けて管理対象へ追加
-      const config = await this.getVacConfigOrDefault(guildId);
-      const exists = hasCreatedChannel(config, channel.voiceChannelId);
-      if (!exists) {
-        config.createdChannels.push(channel);
-        await this.saveVacConfig(guildId, config);
-        logger.debug(
-          tDefault("system:database.vac_channel_registered", {
-            guildId,
-            voiceChannelId: channel.voiceChannelId,
-          }),
-        );
-      }
-      return config;
-    }, tDefault("system:database.vac_channel_register_failed", { guildId, voiceChannelId: channel.voiceChannelId }));
+    return executeWithDatabaseError(
+      async () => {
+        // 同一VCの二重登録を避けて管理対象へ追加
+        const config = await this.getVacConfigOrDefault(guildId);
+        const exists = hasCreatedChannel(config, channel.voiceChannelId);
+        if (!exists) {
+          config.createdChannels.push(channel);
+          await this.saveVacConfig(guildId, config);
+          logger.debug(
+            tDefault("system:database.vac_channel_registered", {
+              guildId,
+              voiceChannelId: channel.voiceChannelId,
+            }),
+          );
+        }
+        return config;
+      },
+      tDefault("system:database.vac_channel_register_failed", {
+        guildId,
+        voiceChannelId: channel.voiceChannelId,
+      }),
+    );
   }
 
   /**
@@ -181,23 +205,32 @@ export class VacConfigService {
     guildId: string,
     voiceChannelId: string,
   ): Promise<VacConfig> {
-    return executeWithDatabaseError(async () => {
-      // 対象VC除去前後で件数を比較し、変化時のみ保存
-      const config = await this.getVacConfigOrDefault(guildId);
-      const previousLength = config.createdChannels.length;
-      config.createdChannels = config.createdChannels.filter(
-        (item) => item.voiceChannelId !== voiceChannelId,
-      );
-
-      if (config.createdChannels.length !== previousLength) {
-        await this.saveVacConfig(guildId, config);
-        logger.debug(
-          tDefault("system:database.vac_channel_unregistered", { guildId, voiceChannelId }),
+    return executeWithDatabaseError(
+      async () => {
+        // 対象VC除去前後で件数を比較し、変化時のみ保存
+        const config = await this.getVacConfigOrDefault(guildId);
+        const previousLength = config.createdChannels.length;
+        config.createdChannels = config.createdChannels.filter(
+          (item) => item.voiceChannelId !== voiceChannelId,
         );
-      }
 
-      return config;
-    }, tDefault("system:database.vac_channel_unregister_failed", { guildId, voiceChannelId }));
+        if (config.createdChannels.length !== previousLength) {
+          await this.saveVacConfig(guildId, config);
+          logger.debug(
+            tDefault("system:database.vac_channel_unregistered", {
+              guildId,
+              voiceChannelId,
+            }),
+          );
+        }
+
+        return config;
+      },
+      tDefault("system:database.vac_channel_unregister_failed", {
+        guildId,
+        voiceChannelId,
+      }),
+    );
   }
 
   /**

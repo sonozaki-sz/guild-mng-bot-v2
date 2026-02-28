@@ -75,27 +75,36 @@ export class AfkConfigService {
    * AFK設定を永続化する
    */
   async saveAfkConfig(guildId: string, config: AfkConfig): Promise<void> {
-    return executeWithDatabaseError(async () => {
-      // 保存前に正規化して副作用のある参照共有を防止
-      await this.guildConfigRepository.updateAfkConfig(
-        guildId,
-        normalizeAfkConfig(config),
-      );
-      logger.debug(tDefault("system:database.afk_config_saved", { guildId }));
-    }, tDefault("system:database.afk_config_save_failed", { guildId }));
+    return executeWithDatabaseError(
+      async () => {
+        // 保存前に正規化して副作用のある参照共有を防止
+        await this.guildConfigRepository.updateAfkConfig(
+          guildId,
+          normalizeAfkConfig(config),
+        );
+        logger.debug(tDefault("system:database.afk_config_saved", { guildId }));
+      },
+      tDefault("system:database.afk_config_save_failed", { guildId }),
+    );
   }
 
   /**
    * AFKチャンネルを設定し、AFK機能を有効化する
    */
   async setAfkChannel(guildId: string, channelId: string): Promise<void> {
-    return executeWithDatabaseError(async () => {
-      // チャンネル設定とAFK有効化は repository 実装へ委譲
-      await this.guildConfigRepository.setAfkChannel(guildId, channelId);
-      logger.debug(
-        tDefault("system:database.afk_channel_set", { guildId, channelId }),
-      );
-    }, tDefault("system:database.afk_channel_set_failed", { guildId, channelId }));
+    return executeWithDatabaseError(
+      async () => {
+        // チャンネル設定とAFK有効化は repository 実装へ委譲
+        await this.guildConfigRepository.setAfkChannel(guildId, channelId);
+        logger.debug(
+          tDefault("system:database.afk_channel_set", { guildId, channelId }),
+        );
+      },
+      tDefault("system:database.afk_channel_set_failed", {
+        guildId,
+        channelId,
+      }),
+    );
   }
 }
 

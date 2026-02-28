@@ -53,7 +53,12 @@
    - `any` の導入は避ける
    - `pnpm run typecheck` を必ず通す
 
-5. **ログメッセージを i18n 化する**
+5. **ユーザー向けの応答文字列をすべて i18n 化する**
+   - `editReply` / `followUp` / `reply` の `content`、ボタンラベル、セレクトメニューラベル・プレースホルダー、モーダルのラベル・プレースホルダー、Embedタイトル・説明文など、Discordユーザーの目に触れる文字列はすべて `tDefault("commands:...")` 経由にする
+   - キーは `src/shared/locale/locales/ja/commands.ts` / `en/commands.ts` に定義し、両言語同時に追加する
+   - 生文字列をハードコードすることを **禁止** する（英語圏ユーザー対応・将来の文言変更を容易にするため）
+
+6. **ログメッセージを i18n 化する**
    - `logger.*()` の引数には生文字列を渡さず、`tDefault("system:...")` を使う
    - キーは `src/shared/locale/locales/ja/system.ts` / `en/system.ts` に定義する
    - DB操作は `executeWithDatabaseError` でラップし、成功時は `logger.debug`、失敗時はキー付きエラーメッセージを渡す
@@ -179,7 +184,83 @@ src/bot/features/<feature-name>/
 
 ---
 
-## 📂 命名規則
+## � Discord レスポンスパターン
+
+### 必須ルール: ステータス通知は必ず Embed で返す
+
+コマンドの実行結果として**エラー・警告・情報・成功**をユーザーに通知する際は、`editReply(string)` や `followUp({ content: string })` のようなプレーンテキスト返しを **禁止** し、必ず `src/bot/utils/messageResponse.ts` の Embed ユーティリティを使う。
+
+```typescript
+// ❌ 禁止: プレーンテキストでステータスを返す
+await interaction.editReply(tDefault("commands:foo.errors.bar"));
+await interaction.followUp({ content: tDefault("commands:foo.errors.bar") });
+
+// ✅ 正しい: Embed ユーティリティを使う
+await interaction.editReply({
+  embeds: [createWarningEmbed(tDefault("commands:foo.errors.bar"))],
+});
+await interaction.followUp({
+  embeds: [createWarningEmbed(tDefault("commands:foo.errors.bar"))],
+  ephemeral: true,
+});
+```
+
+> **背景**: message-delete 機能の初期実装でエラー返答にプレーンテキストを使用しており、後から Embed 化が必要になった（2026-02-28 修正）。再発防止のためルール化した。
+
+### Embed ユーティリティ（messageResponse.ts）
+
+ステータス通知（エラー・警告・情報・成功）には、`src/bot/utils/messageResponse.ts` のユーティリティ関数を使う。
+
+| 関数                                            | ステータス | タイトル自動付与                   | カラー     |
+| ----------------------------------------------- | ---------- | ---------------------------------- | ---------- |
+| `createSuccessEmbed(description)`               | success    | `✅ 成功`                          | 緑         |
+| `createInfoEmbed(description)`                  | info       | `ℹ️ 情報`                          | 青         |
+| `createWarningEmbed(description)`               | warning    | `⚠️ 警告`                          | 黄         |
+| `createErrorEmbed(description)`                 | error      | `❌ エラー`                        | 赤         |
+| `createStatusEmbed(status, title, description)` | 任意       | 任意（絵文字は自動プレフィックス） | status依存 |
+
+#### ⚠️ 絵文字の二重付加に注意
+
+`create*Embed` 系は内部で `${emoji} ${title}` としてタイトルに絵文字を自動プレフィックスする。
+そのため **description（本文）に渡すロケール文字列には絵文字を含めてはならない。**
+
+```typescript
+// ❌ NG: ロケール文字列に絵文字が含まれている → タイトルと二重になる
+// ja/commands.ts: "foo.errors.bar": "⚠️ 条件が不正です"
+await interaction.editReply({
+  embeds: [createWarningEmbed(tDefault("commands:foo.errors.bar"))],
+  // 結果: タイトル "⚠️ 警告"  + description "⚠️ 条件が不正です"  ← 二重
+});
+
+// ✅ OK: ロケール文字列に絵文字を含めない
+// ja/commands.ts: "foo.errors.bar": "条件が不正です"
+await interaction.editReply({
+  embeds: [createWarningEmbed(tDefault("commands:foo.errors.bar"))],
+  // 結果: タイトル "⚠️ 警告"  + description "条件が不正です"  ← 正常
+});
+```
+
+#### 使い分け
+
+| 用途                                                          | 手段                            | 必須/任意 |
+| ------------------------------------------------------------- | ------------------------------- | --------- |
+| バリデーションエラー・権限エラー等のフィードバック            | `create*Embed` ユーティリティ   | **必須**  |
+| 情報・成功通知                                                | `create*Embed` ユーティリティ   | **必須**  |
+| カスタムレイアウトが必要なドメイン固有Embed（削除サマリー等） | `new EmbedBuilder()` を直接使用 | 任意      |
+| ダイアログ本文・確認メッセージ等（Embed でなくてよい）        | `content:` に文字列             | 任意      |
+
+`new EmbedBuilder().setTitle(tDefault("..."))` の場合はユーティリティを経由しないため、ロケール文字列中に絵文字を含めても二重にはならない。
+
+```typescript
+// ✅ OK: setTitle に直渡し → ユーティリティの自動プレフィックスなし
+// ja/commands.ts: "foo.embed.summary_title": "✅ 削除完了"
+new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
+// 結果: "✅ 削除完了"（絵文字は1つ）
+```
+
+---
+
+## �📂 命名規則
 
 ### ファイル名
 
@@ -311,7 +392,11 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] 共用定数に説明コメントがある
 - [ ] 処理ブロックの意図コメントがある
 - [ ] `typecheck` が通る
+- [ ] ユーザー向け応答文字列（`editReply` / `followUp` / `reply` の `content`・ボタンラベル・Embedタイトル/説明文等）に生文字列をハードコードしていない
+- [ ] エラー・警告・情報・成功のステータス通知を `create*Embed` ユーティリティ（`createErrorEmbed` 等）で返しており、`editReply(string)` のようなプレーンテキスト返しを使っていない
+- [ ] ロケールキーを ja/commands.ts と en/commands.ts の両方に追加している
 - [ ] ログメッセージは `tDefault("system:...")` 経由になっている（生文字列を logger に渡していない）
+- [ ] `create*Embed` ユーティリティに渡すロケール文字列に絵文字を含めていない（絵文字はタイトルに自動付与されるため二重になる）
 - [ ] （src整備時）再分析 → コメント反映 → ドキュメント同期 → TODO同期の順序を守っている
 
 ---
