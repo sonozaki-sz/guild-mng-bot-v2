@@ -141,6 +141,124 @@ export const commands = {
   "vac.panel.afk_button": "メンバーをAFKに移動",
   "vac.panel.refresh_button": "パネルを最下部に移動",
 
+  // メッセージ削除コマンド
+  "message-delete.description":
+    "メッセージを一括削除します（デフォルト: サーバー全チャンネル）",
+  "message-delete.count.description":
+    "削除するメッセージ数（未指定で全件削除）",
+  "message-delete.user.description":
+    "削除対象のユーザーID またはメンション（Bot/Webhookの場合はIDを直接入力）",
+  "message-delete.errors.user_invalid_format":
+    "`user` の形式が不正です。ユーザーIDまたはメンション（例: `<@123456789>`）を入力してください。",
+  "message-delete.bot.description":
+    "ボット・webhookのメッセージのみ削除（true を指定）",
+  "message-delete.keyword.description":
+    "本文に指定キーワードを含むメッセージのみ削除（部分一致）",
+  "message-delete.days.description":
+    "過去N日以内のメッセージのみ削除（after/beforeとの同時指定不可）",
+  "message-delete.after.description":
+    "この日時以降のメッセージのみ削除 (YYYY-MM-DD または YYYY-MM-DDTHH:MM:SS)",
+  "message-delete.before.description":
+    "この日時以前のメッセージのみ削除 (YYYY-MM-DD または YYYY-MM-DDTHH:MM:SS)",
+  "message-delete.channel.description":
+    "削除対象を絞り込むチャンネル（未指定でサーバー全体）",
+
+  // message-delete-config コマンド
+  "message-delete-config.description": "/message-delete の挙動設定を変更",
+  "message-delete-config.confirm.description":
+    "削除前に確認ダイアログを表示するか（true:有効 / false:スキップ）",
+  // message-delete 設定更新結果
+  "message-delete-config.result.confirm_on": "実行確認ダイアログ: 有効",
+  "message-delete-config.result.confirm_off": "実行確認ダイアログ: 無効",
+  "message-delete-config.result.updated":
+    "✅ 設定を更新しました。次回の `/message-delete` から反映されます。\n{{status}}",
+
+  // message-delete バリデーションエラー
+  "message-delete.errors.no_filter":
+    "フィルタ条件が指定されていないため実行できません。\n`count`・`user`・`bot`・`keyword`・`days`・`after`・`before` のいずれか1つを指定してください。",
+  "message-delete.errors.no_channel_no_count":
+    "サーバー全体を対象にする場合は `count`（件数）を必ず指定してください。\n特定チャンネルのみ対象にする場合は `channel` を指定してください。",
+  "message-delete.confirm.condition_bot": "  ボット/Webhook: 対象",
+  "message-delete.errors.days_and_date_conflict":
+    "`days` と `after`/`before` は同時に指定できません。どちらか一方を使用してください。",
+  "message-delete.errors.after_invalid_format":
+    "`after` の日付形式が不正です。`YYYY-MM-DD` または `YYYY-MM-DDTHH:MM:SS` 形式で指定してください。",
+  "message-delete.errors.before_invalid_format":
+    "`before` の日付形式が不正です。`YYYY-MM-DD` または `YYYY-MM-DDTHH:MM:SS` 形式で指定してください。",
+  "message-delete.errors.date_range_invalid":
+    "`after` は `before` より前の日時を指定してください。",
+  "message-delete.errors.no_permission":
+    "この操作を実行する権限がありません。\n必要な権限: メッセージ管理",
+  "message-delete.errors.text_channel_only":
+    "テキストチャンネルを指定してください。",
+  "message-delete.errors.no_messages_found":
+    "削除可能なメッセージが見つかりませんでした。",
+  "message-delete.errors.delete_failed":
+    "メッセージの削除中にエラーが発生しました。",
+  "message-delete.errors.not_authorized": "操作権限がありません。",
+  "message-delete.errors.days_invalid_value":
+    "日数は1以上の整数で入力してください。",
+  // 確認ダイアログ
+  "message-delete.confirm.channel_all": "サーバー全体",
+  "message-delete.confirm.target_channel": "対象チャンネル: {{channel}}",
+  "message-delete.confirm.conditions": "削除条件:",
+  "message-delete.confirm.condition_user": "  ユーザー    : <@{{userId}}>",
+  "message-delete.confirm.condition_keyword": '  キーワード  : "{{keyword}}"',
+  "message-delete.confirm.condition_days": "  期間        : 過去{{days}}日間",
+  "message-delete.confirm.condition_after": "  after       : {{after}}",
+  "message-delete.confirm.condition_before": "  before      : {{before}}",
+  "message-delete.confirm.condition_count": "  件数上限    : {{count}}件",
+  "message-delete.confirm.question":
+    "⚠️ **この操作は取り消せません**\n\n{{conditions}}\n\n実行しますか？",
+  "message-delete.confirm.btn_yes": "削除する",
+  "message-delete.confirm.btn_no": "キャンセル",
+  "message-delete.confirm.btn_skip_toggle_off": "次回から確認しない",
+  "message-delete.confirm.btn_skip_toggle_on": "次回から確認しない",
+  "message-delete.confirm.cancelled": "削除をキャンセルしました。",
+  "message-delete.confirm.timed_out":
+    "タイムアウトしました。再度コマンドを実行してください。",
+  // 結果表示
+  "message-delete.result.empty_content": "*(本文なし)*",
+  // サマリーEmbed
+  "message-delete.embed.summary_title": "✅ 削除完了",
+  "message-delete.embed.total_deleted": "合計削除件数",
+  "message-delete.embed.channel_breakdown": "チャンネル別内訳",
+  "message-delete.embed.channel_breakdown_item": "#{{channel}}: {{count}}件",
+  "message-delete.embed.breakdown_empty": "—",
+  // 詳細Embed
+  "message-delete.embed.detail_title":
+    "📋 削除したメッセージ一覧  ({{page}} / {{total}} ページ)",
+  "message-delete.embed.filter_active": "（フィルター適用中）",
+  "message-delete.embed.no_messages": "表示できるメッセージがありません。",
+  // ページネーション
+  "message-delete.pagination.btn_prev": "前へ",
+  "message-delete.pagination.btn_next": "次へ",
+  "message-delete.pagination.btn_days_set": "過去{{days}}日間",
+  "message-delete.pagination.btn_days_empty": "過去N日間を入力",
+  "message-delete.pagination.btn_after_set": "after: {{date}}",
+  "message-delete.pagination.btn_after_empty": "after（開始日時）を入力",
+  "message-delete.pagination.btn_before_set": "before: {{date}}",
+  "message-delete.pagination.btn_before_empty": "before（終了日時）を入力",
+  "message-delete.pagination.btn_keyword": "内容で検索",
+  "message-delete.pagination.btn_reset": "リセット",
+  "message-delete.pagination.author_select_placeholder": "投稿者でフィルター",
+  "message-delete.pagination.author_all": "（全投稿者）",
+  // モーダル
+  "message-delete.modal.keyword.title": "内容でフィルター",
+  "message-delete.modal.keyword.label": "キーワード",
+  "message-delete.modal.keyword.placeholder": "フィルターするキーワードを入力",
+  "message-delete.modal.days.title": "過去N日間でフィルター",
+  "message-delete.modal.days.label": "日数（1以上の整数）",
+  "message-delete.modal.days.placeholder": "例: 7",
+  "message-delete.modal.after.title": "after（開始日時）でフィルター",
+  "message-delete.modal.after.label": "開始日時",
+  "message-delete.modal.after.placeholder":
+    "例: 2026-01-01 または 2026-01-01T00:00:00",
+  "message-delete.modal.before.title": "before（終了日時）でフィルター",
+  "message-delete.modal.before.label": "終了日時",
+  "message-delete.modal.before.placeholder":
+    "例: 2026-02-28 または 2026-02-28T23:59:59",
+
   // スティッキーメッセージコマンド
   "sticky-message.description":
     "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）",

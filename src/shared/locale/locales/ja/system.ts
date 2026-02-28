@@ -209,6 +209,13 @@ export const system = {
   "database.sticky_message_delete_by_channel_failed":
     "[データベース] スティッキーメッセージ削除に失敗 ChannelId: {{channelId}}",
 
+  // UserSetting DB操作ログ
+  // user_settings テーブル操作ログ
+  "database.user_setting_find_failed":
+    "[データベース] ユーザー設定取得に失敗 UserId: {{userId}} GuildId: {{guildId}}",
+  "database.user_setting_upsert_failed":
+    "[データベース] ユーザー設定保存に失敗 UserId: {{userId}} GuildId: {{guildId}}",
+
   // VAC DB操作ログ
   "database.vac_trigger_added":
     "[データベース] VACトリガーチャンネルを追加 GuildId: {{guildId}} ChannelId: {{channelId}}",
