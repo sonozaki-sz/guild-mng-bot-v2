@@ -26,7 +26,11 @@ describe("bot/features/bump-reminder/repositories/usecases/createBumpReminder", 
 
     expect(result).toEqual({ id: "r1" });
     expect(updateMany).toHaveBeenCalledWith({
-      where: { guildId: "guild-1", status: BUMP_REMINDER_STATUS.PENDING },
+      where: {
+        guildId: "guild-1",
+        status: BUMP_REMINDER_STATUS.PENDING,
+        serviceName: "Disboard",
+      },
       data: { status: BUMP_REMINDER_STATUS.CANCELLED },
     });
     expect(create).toHaveBeenCalledWith({

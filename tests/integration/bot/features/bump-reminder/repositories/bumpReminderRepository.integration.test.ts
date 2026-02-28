@@ -93,6 +93,7 @@ describe("BumpReminderRepository", () => {
         where: {
           guildId: "guild-123",
           status: "pending",
+          serviceName: null,
         },
         data: { status: "cancelled" },
       });
