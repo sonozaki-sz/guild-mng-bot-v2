@@ -200,6 +200,40 @@ docker exec ayasono-bot ls -la /app/storage/
 
 ---
 
+## ⚠️ 6. Docker・デプロイ関連ファイルの変更ルール
+
+> **Dockerfile / docker-compose ファイル / GitHub Actions ワークフローを変更する場合は、必ずローカルでテストを通過させてからコミットすること。**
+> CI/CD を使ったデプロイは失敗するたびに本番停止時間が発生するため、ローカル確認を必須とする。
+
+### 対象ファイル
+
+| ファイル | ローカルテスト方法 |
+| -------- | ------------------ |
+| `Dockerfile` | `docker build --target runner .` が成功すること |
+| `docker-compose.prod.yml` | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること |
+| `docker-compose.infra.yml` | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること |
+| `.github/workflows/deploy.yml` | [act](https://github.com/nektos/act) または PR を作成してテストジョブを確認すること |
+
+### Dockerfile 変更時の必須手順
+
+```bash
+# 1. runner ステージのビルドが最後まで通ることを確認
+docker build --target runner .
+
+# 2. エラーが出た場合は --progress=plain でログを確認
+docker build --target runner --progress=plain . 2>&1 | tail -50
+```
+
+> **背景**: 2026-03-01 に `COREPACK_HOME` 設定順序の誤りと `husky: not found` エラーにより本番デプロイが2回連続で失敗した。どちらもローカルで `docker build` を実行すれば即座に発見できた問題だった。
+
+### チェックリスト（デプロイ関連ファイル変更時）
+
+- [ ] `docker build --target runner .` がエラーなく完了する
+- [ ] `docker compose -f docker-compose.prod.yml config` がバリデーションを通る
+- [ ] ローカルビルド確認後にコミットしている
+
+---
+
 ## 📖 関連ドキュメント
 
 - [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) — VPS・Portainer の初回セットアップ手順

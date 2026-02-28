@@ -412,6 +412,7 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] ログメッセージは `tDefault("system:...")` 経由になっている（生文字列を logger に渡していない）
 - [ ] `create*Embed` ユーティリティに渡すロケール文字列に絵文字を含めていない（絵文字はタイトルに自動付与されるため二重になる）
 - [ ] （src整備時）再分析 → コメント反映 → ドキュメント同期 → TODO同期の順序を守っている
+- [ ] **Dockerfile / docker-compose / deploy.yml を変更した場合は `docker build --target runner .` でローカルビルドが通ることを確認している**（[詳細](DEPLOYMENT.md#️⃣-6-dockerデプロイ関連ファイルの変更ルール)）
 
 ---
 
