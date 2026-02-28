@@ -39,7 +39,7 @@ function createInteractionMock({
     channel: { id: "current-ch", type: channelType },
     options: {
       getChannel: vi.fn(() => channelFromOption),
-      getBoolean: vi.fn(() => useEmbed),
+      getString: vi.fn(() => (useEmbed ? "embed" : null)),
     },
   };
 }
@@ -140,8 +140,8 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     expect(showModalMock).toHaveBeenCalled();
   });
 
-  // getBoolean が null を返す場合に null 合体演算子で false へフォールバックし、プレーンテキストモーダルが開かれることを検証
-  it("shows plain text update modal when getBoolean returns null (null-coalescing fallback)", async () => {
+  // getString が null を返す場合（mode 未指定）にデフォルトで text モードとなり、プレーンテキストモーダルが開かれることを検証
+  it("shows plain text update modal when getString returns null (defaults to text mode)", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     findByChannelMock.mockResolvedValue({
@@ -155,7 +155,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
       channel: { id: "current-ch", type: ChannelType.GuildText },
       options: {
         getChannel: vi.fn(() => null),
-        getBoolean: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     };
 

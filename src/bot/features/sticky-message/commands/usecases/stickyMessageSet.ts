@@ -74,8 +74,8 @@ export async function handleStickyMessageSet(
   }
 
   const useEmbed =
-    interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.EMBED) ??
-    false;
+    interaction.options.getString(STICKY_MESSAGE_COMMAND.OPTION.MODE) ===
+    STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED;
 
   if (useEmbed) {
     // Embed モーダルを表示する（tDefault は同期）

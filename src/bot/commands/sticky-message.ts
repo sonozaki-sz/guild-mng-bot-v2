@@ -23,8 +23,8 @@ export const stickyMessageCommand: Command = {
     const setChannelDesc = getCommandLocalizations(
       "sticky-message.set.channel.description",
     );
-    const setEmbedDesc = getCommandLocalizations(
-      "sticky-message.set.embed.description",
+    const setModeDesc = getCommandLocalizations(
+      "sticky-message.set.mode.description",
     );
     // update サブコマンド
     const updateDesc = getCommandLocalizations(
@@ -33,8 +33,8 @@ export const stickyMessageCommand: Command = {
     const updateChannelDesc = getCommandLocalizations(
       "sticky-message.update.channel.description",
     );
-    const updateEmbedDesc = getCommandLocalizations(
-      "sticky-message.update.embed.description",
+    const updateModeDesc = getCommandLocalizations(
+      "sticky-message.update.mode.description",
     );
     // remove / view サブコマンド
     const removeDesc = getCommandLocalizations(
@@ -64,11 +64,21 @@ export const stickyMessageCommand: Command = {
                 .setDescriptionLocalizations(setChannelDesc.localizations)
                 .setRequired(false),
             )
-            .addBooleanOption((opt) =>
+            .addStringOption((opt) =>
               opt
-                .setName(STICKY_MESSAGE_COMMAND.OPTION.EMBED)
-                .setDescription(setEmbedDesc.ja)
-                .setDescriptionLocalizations(setEmbedDesc.localizations)
+                .setName(STICKY_MESSAGE_COMMAND.OPTION.MODE)
+                .setDescription(setModeDesc.ja)
+                .setDescriptionLocalizations(setModeDesc.localizations)
+                .addChoices(
+                  {
+                    name: "text",
+                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.TEXT,
+                  },
+                  {
+                    name: "embed",
+                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED,
+                  },
+                )
                 .setRequired(false),
             ),
         )
@@ -106,11 +116,21 @@ export const stickyMessageCommand: Command = {
                 .setDescriptionLocalizations(updateChannelDesc.localizations)
                 .setRequired(false),
             )
-            .addBooleanOption((opt) =>
+            .addStringOption((opt) =>
               opt
-                .setName(STICKY_MESSAGE_COMMAND.OPTION.EMBED)
-                .setDescription(updateEmbedDesc.ja)
-                .setDescriptionLocalizations(updateEmbedDesc.localizations)
+                .setName(STICKY_MESSAGE_COMMAND.OPTION.MODE)
+                .setDescription(updateModeDesc.ja)
+                .setDescriptionLocalizations(updateModeDesc.localizations)
+                .addChoices(
+                  {
+                    name: "text",
+                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.TEXT,
+                  },
+                  {
+                    name: "embed",
+                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED,
+                  },
+                )
                 .setRequired(false),
             ),
         )
