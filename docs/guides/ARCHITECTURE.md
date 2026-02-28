@@ -17,27 +17,6 @@ ayasono は **Bot プロセス**と **Web プロセス**の2プロセス構成�
 - 扱わない内容: 関数分割手順、命名/コメント細則、実装時のチェックリスト
 - 実装細則は [IMPLEMENTATION_GUIDELINES.md](IMPLEMENTATION_GUIDELINES.md) を参照
 
-### 0ベース再監査結果（2026-02-22）
-
-- 責務分離:
-  - `commands/*.execute.ts` の入口は概ね「入力解釈・委譲・共通エラー処理」に収束
-  - ただし `bumpReminderConfigCommand.removeMention.ts` は 300 行級で、追加分割余地あり
-- 依存方向:
-  - `shared -> bot/web` と `bot <-> web` の直接依存は監査時点で検出なし
-  - 依存方向は `bot|web -> shared` の原則を維持
-- 構成/公開面:
-  - 旧 `index.ts` barrel は撤廃し、明示モジュール名（例: `commands.ts`）へ統一済み
-  - 方針を「公開境界・内部層ともに直接 import」に統一
-  - `shared/database` は型/実装をファイル単位で直接参照する
-- 命名:
-  - `stick` と `sticky` は移行途中で混在（互換維持のため段階移行を継続）
-- スリム化:
-  - `src` 全175ファイル中、300行超は3ファイルまで圧縮済み
-  - 引き続き大型ファイルの分割余地を管理する
-- テスト容易性:
-  - Composition Root + resolver注入により、依存切替の経路は確保
-  - import変更時はモック対象パス追従が必須（内部実装は実解決先をモック）
-
 ---
 
 ## 🏗️ プロセス構成
@@ -205,8 +184,8 @@ intents: [
   GatewayIntentBits.Guilds, // サーバー情報・チャンネル情報
   GatewayIntentBits.MessageContent, // メッセージ本文の読み取り（Bump検知に必須）
   GatewayIntentBits.GuildMessages, // サーバー内メッセージイベント
-  GatewayIntentBits.GuildMembers, // メンバー参加・退出イベント（将来の MemberLog 用）
-  GatewayIntentBits.GuildVoiceStates, // VC 参加・退出イベント（AFK移動・将来の VAC 用）
+  GatewayIntentBits.GuildMembers, // メンバー参加・退出イベント（MemberLog 用）
+  GatewayIntentBits.GuildVoiceStates, // VC 参加・退出イベント（AFK移動・VAC 用）
 ];
 ```
 

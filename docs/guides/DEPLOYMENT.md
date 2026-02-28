@@ -51,17 +51,16 @@ main へ push / PR マージ
 
 ## 🔑 2. 必要な GitHub Secrets
 
-| Secret 名               | 内容                                                                                     |
-| ----------------------- | ---------------------------------------------------------------------------------------- |
-| `SSH_HOST`              | VPS の IP アドレス（例: `220.158.17.101`）                                               |
-| `SSH_USER`              | SSH ユーザー名（例: `deploy`）                                                           |
-| `SSH_PRIVATE_KEY`       | デプロイ用 SSH 秘密鍵（`-----BEGIN OPENSSH PRIVATE KEY-----` から末尾まで）              |
-| `PORTAINER_HOST`        | VPS の IP アドレス（Discord 通知の Portainer リンク用）                                  |
-| `PORTAINER_STACK_ID`    | Portainer スタック ID（Discord 通知のリンク用）                                          |
-| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（Discord 通知のリンク用）                                    |
-| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL                                                                   |
+| Secret 名               | 内容                                                                        |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `SSH_HOST`              | VPS の IP アドレス（例: `220.158.17.101`）                                  |
+| `SSH_USER`              | SSH ユーザー名（例: `deploy`）                                              |
+| `SSH_PRIVATE_KEY`       | デプロイ用 SSH 秘密鍵（`-----BEGIN OPENSSH PRIVATE KEY-----` から末尾まで） |
+| `PORTAINER_HOST`        | VPS の IP アドレス（Discord 通知の Portainer リンク用）                     |
+| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（Discord 通知のリンク用）                       |
+| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL                                                      |
 
-> `PORTAINER_*` の3つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
+> `PORTAINER_HOST` と `PORTAINER_ENDPOINT_ID` の2つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
 
 ---
 
@@ -84,17 +83,19 @@ GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）により�
 
 ```bash
 cd /opt/ayasono
-echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 docker compose -f docker-compose.prod.yml pull   # GHCR から :latest をプル
 docker compose -f docker-compose.prod.yml up -d --remove-orphans
 docker logout ghcr.io
 ```
 
+> `GITHUB_TOKEN` は GitHub Actions が自動発行するリポジトリ書き込みトークン。`GHCR_USER` / `GHCR_TOKEN` などの別途 Secret 登録は不要。
+
 ### 3-3. VPS 上のファイル構成
 
 ```
 /opt/ayasono/
-├── docker-compose.prod.yml   ← compose 定義（リポジトリから手動配置）
+├── docker-compose.prod.yml   ← compose 定義（初回は手動配置、以降は Actions が自動転送）
 ├── .env                      ← 環境変数（VPS 上で直接管理、権限 600）
 └── logs/                     ← ログ出力先（bot コンテナがマウント）
 ```
@@ -110,10 +111,10 @@ docker compose -f /opt/ayasono/docker-compose.prod.yml up -d
 
 ### 3-4. Discord 通知の Portainer リンク
 
-Discord の成功/失敗 Embed には Portainer のスタック管理ページへのリンクが付く。
+Discord の成功/失敗 Embed には Portainer のコンテナ管理ページへのリンクが付く。
 
 ```
-http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/stacks/ayasono?id=<PORTAINER_STACK_ID>&type=2
+http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/containers
 ```
 
 デプロイ自体は SSH 経由で行うが、コンテナ管理 UI として Portainer は引き続き利用できる。
@@ -173,7 +174,7 @@ docker logs ayasono-bot --tail 50
 
 ### Discord 通知の Portainer リンクが機能しない
 
-- `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` / `PORTAINER_STACK_ID` が正しく設定されているか確認
+- `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` が正しく設定されているか確認
 
 ---
 

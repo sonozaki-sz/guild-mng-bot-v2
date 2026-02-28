@@ -2,7 +2,7 @@
 
 > ayasono のドキュメント一覧
 
-最終更新: 2026年2月22日
+最終更新: 2026年2月28日
 
 ---
 
@@ -91,7 +91,7 @@ Discord Developer Portal でのアプリ作成からサーバーへの招待ま�
 
 ### [XSERVER_VPS_SETUP.md](guides/XSERVER_VPS_SETUP.md)
 
-XServer VPS の初期設定から Portainer のインストール・スタック登録までの初回セットアップ手順。
+XServer VPS の初期設定から Portainer のインストール・ bot コンテナ初回起動確認までの初回セットアップ手順。
 
 **内容:**
 
@@ -99,8 +99,8 @@ XServer VPS の初期設定から Portainer のインストール・スタック
 - Docker / Docker Compose のインストール確認
 - Portainer CE の起動（`infra` スタックとして `/opt/infra/` で管理）
 - Portainer の初期設定（管理者アカウント・環境設定）
-- bot スタック（`ayasono`）の初回作成
-- GitHub Secrets の登録方法（API キー・スタック ID 等）
+- bot コンテナの初回起動確認（`/opt/ayasono/` に Compose ファイルを配置）
+- GitHub Secrets の登録方法（SSH 鍵・Portainer エンドポイント ID 等）
 - 動作確認と手動再起動コマンド
 
 **対象:** 運用担当者、インフラ構築担当者
@@ -109,19 +109,32 @@ XServer VPS の初期設定から Portainer のインストール・スタック
 
 ### [DEPLOYMENT.md](guides/DEPLOYMENT.md)
 
-GitHub Actions + Portainer による自動デプロイフローの詳細解説。
+SSH + GitHub Actions による自動デプロイフローの詳細解説。
 
 **内容:**
 
 - GitHub Actions ワークフロー構成（Test / Deploy / Discord通知）
 - 必要な GitHub Secrets 一覧
-- デプロイステップ詳細（GHCR ビルド・Portainer API 更新・コンテナ ID 取得）
-- ロールバック手順（Portainer UI / CLI）
+- デプロイステップ詳細（GHCR ビルド・SSH デプロイ）
+- ロールバック手順（SSH / Portainer UI）
 - トラブルシューティング
 
 **対象:** 運用担当者、デプロイ担当者
 
----
+### [GIT_WORKFLOW.md](guides/GIT_WORKFLOW.md)
+
+Git ブランチ戦略とコミットメッセージ規約。
+
+**内容:**
+
+- ブランチ構成（main / develop / feature/_ / hotfix/_ 等）
+- 各ブランチの役割とマージ先
+- 通常の開発フロー（PR 必須）
+- ホットフィックスフロー
+- Conventional Commits 規約
+- PR テンプレートとレビュールール
+
+**対象:** 全開発者
 
 ### [TESTING_GUIDELINES.md](guides/TESTING_GUIDELINES.md)
 
@@ -132,8 +145,8 @@ GitHub Actions + Portainer による自動デプロイフローの詳細解説�
 - テスト哲学（AAA パターン）
 - テスト戦略（ユニット、インテグレーション、E2E）
 - テストフォルダ構成
-- Jestの使い方
-- カバレッジ目標（70%）
+- Vitestの使い方
+- カバレッジ目標（99% ブランチ / 100% その他）
 - ベストプラクティス
 - テストコメント規約（関数単位・処理ブロック単位）
 - 時刻依存/環境変数依存テストの安定化パターン（fake timers・キー単位復元）
@@ -225,8 +238,8 @@ VC自動作成機能 - トリガーチャンネル参加時に専用VCを自動�
 
 **主要機能:**
 
-- `/sticky-message` コマンド（set、remove、list）
-- 新規メッセージ投稿時の自動再送信
+- `/sticky-message` コマンド（set、remove、update、view）
+- 新規メッセージ投稿時の自動再送信（デバウンス5秒）
 - チャンネル別管理
 
 ---
@@ -265,6 +278,19 @@ Embed形式の統一メッセージレスポンスシステム。
 - 統一Embed生成関数（Success、Info、Warning、Error）
 - 既存コマンドのメッセージ統一
 - ErrorHandlerの統一
+
+---
+
+#### [VC_RECRUIT_SPEC.md](specs/VC_RECRUIT_SPEC.md)
+
+VC募集機能 - 専用チャンネルでVC参加者を募る投稿を作成。
+
+**主要機能:**
+
+- `/vc-recruit-config` コマンド（setup / teardown / add-role / remove-role / view）
+- ボタン → 2ステップモーダルによる募集投稿フロー
+- 募集時の新規VC自動作成・全員退出後の自動削除
+- 投稿後に募集者を対象VCへ自動移動・返信スレッド自動作成
 
 ---
 
@@ -355,7 +381,3 @@ Embed形式の統一メッセージレスポンスシステム。
 - **ガイド**: `大文字_GUIDE.md` または `大文字.md` （例: `I18N_GUIDE.md`, `COMMANDS.md`）
 - **仕様書**: `機能名_SPEC.md` （例: `VAC_SPEC.md`, `BUMP_REMINDER_SPEC.md`）
 - **進捗管理**: `内容_PROGRESS.md` （例: `IMPLEMENTATION_PROGRESS.md`, `TEST_PROGRESS.md`）
-
----
-
-**最終更新**: 2026年2月26日

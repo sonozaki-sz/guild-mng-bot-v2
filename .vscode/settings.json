@@ -104,9 +104,64 @@
   "path-intellisense.autoSlashAfterDirectory": true,
   "path-intellisense.extensionOnImport": true,
   "chat.tools.terminal.autoApprove": {
-    "/^cd /home/shun/dev/ayasono && python3 - <<'PY'\nimport pathlib\nrows=\\[\\]\nfor p in pathlib\\.Path\\('src'\\)\\.rglob\\('\\*\\.ts'\\):\n    s=p\\.read_text\\(encoding='utf-8'\\)\\.splitlines\\(\\)\n    code=sum\\(1 for l in s if l\\.strip\\(\\)\\)\n    c=sum\\(1 for l in s if l\\.strip\\(\\)\\.startswith\\('//'\\) or l\\.strip\\(\\)\\.startswith\\('/\\*\\*'\\) or l\\.strip\\(\\)\\.startswith\\('\\*'\\)\\)\n    rows\\.append\\(\\(c/\\(code or 1\\),c,code,str\\(p\\)\\)\\)\nrows\\.sort\\(key=lambda x:\\(x\\[0\\],x\\[1\\]\\)\\)\nfor r in rows\\[:15\\]:\n    print\\(f\"\\{r\\[0\\]:\\.3f\\}\\\\t\\{r\\[1\\]:3d\\}/\\{r\\[2\\]:3d\\}\\\\t\\{r\\[3\\]\\}\"\\)\nPY$/": {
-      "approve": true,
-      "matchCommandLine": true
-    }
-  }
+    "gh": true,
+    // 読み取り系コマンド
+    "ls": true,
+    "ll": true,
+    "cat": true,
+    "head": true,
+    "tail": true,
+    "find": true,
+    "grep": true,
+    "rg": true,
+    "wc": true,
+    "pwd": true,
+    "which": true,
+    "stat": true,
+    "file": true,
+    "diff": true,
+    "du": true,
+    "df": true,
+    "sort": true,
+    "uniq": true,
+    "cut": true,
+    "awk": true,
+    "jq": true,
+    "tree": true,
+    "echo": true,
+    "env": true,
+    "printenv": true,
+    "uname": true,
+    "whoami": true,
+    "id": true,
+    "date": true
+  },
+  // Copilot ツール自動許可（ファイル作成・編集・削除系は除外）
+  "chat.tools.autoApprove": [
+    // 読み取り系
+    "read_file",
+    "list_dir",
+    "file_search",
+    "grep_search",
+    "semantic_search",
+    "get_errors",
+    "get_changed_files",
+    // GitKraken MCP: git 操作
+    "mcp_gitkraken_git_add_or_commit",
+    "mcp_gitkraken_git_push",
+    "mcp_gitkraken_git_branch",
+    "mcp_gitkraken_git_checkout",
+    "mcp_gitkraken_git_stash",
+    "mcp_gitkraken_git_worktree",
+    "mcp_gitkraken_git_blame",
+    // GitKraken MCP: GitLens
+    "mcp_gitkraken_gitlens_commit_composer",
+    "mcp_gitkraken_gitlens_launchpad",
+    "mcp_gitkraken_gitkraken_workspace_list",
+    // GitKraken MCP: PR / Issue
+    "mcp_gitkraken_pull_request_create",
+    "mcp_gitkraken_issues_add_comment",
+    "mcp_gitkraken_issues_assigned_to_me",
+    "mcp_gitkraken_repository_get_file_content"
+  ]
 }

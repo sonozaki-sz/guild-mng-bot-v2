@@ -22,7 +22,7 @@ await localeManager.initialize();
 #### Guild別の翻訳
 
 ```typescript
-import { tGuild } from "@/shared/locale";
+import { tGuild } from "@/shared/locale/helpers";
 
 // Guild IDを指定して翻訳
 const message = await tGuild(guildId, "common:success");
@@ -48,7 +48,7 @@ const message = tDefault("common:error");
 #### 固定言語の翻訳関数を取得
 
 ```typescript
-import { localeManager } from "@/shared/locale";
+import { localeManager } from "@/shared/locale/localeManager";
 
 // 日本語の翻訳関数を取得
 const fixedT = localeManager.getFixedT("ja");
@@ -65,20 +65,20 @@ const message = guildT("commands:example.success");
 ```
 src/shared/locale/
 ├── i18n.ts                    # i18next設定
-├── i18next.d.ts              # 型定義
-├── localeManager.ts          # ロケール管理
-├── helpers.ts                # ギルド翻訳ヘルパー
+├── i18next.d.ts               # 型定義
+├── localeManager.ts           # ロケール管理
+├── helpers.ts                 # ギルド翻訳ヘルパー
 └── locales/
-  ├── resources.ts          # リソースまとめ
-    ├── ja/                   # 日本語
-  │   ├── resources.ts
-    │   ├── common.ts         # 共通
-    │   ├── commands.ts       # コマンド
-    │   ├── errors.ts         # エラー
-    │   ├── events.ts         # イベント
-    │   └── system.ts         # システムログ（operator向け）
-    └── en/                   # 英語
-    ├── resources.ts
+    ├── resources.ts           # リソースまとめ
+    ├── ja/                    # 日本語
+    │   ├── resources.ts
+    │   ├── common.ts          # 共通
+    │   ├── commands.ts        # コマンド
+    │   ├── errors.ts          # エラー
+    │   ├── events.ts          # イベント
+    │   └── system.ts          # システムログ（operator向け）
+    └── en/                    # 英語
+        ├── resources.ts
         ├── common.ts
         ├── commands.ts
         ├── errors.ts
@@ -189,7 +189,13 @@ import { logger } from "@/shared/utils/logger";
 
 // ✅ 正しい: system名前空間のキーを使う
 logger.info(tDefault("system:vac.channel_created", { guildId, channelId }));
-logger.error(tDefault("system:database.vac_channel_register_failed", { guildId, voiceChannelId }), error);
+logger.error(
+  tDefault("system:database.vac_channel_register_failed", {
+    guildId,
+    voiceChannelId,
+  }),
+  error,
+);
 
 // ❌ 禁止: 生文字列
 logger.info("VAC channel created");
@@ -197,17 +203,17 @@ logger.info("VAC channel created");
 
 ### system名前空間のキー構造
 
-| プレフィックス       | 用途                         | 例                                          |
-| -------------------- | ---------------------------- | ------------------------------------------- |
-| `bot.*`              | Bot起動・シャットダウン      | `system:bot.starting`                       |
-| `bump-reminder.*`    | Bumpリマインダー操作         | `system:bump-reminder.config_enabled`       |
-| `database.*`         | DB操作の成否                 | `system:database.vac_channel_registered`    |
-| `error.*`            | グローバルエラーハンドラー   | `system:error.global_handlers_registered`   |
-| `shutdown.*`         | シャットダウン処理           | `system:shutdown.cleanup_complete`          |
-| `afk.*`              | AFK操作ログ                  | `system:afk.moved`                          |
-| `vac.*`              | VAC操作ログ                  | `system:vac.channel_created`                |
-| `sticky-message.*`   | スティッキーメッセージログ   | `system:sticky-message.send_failed`         |
-| `scheduler.*`        | スケジューラー操作           | `system:scheduler.bump_reminder_cancelling` |
+| プレフィックス     | 用途                       | 例                                          |
+| ------------------ | -------------------------- | ------------------------------------------- |
+| `bot.*`            | Bot起動・シャットダウン    | `system:bot.starting`                       |
+| `bump-reminder.*`  | Bumpリマインダー操作       | `system:bump-reminder.config_enabled`       |
+| `database.*`       | DB操作の成否               | `system:database.vac_channel_registered`    |
+| `error.*`          | グローバルエラーハンドラー | `system:error.global_handlers_registered`   |
+| `shutdown.*`       | シャットダウン処理         | `system:shutdown.cleanup_complete`          |
+| `afk.*`            | AFK操作ログ                | `system:afk.moved`                          |
+| `vac.*`            | VAC操作ログ                | `system:vac.channel_created`                |
+| `sticky-message.*` | スティッキーメッセージログ | `system:sticky-message.send_failed`         |
+| `scheduler.*`      | スケジューラー操作         | `system:scheduler.bump_reminder_cancelling` |
 
 ## �📌 ベストプラクティス
 

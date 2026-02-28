@@ -587,14 +587,18 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 **構文:**
 
 ```
-/message-delete [count] [user] [channel]
+/message-delete [count] [user] [keyword] [days] [after] [before] [channel]
 ```
 
 **オプション:**
 
-- `count` (オプション): 削除するメッセージ数（1以上）
-- `user` (オプション): 特定ユーザーのメッセージのみ削除
-- `channel` (オプション): 削除を実行するチャンネル（未指定時は実行チャンネル）
+- `count` (オプション): 削除するメッセージ数（1以上）。未指定時は条件に合うすべてのメッセージを削除
+- `user` (オプション): 特定ユーザーのメッセージのみ対象
+- `keyword` (オプション): 指定キーワードを本文に含むメッセージのみ対象（大文字小文字を区別しない）
+- `days` (オプション): 過去N日以内のメッセージのみ対象。`after` / `before` との同時指定不可
+- `after` (オプション): この日時以降のメッセージのみ対象（形式: `YYYY-MM-DD` または `YYYY-MM-DDTHH:MM:SS`）
+- `before` (オプション): この日時以前のメッセージのみ対象（形式: `YYYY-MM-DD` または `YYYY-MM-DDTHH:MM:SS`）
+- `channel` (オプション): 削除を実行するチャンネル（省略時はサーバー全チャンネルを横断）
 
 **権限:** メッセージ管理
 
@@ -628,6 +632,135 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 - 削除可能なメッセージが見つからない
 
 **関連ドキュメント:** [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md)
+
+---
+
+### `/message-delete-config`
+
+`/message-delete` の挙動設定を変更します。設定はユーザーごとに DB に永続保存されます。
+
+**構文:**
+
+```
+/message-delete-config confirm:<true|false>
+```
+
+**オプション:**
+
+- `confirm` (必須): `true`（デフォルト）：削除前に確認ダイアログを表示。`false`：確認をスキップ。
+
+**権限:** なし（全員使用可能）
+
+**使用例:**
+
+```
+# 確認ダイアログを無効化
+/message-delete-config confirm:false
+
+# 確認ダイアログを再度有効化
+/message-delete-config confirm:true
+```
+
+> 実行確認ダイアログの「次回から確認しない」トグルを ON にして削除を承認することでも同等の効果があります。
+
+**関連ドキュメント:** [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md)
+
+---
+
+## 🎵 VC募集機能
+
+> ⚠️ **このコマンドは未実装です。** 仕様書のみ作成済みで、実装待ちの機能です。
+
+### `/vc-recruit-config`
+
+VC募集機能の設定を管理します。
+
+**構文:**
+
+```
+/vc-recruit-config <サブコマンド> [オプション]
+```
+
+**サブコマンド:**
+
+#### `setup`
+
+指定カテゴリー（または TOP レベル）にパネルチャンネル・投稿チャンネルの2セットを自動作成します。
+
+```
+/vc-recruit-config setup [category:<カテゴリー名>] [thread-archive:<1h|24h|3d|1w>]
+```
+
+**オプション:**
+
+- `category` (省略可): 作成先カテゴリー名（`TOP` またはカテゴリー名、省略時は実行チャンネルのカテゴリー）
+- `thread-archive` (省略可): 募集スレッドの自動アーカイブ時間。`1h` / `24h` / `3d` / `1w`（デフォルト: `24h`）
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**使用例:**
+
+```
+/vc-recruit-config setup category:TOP
+/vc-recruit-config setup category:ゲームカテゴリー
+/vc-recruit-config setup
+```
+
+---
+
+#### `teardown`
+
+指定カテゴリーのVC募集チャンネルセットを削除します。
+
+```
+/vc-recruit-config teardown [category:<カテゴリー名>]
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `add-role`
+
+募集投稿モーダルのメンション候補にロールを追加します。
+
+```
+/vc-recruit-config add-role role:<ロール>
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**使用例:**
+
+```
+/vc-recruit-config add-role role:@ゲーマー募集
+```
+
+---
+
+#### `remove-role`
+
+メンション候補からロールを削除します。
+
+```
+/vc-recruit-config remove-role role:<ロール>
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `view`
+
+現在のVC募集設定を表示します。セットアップ済みカテゴリーおよびメンション候補ロール一覧が表示されます。
+
+```
+/vc-recruit-config view
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**関連ドキュメント:** [VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md)
 
 ---
 

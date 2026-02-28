@@ -56,7 +56,7 @@
 
 #### テスト環境
 
-- ✅ Jestセットアップ
+- ✅ Vitestセットアップ
 - ✅ ユニット/インテグレーションテスト構造
 - ✅ カバレッジ設定（lcov、html）
 - ✅ テストヘルパー（testHelpers.ts）
@@ -80,9 +80,9 @@
   - コマンドローダー
   - グレースフルシャットダウン（SIGTERM / SIGINT + Prisma切断）
 - ✅ 環境変数管理（env.ts + Zod validation）
-  - Discord設定（TOKEN、CLIENT_ID、GUILD_ID）
+  - Discord設定（TOKEN、APP_ID、GUILD_ID、ERROR_WEBHOOK_URL）
   - データベース設定（DATABASE_URL）
-  - Web設定（PORT、HOST）
+  - Web設定（WEB_PORT、WEB_HOST）
   - ログ設定（LOG_LEVEL）
 
 #### エラーハンドリング
@@ -205,7 +205,7 @@
   - guildId、channelId、serviceName など保存
   - status（pending/sent/cancelled）管理
 - ✅ `/bump-reminder-config` コマンド（Embed形式対応済）
-  - サブコマンド: enable, disable, set-mention, remove-mention, show
+  - サブコマンド: enable, disable, set-mention, remove-mention, view
   - インタラクティブUI（Button、Select Menu）
   - 権限チェック（サーバー管理権限のみ）・多言語対応
 
@@ -238,7 +238,7 @@
   - エラーハンドリング
   - 多言語対応
 - ✅ `/afk-config` コマンド
-  - サブコマンド: set-channel, show
+  - サブコマンド: set-channel, view
   - AFKチャンネル設定
   - 現在の設定表示
   - Select Menuによるチャンネル選択UI
@@ -338,57 +338,7 @@
 
 ---
 
-### 📚 ドキュメント（90%完了）
-
-**状態**: ✅ ほぼ完了
-
-#### プロジェクト管理
-
-- ✅ README.md - プロジェクト概要とクイックスタート
-- ✅ TODO.md - タスク管理・残件リスト
-- ✅ docs/README.md - ドキュメント構成説明
-- ✅ docs/progress/IMPLEMENTATION_PROGRESS.md - 実装進捗の詳細
-- ✅ docs/progress/TEST_PROGRESS.md - テスト進捗の詳細
-
-#### 開発ガイド (docs/guides/)
-
-- ✅ ARCHITECTURE.md - アーキテクチャ・設計概要
-- ✅ COMMANDS.md - コマンドリファレンス（全コマンドの詳細）
-- ✅ XSERVER_VPS_SETUP.md - VPS セットアップガイド
-- ✅ DEPLOYMENT.md - GitHub Actions デプロイガイド
-- ✅ TESTING_GUIDELINES.md - テスト方針とガイドライン
-- ✅ I18N_GUIDE.md - 多言語対応ガイド
-
-#### 機能仕様書 (docs/specs/)
-
-**実装済み機能:**
-
-- ✅ AFK_SPEC.md - AFK機能仕様
-  - **検証完了**: 仕様書と実装が100%一致
-  - コマンド、データ構造、エラーハンドリング、多言語対応
-- ✅ BUMP_REMINDER_SPEC.md - Bumpリマインダー機能仕様 - **検証完了**: 仕様書と実装が100%一致
-  - Bump検知、タイマー管理、データベース設計、コマンド実装
-
-**未実装機能（仕様書のみ）:**
-
-- ✅ VAC_SPEC.md - VC自動作成機能仕様
-- ✅ STICKY_MESSAGE_SPEC.md - メッセージ固定機能仕様
-- ✅ MEMBER_LOG_SPEC.md - メンバーログ仕様
-- ✅ MESSAGE_DELETE_SPEC.md - メッセージ削除仕様
-- ✅ MESSAGE_RESPONSE_SPEC.md - メッセージレスポンス仕様
-
-#### ドキュメント整理（2026年2月19日完了）
-
-- ✅ docs配下のディレクトリ構造整理
-  - guides/ (開発者向けガイド: 5ファイル)
-  - specs/ (機能仕様書: 7ファイル)
-  - progress/ (進捗管理: 2ファイル)
-- ✅ 全ドキュメントのリンク更新
-  - README.md、TODO.md、IMPLEMENTATION_PROGRESS.md、TEST_PROGRESS.md
-- ✅ 仕様書と実装の整合性検証
-  - AFK機能: 完全一致 (コマンド、データ構造、エラーハンドリング、多言語対応)
-  - Bumpリマインダー機能: 完全一致 (Bump検知、タイマー管理、DB設計、コマンド、設定管理)
-  - 全120テストパス確認
+> ドキュメント一覧は [docs/README.md](../README.md) を参照
 
 ---
 
@@ -656,8 +606,6 @@ model BumpReminder {
 
 - **総ファイル数**: ~120+
 - **TypeScriptファイル**: ~100+（index.ts 撤廃によりバレルファイルを削減済み）
-- **テストファイル**: 206
-- **テスト数**: 987
 - **総行数**: ~10000+ 行
 
 ### コンポーネント統計
@@ -694,122 +642,3 @@ model BumpReminder {
 - [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除
 - [MESSAGE_RESPONSE_SPEC.md](../specs/MESSAGE_RESPONSE_SPEC.md) - メッセージレスポンス
 - [VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md) - VC募集機能
-
----
-
-**最終更新**: 2026年2月28日
-
----
-
-## ✅ 最近の完了項目 (2026年2月22日 追記分 — sticky-message)
-
-### 📌 メッセージ固定機能（sticky-message）
-
-- ✅ `prisma/schema.prisma` に `StickyMessage` モデル追加・マイグレーション適用
-- ✅ `src/bot/features/sticky-message/repositories/stickyMessageRepository.ts` 実装
-  - `create` / `findByChannel` / `findAllByGuild` / `updateContent` / `updateLastMessageId` / `delete`
-- ✅ `stickyMessagePayloadBuilder.ts` 実装（プレーン/Embed 送信ペイロード生成）
-- ✅ `StickyMessageResendService` 実装（デバウンス5秒、前メッセージ削除・再送信）
-- ✅ `src/bot/features/sticky-message/handlers/stickyMessageCreateHandler.ts` 実装
-- ✅ `/sticky-message` コマンド4サブコマンド全実装（set / remove / update / view）
-- ✅ `view` サブコマンドを StringSelectMenu 方式に刷新
-- ✅ StringSelectMenu ルーティング基盤新設（`StringSelectHandler` インターフェース・`handleStringSelectMenu` 関数）
-- ✅ `stickyMessageViewSelectHandler.ts` 実装（選択チャンネルの詳細を Embed 返信）
-- ✅ 全レスポンスを `tGuild` によるギルド別言語対応に統一
-- ✅ コメント規約対応（全関数 JSDoc `@param`/`@returns` 追加・処理ブロックコメント整備）
-- ✅ テスト追加（987 tests / 206 suites、全件 PASS）
-
-### `index.ts`撤廃スプリント（直接import化）
-
-- ✅ `src/bot/commands/index.ts` 削除 → `commands.ts`（コマンドレジストリ）に統一
-- ✅ `src/bot/events/index.ts` 削除 → `events.ts` に統一
-- ✅ `src/bot/features/afk/index.ts`, `commands/index.ts` 削除
-- ✅ `src/bot/features/ping/index.ts`, `commands/index.ts` 削除
-- ✅ `src/bot/features/vac/index.ts`, `commands/index.ts`, `handlers/index.ts`, `handlers/ui/index.ts`, `repositories/index.ts`, `services/index.ts` 削除
-- ✅ `src/bot/features/bump-reminder/` 配下全 `index.ts` 削除（commands, constants, handlers, handlers/ui, repositories, services）
-- ✅ 全ソースまたはテストの `jest.mock()` / `import` を実解決先（直接モジュールパス）へ全面追従
-- ✅ 全テスト（805 tests / 185 suites）の回帰確認完了
-
----
-
-## ✅ 最近の完了項目 (2026年2月28日 追記分 — ログのi18n化・DB操作ログ整備)
-
-### 🌐 ログメッセージの全面i18n化
-
-- ✅ 全 `logger.*()` 呼び出しを `tDefault("system:...")` 経由に統一
-  - 生文字列を logger に直接渡すことを廃止
-  - `src/shared/locale/locales/ja/system.ts` / `en/system.ts` にすべての system ロケールキーを定義
-- ✅ system名前空間のキー構造を feature プレフィックスで整理
-  - `log.bump_reminder_*` → `bump-reminder.config_*`
-  - `error.cleanup_*` → `shutdown.cleanup_*`
-  - `afk.*_log` → `afk.*`（`_log` サフィックス廃止）
-  - `scheduler.cancel_bump_reminder` → `scheduler.bump_reminder_cancelling`
-- ✅ StickyMessage系ハンドラー・サービス・リポジトリを system 名前空間に対応
-
-### 🗄️ VAC・AFK のDB操作ログ追加
-
-- ✅ `VacConfigService` の4メソッドに `executeWithDatabaseError` + `logger.debug` を適用
-  - `addTriggerChannel` / `removeTriggerChannel` / `addCreatedVacChannel` / `removeCreatedVacChannel`
-- ✅ `AfkConfigService` の2メソッドに同パターンを適用
-  - `setAfkChannel` / `saveAfkConfig`
-- ✅ DB操作ログキー12件追加（VAC 8件・AFK 4件）
-  - `system:database.vac_trigger_added/failed` 等
-
-### 📊 テスト
-
-- ✅ 全テスト成功（206 suites / 987 tests）
-- ✅ カバレッジ: statements 100% / functions 100% / lines 100% / branches 99.19%
-
----
-
-## ✅ 最近の完了項目 (2026年2月19日 追記分)
-
-### Phase 2: VAC機能実装
-
-- ✅ `src/bot/events/voiceStateUpdate.ts` 実装（自動作成・自動削除）
-- ✅ `src/bot/events/channelDelete.ts` 実装（削除同期）
-- ✅ `src/bot/commands/vac-config.ts` 実装（create/remove/show）
-- ✅ `src/bot/commands/vac.ts` 実装（vc-rename/vc-limit）
-- ✅ `src/bot/features/vac/handlers/ui/vacControlPanel.ts` 実装（操作パネル生成）
-- ✅ `src/bot/features/vac/handlers/ui/vacPanelUserSelect.ts` 追加（AFK移動）
-- ✅ `src/bot/events/clientReady.ts` 起動時VACクリーンアップを追加
-
-### deprecation対応（Interaction response）
-
-- ✅ `ephemeral` を `flags: MessageFlags.Ephemeral` へ置換
-- ✅ AFK/Bump/VAC/共通ErrorHandler/interactionCreate に横展開
-- ✅ docs/specs の表記も `MessageFlags.Ephemeral` に統一
-
-### Phase 1: メッセージシステム統一
-
-- ✅ `src/shared/utils/messageResponse.ts` 実装（4種類Embedヘルパー）
-- ✅ 全コマンドレスポンスのEmbed化（/ping, /afk, /afk-config, /bump-reminder-config）
-- ✅ ErrorHandlerのEmbed形式対応
-- ✅ ローカライゼーション拡充（日英各 60+項目、Embed UI向キー團設計）
-- ✅ ユニットテスト 14ケース追加（全134テストパス）
-
-### Bumpリマインダー機能のモジュール分離
-
-- ✅ `src/shared/features/bump-reminder/bumpReminderConfigService.ts` へ集約
-- ✅ buttonHandlers/modalHandlers レジストリ方式に移行
-- ✅ `src/shared/database/types.ts` 型定義集約
-- ✅ `getGuildConfigRepository()` 工場関数追加
-
-### i18n 型安全化
-
-- ✅ `AllParseKeys` 型で `tGuild()` / `tDefault()` 引数を型安全化
-- ✅ `keySeparator: false` でフラットキー形式に統一
-- ✅ ログキーを `events:` から `system:` ネームスペースへ移動
-- ✅ `GuildTFunction` 型導入
-
-### ドキュメントとソースコードの整合修正
-
-- ✅ docs/guides/ARCHITECTURE.md 新規作成（アーキテクチャ・設計概要）
-- ✅ bump-reminder-config サブコマンド名修正: `start/stop` → `enable/disable`
-- ✅ afk-config サブコマンド名修正: `set-channel` → `set-ch` → `set-channel` (統一)
-- ✅ AFK データベース保存フィールド修正: `afkChannelId` → `afkConfig (JSON)`
-- ✅ `GuildBumpReminderConfigStore.ts` をデータベースセクションへ追記
-- ✅ Bumpリマインダー定数の説明更新（`getReminderDelayMinutes()` / `toScheduledAt()` 等）
-- ✅ データベーススキーマの記述を実際のスキーマ（cuid, JSON統合, @@map）に更新
-- ✅ TEST_PROGRESS.md のテスト数・スイート数を実績値に更新（805テスト / 185スイート）
-- ✅ BumpReminderRepository / BumpReminderService テストを「実装済み」に移動
