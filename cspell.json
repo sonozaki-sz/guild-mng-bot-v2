@@ -60,6 +60,7 @@
     "CooldownManager",
     "JobScheduler",
     "sonozaki",
+    "ayasono",
     // Bumpサービス関連
     "Disboard",
     "Dissoku",
