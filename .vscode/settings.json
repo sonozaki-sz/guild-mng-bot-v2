@@ -67,7 +67,10 @@
     "**/dist": true,
     "**/coverage": true,
     "**/pnpm-lock.yaml": true,
-    "**/*.log": true
+    "**/*.log": true,
+    // Prisma 自動生成ファイル（編集不要）
+    "prisma/migrations/**/migration.sql": true,
+    "prisma/migrations/migration_lock.toml": true
   },
   // テスト設定
   "jest.runMode": "on-demand",
