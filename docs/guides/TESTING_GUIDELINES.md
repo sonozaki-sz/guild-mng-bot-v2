@@ -27,12 +27,7 @@
    - statements / functions / lines: **100%**
    - branches: **99%以上**（v8 async内部ブランチのアーティファクトにより 100% 初期は達成不可）
 
-### 現状（2026-02-28）
-
-- 全テスト成功（206 suites / 987 tests）
-- カバレッジ: statements 100% / functions 100% / lines 100% / branches 99.19%
-- `unit` / `integration` の配置を `src` 対称へ再編済み
-- `e2e` は次フェーズで実施
+> 最新のテスト統計・カバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照
 
 ### import方針とテスト追従
 
@@ -122,7 +117,7 @@ describe("ClassName/FunctionName", () => {
 - 次は監査対象外とする
   - 宣言ファイル: `src/**/*.d.ts`
   - ビルド生成物・補助ファイル
-- 理由: `.d.ts` は型宣言専用で Jest 実行対象ではなく、`*.test.ts` と 1:1 対応を強制しないため
+- 理由: `.d.ts` は型宣言専用で Vitest 実行対象ではなく、`*.test.ts` と 1:1 対応を強制しないため
 - 具体例: `src/shared/locale/i18next.d.ts` はマッピング残件として扱わない
 
 ---

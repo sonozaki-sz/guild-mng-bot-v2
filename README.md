@@ -174,7 +174,7 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 
 ### 開発フロー
 
-- **ブランチ戦略**: main（安定版）、feature/xxx（開発）
+- **ブランチ戦略**: main（本番安定版）/ develop（開発統合）/ feature/xxx（機能開発）
 - **コミット規約**: Conventional Commits（feat/fix/chore など）
 - **バージョニング**: セマンティックバージョニング
 
@@ -283,18 +283,20 @@ ayasono/
 - [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
 - [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・直接import運用
 - [国際化ガイド](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
+- [取扱説明書](docs/guides/USER_MANUAL.md) - サーバーメンバー・管理者向け操作ガイド
 
 ### 機能仕様書
 
 各機能の詳細設計と実装仕様を記載したドキュメントです。
 
 - [AFK機能](docs/specs/AFK_SPEC.md) - VCの非アクティブユーザーを手動でAFKチャンネルに移動
-- [Bumpリマインダー機能](docs/specs/BUMP_REMINDER_SPEC.md) - Disboard/ディス速のBump後、次回Bump時刻に自動通知
+- [Bumpリマインダー機能](docs/specs/BUMP_REMINDER_SPEC.md) - Disboard/ディス速Bump後、次回Bump時刻に自動通知
 - [VC自動作成機能](docs/specs/VAC_SPEC.md) - トリガーチャンネル参加時に専用VCを作成・管理
 - [メッセージ固定機能](docs/specs/STICKY_MESSAGE_SPEC.md) - 指定メッセージをチャンネル最下部に固定表示
 - [メッセージレスポンス](docs/specs/MESSAGE_RESPONSE_SPEC.md) - Embed形式の統一メッセージシステム
 - [メンバーログ機能](docs/specs/MEMBER_LOG_SPEC.md) - メンバーの参加・脱退を指定チャンネルに記録
 - [メッセージ削除](docs/specs/MESSAGE_DELETE_SPEC.md) - モデレーター向けメッセージ一括削除コマンド
+- [VC募集機能](docs/specs/VC_RECRUIT_SPEC.md) - 専用チャンネルでVC参加者を募る投稿を作成
 
 ## 🔧 開発環境
 
@@ -368,20 +370,7 @@ GET http://localhost:3000/api/guilds/{{guildId}}/config
 
 REST Client拡張機能で「Send Request」をクリックするだけでテストできます。
 
-## 📊 プロジェクト状況
-
-**現在のフェーズ**: Phase 2 - 主要機能実装中 🚧
-
-- ✅ Phase 0: 環境構築完了
-- ✅ Phase 1: 基盤実装完了（ロガー、Bot基盤、データベース、i18n、テスト）
-- ✅ Bump Reminder機能実装完了
-- ✅ VAC（VC自動作成）機能実装完了
-- ✅ メッセージ固定機能実装完了（set/remove/update/view）
-- 🚧 Phase 2: メンバーログ機能、メッセージ削除機能
-
-詳細は [TODO.md](TODO.md) を参照してください。
-
-## 📝 コミット規約
+## コミット規約
 
 Conventional Commits を使用：
 
@@ -402,4 +391,4 @@ Apache License 2.0 - 詳細は [LICENSE](LICENSE) を参照
 ---
 
 **開発開始**: 2026年2月
-**最終更新**: 2026年2月26日
+**最終更新**: 2026年2月28日

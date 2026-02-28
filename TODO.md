@@ -2,7 +2,7 @@
 
 > プロジェクト全体のタスク管理と残件リスト
 
-最終更新: 2026年2月27日（message-delete 仕様拡張・VC募集機能仕様書作成）
+最終更新: 2026年2月28日
 
 ---
 
@@ -11,7 +11,7 @@
 ### 残タスク統計
 
 - 残タスク合計: **54件**
-- bot優先対象（1～3）: **30件**
+- bot優先対象（1～3）: **31件**
 - デプロイ・運用（4）: **11件**
 - Web UI実装（5 / 凍結中）: **12件**
 
@@ -99,11 +99,11 @@
 
 ### 3. テスト・品質向上 - 残6件
 
-**状況**: ユニットテスト＋インテグレーションテストで972テスト実装済み（205 suites, 全件PASS）。単体テストは statements/functions/lines 100%、branches 99.27%（v8 async内部ブランチのみ未到達）を達成。
+**状況**: ユニットテスト＋インテグレーションテストで987テスト実装済み（206 suites, 全件PASS）。単体テストは statements/functions/lines 100%、branches 99.19%（v8 async内部ブランチのみ未到達）を達成。
 
 #### 3.1 テストカバレッジ向上 - 残1件
 
-- [x] カバレッジ目標100%達成（statements/functions/lines: 100%, branches: 99.27%）
+- [x] カバレッジ目標100%達成（statements/functions/lines: 100%, branches: 99.19%）
 - [x] sticky-message 全機能のユニットテスト追加（17ファイル新規作成）
 - [x] エッジケーステスト（null合体演算子・エラーハンドラ・タイムアウトcallback等）
 - [ ] E2Eテスト追加（Discordモック利用）
@@ -111,7 +111,7 @@
 #### 3.2 ドキュメント整備 - 残1件
 
 - [ ] API仕様書（OpenAPI/Swagger）
-- [x] デプロイガイド（[DEPLOYMENT_XSERVER.md](docs/guides/DEPLOYMENT_XSERVER.md)追加済み）
+- [x] デプロイガイド（[XSERVER_VPS_SETUP.md](docs/guides/XSERVER_VPS_SETUP.md)追加済み）
 
 #### 3.3 ソースコメント整備 - ✅ 完了
 
@@ -129,7 +129,7 @@
 
 ---
 
-### 4. デプロイ・運用 - 残12件
+### 4. デプロイ・運用 - 残11件
 
 #### 4.1 Docker化 - 残5件
 
@@ -187,71 +187,16 @@
 
 ## 🎯 優先度別タスク
 
-1. **主要機能実装** - 15件
+1. **主要機能実装** - 19件
 2. **基本コマンド追加** - 6件
-3. **テスト・品質向上** - 9件
-4. **デプロイ・運用** - 12件
+3. **テスト・品質向上** - 6件
+4. **デプロイ・運用** - 11件
 5. **Web UI実装（凍結中）** - 12件
 
 ---
 
 ## 🔧 技術的改善タスク
 
-### src再監査スプリント（0ベース再確認 / コミット単位）✅ クローズ
-
-> 目的: src整備結果を 0 ベースで再監査し、問題がないことを担保した上でコメント規約・ガイド同期・テスト修正へ進む。
-
-**クローズ方針（2026-02-21）**:
-
-- src整備（監査・コメント反映・ガイド同期・TODO同期）は完了としてクローズ
-- テスト修正は **別セッションへ移管** し、このスプリントからは切り離す
-
-**完了担保（記録）**:
-
-- src再監査結果を `docs/guides/ARCHITECTURE.md` / `docs/guides/IMPLEMENTATION_GUIDELINES.md` / `TODO.md` に同期済み
-- src整備フェーズで扱う修正範囲は完了として凍結し、以後のテスト修正は別セッションで管理
-- 2026-02-21 時点で `pnpm run typecheck` を再実行し、`tsc --noEmit` 成功（`TYPECHECK_OK`）を確認
-- 2026-02-21 時点で `pnpm test --runInBand` を再実行し、`39 suites / 431 tests` 全件PASSを確認
-
-### `index.ts`撤廃スプリント（直接import化 / コミット単位）✅ 完了
-
-> 目的: src配下の `index.ts`（バレルファイル）を全撤廃し、常に実体モジュールを直接 import する方針を完遂する。
-
-**クローズ記録（2026-02-22）**:
-
-- [x] `src/bot/commands/index.ts` 削除 → `commands.ts` に統一
-- [x] `src/bot/events/index.ts` 削除 → `events.ts` に統一
-- [x] `src/bot/features/{afk,ping,vac,bump-reminder}` 配下全 `index.ts` 削除
-- [x] 全ソース・テストの import / `jest.mock()` を実解決先へ追従
-- [x] 回帰確認（`pnpm test` 全件PASS: 805 tests / 185 suites）
-
-### テスト再編スプリント（src対称化 / コミット単位）✅ 完了
-
-**合意方針（2026-02-21）**:
-
-- テスト配置は `tests/unit` / `tests/integration` を維持しつつ、各配下で `src` と同じパス構造へ寄せる
-- ファイル名は **camelCase固定にしない**。`src` 側のベース名に一致（`kebab-case` を含む）
-- 今回フェーズは `unit` / `integration`。`e2e` は次フェーズで実施
-
-**コミット単位タスク**:
-
-- [x] **TST-REORG-001**: `tests/unit` の `src` 対称化（移動・改名のみ）
-  - 完了条件: 旧パスから新パスへ移動し、命名を `src` ベース名へ統一
-- [x] **TST-REORG-002**: import / mock 参照の追随修正
-  - 完了条件: `tests/unit` で `src` 参照を `@/` へ統一し、`tests/tsconfig.json` に `paths` を追加
-- [x] **TST-REORG-003**: 回帰確認（テスト実行）
-  - 完了条件: `pnpm test` が全件PASS（`431 passed / 0 failed`）
-- [x] **TST-REORG-004**: `tests/integration` の `src` 対称化マッピング作成
-  - 完了条件: 既存 `integration` ファイルの移動先を `src` 対称で確定
-- [x] **TST-REORG-005**: `tests/integration` 移動・改名 + 参照追随
-  - 完了条件: `integration` を移行し、`pnpm test` 全件PASS（`39 suites / 431 tests`）
-- [x] **TST-REORG-006**: テストガイド更新（再編後の正式構成反映）
-  - 完了条件: `docs/guides/TESTING_GUIDELINES.md` の構成図と命名ルールを更新
-
-**クローズ記録（2026-02-21）**:
-
-- src↔tests マッピング監査の残件は **0件としてクローズ**
-- `src/**/*.d.ts`（例: `src/shared/locale/i18next.d.ts`）は監査対象外（宣言ファイルのため）
 
 ### コード品質
 
@@ -281,7 +226,6 @@
 
 - **キャッシュ**: Redis導入の検討
 - **ロガー**: Winston → Pino 移行検討
-- ~~**テスト**: Jest → Vitest 移行検討~~ → ✅ Vitest 移行完了（2026-02-25）
 
 ### 機能拡張アイデア
 
@@ -304,7 +248,7 @@
 ### 開発ガイド
 
 - [docs/guides/COMMANDS.md](docs/guides/COMMANDS.md) - コマンドリファレンス
-- [docs/guides/DEVELOPMENT_SETUP.md](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築ガイド
+- [docs/guides/DISCORD_BOT_SETUP.md](docs/guides/DISCORD_BOT_SETUP.md) - Discord Bot セットアップガイド
 - [docs/guides/TESTING_GUIDELINES.md](docs/guides/TESTING_GUIDELINES.md) - テスト方針
 - [docs/guides/I18N_GUIDE.md](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
 
@@ -325,14 +269,8 @@
 ### 直近の推奨作業順序
 
 1. ~~**ソースコメント整備**（セクション 3.3）~~ ✅ **完了**
-   - `src/` 全 169 ファイル: ファイル先頭コメント・JSDoc・インラインコメント確認済み（欠落 0）
-   - `tests/` 全 207 ファイル: ファイル先頭コメント補完（187 ファイル追加）+ 80 行以上のテストファイル全件に観点コメント補完
 
 2. ~~**Botエラー時の Discord 通知実装**（セクション 4.3）~~ ✅ **完了**
-   - `DISCORD_ERROR_WEBHOOK_URL` 環境変数追加（任意）
-   - `DiscordWebhookTransport` を `src/shared/utils/discordWebhookTransport.ts` に実装
-   - `logger.error()` 呼び出し時に Discord Webhook へ Embed 形式で自動通知
-   - ユニットテスト 10 件追加（`tests/unit/shared/utils/discordWebhookTransport.test.ts`）
 
 3. **主要機能実装**（セクション 1）
    - メンバーログ機能（`guildMemberAdd` / `guildMemberRemove` + `/member-log-config`）
@@ -350,6 +288,5 @@
 
 ---
 
-**最終更新**: 2026年2月27日
-**全体進捗**: src再監査完了、テスト再編完了、`index.ts`撤廃完了、sticky-message実装完了、**単体テストカバレッジ 100%（statements/functions/lines）達成**、CIデプロイ高速化完了、**ソースコメント整備完了**、**Bot Discord エラー通知実装完了**
+**最終更新**: 2026年2月28日
 **次のマイルストーン**: 主要機能実装（メンバーログ・メッセージ削除）→ E2E テスト着手

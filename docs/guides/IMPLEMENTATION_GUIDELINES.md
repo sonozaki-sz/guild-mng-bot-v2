@@ -158,12 +158,12 @@ src/bot/features/<feature-name>/
   - 例: `../locale/localeManager`, `../utils/logger`, `../../database/types`
 - 入口ファイルは `index.ts` ではなく役割名ファイルを使う
   - 例: `commands.ts`, `events.ts`, `apiRoutes.ts`, `handleInteractionCreate.ts`, `resources.ts`
-- 参照先を変更した場合は、関連テストの `jest.mock()` / `import()` パスも実解決先へ追従する
+- 参照先を変更した場合は、関連テストの `vi.mock()` / `import()` パスも実解決先へ追従する
 
 ### import / モック追従ルール（2026-02-22 追加）
 
-- 実装で import 先を `index.ts` から直接モジュールへ変更した場合、関連テストの `jest.mock()` 対象も同じ実解決先へ更新する
-- `jest.mock()` / `import()` は常に実体モジュールパスへ合わせる
+- 実装で import 先を `index.ts` から直接モジュールへ変更した場合、関連テストの `vi.mock()` 対象も同じ実解決先へ更新する
+- `vi.mock()` / `import()` は常に実体モジュールパスへ合わせる
 - `src/bot/features/**` でも同方針を段階適用する
   - `../../../../shared/locale` のような shared barrel import は使わず、`.../shared/locale/localeManager` など直接モジュールを参照する
 - `src/bot/features/**` では featureローカルの barrel import（`..`, `../..`, `../index` など）も禁止する

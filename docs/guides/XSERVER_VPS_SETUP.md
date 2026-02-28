@@ -8,7 +8,7 @@
 
 ## 📋 概要
 
-このドキュメントでは、XServer VPS の初期設定から Docker・Portainer のインストール、スタックの初回登録までの手順を説明します。
+このドキュメントでは、XServer VPS の初期設定から Docker・Portainer のインストール、bot コンテナの初回起動確認までの手順を説明します。
 **一度セットアップが完了すれば、以降のデプロイはすべて GitHub Actions が自動で行います。**
 
 ### 完成後の構成
@@ -272,13 +272,14 @@ cat ~/.ssh/ayasono_deploy.pub >> ~/.ssh/authorized_keys
 cat ~/.ssh/ayasono_deploy
 ```
 
-### 5-4. 起動確認
+### 5-4. 起動確認（初回 GitHub Actions デプロイ後）
 
-初回は手動で起動して動作を確認する。
+> ⚠️ イメージは初回 GitHub Actions 実行（セクション 7）で GHCR にプッシュされる。
+> **セクション 6 の Secrets 登録 → セクション 7 の動作確認を先に完了させてから以下を実行すること。**
+
+GitHub Actions によるデプロイが完了したら、コンテナの状態をログで確認する。
 
 ```bash
-cd /opt/ayasono
-docker compose -f docker-compose.prod.yml up -d
 docker logs ayasono-bot --tail 50
 ```
 
@@ -294,24 +295,10 @@ GitHub リポジトリ → **Settings → Secrets and variables → Actions → 
 | `SSH_USER`              | SSH ユーザー名（例: `deploy`）          | 固定値                                |
 | `SSH_PRIVATE_KEY`       | デプロイ用 SSH 秘密鍵                   | セクション 5-3 で生成した秘密鍵の中身 |
 | `PORTAINER_HOST`        | VPS の IP アドレス                      | コントロールパネルで確認（通知用）    |
-| `PORTAINER_STACK_ID`    | Portainer スタック ID                   | セクション 6-1 参照（通知用）         |
 | `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（通常 `3`） | セクション 4-3 参照（通知用）         |
 | `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL                  | Discord チャンネル設定から取得        |
 
-> `PORTAINER_*` の3つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
-
-### 6-1. Portainer スタック ID の取得（通知リンク用）
-
-1. Portainer 左メニュー → **Stacks** → `ayasono` をクリック（スタックが存在しない場合は不要）
-2. ブラウザの URL から ID を確認する
-
-```
-http://220.158.17.101:9000/#!/3/docker/stacks/ayasono?id=1&type=2
-                                                              ^
-                                                 Stack ID = 1
-```
-
-この `id` の値を `PORTAINER_STACK_ID` に登録する。
+> `PORTAINER_HOST` と `PORTAINER_ENDPOINT_ID` の2つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
 
 ---
 
