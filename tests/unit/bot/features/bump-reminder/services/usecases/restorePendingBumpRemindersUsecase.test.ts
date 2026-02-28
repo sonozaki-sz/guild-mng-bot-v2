@@ -5,6 +5,7 @@ import { restorePendingBumpRemindersUsecase } from "@/bot/features/bump-reminder
 const createBumpReminderRestorePlanMock = vi.fn();
 const isBumpServiceNameMock = vi.fn();
 const toBumpReminderJobIdMock = vi.fn();
+const toBumpReminderKeyMock = vi.fn();
 const scheduleReminderInMemoryMock = vi.fn();
 const createTrackedReminderTaskMock = vi.fn();
 const loggerInfoMock = vi.fn();
@@ -17,19 +18,16 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  "@/bot/features/bump-reminder/constants/bumpReminderConstants",
-  () => ({
-    BUMP_REMINDER_STATUS: {
-      PENDING: "pending",
-      SENT: "sent",
-      CANCELLED: "cancelled",
-    },
-    isBumpServiceName: (...args: unknown[]) => isBumpServiceNameMock(...args),
-    toBumpReminderJobId: (...args: unknown[]) =>
-      toBumpReminderJobIdMock(...args),
-  }),
-);
+vi.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
+  BUMP_REMINDER_STATUS: {
+    PENDING: "pending",
+    SENT: "sent",
+    CANCELLED: "cancelled",
+  },
+  isBumpServiceName: (...args: unknown[]) => isBumpServiceNameMock(...args),
+  toBumpReminderJobId: (...args: unknown[]) => toBumpReminderJobIdMock(...args),
+  toBumpReminderKey: (...args: unknown[]) => toBumpReminderKeyMock(...args),
+}));
 
 vi.mock(
   "@/bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper",
@@ -65,6 +63,7 @@ describe("bot/features/bump-reminder/services/usecases/restorePendingBumpReminde
     vi.clearAllMocks();
     isBumpServiceNameMock.mockReturnValue(true);
     toBumpReminderJobIdMock.mockReturnValue("job-g1");
+    toBumpReminderKeyMock.mockReturnValue("g1:Disboard");
     createTrackedReminderTaskMock.mockImplementation(
       (
         _repo: unknown,

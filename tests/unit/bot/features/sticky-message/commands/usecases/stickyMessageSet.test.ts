@@ -42,7 +42,7 @@ function createInteractionMock({
       getChannel: vi.fn(
         (_name: string, _required: boolean) => channelFromOption,
       ),
-      getBoolean: vi.fn((_name: string) => useEmbed),
+      getString: vi.fn((_name: string) => (useEmbed ? "embed" : null)),
     },
     _replyMock: replyMock,
   };
@@ -146,7 +146,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
       channel: null, // no current channel
       options: {
         getChannel: vi.fn(() => null),
-        getBoolean: vi.fn(() => false),
+        getString: vi.fn(() => null),
       },
     };
 
@@ -157,7 +157,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     );
   });
 
-  it("shows plain text modal when getBoolean returns null (null-coalescing fallback)", async () => {
+  it("shows plain text modal when getString returns null (defaults to text mode)", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     findByChannelMock.mockResolvedValue(null);
@@ -168,7 +168,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
       channel: { id: "current-ch", type: ChannelType.GuildText },
       options: {
         getChannel: vi.fn(() => null),
-        getBoolean: vi.fn(() => null),
+        getString: vi.fn(() => null),
       },
     };
 
