@@ -71,7 +71,9 @@ git commit -m "feat(bump-reminder): メンションロール設定機能を追�
 ```bash
 git push origin feature/bump-reminder-mention-role
 # GitHub で feature/* → develop の PR を作成
-# CI（Test + commitlint）が通ったらマージ（Squash and merge 推奨）
+gh pr create --base develop --title "feat(bump-reminder): ..." --body "..."
+# CI 通過後に自動でマージされるよう設定（Squash and merge）
+gh pr merge <PR番号> --squash --auto
 ```
 
 #### 4. develop から main への PR を作成してリリース
@@ -80,8 +82,9 @@ git push origin feature/bump-reminder-mention-role
 
 ```bash
 # GitHub で develop → main の PR を作成
-# PR名: "release: vX.Y.Z" の形式を推奨
-# CI が通ったらマージ（Merge commit 推奨）
+gh pr create --base main --title "release: vX.Y.Z" --body "..."
+# CI 通過後に自動でマージされるよう設定（Merge commit）
+gh pr merge <PR番号> --merge --auto
 ```
 
 ---
@@ -96,9 +99,13 @@ git checkout main
 git pull origin main
 git checkout -b hotfix/fix-crash-on-empty-guild
 
-# 修正後、main と develop 両方に PR を作成
-# 1. hotfix/* → main （緊急マージ）
-# 2. hotfix/* → develop（乖離防止）
+# 修正・コミット・push 後、main と develop 両方に PR を作成
+gh pr create --base main    --title "fix(...): ..." --body "..."
+gh pr create --base develop --title "fix(...): ... を develop にバックポート" --body "..."
+
+# CI 通過後に自動マージされるよう設定
+gh pr merge <main向けPR番号>    --merge  --auto   # main はMerge commit
+gh pr merge <develop向けPR番号> --squash --auto   # develop はSquash and merge
 ```
 
 ---
@@ -230,10 +237,12 @@ PR に対して以下の CI が自動で実行される：
 
 ### マージ戦略
 
-| マージ先  | 推奨方式             | 理由                                       |
-| --------- | -------------------- | ------------------------------------------ |
-| `develop` | **Squash and merge** | feature ブランチの細かいコミットをまとめる |
-| `main`    | **Merge commit**     | リリース履歴を明確に残す                   |
+| マージ先  | 推奨方式             | CLI オプション  | 理由                                       |
+| --------- | -------------------- | --------------- | ------------------------------------------ |
+| `develop` | **Squash and merge** | `--squash`      | feature ブランチの細かいコミットをまとめる |
+| `main`    | **Merge commit**     | `--merge`       | リリース履歴を明確に残す                   |
+
+> **auto-merge 有効**: `--auto` を付けると CI 通過後に自動マージされる。`gh pr merge <番号> --squash --auto` のように使う。
 
 ---
 
@@ -250,6 +259,7 @@ PR に対して以下の CI が自動で実行される：
 | Require a pull request before merging | ✅（レビュー承認は不要）         |
 | Require status checks to pass: `Test` | ✅（strict: ベース最新化が必要） |
 | Block force pushes                    | ✅                               |
+| Allow auto-merge                      | ✅                               |
 
 ### `develop` ブランチ
 
@@ -260,6 +270,7 @@ PR に対して以下の CI が自動で実行される：
 | Require a pull request before merging | ✅（レビュー承認は不要）         |
 | Require status checks to pass: `Test` | ✅（strict: ベース最新化が必要） |
 | Block force pushes                    | ✅                               |
+| Allow auto-merge                      | ✅                               |
 
 ---
 
