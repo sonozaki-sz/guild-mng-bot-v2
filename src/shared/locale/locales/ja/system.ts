@@ -361,6 +361,27 @@ export const system = {
 
   // Discord エラー通知
   "discord.error_notification_title": "🚨 {{appName}} エラー通知",
+
+  // メンバーログ機能ログ
+  // guildMemberAdd/Remove イベント処理結果ログ
+  "member-log.join_notification_sent":
+    "[メンバーログ機能] 参加通知を送信 GuildId: {{guildId}} UserId: {{userId}}",
+  "member-log.leave_notification_sent":
+    "[メンバーログ機能] 退出通知を送信 GuildId: {{guildId}} UserId: {{userId}}",
+  "member-log.notification_failed":
+    "[メンバーログ機能] 通知送信失敗 GuildId: {{guildId}}",
+  "member-log.channel_not_found":
+    "[メンバーログ機能] チャンネルが見つかりません GuildId: {{guildId}} ChannelId: {{channelId}}",
+  // 設定コマンド操作ログ
+  "member-log.config_set_channel":
+    "[メンバーログ機能] チャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "member-log.config_enabled": "[メンバーログ機能] 有効化 GuildId: {{guildId}}",
+  "member-log.config_disabled":
+    "[メンバーログ機能] 無効化 GuildId: {{guildId}}",
+  "member-log.config_join_message_set":
+    "[メンバーログ機能] 参加メッセージ設定 GuildId: {{guildId}}",
+  "member-log.config_leave_message_set":
+    "[メンバーログ機能] 退出メッセージ設定 GuildId: {{guildId}}",
 } as const;
 
 export type SystemTranslations = typeof system;

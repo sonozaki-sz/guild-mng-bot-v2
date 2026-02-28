@@ -124,8 +124,14 @@ export interface StickMessage {
 }
 
 export interface MemberLogConfig {
+  // 機能有効フラグ
+  enabled: boolean;
   // 参加/退出ログ送信先
   channelId?: string;
+  // カスタム参加メッセージ（{user}/{username}/{count} 置換可）
+  joinMessage?: string;
+  // カスタム退出メッセージ（{user}/{username}/{count} 置換可）
+  leaveMessage?: string;
 }
 
 // ============================================================

@@ -259,6 +259,46 @@ export const commands = {
   "message-delete.modal.before.placeholder":
     "例: 2026-02-28 または 2026-02-28T23:59:59",
 
+  // メンバーログ設定コマンド
+  // スラッシュコマンド本体とサブコマンド説明
+  "member-log-config.description": "メンバーログ機能の設定（管理者専用）",
+  "member-log-config.set-channel.description": "通知チャンネルを設定",
+  "member-log-config.set-channel.channel.description":
+    "通知を送信するテキストチャンネル",
+  "member-log-config.enable.description": "メンバーログ機能を有効化",
+  "member-log-config.disable.description": "メンバーログ機能を無効化",
+  "member-log-config.set-join-message.description":
+    "カスタム参加メッセージを設定",
+  "member-log-config.set-join-message.message.description":
+    "参加メッセージ（{user}, {username}, {count} を使用可）",
+  "member-log-config.set-leave-message.description":
+    "カスタム退出メッセージを設定",
+  "member-log-config.set-leave-message.message.description":
+    "退出メッセージ（{user}, {username}, {count} を使用可）",
+  "member-log-config.view.description": "現在の設定を表示",
+  // メンバーログ設定コマンド レスポンス
+  "member-log-config.embed.success_title": "設定完了",
+  "member-log-config.embed.title": "メンバーログ機能",
+  "member-log-config.embed.not_configured":
+    "メンバーログが設定されていません。",
+  "member-log-config.embed.set_channel_success":
+    "通知チャンネルを {{channel}} に設定しました",
+  "member-log-config.embed.enable_success": "メンバーログ機能を有効化しました",
+  "member-log-config.embed.enable_error_no_channel":
+    "通知チャンネルが設定されていません。先に /member-log-config set-channel を実行してください。",
+  "member-log-config.embed.disable_success": "メンバーログ機能を無効化しました",
+  "member-log-config.embed.set_join_message_success":
+    "参加メッセージを設定しました",
+  "member-log-config.embed.set_leave_message_success":
+    "退出メッセージを設定しました",
+  "member-log-config.embed.field.status": "状態",
+  "member-log-config.embed.field.channel": "通知チャンネル",
+  "member-log-config.embed.field.join_message": "参加メッセージ",
+  "member-log-config.embed.field.leave_message": "退出メッセージ",
+  // エラー
+  "member-log-config.errors.text_channel_only":
+    "テキストチャンネルを指定してください。",
+
   // スティッキーメッセージコマンド
   "sticky-message.description":
     "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）",

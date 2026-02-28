@@ -28,6 +28,32 @@ export const events = {
     "Bumpリマインダーのメンションリストに登録されていません。",
   "bump-reminder.panel.success_title": "設定完了",
   "bump-reminder.panel.error": "メンション設定の更新に失敗しました",
+
+  // メンバーログ機能のEmbed
+  // 参加通知Embedのフィールドラベル・フッター
+  "member-log.join.title": "👋 新しいメンバーが参加しました！",
+  "member-log.join.fields.username": "ユーザー",
+  "member-log.join.fields.accountCreated": "アカウント作成日時",
+  "member-log.join.fields.serverJoined": "サーバー参加日時",
+  "member-log.join.fields.memberCount": "メンバー数",
+  "member-log.join.footer": "ようこそ！",
+  // 退出通知Embedのフィールドラベル・フッター
+  "member-log.leave.title": "👋 メンバーが退出しました",
+  "member-log.leave.fields.username": "ユーザー",
+  "member-log.leave.fields.accountCreated": "アカウント作成日時",
+  "member-log.leave.fields.serverJoined": "サーバー参加日時",
+  "member-log.leave.fields.serverLeft": "サーバー退出日時",
+  "member-log.leave.fields.stayDuration": "滞在期間",
+  "member-log.leave.fields.memberCount": "メンバー数",
+  "member-log.leave.footer": "またね！",
+  // 日・単位ラベル
+  "member-log.days": "{{count}}日",
+  "member-log.unknown": "不明",
+  // 経過期間フォーマット
+  "member-log.age.years": "{{count}}年",
+  "member-log.age.months": "{{count}}ヶ月",
+  "member-log.age.days": "{{count}}日",
+  "member-log.age.separator": "",
 } as const;
 
 export type EventsTranslations = typeof events;

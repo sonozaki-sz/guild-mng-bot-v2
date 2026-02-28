@@ -41,8 +41,9 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().optional(),
 
   // ログレベル
+  // Winston 標準レベル: error(0) warn(1) info(2) http(3) verbose(4) debug(5) silly(6)
   LOG_LEVEL: z
-    .enum(["trace", "debug", "info", "warn", "error"])
+    .enum(["error", "warn", "info", "http", "verbose", "debug", "silly"])
     .default("info"),
 
   // テストモード（機能のテスト用動作を有効化）

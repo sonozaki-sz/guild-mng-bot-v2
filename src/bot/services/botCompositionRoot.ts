@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import { createMemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
 import { createMessageDeleteUserSettingService } from "../../shared/features/message-delete/messageDeleteUserSettingService";
 import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
@@ -24,6 +25,7 @@ import {
   setBotBumpReminderRepository,
 } from "./botBumpReminderDependencyResolver";
 import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
+import { setBotMemberLogConfigService } from "./botMemberLogDependencyResolver";
 import { setBotMessageDeleteUserSettingService } from "./botMessageDeleteDependencyResolver";
 import {
   setBotStickyMessageConfigService,
@@ -80,4 +82,10 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
     messageDeleteUserSettingRepository,
   );
   setBotMessageDeleteUserSettingService(messageDeleteUserSettingService);
+
+  // member-log 設定サービスを初期化
+  const memberLogConfigService = createMemberLogConfigService(
+    guildConfigRepository,
+  );
+  setBotMemberLogConfigService(memberLogConfigService);
 }

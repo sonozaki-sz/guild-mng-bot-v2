@@ -101,7 +101,15 @@ describe("Environment Configuration", () => {
     });
 
     it("should accept valid LOG_LEVEL values", async () => {
-      const validLevels = ["trace", "debug", "info", "warn", "error"];
+      const validLevels = [
+        "error",
+        "warn",
+        "info",
+        "http",
+        "verbose",
+        "debug",
+        "silly",
+      ];
 
       // 有効な LOG_LEVEL 値を順番に検証
       for (const level of validLevels) {

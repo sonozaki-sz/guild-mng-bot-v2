@@ -27,6 +27,32 @@ export const events = {
     "You are not in the bump reminder mention list.",
   "bump-reminder.panel.success_title": "Settings Updated",
   "bump-reminder.panel.error": "Failed to update mention settings",
+
+  // Member log feature embeds
+  // Join notification embed field labels and footer
+  "member-log.join.title": "👋 A new member has joined!",
+  "member-log.join.fields.username": "User",
+  "member-log.join.fields.accountCreated": "Account Created",
+  "member-log.join.fields.serverJoined": "Joined Server At",
+  "member-log.join.fields.memberCount": "Member Count",
+  "member-log.join.footer": "Welcome!",
+  // Leave notification embed field labels and footer
+  "member-log.leave.title": "👋 A member has left",
+  "member-log.leave.fields.username": "User",
+  "member-log.leave.fields.accountCreated": "Account Created",
+  "member-log.leave.fields.serverJoined": "Joined Server At",
+  "member-log.leave.fields.serverLeft": "Left Server At",
+  "member-log.leave.fields.stayDuration": "Stay Duration",
+  "member-log.leave.fields.memberCount": "Member Count",
+  "member-log.leave.footer": "See you!",
+  // Days unit label
+  "member-log.days": "{{count}} days",
+  "member-log.unknown": "Unknown",
+  // Duration format
+  "member-log.age.years": "{{count}}yr",
+  "member-log.age.months": "{{count}}mo",
+  "member-log.age.days": "{{count}}d",
+  "member-log.age.separator": " ",
 } as const;
 
 export type EventsTranslations = typeof events;

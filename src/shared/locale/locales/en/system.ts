@@ -351,6 +351,26 @@ export const system = {
 
   // Discord error notification
   "discord.error_notification_title": "🚨 {{appName}} Error Notification",
+
+  // Member log feature logs
+  // guildMemberAdd/Remove event processing outcome logs
+  "member-log.join_notification_sent":
+    "[MemberLog] join notification sent GuildId: {{guildId}} UserId: {{userId}}",
+  "member-log.leave_notification_sent":
+    "[MemberLog] leave notification sent GuildId: {{guildId}} UserId: {{userId}}",
+  "member-log.notification_failed":
+    "[MemberLog] failed to send notification GuildId: {{guildId}}",
+  "member-log.channel_not_found":
+    "[MemberLog] channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
+  // Config command operation logs
+  "member-log.config_set_channel":
+    "[MemberLog] channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "member-log.config_enabled": "[MemberLog] enabled GuildId: {{guildId}}",
+  "member-log.config_disabled": "[MemberLog] disabled GuildId: {{guildId}}",
+  "member-log.config_join_message_set":
+    "[MemberLog] join message set GuildId: {{guildId}}",
+  "member-log.config_leave_message_set":
+    "[MemberLog] leave message set GuildId: {{guildId}}",
 } as const;
 
 export type SystemTranslations = typeof system;

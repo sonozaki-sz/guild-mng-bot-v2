@@ -3,6 +3,8 @@
 
 import { channelDeleteEvent } from "./channelDelete";
 import { clientReadyEvent } from "./clientReady";
+import { guildMemberAddEvent } from "./guildMemberAdd";
+import { guildMemberRemoveEvent } from "./guildMemberRemove";
 import { interactionCreateEvent } from "./interactionCreate";
 import { messageCreateEvent } from "./messageCreate";
 import { voiceStateUpdateEvent } from "./voiceStateUpdate";
@@ -13,6 +15,8 @@ import { voiceStateUpdateEvent } from "./voiceStateUpdate";
  */
 export const events = [
   channelDeleteEvent,
+  guildMemberAddEvent,
+  guildMemberRemoveEvent,
   interactionCreateEvent,
   clientReadyEvent,
   messageCreateEvent,
