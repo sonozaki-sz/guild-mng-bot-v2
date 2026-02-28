@@ -34,10 +34,13 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends openssl gosu \
     && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
-
 # corepack キャッシュを /app 以下に設定（app ユーザーが書き込み可能にするため）
+# ※ corepack prepare より前に設定しないと pnpm がデフォルト場所にキャッシュされ、
+#   その後 COREPACK_HOME が変わると pnpm install 時に見つからず失敗する
 ENV COREPACK_HOME=/app/.cache/corepack
+RUN mkdir -p /app/.cache/corepack
+
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 # 本番依存のみインストール
 COPY package.json pnpm-lock.yaml ./
@@ -54,8 +57,8 @@ COPY prisma.config.ts ./
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# ストレージ・ログ・corepack キャッシュディレクトリを作成
-RUN mkdir -p /app/storage /app/logs /app/.cache/corepack
+# ストレージ・ログディレクトリを作成（corepack キャッシュは上で作成済み）
+RUN mkdir -p /app/storage /app/logs
 
 # アプリファイルの所有権を node ユーザーに設定
 # (マウントされるボリューム /app/storage、/app/logs は entrypoint で起動時に修正)
