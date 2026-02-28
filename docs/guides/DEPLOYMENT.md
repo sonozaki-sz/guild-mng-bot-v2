@@ -172,6 +172,28 @@ docker logs ayasono-bot --tail 50
 - `/opt/ayasono/.env` の各変数が正しく設定されているか確認
 - `sqlite_data` ボリュームの権限エラーがないか確認
 
+### SQLITE_READONLY エラーが発生する (データベース書き込み不可)
+
+**症状**: Bump リマインダーなど書き込み操作で `SQLITE_READONLY: attempt to write a readonly database` が発生する。
+**原因**: `sqlite_data` ボリューム内の `db.sqlite` (および WAL ファイル) が root 所有になっており、node ユーザーで動くアプリが書き込めない状態。過去のデプロイで root 権限のプロセスがファイルを作成した場合に発生する。
+
+#### 緊急修復手順（現在稼働中のコンテナへの即時対応）
+
+```bash
+ssh deploy@<VPS_IP>
+
+# コンテナ内のストレージファイル所有者を確認
+docker exec ayasono-bot ls -la /app/storage/
+
+# node:node (UID 1000) 以外が所有者の場合は修正
+docker exec -u root ayasono-bot chown -R node:node /app/storage
+
+# 修正後に確認
+docker exec ayasono-bot ls -la /app/storage/
+```
+
+> **恒久対応済み**: `docker-entrypoint.sh` がコンテナ起動時に自動で `chown -R node:node /app/storage` を実行するよう修正済み。次回デプロイ後は自動的に解消される。
+
 ### Discord 通知の Portainer リンクが機能しない
 
 - `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` が正しく設定されているか確認
