@@ -122,6 +122,34 @@ export const commands = {
 const message = await tGuild(guildId, "commands:newCommand.success");
 ```
 
+> **⚠️ 重要**: コマンド実装において Discord ユーザーの目に触れる文字列はすべて `tDefault()` 経由にする。生文字列のハードコードは **禁止**。詳細は次節参照。
+
+## 🚫 コマンド実装における生文字列禁止
+
+Discord ユーザーの目に触れる **すべての文字列** をロケールキー経由にする。
+
+対象は以下をすべて含む:
+
+| 対象                                                 | 例                         |
+| ---------------------------------------------------- | -------------------------- |
+| `editReply` / `followUp` / `reply` の `content:`     | エラー通知・確認メッセージ |
+| Embed のタイトル・説明文・フィールド名/値            | サマリー・結果表示         |
+| ボタンのラベル（`setLabel`）                         | 「削除する」「キャンセル」 |
+| セレクトメニューのプレースホルダー・オプションラベル | 「チャンネルを選択」       |
+| モーダルのタイトル・ラベル・プレースホルダー         | 入力フォーム               |
+
+```typescript
+// ❌ 禁止: 生文字列のハードコード
+await interaction.editReply("削除しました");
+new ButtonBuilder().setLabel("削除する");
+
+// ✅ 正しい: tDefault() 経由
+await interaction.editReply(tDefault("commands:foo.success"));
+new ButtonBuilder().setLabel(tDefault("commands:foo.btn_delete"));
+```
+
+キーは `ja/commands.ts` と `en/commands.ts` に **同時に** 追加する。片方だけの追加は不完全。
+
 ## 🔧 名前空間
 
 | 名前空間   | 用途                 | 例                             |
@@ -222,6 +250,15 @@ logger.info("VAC channel created");
 3. **補間を使う**: 動的な値は `{{variable}}` で
 4. **型安全性を活用**: TypeScriptの補完とエラー検出を利用
 5. **全言語で同じキー**: すべての言語で同じキー構造を維持
+6. **Embedユーティリティに渡す文字列に絵文字を含めない**:
+   `createWarningEmbed` / `createErrorEmbed` / `createInfoEmbed` / `createSuccessEmbed` は
+   タイトルに絵文字を**自動付与**するため、description に渡すロケール文字列には絵文字を入れない。
+   `new EmbedBuilder().setTitle()` や `content:` に直接渡す場合は絵文字を含めてよい。
+
+   ```typescript
+   // ❌ "⚠️ 条件が不正です" → タイトルとdescriptionで二重になる
+   // ✅ "条件が不正です"    → タイトル "⚠️ 警告" + description "条件が不正です"
+   ```
 
 ## 🐛 トラブルシューティング
 
