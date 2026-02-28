@@ -7,7 +7,9 @@ import { ValidationError } from "@/shared/errors/customErrors";
 const ensurePermissionMock = vi.fn();
 const setLeaveMessageMock = vi.fn();
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
-const tDefaultMock = vi.fn((key: string) => key);
+const tDefaultMock = vi.fn(
+  (key: string, _opts?: Record<string, unknown>) => key,
+);
 const loggerInfoMock = vi.fn();
 const createSuccessEmbedMock = vi.fn(
   (desc: string, opts?: { title?: string }) => ({

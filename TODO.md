@@ -2,7 +2,7 @@
 
 > プロジェクト全体のタスク管理と残件リスト
 
-最終更新: 2026年2月28日
+最終更新: 2026年3月1日
 
 ---
 
@@ -10,8 +10,8 @@
 
 ### 残タスク統計
 
-- 残タスク合計: **54件**
-- bot優先対象（1～3）: **31件**
+- 残タスク合計: **42件**
+- bot優先対象（1～3）: **19件**
 - デプロイ・運用（4）: **11件**
 - Web UI実装（5 / 凍結中）: **12件**
 
@@ -19,7 +19,7 @@
 
 | No. | 内容               | 残件 | 状態 |
 | --- | ------------------ | ---- | ---- |
-| 1   | 主要機能実装       | 19   | 🚧   |
+| 1   | 主要機能実装       | 7    | 🛠️   |
 | 2   | 基本コマンド追加   | 6    | 📋   |
 | 3   | テスト・品質向上   | 6    | 🚧   |
 | 4   | デプロイ・運用     | 11   | 🚧   |
@@ -33,7 +33,7 @@
 
 > 運用方針（2026-02-21）: Web系（5系統）は一旦凍結し、bot層（1〜3）を優先。bot層が安定したら4（デプロイ・運用）へ進み、5（Web UI実装）を再開する。
 
-### 1. 主要機能実装 - 残19件
+### 1. 主要機能実装 - 残7件
 
 #### 1.1 VC自動作成機能（VAC） - 残1件
 
@@ -53,25 +53,25 @@
 
 **仕様書**: [docs/specs/STICKY_MESSAGE_SPEC.md](docs/specs/STICKY_MESSAGE_SPEC.md)
 
-#### 1.3 メンバーログ機能 - 残5件
+#### 1.3 メンバーログ機能 - ✅ 完了
 
-- [ ] guildMemberAdd、guildMemberRemoveイベントハンドラ作成
-- [ ] Embed形式の通知メッセージ実装
-- [ ] `/member-log-config` コマンド実装（set-channel、enable、disable、show）
-- [ ] Prisma Schema更新（MemberLogConfig）
-- [ ] テスト実装
+- [x] guildMemberAdd、guildMemberRemoveイベントハンドラ作成
+- [x] Embed形式の通知メッセージ実装
+- [x] `/member-log-config` コマンド実装（set-channel、enable、disable、set-join-message、set-leave-message、show）
+- [x] Prisma Schema更新（memberLogConfig JSONフィールド）
+- [x] テスト実装
 
 **仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md)
 
-#### 1.4 メッセージ削除機能 - 残7件
+#### 1.4 メッセージ削除機能 - ✅ 完了
 
-- [ ] `/message-delete` コマンド実装（user / keyword / count / days / after / before / channel オプション）
-- [ ] サーバー全チャンネル横断削除（channel 未指定時）
-- [ ] 実行確認ダイアログ（`/message-delete-config confirm` でスキップ設定）
-- [ ] ユーザー設定の永続化（`skipConfirm` を DB に保存）
-- [ ] 削除結果詳細表示（ページネイション＋フィルター）
-- [ ] 権限チェック（MANAGE_MESSAGES / VIEW_CHANNEL）・削除実行ログ
-- [ ] テスト実装
+- [x] `/message-delete` コマンド実装（user / bot / keyword / count / days / after / before / channel オプション）
+- [x] 容認範囲内チャンネル削除（channel 未指定時は現在チャンネル）
+- [x] 実行確認ダイアログ（`/message-delete-config confirm` でスキップ設定）
+- [x] ユーザー設定の永続化（`skipConfirm` をメモリ保持・ DB 東洋小子経由保存）
+- [x] 削除結果表示（Embed形式）
+- [x] 権限チェック（MANAGE_MESSAGES）
+- [x] テスト実装
 
 **仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md)
 
@@ -187,7 +187,7 @@
 
 ## 🎯 優先度別タスク
 
-1. **主要機能実装** - 19件
+1. **主要機能実装** - 7件
 2. **基本コマンド追加** - 6件
 3. **テスト・品質向上** - 6件
 4. **デプロイ・運用** - 11件
@@ -273,8 +273,8 @@
 2. ~~**Botエラー時の Discord 通知実装**（セクション 4.3）~~ ✅ **完了**
 
 3. **主要機能実装**（セクション 1）
-   - メンバーログ機能（`guildMemberAdd` / `guildMemberRemove` + `/member-log-config`）
-   - メッセージ削除機能（`/message-delete`）
+   - ~~メンバーログ機能（`guildMemberAdd` / `guildMemberRemove` + `/member-log-config`）~~ ✅ **完了**
+   - ~~メッセージ削除機能（`/message-delete`）~~ ✅ **完了**
    - VAC E2E検証
 
 4. **E2Eフェーズ実装の着手**
@@ -288,5 +288,5 @@
 
 ---
 
-**最終更新**: 2026年2月28日
-**次のマイルストーン**: 主要機能実装（メンバーログ・メッセージ削除）→ E2E テスト着手
+**最終更新**: 2026年3月1日
+**次のマイルストーン**: VC募集機能実装 → E2E テスト着手
