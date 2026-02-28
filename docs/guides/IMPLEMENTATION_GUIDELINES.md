@@ -297,16 +297,27 @@ new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
 
 - 必須: 関数宣言（`function` / `export function` / `async function`）の先頭に「何をする関数か」を記載
 - 必須: 引数がある場合は `@param`、戻り値を持つ場合は `@returns` を記載
-- 推奨: クラスメソッド・アロー関数にも同等の意図コメントを付与する
-- 例:
+- **必須: クラスの public メソッドにも同等の JSDoc を付与する**（`private` は推奨）
+- アロー関数にも同等の意図コメントを付与することを推奨する
+- **説明文だけの JSDoc ブロックは不完全とみなす。`@param`/`@returns` を必ずセットで記載すること**
 
 ```ts
+// ❌ NG: 説明文のみで @param / @returns が抜けている
+/**
+ * ギルド設定を取得する
+ */
+async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ... }
+
+// ✅ OK: @param / @returns をセットで記載
 /**
  * ギルド設定を取得する
  * @param guildId 取得対象のギルドID
  * @returns ギルド設定（未設定時は null）
  */
+async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ... }
 ```
+
+> **背景**: message-delete 機能の実装時（2026-02-28）に、JSDoc の説明文は存在するが `@param`/`@returns` が抜けている関数が複数あり後から一括追加が必要になった事例。再発防止のためルール明示した。
 
 ### 3. 変数・定数コメント
 
@@ -361,6 +372,7 @@ new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
 - ファイル先頭コメント不足: 0
 - 関数コメント不足（関数宣言ベース）: 0
 - コメント不足検出分は反映済みとして、以後は同手順で差分監査する
+- **注意: 「説明文のみの JSDoc(`@param`/`@returns` なし)」も不備としてカウントする（2026-02-28 ルール改訂により追記）**
 
 ### src整備フェーズ運用順序
 
@@ -388,7 +400,8 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] ファイル名は命名規則に従っている（基本 camelCase / SlashCommand 系は kebab-case）
 - [ ] ディレクトリ名は kebab-case になっている
 - [ ] ファイル先頭コメントがある
-- [ ] 関数宣言に `@param` / `@returns` がある
+- [ ] 関数宣言に JSDoc がある（説明文のみは不可。`@param` / `@returns` をセットで記載）
+- [ ] クラスの public メソッドにも JSDoc（`@param` / `@returns` 含む）がある
 - [ ] 共用定数に説明コメントがある
 - [ ] 処理ブロックの意図コメントがある
 - [ ] テストの全 `it()` ブロックの直前に `//` コメントがある
