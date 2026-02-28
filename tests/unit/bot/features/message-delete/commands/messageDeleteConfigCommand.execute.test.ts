@@ -1,11 +1,12 @@
 // tests/unit/bot/features/message-delete/commands/messageDeleteConfigCommand.execute.test.ts
+import type { Mock } from "vitest";
 
 const tDefaultMock = vi.fn((key: string, opts?: Record<string, unknown>) =>
   opts ? `${key}:${JSON.stringify(opts)}` : key,
 );
-const handleCommandErrorMock = vi.fn();
-const updateUserSettingMock = vi.fn();
-const getBotMessageDeleteUserSettingServiceMock = vi.fn(() => ({
+const handleCommandErrorMock: Mock = vi.fn();
+const updateUserSettingMock: Mock = vi.fn();
+const getBotMessageDeleteUserSettingServiceMock: Mock = vi.fn(() => ({
   updateUserSetting: updateUserSettingMock,
 }));
 
@@ -20,12 +21,20 @@ vi.mock("@/bot/services/botMessageDeleteDependencyResolver", () => ({
     getBotMessageDeleteUserSettingServiceMock,
 }));
 
+interface FakeInteraction {
+  guildId: string | null;
+  user: { id: string };
+  deferReply: Mock;
+  editReply: Mock;
+  options: { getBoolean: Mock };
+}
+
 function createInteraction(
   opts: {
     guildId?: string | null;
     confirmEnabled?: boolean;
   } = {},
-) {
+): FakeInteraction {
   const { guildId = "guild-1", confirmEnabled = true } = opts;
   return {
     guildId,

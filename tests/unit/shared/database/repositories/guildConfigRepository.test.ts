@@ -202,7 +202,10 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     await repository.getStickMessages("g1");
     await repository.updateStickMessages("g1", []);
     await repository.getMemberLogConfig("g1");
-    await repository.updateMemberLogConfig("g1", { channelId: "x" });
+    await repository.updateMemberLogConfig("g1", {
+      enabled: true,
+      channelId: "x",
+    });
 
     const stickStoreCtorArgs = (constructors.GuildStickMessageStore as Mock)
       .mock.calls[0] as unknown[] | undefined;

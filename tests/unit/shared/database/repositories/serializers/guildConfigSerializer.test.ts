@@ -109,7 +109,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
       },
       bumpReminderConfig: { enabled: false, mentionUserIds: ["u"] },
       stickMessages: [{ channelId: "c", messageId: "m" }],
-      memberLogConfig: { channelId: "log" },
+      memberLogConfig: { enabled: true, channelId: "log" },
     });
 
     expect(result).toEqual({
@@ -119,7 +119,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
         '{"enabled":true,"triggerChannelIds":["t"],"createdChannels":[]}',
       bumpReminderConfig: '{"enabled":false,"mentionUserIds":["u"]}',
       stickMessages: '[{"channelId":"c","messageId":"m"}]',
-      memberLogConfig: '{"channelId":"log"}',
+      memberLogConfig: '{"enabled":true,"channelId":"log"}',
     });
   });
 
