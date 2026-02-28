@@ -42,9 +42,9 @@ RUN mkdir -p /app/.cache/corepack
 
 RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
-# 本番依存のみインストール
+# 本番依存のみインストール（--ignore-scripts で prepare/husky 等を無効化）
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 # ビルド成果物・Prisma クライアントをコピー
 COPY --from=builder /app/dist ./dist
