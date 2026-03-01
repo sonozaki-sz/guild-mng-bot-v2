@@ -61,7 +61,7 @@ jobs:
       (needs.test.result == 'success' || needs.test.result == 'skipped')
     permissions:
       contents: read
-      packages: write
+      packages: write # イメージのプッシュ・削除に必要
 
     steps:
       - uses: actions/checkout@v4
@@ -98,6 +98,14 @@ jobs:
           source: docker-compose.prod.yml
           target: /opt/ayasono/
 
+      - name: GHCR の古いイメージを削除（最新 3 件を保持）
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ayasono
+          package-type: container
+          min-versions-to-keep: 3
+          ignore-versions: "^latest$"
+
       - name: SSH でデプロイ
         uses: appleboy/ssh-action@v1
         with:
@@ -110,6 +118,8 @@ jobs:
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker logout ghcr.io
+            # pull 後に残るダングリングイメージを削除
+            docker image prune -f
             echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
 
   # ─────────────────────────────────────────────
