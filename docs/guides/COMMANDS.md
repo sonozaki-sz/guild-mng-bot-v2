@@ -420,13 +420,13 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 スティッキーメッセージを設定します。コマンド実行後にモーダルポップアップで内容を入力します。
 
 ```
-/sticky-message set [channel:<チャンネル>] [mode:<text|embed>]
+/sticky-message set [channel:<チャンネル>] [style:<text|embed>]
 ```
 
 **オプション:**
 
 - `channel` (任意): スティッキーメッセージを設定するテキストチャンネル（省略時はコマンド実行チャンネル）
-- `mode` (任意): 表示形式— `text`（デフォルト）または `embed`
+- `style` (任意): 表示スタイル— `text`（デフォルト）または `embed`
 
 > メッセージ内容（テキスト / Embed タイトル・説明・カラー）はコマンド実行後に表示される**モーダル**で入力します。
 
@@ -435,11 +435,11 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 **使用例:**
 
 ```
-# プレーンテキスト（mode 未指定）
+# プレーンテキスト（style 未指定）
 /sticky-message set channel:#rules
 
 # Embed形式
-/sticky-message set channel:#rules mode:embed
+/sticky-message set channel:#rules style:embed
 ```
 
 ---
@@ -465,15 +465,15 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 既存のスティッキーメッセージの内容を上書き更新します。旧メッセージを削除し新しい内容で即時再送信します。
 
 ```
-/sticky-message update [channel:<チャンネル>] [mode:<text|embed>]
+/sticky-message update [channel:<チャンネル>] [style:<text|embed>]
 ```
 
 **オプション:**
 
 - `channel` (任意): 更新対象のチャンネル（省略時はコマンド実行チャンネル）
-- `mode` (任意): 表示形式— `text`（デフォルト）または `embed`
+- `style` (任意): 表示スタイル— `text`（デフォルト）または `embed`
 
-> 更新内容はコマンド実行後に表示される**モーダル**で入力します。`mode` を切り替えることでテキスト↔Embed間の変更も可能です。
+> 更新内容はコマンド実行後に表示される**モーダル**で入力します。`style` を切り替えることでテキスト↔Embed間の変更も可能です。
 
 **権限:** チャンネル管理（`MANAGE_CHANNELS`）
 
@@ -484,7 +484,7 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 /sticky-message update channel:#rules
 
 # Embed形式に切り替えてタイトル・内容を変更する
-/sticky-message update channel:#rules mode:embed
+/sticky-message update channel:#rules style:embed
 ```
 
 ---

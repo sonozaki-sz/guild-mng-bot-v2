@@ -74,7 +74,7 @@ export async function handleStickyMessageSet(
   }
 
   const useEmbed =
-    interaction.options.getString(STICKY_MESSAGE_COMMAND.OPTION.MODE) ===
+    interaction.options.getString(STICKY_MESSAGE_COMMAND.OPTION.STYLE) ===
     STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED;
 
   if (useEmbed) {

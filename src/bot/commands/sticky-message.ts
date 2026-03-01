@@ -23,8 +23,8 @@ export const stickyMessageCommand: Command = {
     const setChannelDesc = getCommandLocalizations(
       "sticky-message.set.channel.description",
     );
-    const setModeDesc = getCommandLocalizations(
-      "sticky-message.set.mode.description",
+    const setStyleDesc = getCommandLocalizations(
+      "sticky-message.set.style.description",
     );
     // update サブコマンド
     const updateDesc = getCommandLocalizations(
@@ -33,8 +33,8 @@ export const stickyMessageCommand: Command = {
     const updateChannelDesc = getCommandLocalizations(
       "sticky-message.update.channel.description",
     );
-    const updateModeDesc = getCommandLocalizations(
-      "sticky-message.update.mode.description",
+    const updateStyleDesc = getCommandLocalizations(
+      "sticky-message.update.style.description",
     );
     // remove / view サブコマンド
     const removeDesc = getCommandLocalizations(
@@ -66,9 +66,9 @@ export const stickyMessageCommand: Command = {
             )
             .addStringOption((opt) =>
               opt
-                .setName(STICKY_MESSAGE_COMMAND.OPTION.MODE)
-                .setDescription(setModeDesc.ja)
-                .setDescriptionLocalizations(setModeDesc.localizations)
+                .setName(STICKY_MESSAGE_COMMAND.OPTION.STYLE)
+                .setDescription(setStyleDesc.ja)
+                .setDescriptionLocalizations(setStyleDesc.localizations)
                 .addChoices(
                   {
                     name: "text",
@@ -118,9 +118,9 @@ export const stickyMessageCommand: Command = {
             )
             .addStringOption((opt) =>
               opt
-                .setName(STICKY_MESSAGE_COMMAND.OPTION.MODE)
-                .setDescription(updateModeDesc.ja)
-                .setDescriptionLocalizations(updateModeDesc.localizations)
+                .setName(STICKY_MESSAGE_COMMAND.OPTION.STYLE)
+                .setDescription(updateStyleDesc.ja)
+                .setDescriptionLocalizations(updateStyleDesc.localizations)
                 .addChoices(
                   {
                     name: "text",

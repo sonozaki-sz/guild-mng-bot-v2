@@ -157,7 +157,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     );
   });
 
-  it("shows plain text modal when getString returns null (defaults to text mode)", async () => {
+  it("shows plain text modal when getString returns null (defaults to text style)", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     findByChannelMock.mockResolvedValue(null);

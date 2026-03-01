@@ -47,7 +47,7 @@
 1. `/sticky-message set` コマンドを実行
    ↓
 2. オプションでメッセージ内容を入力
-   - mode: 表示形式の選択 (String スラッシュオプション: text / embed)
+   - style: 表示スタイルの選択 (String スラッシュオプション: text / embed)
    - message / embed-title / embed-description / embed-color: モーダル入力
    ↓
 3. 指定チャンネルにメッセージを送信
@@ -89,10 +89,10 @@
 
 **オプション:**
 
-| オプション名 | 型             | 必須 | 説明                                                                                                |
-| ------------ | -------------- | ---- | --------------------------------------------------------------------------------------------------- |
-| `channel`    | Channel (TEXT) | ❌   | スティッキーメッセージを設定するチャンネル（省略時はコマンド実行チャンネル）                        |
-| `mode`       | String         | ❌   | 表示形式（`text`: テキストモードモーダルを表示 / `embed`: Embedモーダルを表示、デフォルト: `text`） |
+| オプション名 | 型             | 必須 | 説明                                                                                              |
+| ------------ | -------------- | ---- | ------------------------------------------------------------------------------------------------- |
+| `channel`    | Channel (TEXT) | ❌   | スティッキーメッセージを設定するチャンネル（省略時はコマンド実行チャンネル）                      |
+| `style`      | String         | ❌   | 表示スタイル（`text`: テキストモーダルを表示 / `embed`: Embedモーダルを表示、デフォルト: `text`） |
 
 > メッセージ内容（`message` / `embed-title` / `embed-description` / `embed-color`）はスラッシュオプションではなく、コマンド実行後に表示される**モーダル**で入力します。
 
@@ -101,18 +101,18 @@
 **実行例:**
 
 ```
-# テキスト形式（channel のみ、mode 未指定または mode:text）
+# テキスト形式（channel のみ、style 未指定または style:text）
 /sticky-message set channel:#rules
 # → モーダルでメッセージ内容を入力
 
 # Embed形式
-/sticky-message set channel:#rules mode:embed
+/sticky-message set channel:#rules style:embed
 # → Embed用モーダル（タイトル・説明・カラー）が表示される
 ```
 
 **モーダルイメージ:**
 
-_テキストモーダル（`mode` 未指定または `mode:text`）:_
+_テキストモーダル（`style` 未指定または `style:text`）:_
 │ │
 │ メッセージ内容 │
 │ ┌───────────────────────────────────────────────────┐ │
@@ -129,7 +129,7 @@ _テキストモーダル（`mode` 未指定または `mode:text`）:_
 
 ```
 
-_Embed モーダル（`mode:embed`）:_
+_Embed モーダル（`style:embed`）:_
 │                                                         │
 │  タイトル                                               │
 │  ┌───────────────────────────────────────────────────┐  │
@@ -217,10 +217,10 @@ _Embed モーダル（`mode:embed`）:_
 
 **オプション:**
 
-| オプション名 | 型             | 必須 | 説明                                                                                          |
-| ------------ | -------------- | ---- | --------------------------------------------------------------------------------------------- |
-| `channel`    | Channel (TEXT) | ❌   | 更新するスティッキーメッセージのチャンネル（省略時はコマンド実行チャンネル）                  |
-| `mode`       | String         | ❌   | 表示形式（`text`: テキストモーダルを表示 / `embed`: Embedモーダルを表示、デフォルト: `text`） |
+| オプション名 | 型             | 必須 | 説明                                                                                              |
+| ------------ | -------------- | ---- | ------------------------------------------------------------------------------------------------- |
+| `channel`    | Channel (TEXT) | ❌   | 更新するスティッキーメッセージのチャンネル（省略時はコマンド実行チャンネル）                      |
+| `style`      | String         | ❌   | 表示スタイル（`text`: テキストモーダルを表示 / `embed`: Embedモーダルを表示、デフォルト: `text`） |
 
 > 更新内容（`message` / `embed-title` / `embed-description` / `embed-color`）はコマンド実行後に表示される**モーダル**で入力します。
 
@@ -234,13 +234,13 @@ _Embed モーダル（`mode:embed`）:_
 # → モーダルで新しいメッセージ内容を入力
 
 # Embed形式に切り替えてタイトル・カラーを変更
-/sticky-message update channel:#rules mode:embed
+/sticky-message update channel:#rules style:embed
 # → Embed用モーダル（タイトル・説明・カラー）が表示される
 ```
 
 **モーダルイメージ:**
 
-_テキストモーダル（`mode` 未指定または `mode:text`）:_
+_テキストモーダル（`style` 未指定または `style:text`）:_
 │ │
 │ メッセージ内容 │
 │ ┌───────────────────────────────────────────────────┐ │
@@ -255,7 +255,7 @@ _テキストモーダル（`mode` 未指定または `mode:text`）:_
 
 ```
 
-_Embed モーダル（`mode:embed`）:_
+_Embed モーダル（`style:embed`）:_
 │                                                         │
 │  タイトル                                               │
 │  ┌───────────────────────────────────────────────────┐  │
@@ -564,7 +564,7 @@ function hasPermission(member: GuildMember): boolean {
 // set（スラッシュオプション）
 "sticky-message.set.description": "スティッキーメッセージを設定"
 "sticky-message.set.channel.description": "スティッキーメッセージを設定するテキストチャンネル"
-"sticky-message.set.mode.description": "表示形式（text: テキスト / embed: Embed）"
+"sticky-message.set.style.description": "表示形式（text: テキスト / embed: Embed）"
 // set（プレーンテキストモーダル）
 "sticky-message.set.modal.title": "スティッキーメッセージの内容を入力"
 "sticky-message.set.modal.message.label": "メッセージ内容"
@@ -594,7 +594,7 @@ function hasPermission(member: GuildMember): boolean {
 // update（スラッシュオプション）
 "sticky-message.update.description": "スティッキーメッセージの内容を更新"
 "sticky-message.update.channel.description": "更新対象のチャンネル"
-"sticky-message.update.mode.description": "表示形式（text: テキスト / embed: Embed）"
+"sticky-message.update.style.description": "表示形式（text: テキスト / embed: Embed）"
 // update（プレーンテキストモーダル）
 "sticky-message.update.modal.title": "スティッキーメッセージを更新"
 "sticky-message.update.modal.message.label": "メッセージ内容"

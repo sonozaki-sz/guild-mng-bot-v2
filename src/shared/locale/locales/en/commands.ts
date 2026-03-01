@@ -305,8 +305,8 @@ export const commands = {
   "sticky-message.set.description": "Set a sticky message (modal input)",
   "sticky-message.set.channel.description":
     "Text channel to set the sticky message in (defaults to this channel)",
-  "sticky-message.set.mode.description":
-    "Display format (text: plain text / embed: embed)",
+  "sticky-message.set.style.description":
+    "Display style (text: plain text / embed: embed; defaults to text)",
   // set plain text modal
   "sticky-message.set.modal.title": "Enter sticky message content",
   "sticky-message.set.modal.message.label": "Message content",
@@ -369,8 +369,8 @@ export const commands = {
     "Update the content of an existing sticky message (modal input)",
   "sticky-message.update.channel.description":
     "Channel whose sticky message to update (defaults to this channel)",
-  "sticky-message.update.mode.description":
-    "Display format (text: plain text / embed: embed)",
+  "sticky-message.update.style.description":
+    "Display style (text: plain text / embed: embed; defaults to text)",
   // update plain text modal
   "sticky-message.update.modal.title": "Update sticky message",
   "sticky-message.update.modal.message.label": "Message content",

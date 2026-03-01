@@ -140,8 +140,8 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     expect(showModalMock).toHaveBeenCalled();
   });
 
-  // getString が null を返す場合（mode 未指定）にデフォルトで text モードとなり、プレーンテキストモーダルが開かれることを検証
-  it("shows plain text update modal when getString returns null (defaults to text mode)", async () => {
+  // getString が null を返す場合（style 未指定）にデフォルトで text スタイルとなり、プレーンテキストモーダルが開かれることを検証
+  it("shows plain text update modal when getString returns null (defaults to text style)", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     findByChannelMock.mockResolvedValue({

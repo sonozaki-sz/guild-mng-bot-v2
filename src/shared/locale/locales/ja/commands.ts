@@ -307,8 +307,8 @@ export const commands = {
     "スティッキーメッセージを設定（モーダル入力）",
   "sticky-message.set.channel.description":
     "設定するテキストチャンネル（省略時はこのチャンネル）",
-  "sticky-message.set.mode.description":
-    "表示形式（text: テキスト / embed: Embed）",
+  "sticky-message.set.style.description":
+    "表示スタイル（text: テキスト / embed: Embed、省略時: text）",
   // set プレーンテキストモーダル
   "sticky-message.set.modal.title": "スティッキーメッセージの内容を入力",
   "sticky-message.set.modal.message.label": "メッセージ内容",
@@ -372,8 +372,8 @@ export const commands = {
     "スティッキーメッセージの内容を更新（モーダル入力）",
   "sticky-message.update.channel.description":
     "更新対象のチャンネル（省略時はこのチャンネル）",
-  "sticky-message.update.mode.description":
-    "表示形式（text: テキスト / embed: Embed）",
+  "sticky-message.update.style.description":
+    "表示スタイル（text: テキスト / embed: Embed、省略時: text）",
   // update プレーンテキストモーダル
   "sticky-message.update.modal.title": "スティッキーメッセージを更新",
   "sticky-message.update.modal.message.label": "メッセージ内容",

@@ -31,7 +31,7 @@ export const STICKY_MESSAGE_COMMAND = {
   },
   OPTION: {
     CHANNEL: "channel",
-    MODE: "mode",
+    STYLE: "style",
   },
   OPTION_VALUE: {
     TEXT: "text",
